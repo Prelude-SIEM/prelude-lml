@@ -1,5 +1,9 @@
 2004-01-15  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* plugins/simple/ruleset/grsecurity.rules: 
+	* plugins/simple/ruleset/ssh.rules: 
+	syslog independance...
+	
 	* src/lml-alert.c (generate_target): 
 	reuse existing target if any. We need some kind of
 	mechanism so that it is totally doable from the rulesets.
