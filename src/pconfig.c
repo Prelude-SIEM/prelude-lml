@@ -47,17 +47,23 @@
 #include "pconfig.h"
 #include "regex.h"
 #include "log-common.h"
+#include "lml-alert.h"
 #include "file-server.h"
 #include "udp-server.h"
 
 #define DEFAULT_ANALYZER_NAME "prelude-lml"
 #define DEFAULT_UDP_SERVER_PORT 514
 
+/*
+ * udp server stuff
+ */
+static char *udp_srvr_addr;
+static uint16_t udp_srvr_port;
+udp_server_t *udp_srvr = NULL;
 
 int batch_mode = 0;
 prelude_client_t *lml_client;
 static char *pidfile = NULL;
-udp_server_t *udp_srvr = NULL;
 static uid_t prelude_lml_user = 0;
 static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
@@ -66,6 +72,7 @@ static char *logfile_format = NULL, *logfile_ts_format = NULL;
 static int get_version(void *context, prelude_option_t *opt, char *buf, size_t size)
 {
         snprintf(buf, size, "prelude-lml %s", VERSION);
+        return 0;
 }
 
 
@@ -129,8 +136,8 @@ static int set_pidfile(void *context, prelude_option_t *opt, const char *arg)
                 log(LOG_ERR, "memory exhausted.\n");
                 return prelude_option_error;
         }
-                                                
-	return prelude_option_success;
+        
+        return prelude_option_success;
 }
 
 
@@ -205,36 +212,65 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int enable_udp_server(void *context, prelude_option_t *opt, const char *arg) 
+static int destroy_udp_server(void *context, prelude_option_t *opt)
 {
-        int port;
+        if ( ! udp_srvr )
+                return 0;
+                
+        log(LOG_INFO, "- Closing syslog server listening at %s:%d.\n", udp_srvr_addr, udp_srvr_port);
+
+        udp_server_close(udp_srvr);
+        udp_srvr = NULL;
+        
+        return 0;
+}
+
+
+
+static int get_udp_server(void *context, prelude_option_t *opt, char *out, size_t size)
+{
+        if ( ! udp_srvr )
+                return 0;
+        
+        snprintf(out, size, "%s:%u", udp_srvr_addr, udp_srvr_port);
+        return 0;
+}
+
+
+static int set_udp_server(void *context, prelude_option_t *opt, const char *arg) 
+{
         char *ptr = NULL;
         regex_list_t *rlist;
-        const char *addr = NULL;
+       
+        destroy_udp_server(context, opt);
         
-        port = DEFAULT_UDP_SERVER_PORT;
+        udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
 
         if ( arg ) {
-                addr = arg;
-
                 ptr = strrchr(arg, ':');
                 if ( ptr ) {
                         *ptr = 0;
-                        port = atoi(ptr + 1);
+                        udp_srvr_port = atoi(ptr + 1);
                 }
-        }
+                
+                udp_srvr_addr = strdup(arg);
+                
+                if ( ptr )
+                        *ptr = ':';
+        } 
+        
+        else udp_srvr_addr = strdup("0.0.0.0");
         
         rlist = regex_init("syslog");
         if ( ! rlist ) 
                 return prelude_option_error;
         
-        udp_srvr = udp_server_new(rlist, addr, port);        
+        udp_srvr = udp_server_new(rlist, udp_srvr_addr, udp_srvr_port);        
         if ( ! udp_srvr )
                 return prelude_option_error;
 
-        if ( ptr )
-                *ptr = ':';
-        
+        log(LOG_INFO, "- Listening for syslog message on %s:%d.\n", udp_srvr_addr, udp_srvr_port);
+
         return prelude_option_success;
 }
 
@@ -312,8 +348,9 @@ int pconfig_set(int argc, char **argv)
         prelude_option_set_priority(opt, option_run_first);
         
         opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 's', "udp-srvr",
-                           "address:port pair to listen to syslog to UDP messages (default port 514)", optionnal_argument,
-                           enable_udp_server, NULL);
+                           "address:port pair to listen to syslog to UDP messages (default port 514)", 
+                           optionnal_argument, set_udp_server, get_udp_server);
+        prelude_option_set_destroy_callback(opt, destroy_udp_server);
         prelude_option_set_priority(opt, option_run_last);
         
         prelude_option_set_priority(opt, option_run_last);

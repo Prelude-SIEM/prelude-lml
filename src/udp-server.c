@@ -117,20 +117,12 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
                 return NULL;
 	}
 
-        /*
-         * resolve provided address, or use INADDR_ANY if no address
-         * were provided.
-         */
-        if ( addr ) {
-                ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
-                if ( ret < 0 ) {
-                        log(LOG_INFO, "couldn't resolve %s.\n", addr);
-                        udp_server_close(server);
-                        return NULL;
-                }
-        } else {
-                addr = "0.0.0.0";
-                server->saddr.sin_addr.s_addr = INADDR_ANY;
+        
+        ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
+        if ( ret < 0 ) {
+                log(LOG_INFO, "couldn't resolve %s.\n", addr);
+                udp_server_close(server);
+                return NULL;
         }
         
         server->saddr.sin_family = AF_INET;
@@ -143,11 +135,6 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
                 udp_server_close(server);
                 return NULL;
 	}
-
-        log(LOG_INFO, "- Listening for syslog message on %s:%d.\n", addr, port);
                 
 	return server;
 }
-
-
-
