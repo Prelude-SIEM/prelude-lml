@@ -308,7 +308,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
 
         *offptr++ = '\0';
 
-        ret = sscanf(buf, "%" SCNu64, start);
+        ret = sscanf(buf, "%" PRELUDE_SCNu64, start);
         if ( ret != 1 ) {
                 prelude_log(PRELUDE_LOG_WARN, "error reading metadata file offset.\n");
                 return -1;
