@@ -86,7 +86,7 @@ if test x$enable_fam = xyes; then
    CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
    
    AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
-   AC_CHECK_LIB(fam, main, , fam_lib_ok="no")
+   AC_CHECK_LIB(fam, FAMOpen, , fam_lib_ok="no")
 
    LDFLAGS="$old_LDFLAGS"
    CPPFLAGS="$old_CPPFLAGS"
