@@ -280,11 +280,11 @@ int pconfig_set(int argc, char **argv)
 			   "Print this help", no_argument, print_help,
 			   NULL);
 
-	prelude_option_add(NULL, CLI_HOOK, 'v', "version",
+	prelude_option_add(NULL, CLI_HOOK|WIDE_HOOK, 'v', "version",
 			   "Print version number", no_argument,
 			   print_version, NULL);
 
-        prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'q', "quiet",
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'q', "quiet",
 			   "Quiet mode", no_argument, set_quiet_mode,
 			   NULL);
         
@@ -296,23 +296,23 @@ int pconfig_set(int argc, char **argv)
                            "Run in the specified group", required_argument,
                            set_lml_group, NULL);
         
-	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'd', "daemon",
+	prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'd', "daemon",
 			   "Run in daemon mode", no_argument,
 			   set_daemon_mode, NULL);
         
-	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'P', "pidfile",
+	opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'P', "pidfile",
                                  "Write Prelude LML PID to specified pidfile",
                                  required_argument, set_pidfile, NULL);
         prelude_option_set_priority(opt, option_run_first);
         
-        opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 's', "udp-srvr",
+        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 's', "udp-srvr",
                            "address:port pair to listen to syslog to UDP messages (default port 514)", optionnal_argument,
                            enable_udp_server, NULL);
         prelude_option_set_priority(opt, option_run_last);
         
         prelude_option_set_priority(opt, option_run_last);
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'r', "rotation-interval",
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 'r', "rotation-interval",
                            "Specifies the maximum difference, in seconds, between the interval " \
                            "of two logfiles' rotation. If this difference is reached, a high "   \
                            "severity alert will be emited", required_argument,
