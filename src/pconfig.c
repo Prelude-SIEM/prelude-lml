@@ -106,19 +106,11 @@ static int set_pidfile(const char *arg)
 
 static int set_file(const char *arg) 
 {
-        int fd, ret;
-           
-        fd = open(arg, O_RDONLY);
-        if ( fd < 0 ) {
-                log(LOG_ERR, "couldn't open %s for reading.\n", arg);
-                return prelude_option_success; /* do not stop */
-        }
-        
-        ret = file_server_monitor_file(arg, fd);
-        if ( ret < 0 ) {
-                close(fd);
+        int ret;
+                
+        ret = file_server_monitor_file(arg);
+        if ( ret < 0 ) 
                 return prelude_option_error;
-        }
         
         log(LOG_INFO, "- Added monitor for '%s'.\n", arg);
 

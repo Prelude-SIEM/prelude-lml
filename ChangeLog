@@ -1,3 +1,23 @@
+2002-05-21  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/pconfig.c (set_file): 
+	file_server_monitor_file() now open the file by itself.
+
+	* src/file-server.c: 
+	use list instead of array to store monitor. Now we have
+	an active FD list and an inactive FD list.
+	
+	(file_server_monitor_file): don't take the file handle as
+	argument anymore, we open the file by ourselve. Mark the file
+	as inactive if we can't open it.
+
+	(file_server_wake_up): 
+	if st_nlink is 0, then the file doesn't exist on the filesystem
+	anymore, mark as inactive, and try reopening later.
+	
+	(try_reopening_inactive_fd): new function, try opening
+	monitor marked as inactive.
+
 2002-05-16  Baptiste Malguy <baptiste@malguy.net>
 
         * src/*-plugins.c (*_plugins_init):

@@ -41,8 +41,6 @@
 #include "log-common.h"
 #include "file-server.h"
 
-#define MAX_FD 1024
-
 typedef struct {
         FILE *fd;
         char *file;
@@ -50,11 +48,12 @@ typedef struct {
         char buf[1024];
         int need_more_read;
         time_t last_size;
+        struct list_head list;
 } monitor_fd_t;
 
 
-static int fd_index = 0;
-static monitor_fd_t *fd_tbl[MAX_FD];
+static LIST_HEAD(active_fd_list);
+static LIST_HEAD(inactive_fd_list);
 
 
 
@@ -78,7 +77,7 @@ static int read_logfile(monitor_fd_t *fd)
                  * Override this by using *_unlocked() variant.
                  */
                 ret = getc_unlocked(fd->fd);
-                if ( ret == EOF ) {
+                if ( ret == EOF ) {                        
 			clearerr_unlocked(fd->fd);
                         return -1;
                 }
@@ -100,27 +99,70 @@ static int read_logfile(monitor_fd_t *fd)
 
 
 
+static void try_reopening_inactive_fd(void) 
+{
+        int ret;
+        struct stat st;
+        monitor_fd_t *monitor;
+        struct list_head *tmp, *bkp;
+
+        list_for_each_safe(tmp, bkp, &inactive_fd_list) {
+
+                monitor = list_entry(tmp, monitor_fd_t, list);
+                
+                monitor->fd = fopen(monitor->file, "r");
+                if ( ! monitor->fd )
+                        continue;
+
+                monitor->index = 0;
+                monitor->last_size = 0;
+                monitor->need_more_read = 0;
+                
+                list_del(&monitor->list);
+                list_add_tail(&monitor->list, &active_fd_list);
+                
+                log(LOG_INFO, "Re-opened monitor for '%s'.\n", monitor->file);
+        }
+}
+
+
+
 
 int file_server_wake_up(regex_list_t *list, queue_t *queue) 
 {
+        int ret, len;
         struct stat st;
-        int i, ret, len;
         monitor_fd_t *monitor;
-
+        struct list_head *tmp, *bkp;
+        
         /*
          * this function is called every second,
          * as we're not using prelude-async, we have to wake possibly
          * existing timer manually.
          */
         prelude_wake_up_timer();
-        
-        for ( i = 0; i < fd_index; i++ ) {
+
+        /*
+         * try to open inactive fd (file was not existing previously).
+         */
+        try_reopening_inactive_fd();
+
+        list_for_each_safe(tmp, bkp, &active_fd_list) {
                                
-                monitor = fd_tbl[i];
+                monitor = list_entry(tmp, monitor_fd_t, list);
 
                 ret = fstat(fileno(monitor->fd), &st);
                 if ( ret < 0 ) {
                         log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
+                        continue;
+                }
+                
+                if ( st.st_nlink == 0 ) {
+                        /*
+                         * This file doesn't exist on the file system anymore.
+                         */
+                        list_del(&monitor->list);
+                        list_add_tail(&monitor->list, &inactive_fd_list);
                         continue;
                 }
                 
@@ -149,38 +191,43 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
 
 
 
-int file_server_monitor_file(const char *file, int fd) 
+int file_server_monitor_file(const char *file) 
 {
         int ret;
         struct stat st;
         monitor_fd_t *new;
         
-        ret = lseek(fd, 0, SEEK_END);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't seek to the end of the file.\n");
-                close(fd);
-                return -1;
-        }
-        
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
                 log(LOG_ERR, "memory exhausted.\n");
-                close(fd);
                 return -1;
-        }        
+        }
 
-        ret = fstat(fd, &st);
+        new->fd = fopen(file, "r");
+        if ( ! new->fd ) {
+                list_add_tail(&new->list, &inactive_fd_list);
+                return 0;
+        }
+        
+        ret = fseek(new->fd, 0, SEEK_END);
         if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't stat '%s'.\n", file);
-                free(new);
-                close(fd);
+                log(LOG_ERR, "couldn't seek to the end of the file.\n");
+                fclose(new->fd);
                 return -1;
         }
         
-        new->fd = fdopen(fd, "r");
+        ret = fstat(fileno(new->fd), &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't stat '%s'.\n", file);
+                free(new);
+                fclose(new->fd);
+                return -1;
+        }
+        
         new->last_size = st.st_size;
         new->file = strdup(file);
-        fd_tbl[fd_index++] = new;
+
+        list_add_tail(&new->list, &active_fd_list);
         
         return 0;
 }
