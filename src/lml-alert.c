@@ -21,6 +21,7 @@
 *
 *****/
 
+#include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
 #include <sys/types.h>
@@ -35,16 +36,44 @@
 #include <libprelude/idmef-tree-func.h>
 #include <libprelude/prelude-message-buffered.h>
 #include <libprelude/idmef-msg-send.h>
+#include <libprelude/prelude-io.h>
+#include <libprelude/prelude-message.h>
 
 #include "log-common.h"
 #include "lml-alert.h"
 
 static prelude_msgbuf_t *msgbuf;
-static idmef_string_t ostype, osversion;
+static idmef_analyzer_t analyzer;
+
 
 #define ANALYZER_MODEL "Prelude LML"
 #define ANALYZER_CLASS "Host based Intrusion Detection System"
 #define ANALYZER_MANUFACTURER "The Prelude Team http://www.prelude-ids.org"
+
+
+
+static void send_heartbeat_cb(void *data) 
+{
+        struct timeval tv;
+        idmef_heartbeat_t *hb;
+        idmef_message_t *message;
+        
+        message = idmef_message_new();
+        if ( ! message )
+                return;
+        
+        idmef_heartbeat_new(message);
+        hb = message->message.heartbeat;
+        
+        memcpy(&hb->analyzer, &analyzer, sizeof(analyzer));
+        
+        gettimeofday(&tv, NULL);
+        hb->create_time.sec = tv.tv_sec;
+        hb->create_time.usec = tv.tv_usec;
+
+        idmef_msg_send(msgbuf, message, PRELUDE_MSG_PRIORITY_MID);
+}
+
 
 
 
@@ -106,7 +135,6 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
         struct timeval tv;
         idmef_additional_data_t *data;
         idmef_alert_t *alert = msg->message.alert;
-        idmef_analyzer_t *analyzer = &alert->analyzer;
 
         gettimeofday(&tv, NULL);
         alert->create_time.sec = tv.tv_sec;
@@ -124,12 +152,8 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
                       return;  
                 }
         }        
-        
-        idmef_string_copy(&analyzer->ostype, &ostype);
-        idmef_string_copy(&analyzer->osversion, &osversion);
-        idmef_string_set_constant(&analyzer->model, ANALYZER_MODEL);
-        idmef_string_set_constant(&analyzer->class, ANALYZER_CLASS);
-        idmef_string_set_constant(&analyzer->manufacturer, ANALYZER_MANUFACTURER);
+
+        memcpy(&alert->analyzer, &analyzer, sizeof(alert->analyzer));
 
         /*
          *
@@ -169,8 +193,10 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
 int lml_alert_init(void) 
 {
         int ret;
+        static char host[256];        
+        static idmef_node_t node;
         static struct utsname buf;
-
+        
         msgbuf = prelude_msgbuf_new(0);
         if ( ! msgbuf ) {
                 log(LOG_ERR, "couldn't create a message stream.\n");
@@ -182,12 +208,57 @@ int lml_alert_init(void)
                 log(LOG_ERR, "uname returned an error.\n");
                 return -1;
         }
-        
-        idmef_string_set(&ostype, buf.sysname);
-        idmef_string_set(&osversion, buf.release);
 
+        memset(&node, 0, sizeof(node));
+        memset(&analyzer, 0, sizeof(analyzer));
+        
+        idmef_string_set(&analyzer.ostype, buf.sysname);
+        idmef_string_set(&analyzer.osversion, buf.release);
+        idmef_string_set_constant(&analyzer.model, ANALYZER_MODEL);
+        idmef_string_set_constant(&analyzer.class, ANALYZER_CLASS);
+        idmef_string_set_constant(&analyzer.manufacturer, ANALYZER_MANUFACTURER);
+
+        /*
+         * setup analyzer node.
+         */
+        gethostname(host, sizeof(host));
+        idmef_string_set(&node.name, host);
+        analyzer.node = &node;
+        INIT_LIST_HEAD(&node.address_list);
+        
+        prelude_heartbeat_register_cb(send_heartbeat_cb, NULL);
+        
         return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -124,10 +124,6 @@ int main(int argc, char **argv)
         int ret;
 	queue_t *myqueue;
 	regex_list_t *regex_list;
-
-        ret = lml_alert_init();
-        if ( ret < 0 )
-                return -1;
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {
@@ -143,6 +139,10 @@ int main(int argc, char **argv)
         ret = pconfig_set(argc, argv);
         if ( ret < 0 )
                 exit(1);
+        
+        ret = lml_alert_init();
+        if ( ret < 0 )
+                return -1;
         
 	regex_list = regex_init(REGEX_CONF);
         if ( ! regex_list )

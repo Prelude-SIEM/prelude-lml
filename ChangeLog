@@ -1,3 +1,19 @@
+2002-06-03  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/lml-alert.c (lml_alert_init): 
+	setup analyzer here; register heartbeat callback.
+	(lml_emit_alert): copy global analyzer.
+	(send_heartbeat_cb): new function, send an heartbeat
+	message.
+
+	* src/main.c (main): 
+	call lml_alert_init() after pconfig_set, because
+	lml_alert_init now call libprelude function.
+
+	* src/lml-alert.c (send_heartbeat_cb): 
+	new function, send an heartbeat.
+	(lml_alert_init): 
+
 2002-05-31  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/log-common.c (format_syslog_header): 
