@@ -260,7 +260,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 			goto error;
         }
         
-        idmef_write_message(msgbuf, message);
+        idmef_message_write(message, msgbuf);
         prelude_msgbuf_mark_end(msgbuf);
         
  error:
