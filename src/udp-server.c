@@ -15,12 +15,13 @@
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-list.h>
 
+#include "config.h"
+#include "libmissing.h"
 #include "common.h"
 #include "regex.h"
 #include "udp-server.h"
 #include "file-server.h"
 
-#include "config.h"
 
 /*
  * From RFC 3164, section 4.1:

@@ -3,6 +3,7 @@ includedir = $(prefix)/include/prelude-lml
 noinst_HEADERS =    				\
                     common.h 			\
                     hashkey.h 			\
+		    libmissing.h		\
                     log-common.h		\
                     log.h 			\
                     plugin-log.h 		\
@@ -10,7 +11,7 @@ noinst_HEADERS =    				\
                     udp-server.h		\
 		    pconfig.h			\
 		    file-server.h		\
-		    plugin-log-prv.h
+		    plugin-log-prv.h		
 
 include_HEADERS =                               \
 		    lml-alert.h			\

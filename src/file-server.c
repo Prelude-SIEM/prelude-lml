@@ -34,6 +34,7 @@
 #include <sys/uio.h>
 
 #include "config.h"
+#include "libmissing.h"
 
 #ifdef HAVE_FAM 
  #include <fam.h>

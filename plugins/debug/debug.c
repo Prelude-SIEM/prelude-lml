@@ -13,6 +13,7 @@
 #include <libprelude/idmef-message-id.h>
 #include <libprelude/prelude-getopt.h>
 
+#include "libmissing.h"
 #include "log-common.h"
 #include "log.h"
 #include "lml-alert.h"

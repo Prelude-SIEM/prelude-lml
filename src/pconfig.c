@@ -44,6 +44,7 @@
 #include <libprelude/prelude-client.h>
 
 #include "config.h"
+#include "libmissing.h"
 #include "pconfig.h"
 #include "regex.h"
 #include "log-common.h"

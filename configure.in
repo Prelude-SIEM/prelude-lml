@@ -1,9 +1,9 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(src)
-AC_PREREQ(2.53)
-AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(prelude-lml, 0.8.6)
+AC_INIT([prelude-lml],[0.8.6])
+AC_PREREQ(2.50)
+AC_CANONICAL_TARGET([])
+AM_INIT_AUTOMAKE(1.8)
 AM_CONFIG_HEADER(config.h)
 AM_DISABLE_STATIC
 
@@ -11,6 +11,7 @@ AM_MAINTAINER_MODE
 
 
 dnl Checks for programs.
+gl_EARLY
 AC_PROG_CPP
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -37,6 +38,14 @@ fi
 if test "x$sysconfdir" = "x\${prefix}/etc"; then
     sysconfdir="$prefix/etc"
 fi
+
+
+dnl **************************************************
+dnl * Check for missing function replacement         *
+dnl **************************************************
+gl_SOURCE_BASE(libmissing)
+gl_M4_BASE(libmissing/m4)
+gl_INIT
 
 
 
@@ -114,14 +123,14 @@ fi
                                                                                       
 AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
 
+
 dnl **************************************************
-dnl * Check for socklen_t.                           *
+dnl * Check what type to use in place of socklen_t   *
 dnl **************************************************
 
-AC_DATATYPE_GENERIC([
- #include <sys/types.h>
- #include <sys/socket.h>
-], socklen_t, int size_t "unsigned long")
+AC_PROTOTYPE_RECVFROM
+AC_DEFINE(socklen_t, RECVFROM_ARG6, Define socklen_t to accept third argument type)
+
 
 
 AC_CHECK_DECL(FILENAME_MAX, have_filename_max=yes, have_filename_max=no)
@@ -142,7 +151,6 @@ AC_HEADER_TIME
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday select socket strdup strerror strstr)
 
 configdir=$sysconfdir/prelude-lml
@@ -164,18 +172,26 @@ AC_SUBST(regex_conf)
 AC_SUBST(log_plugin_dir)
 AC_SUBST(LIBWRAP_LIBS)
 
-CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
--Wbad-function-cast -Wcast-qual -Wcast-align -Wnested-externs -Wunused"
+AX_CFLAGS_GCC_OPTION(-Wall)
+AX_CFLAGS_GCC_OPTION(-Wstrict-prototypes)
+AX_CFLAGS_GCC_OPTION(-Wmissing-prototypes)
+AX_CFLAGS_GCC_OPTION(-Wmissing-declarations)
+AX_CFLAGS_GCC_OPTION(-Wbad-function-cast)
+AX_CFLAGS_GCC_OPTION(-Wcast-qual)
+AX_CFLAGS_GCC_OPTION(-Wcast-align)
+AX_CFLAGS_GCC_OPTION(-Wnested-externs)
+AX_CFLAGS_GCC_OPTION(-Wunused)
 
 
 AC_SUBST(CFLAGS)
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 
 prelude-lml.conf
 plugins.rules
 
-Makefile 
+Makefile
+libmissing/Makefile
 
 src/Makefile 
 src/include/Makefile
@@ -187,6 +203,7 @@ plugins/simple/Makefile
 plugins/simple/ruleset/Makefile
 
 ])
+AC_OUTPUT
 
 echo
 echo "*** Dumping configuration ***"

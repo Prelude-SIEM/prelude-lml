@@ -36,8 +36,7 @@
 #include <libprelude/prelude-strbuf.h>
 #include <libprelude/prelude-getopt.h>
 
-#include <assert.h>
-
+#include "libmissing.h"
 #include "log-common.h"
 #include "lml-alert.h"
 #include "log.h"
