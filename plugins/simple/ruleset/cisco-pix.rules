@@ -31,23 +31,22 @@
 #####
 
 #Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
-regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
+regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
  classification(0).name=$1; \
  id=200; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
- assessment.impact.description=Cisco PIX IDS detected an event; \
-  \
+ assessment.impact.description=Messages 400000 through 400051 - Cisco Intrusion Detection System signature messages; \
+ source(0).interface=$4; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  last
 
 #Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
-regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
+regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification(0).name=Successful PIX login; \
  id=201; \
  revision=1; \
@@ -55,15 +54,16 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user
  assessment.impact.severity=low; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=Cisco PIX detected a successful login as user $3; \
-  \
+ assessment.impact.description=This message appears when a user is authenticated successfully and a management session starts.; \
+ source(0).interface=$3; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
-  \
+ source(0).service.port=$2; \
+ target(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$2; \
-  \
- target(0).user.userid(0).name=$3; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
+ target(0).user.userid(0).name=$6; \
  last
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
@@ -76,9 +76,7 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 succesfully enabled; \
-  \
  source(0).user.userid(0).name=$1; \
-  \
  target(0).user.userid(0).name=enable_15; \
  last
 
@@ -91,7 +89,7 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  assessment.impact.severity=low; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=PIX configuration was written from $1 to $2; \
+ assessment.impact.description=Configuration was stored on $2, and the command was executed from $1.; \
  last
 
 #Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
@@ -103,13 +101,12 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  assessment.impact.severity=low; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=PIX user $1 logged out; \
-  \
+ assessment.impact.description=User $1 logged out; \
  source(0).user.userid(0).name=$1; \
  last
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
-regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
+regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification(0).name=Failed PIX login; \
  id=205; \
  revision=1; \
@@ -117,15 +114,16 @@ regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(
  assessment.impact.severity=medium; \
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
- assessment.impact.description=Cisco PIX detected a failed login as user $3; \
-  \
+ assessment.impact.description=User $6 failed login; \
+ source(0).interface=$3; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
-  \
+ source(0).service.port=$2; \
+ target(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$2; \
-  \
- target(0).user.userid(0).name=$3; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
+ target(0).user.userid(0).name=$6; \
  last
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 1.2.3.210))
@@ -138,12 +136,11 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
  assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
-  \
  target(0).user.userid(0).name=enable_15; \
  last
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 192.168.250.6 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
-regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
+regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
  classification(0).name=SSH Server recognition; \
  id=207; \
  revision=1; \
@@ -152,16 +149,17 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disc
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
  assessment.impact.description=$1 making probably a server recognition; \
-  \
+ source(0).interface=$2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
+ target(0).interface=$2; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  last
 
 #Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.33.8.58(192.168.250.58)/80 on interface outside
-regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\([\d\.]+\)\/(\d+); \
+regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\(([\d\.]+)\)\/(\d+) on interface (\S+); \
  classification(0).name=Embryonic connection limit exceeded; \
  id=208; \
  revision=1; \
@@ -169,17 +167,94 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
- assessment.impact.description=The embryonic connection limit on your PIX has been met and exceeded.; \
-  \
+ assessment.impact.description=The number of connections from $1 over $3 to $4 has exceeded the maximum embryonic limit for that static.; \
+ source(0).interface=$6; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.port=$2; \
  source(0).service.protocol=tcp; \
-  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).node.address(1).category=ipv4-addr; \
+ target(0).node.address(1).address=$4; \
+ target(0).service.port=$5; \
+ target(0).service.protocol=tcp; \
+ last
+
+#Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 192.168.250.6 to 195.152.233.99, IP options: "Loose Src Routing"
+regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
+ classification(0).name=IP Options: $3; \
+ id=209; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=An IP packet was seen with IP options.  Because IP options are considered a security risk, the packet was discarded.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.port=$2; \
+ source(0).service.protocol=tcp; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  target(0).service.port=$4; \
  target(0).service.protocol=tcp; \
+ last
+
+#Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 192.168.250.45 to 192.168.250.253 on interface staging
+regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
+ classification(0).name=Reverse path check failure; \
+ id=210; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Reverse route lookup detected a packet that does not have a source address represented by a route and assumed that it is part of an attack.; \
+ source(0).interface=$4; \
+ source(0).spoofed=yes; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.protocol=$1; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=$1; \
+ last
+
+#Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 192.168.250.6, dest = 195.152.233.99, proto = icmp, id = 48130
+regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), dest = ([\d\.]+), proto = (\w+); \
+ classification(0).name=Fragment database limit exceeded; \
+ id=211; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=The IP fragement database limit has been exceeded.  A DoS attack may be in progress.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=$3; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).service.protocol=$3; \
+ last
+
+#Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 192.168.250.6/13798 to 10.32.168.251/0
+regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\d+) to ([\d\.]+)\/(\d+); \
+ classification(0).name=Source or Destination port 0; \
+ id=212; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=There is an invalid transport number, in which the source or destination port number for a protocol is zero.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.port=$2; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$4; \
  last
 
 # Events taken from the Cisco System Log Messages List that will need rules
