@@ -60,7 +60,7 @@
 
 
 
-#define STDIN_FILENAME "stdin"
+#define STDIN_FILENAME "-"
 
 
 /*
