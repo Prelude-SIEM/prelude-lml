@@ -1,3 +1,7 @@
+2003-12-29  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins.rules.in: remove paxmod. Obsoleted.
+
 2003-12-26  Nicolas Delon  <delon.nicolas@wanadoo.fr>
 
 	* src/lml-alert.c:

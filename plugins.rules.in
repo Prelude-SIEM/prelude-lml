@@ -2,7 +2,6 @@
 # plugin-name-list      pcre-options		regex
 #
 
-Paxmod			-			.* PAX: .*
 #Debug			-			.*
 SimpleMod		-			.*
 
