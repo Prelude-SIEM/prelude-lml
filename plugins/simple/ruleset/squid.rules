@@ -24,160 +24,6 @@
 # I. Starting / stopping squid, and associated services (informational, do not show a real attack)
 
 ###
-# 1. Usual syslog file format
-# Rules taken from /var/log/syslog (default Debian conf), same information as in cache.log but format differs
-###
-
-# starting squid
-# No log sample; please submit
-regex=squid\[(\d+)\]: Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
- classification(0).name=Squid started; \
- id=1800; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid version $2 was started with PID $1; \
- last
-
-# accepting connections - is the node address really relevant here (-> listen on 0.0.0.0 for instance) ?
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts HTTP; \
- id=1801; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) listens for incoming HTTP connections on $3:$4, file descriptor #$5; \
- target(0).node.name=$1; \
-  \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$3; \
- target(0).service.port=$4; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- target(0).service.protocol=HTTP; \
- last
-
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts ICP; \
- id=1802; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) listens for incoming ICP messages on $3:$4, file descriptor #$5; \
- target(0).node.name=$1; \
-  \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$3; \
- target(0).service.port=$4; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- target(0).service.protocol=ICP; \
- last
-
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTCP messages on port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts HTCP; \
- id=1803; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) listens for incoming HTCP messages on port $3, file descriptor #$4; \
- target(0).node.name=$1; \
- target(0).service.port=$3; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- target(0).service.protocol=HTCP; \
- last
-
-# No log sample, please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting WCCP messages on port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts WCCP; \
- id=1804; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) listens for incoming WCCP messages on port $3, file descriptor #$4; \
- target(0).node.name=$1; \
- target(0).service.port=$3; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- target(0).service.protocol=WCCP; \
- last
-
-# disabled services (do we really need this ?)
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: HTCP Disabled\.; \
- classification(0).name=Squid started without HTCP; \
- id=1805; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) was invoked without the HTCP service; \
- target(0).node.name=$1; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- last
-
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: WCCP Disabled\.; \
- classification(0).name=Squid started without WCCP; \
- id=1806; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (PID $2) was invoked without the WCCP service; \
- target(0).node.name=$1; \
- target(0).process.pid=$2; \
- target(0).process.name=squid; \
- last
-
-# another way (less verbose) to detect squid has started (found in /var/log/messages and /var/log/syslog, default Debian conf)
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) started; \
- classification(0).name=Squid started; \
- id=1807; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid was started on $1 with pids $2 (parent) and $3 (child); \
- target(0).node.name=$1; \
- target(0).process.name=squid; \
- target(0).process.pid=$2; \
- last
-
-# squid exiting (/var/log/syslog and /var/log/messages format)
-# No log sample; please submit
-regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) exited; \
- classification(0).name=Squid stopped; \
- id=1808; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.description=Squid (pid $2) exited; \
- target(0).node.name=$1; \
- target(0).process.name=squid; \
- target(0).process.pid=$2; \
- last
-
-
-
-###
 # 2. Squid own format
 # same as previous, but using the /var/log/squid/cache.log (do not use these ones if you can use the ones above)
 ###
@@ -186,7 +32,7 @@ regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) exited; \
 # No log sample; please submit
 regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
  classification(0).name=Squid started; \
- id=1809; \
+ id=1801; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -199,14 +45,13 @@ regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
 # No log sample; please submit
 regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
  classification(0).name=Squid accepts HTTP; \
- id=1810; \
+ id=1802; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming HTTP connections on $1:$2, file descriptor #$3; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$1; \
  target(0).service.port=$2; \
@@ -216,14 +61,13 @@ regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
 # No log sample; please submit
 regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
  classification(0).name=Squid accepts ICP; \
- id=1811; \
+ id=1803; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming ICP messages on $1:$2, file descriptor #$3; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$1; \
  target(0).service.port=$2; \
@@ -233,7 +77,7 @@ regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
 # No log sample; please submit
 regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
  classification(0).name=Squid accepts HTCP; \
- id=1812; \
+ id=1804; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -247,7 +91,7 @@ regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
 # No log sample; please submit
 regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
  classification(0).name=Squid accepts WCCP; \
- id=1813; \
+ id=1805; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -261,7 +105,7 @@ regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
 # No log sample; please submit
 regex=HTCP Disabled\.; \
  classification(0).name=Squid started without HTCP; \
- id=1814; \
+ id=1806; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -272,7 +116,7 @@ regex=HTCP Disabled\.; \
 # No log sample; please submit
 regex=WCCP Disabled\.; \
  classification(0).name=Squid started without WCCP; \
- id=1815; \
+ id=1807; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -283,7 +127,7 @@ regex=WCCP Disabled\.; \
 # No log sample; please submit
 regex=Squid Parent: child process (\d+) exited; \
  classification(0).name=Squid stopped; \
- id=1816; \
+ id=1808; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
@@ -301,13 +145,12 @@ regex=Squid Parent: child process (\d+) exited; \
 # No log sample; please submit
 regex=(\d+\.\d+\.\d+\.\d+) .*DENIED/(\d+) (.*); \
  classification(0).name=Squid acl violation attempt; \
- id=1817; \
+ id=1809; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.description=Host $1 tried to violate Squid ACL; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  last
