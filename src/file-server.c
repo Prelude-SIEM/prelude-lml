@@ -101,8 +101,6 @@ static int read_logfile(monitor_fd_t *fd)
 
 static void try_reopening_inactive_fd(void) 
 {
-        int ret;
-        struct stat st;
         monitor_fd_t *monitor;
         struct list_head *tmp, *bkp;
 

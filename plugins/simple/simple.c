@@ -76,6 +76,7 @@ typedef struct {
         idmef_impact_t *impact;  
         idmef_classification_t *class;
         idmef_source_t *source;
+        idmef_target_t *target;
         struct list_head variable_list;
         struct list_head list;
 } simple_rule_t;
@@ -89,6 +90,305 @@ static int is_enabled = 0;
 static plugin_log_t plugin;
 static LIST_HEAD(rules_list);
 static char *rulesetdir = NULL;
+
+
+
+
+/*
+ *   create_* functions
+ */
+
+
+
+
+static int create_class(simple_rule_t *rule)
+{
+        if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        } 
+
+        return 0;
+}
+
+
+
+
+static int create_impact(simple_rule_t *rule)
+{
+        if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+
+
+static int create_source(simple_rule_t *rule)
+{
+        if ( ! rule->source && ! (rule->source = calloc(1, sizeof(*rule->source))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+
+
+static int create_target(simple_rule_t *rule)
+{
+        if ( ! rule->target && ! (rule->target = calloc(1, sizeof(*rule->target))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+
+
+static int create_source_node(idmef_source_t *source)
+{
+        idmef_node_t *node;
+
+        if ( ! source->node && ! (node = idmef_source_node_new(source)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+#define create_target_node(target) create_source_node((idmef_source_t *) target)
+
+
+static int create_node_address_address(idmef_node_t *node, const char *address, int *var_type, void **var_ptr) 
+{
+        idmef_address_t *address_tmp;
+
+        if ( ! (address_tmp = idmef_node_address_new(node)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+ 
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &address_tmp->address;
+
+        idmef_string_set(&address_tmp->address, strdup(address));
+ 
+        return 0;
+}
+
+
+
+
+static int create_node_category(idmef_node_t *node, const char *category, int *var_type, void **var_ptr)
+{
+        int i;
+
+        struct {
+                const char *name;
+                idmef_node_category_t category;
+        } tbl[] = {
+                { "node_unknown", node_unknown },
+                { "ads",          ads          },
+                { "afs",          afs          },
+                { "coda",         coda         },
+                { "dfs",          dfs          },
+                { "dns",          dns          },
+                { "hosts",        hosts        },
+                { "kerberos",     kerberos     },
+                { "nds",          nds          },
+                { "nis",          nis          },
+                { "nisplus",      nisplus      },
+                { "nt",           nt           },
+                { "wfw",          wfw          },
+                { NULL,           0            },
+        };
+
+        for ( i = 0; tbl[i].name != NULL; i++ ) {
+
+                if ( strcmp(category, tbl[i].name) != 0 )
+                        continue;
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &node->category;
+                node->category = tbl[i].category;
+
+                return 0;
+        }
+
+        return -1;
+}
+
+
+
+
+static void create_node_location(idmef_node_t *node, const char *location, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &node->location;
+        idmef_string_set(&node->location, strdup(location));
+}
+
+
+
+
+static void create_node_name(idmef_node_t *node, const char *name, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &node->name;
+        idmef_string_set(&node->name, strdup(name));
+}
+
+
+
+
+static int create_source_spoofed(idmef_source_t *source, const char *spoofed, int *var_type, void **var_ptr)
+{
+        int i;
+        struct {
+                const char *name;
+                idmef_spoofed_t spoofed;
+        } tbl[] = {
+                { "unknown", unknown },
+                { "yes",     yes     },
+                { "no",      no      },
+                { NULL, 0            },
+        };
+
+        for ( i = 0; tbl[i].name != NULL; i++ ) {
+
+                if ( strcmp(spoofed, tbl[i].name) != 0 )
+                        continue;
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &source->spoofed;
+                source->spoofed = tbl[i].spoofed;
+
+                return 0;
+        }
+
+        return -1;
+}
+
+
+
+
+static int create_target_decoy(idmef_target_t *target, const char *decoy, int *var_type, void **var_ptr)
+{
+        int i;
+        struct {
+                const char *name;
+                idmef_spoofed_t decoy;
+        } tbl[] = {
+                { "unknown", unknown },
+                { "yes",     yes     },
+                { "no",      no      },
+                { NULL, 0            },
+        };
+
+        for ( i = 0; tbl[i].name != NULL; i++ ) {
+
+                if ( strcmp(decoy, tbl[i].name) != 0 )
+                        continue;
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &target->decoy;
+                target->decoy = tbl[i].decoy;
+
+                return 0;
+        }
+
+        return -1;
+}
+
+
+
+
+static void create_source_interface(idmef_source_t *source, const char * interface, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &source->interface;
+        idmef_string_set(&source->interface, strdup(interface));
+}
+
+
+#define create_target_interface(target, interface, var_type, var_ptr) \
+        create_source_interface((idmef_source_t *) target, interface, var_type, var_ptr)
+
+
+
+
+static int create_source_service(idmef_source_t *source)
+{
+        idmef_service_t *service;
+        
+        if ( ! source->service && ! (service = idmef_source_service_new(source)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+#define create_target_service(target) create_source_service((idmef_source_t *) target)
+
+
+static void create_service_port(idmef_service_t *service, const char *port, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_INT;
+        *var_ptr  = &service->port;
+        service->port = atoi(port);
+}
+
+
+
+
+static void create_service_protocol(idmef_service_t *service, const char *protocol, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &service->protocol;
+        idmef_string_set(&service->protocol, strdup(protocol));
+}
+
+
+
+
+static void create_service_name(idmef_service_t *service, const char *name, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &service->name;
+        idmef_string_set(&service->name, strdup(name));
+}
+
+
+
+
+static void create_service_portlist(idmef_service_t *service, const char *portlist, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &service->portlist;
+        idmef_string_set(&service->portlist, strdup(portlist));
+}
+
+
+
+
+/*
+ *   parse_* functions
+ */
+
+
 
 
 static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_type, void **var_ptr) 
@@ -110,14 +410,12 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_
                 if ( strcmp(origin, tbl[i].name) != 0 )
                         continue;
 
-                if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
-                        log(LOG_ERR, "memory exhausted.\n");
+                if ( create_class(rule) < 0 )
                         return -1;
-                }
 
                 *var_type = VARIABLE_TYPE_INT;
                 *var_ptr = &rule->class->origin;
-                
+
                 rule->class->origin = tbl[i].origin;
 
                 return 0;
@@ -131,14 +429,12 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_
 
 static int parse_class_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
 {
-        if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( create_class(rule) < 0 )
                 return -1;
-        }
 
         *var_type = VARIABLE_TYPE_STRING;
         *var_ptr = &rule->class->name;
-        
+
         idmef_string_set(&rule->class->name, strdup(name));
 
         return 0;
@@ -149,14 +445,12 @@ static int parse_class_name(simple_rule_t *rule, const char *name, int *var_type
 
 static int parse_class_url(simple_rule_t *rule, const char *url, int *var_type, void **var_ptr) 
 {
-        if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( create_class(rule) < 0 )
                 return -1;
-        }
 
         *var_type = VARIABLE_TYPE_STRING;
         *var_ptr = &rule->class->url;
-        
+
         idmef_string_set(&rule->class->url, strdup(url));
 
         return 0;
@@ -182,10 +476,8 @@ static int parse_impact_completion(simple_rule_t *rule, const char *completion, 
                 if ( strcmp(completion, tbl[i].name) != 0 )
                         continue;
 
-                if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
-                        log(LOG_ERR, "memory exhausted.\n");
+                if ( create_impact(rule) < 0 )
                         return -1;
-                }
 
                 *var_type = VARIABLE_TYPE_INT;
                 *var_ptr = &rule->impact->completion;
@@ -222,10 +514,8 @@ static int parse_impact_type(simple_rule_t *rule, const char *type, int *var_typ
                 if ( strcmp(type, tbl[i].name) != 0 )
                         continue;
 
-                if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
-                        log(LOG_ERR, "memory exhausted.\n");
+                if ( create_impact(rule) < 0 )
                         return -1;
-                }
 
                 *var_type = VARIABLE_TYPE_INT;
                 *var_ptr = &rule->impact->type;
@@ -259,10 +549,8 @@ static int parse_impact_severity(simple_rule_t *rule, const char *severity, int 
                 if ( strcmp(severity, tbl[i].name) != 0 )
                         continue;
 
-                if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
-                        log(LOG_ERR, "memory exhausted.\n");
+                if ( create_impact(rule) < 0 )
                         return -1;
-                }
 
                 *var_type = VARIABLE_TYPE_INT;
                 *var_ptr = &rule->impact->severity;
@@ -276,12 +564,11 @@ static int parse_impact_severity(simple_rule_t *rule, const char *severity, int 
 
 
 
+
 static int parse_impact_desc(simple_rule_t *rule, const char *desc, int *var_type, void **var_ptr) 
 {
-        if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( create_impact(rule) < 0 )
                 return -1;
-        }
 
         *var_type = VARIABLE_TYPE_STRING;
         *var_ptr  = &rule->impact->description;
@@ -290,6 +577,7 @@ static int parse_impact_desc(simple_rule_t *rule, const char *desc, int *var_typ
         
         return 0;
 }
+
 
 
 
@@ -311,40 +599,320 @@ static int parse_regex(simple_rule_t *rule, const char *regex, int *var_type, vo
 }
 
 
-/*
- * arno (29/04/02) : new function for new imdef field : source.node.address.address
- */
+
+
 static int parse_source_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
 {
-        idmef_node_t *idmef_node;
-        idmef_address_t *idmef_address;
-        
-        if ( ! rule->source && ! (rule->source = calloc(1, sizeof(*rule->source))) ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( create_source(rule) < 0 )
                 return -1;
-        }
 
-        if ( ! rule->source->node ) {
-                if ( ! (idmef_node = idmef_source_node_new(rule->source)) ) {
-                        log(LOG_ERR, "memory exhauster.\n");
-                        return -1;
-                }
-        }
-        else
-                idmef_node = rule->source->node;
-
-        if ( ! (idmef_address = idmef_node_address_new(idmef_node)) ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( create_source_node(rule->source) < 0 )
                 return -1;
-        }
 
-        *var_type = VARIABLE_TYPE_STRING;
-        *var_ptr  = &idmef_address->address;
-        
-        idmef_string_set(&idmef_address->address, strdup(address));
-        
+        if ( create_node_address_address(rule->source->node, address, var_type, var_ptr) < 0 )
+                return -1;
+
         return 0;
 }
+
+
+
+
+static int parse_target_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+
+        if ( create_node_address_address(rule->target->node, address, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_source_node_category(simple_rule_t *rule, const char *category, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_node(rule->source) < 0 )
+                return -1;
+
+        if ( create_node_category(rule->source->node, category, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_target_node_category(simple_rule_t *rule, const char *category, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+
+        if ( create_node_category(rule->target->node, category, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_source_node_location(simple_rule_t *rule, const char *location, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_node(rule->source) < 0 )
+                return -1;
+
+        create_node_location(rule->source->node, location, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_node_location(simple_rule_t *rule, const char *location, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+
+        create_node_location(rule->target->node, location, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_node_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_node(rule->source) < 0 )
+                return -1;
+
+        create_node_name(rule->source->node, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_node_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+
+        create_node_name(rule->target->node, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_spoofed(simple_rule_t *rule, const char *spoofed, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_spoofed(rule->source, spoofed, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_target_decoy(simple_rule_t *rule, const char *decoy, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_decoy(rule->target, decoy, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_source_interface(simple_rule_t *rule, const char *interface, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        create_source_interface(rule->source, interface, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_interface(simple_rule_t *rule, const char *interface, int *var_type, void **var_ptr) 
+{
+        
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        create_target_interface(rule->target, interface, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_service_port(simple_rule_t *rule, const char *port, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_service(rule->source) < 0 )
+                return -1;
+
+        create_service_port(rule->source->service, port, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_service_port(simple_rule_t *rule, const char *port, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_service(rule->target) < 0 )
+                return -1;
+
+        create_service_port(rule->target->service, port, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_service_protocol(simple_rule_t *rule, const char *protocol, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_service(rule->source) < 0 )
+                return -1;
+
+        create_service_protocol(rule->source->service, protocol, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_service_protocol(simple_rule_t *rule, const char *protocol, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_service(rule->target) < 0 )
+                return -1;
+
+        create_service_protocol(rule->target->service, protocol, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_service_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_service(rule->source) < 0 )
+                return -1;
+
+        create_service_name(rule->source->service, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_service_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_service(rule->target) < 0 )
+                return -1;
+
+        create_service_name(rule->target->service, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_service_portlist(simple_rule_t *rule, const char *portlist, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_service(rule->source) < 0 )
+                return -1;
+
+        create_service_portlist(rule->source->service, portlist, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_service_portlist(simple_rule_t *rule, const char *portlist, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_service(rule->target) < 0 )
+                return -1;
+
+        create_service_portlist(rule->target->service, portlist, var_type, var_ptr);
+
+        return 0;
+}
+
 
 
 
@@ -504,14 +1072,33 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 { "include", parse_include                                          },
                 { "regex", parse_regex                                              },
                 { "class.origin", parse_class_origin                                },
-                { "class.name", parse_class_name                                    },
-                { "class.url", parse_class_url                                      },
+                { "class.name",   parse_class_name                                  },
+                { "class.url",    parse_class_url                                   },
                 { "impact.completion", parse_impact_completion                      },
                 { "impact.type",       parse_impact_type                            },
                 { "impact.severity",   parse_impact_severity                        },
                 { "impact.description", parse_impact_desc                           },
                 { "source.node.address.address", parse_source_node_address_address  },
-                { NULL, NULL                                                        },
+                { "source.node.category",        parse_source_node_category         },
+                { "source.node.location",        parse_source_node_location         },
+                { "source.node.name",            parse_source_node_name             },
+                { "source.spoofed",              parse_source_spoofed               },
+                { "source.interface",            parse_source_interface             },
+                { "source.service.port",         parse_source_service_port          },
+                { "source.service.protocol",     parse_source_service_protocol      },
+                { "source.service.name",         parse_source_service_name          },
+                { "source.service.portlist",     parse_source_service_portlist      },
+                { "target.node.address.address", parse_target_node_address_address  },
+                { "target.node.category",        parse_target_node_category         },
+                { "target.node.location",        parse_target_node_location         },
+                { "target.node.name",            parse_target_node_name             },
+                { "target.decoy",                parse_target_decoy                 },
+                { "target.interface",            parse_target_interface             },
+                { "target.service.port",         parse_target_service_port          },
+                { "target.service.protocol",     parse_target_service_protocol      },
+                { "target.service.name",         parse_target_service_name          },
+                { "target.service.portlist",     parse_target_service_portlist      },
+		        { NULL, NULL                                                        },
         };
 
         ptr = buf;
@@ -519,8 +1106,8 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 ptr = NULL;
                 
                 /*
-                  * filter space at the begining of the line.
-                  */
+                 * filter space at the begining of the line.
+                 */
                 while ( *in == ' ' && *in != '\0' )
                         in++;
                 
@@ -564,6 +1151,17 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
 
 
 
+static void free_node(idmef_node_t *node)
+{
+        if ( node ) {
+                generic_free_list(idmef_address_t, &node->address_list);
+                free(node);
+        }
+}
+
+
+
+
 static void free_rule(simple_rule_t *rule) 
 {
         if ( rule->regex_string )
@@ -581,15 +1179,18 @@ static void free_rule(simple_rule_t *rule)
         if ( rule->class )
                 free(rule->class);
 
-        /*** arno (29/04/02) ***/
-
         if ( rule->source ) {
-                if ( rule->source->node ) {
-                        generic_free_list(idmef_address_t, &rule->source->node->address_list);
-                        free(rule->source->node);
-                }
-
+                free_node(rule->source->node);
+                if ( rule->source->service )
+                        free(rule->source->service);
                 free(rule->source);
+        } 
+
+        if ( rule->target ) {
+                free_node(rule->target->node);
+                if ( rule->target->service )
+                        free(rule->target->service);
+                free(rule->target);
         } 
 
         free(rule);
@@ -646,19 +1247,119 @@ static int parse_ruleset(const char *filename, FILE *fd)
 
 
 
+static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_source)
+{
+        idmef_node_t *node;
+        idmef_address_t *address;
+        idmef_address_t *address_tmp;
+        idmef_service_t *service;
+        
+        struct list_head *tmp;
+       
+        idmef_string_copy(&alert_source->interface, &source->interface);
+        
+        if ( source->node ) {
+
+                node = idmef_source_node_new(alert_source);
+
+                if ( ! node )
+                        return -1;
+
+                node->category = source->node->category;
+                idmef_string_copy(&node->location, &source->node->location);
+                idmef_string_copy(&node->name, &source->node->name);
+                
+                list_for_each(tmp, &source->node->address_list) {
+                        address = idmef_node_address_new(node);
+
+                        if ( ! address )
+                                return -1;
+                
+                        address_tmp = list_entry(tmp, idmef_address_t, list);
+                        idmef_string_copy(&address->address, &address_tmp->address);
+                }
+        }
+
+        if ( source->service ) {
+                
+                service = idmef_source_service_new(alert_source);
+
+                if ( ! service )
+                        return -1;
+                
+                service->port = source->service->port;
+                idmef_string_copy(&service->protocol, &source->service->protocol);
+                idmef_string_copy(&service->name,     &source->service->name);
+                idmef_string_copy(&service->portlist, &source->service->portlist);
+        }
+        
+        return 0;
+}
+
+
+
+
+#define record_target_fields(target, alert_target) \
+        record_source_fields((idmef_source_t *) target, (idmef_source_t *) alert_target)
+
+
+
+
+static int record_source(idmef_alert_t *alert, idmef_source_t *source)
+{
+        idmef_source_t *alert_source;
+        int ret;
+        
+        alert_source = idmef_alert_source_new(alert);
+        
+        if ( ! alert_source )
+                return -1;
+        
+        alert_source->spoofed = source->spoofed;
+
+        ret = record_source_fields(source, alert_source);
+
+        if ( ret < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int record_target(idmef_alert_t *alert, idmef_target_t *target)
+{
+        idmef_target_t *alert_target;
+        int ret;
+        
+        alert_target = idmef_alert_target_new(alert);
+        
+        if ( ! alert_target )
+                return -1;
+        
+        alert_target->decoy = target->decoy;
+
+        ret = record_target_fields(target, alert_target);
+
+        if ( ret < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
 static void emit_alert(simple_rule_t *rule, const log_container_t *log) 
 {
         idmef_alert_t *alert;
         idmef_message_t *message;
         idmef_classification_t *class;
         idmef_assessment_t *assessment;
-        idmef_source_t *source;
-        idmef_node_t *node;
-        idmef_address_t *address;
-        idmef_address_t *address_tmp;
-        
-        struct list_head *tmp;
-        
+
+        int ret;
+
         message = idmef_message_new();
         if ( ! message )
                 return;
@@ -668,13 +1369,13 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
          */
         idmef_alert_new(message);
         alert = message->message.alert;
-        
+
         idmef_alert_assessment_new(alert);
         assessment = alert->assessment;
 
         if ( rule->impact ) 
                 assessment->impact = rule->impact;
-        
+
         if ( rule->class ) {
             
                 class = idmef_alert_classification_new(alert);
@@ -688,39 +1389,30 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
                 idmef_string_copy(&class->name, &rule->class->name);
         }
 
-        /*** arno (30/04/02) ***/
-
         if ( rule->source ) {
-                
-                source = idmef_alert_source_new(alert);
 
-                if ( ! source ) {
+                ret = record_source(alert, rule->source); 
+
+                if ( ret < 0 ) {
                         idmef_message_free(message);
                         return;
                 }
+        }
 
-                node = idmef_source_node_new(source);
+        if ( rule->target ) {
+            
+                ret = record_target(alert, rule->target); 
 
-                if ( ! node ) {
+                if ( ret < 0 ) {
                         idmef_message_free(message);
                         return;
-                }
-
-                address = idmef_node_address_new(node);
-
-                if ( ! address ) {
-                        idmef_message_free(message);
-                        return;
-                }
-                
-                list_for_each(tmp, &rule->source->node->address_list) {
-                        address_tmp = list_entry(tmp, idmef_address_t, list);
-                        idmef_string_copy(&address->address, &address_tmp->address);
                 }
         }
         
         lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_MID);
 }
+
+
 
 
 static int replace_str(idmef_string_t *str, const char *needle, const char *replacement) 
@@ -800,6 +1492,7 @@ static void resolve_variable(const log_container_t *log,
 
 
 
+
 static void free_variable_allocated_data(simple_rule_t *rule) 
 {
         variable_t *var;
@@ -818,7 +1511,6 @@ static void free_variable_allocated_data(simple_rule_t *rule)
                 }
         }
 }
-
 
 
 

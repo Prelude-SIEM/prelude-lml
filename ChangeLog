@@ -1,3 +1,29 @@
+2002-05-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/file-server.c (try_reopening_inactive_fd): 
+	remove unused variable.
+
+2002-05-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+	
+	Patch from Arnaud Guignard <arnaud.guignard@free.fr> :
+	
+	* plugins/simple/simple.c: added patch to handle
+	IDMEF source node category, source node location,
+	source node name, source spoofed, source interface,
+	source service port, source service protocol,
+	source service name, source service portlist,
+	target node address, target node category, target
+	node location, target node name, target decoy,
+	target interface, target service port, target
+	service protocol, target service name, target
+	service portlist.
+
+	(record_source_fields): fix the impossibility to have
+	several source/target node addresses.
+
+	* plugins/simple/ruleset/simple.rules: added definitions
+	for each new IDMEF tag.
+	
 2002-05-21  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/pconfig.c (set_file): 

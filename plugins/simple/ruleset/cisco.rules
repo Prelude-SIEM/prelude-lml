@@ -23,7 +23,7 @@
 
 # Cisco router support for Prelude-LML
 
-regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; class.name=Cisco ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone tried to bypass access-list #$1 : $3 ($2 $4) -> $5 ($2 $6) ; 
+regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; class.name=Cisco ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone tried to bypass access-list #$1; source.node.address.address = $3; source.service.port = $4; source.service.protocol = $2; target.node.address.address = $5; target.service.port = $6; target.service.protocol = $2;
 
-regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; class.name=Cisco rsh attempt; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone tried to connect to rshell from $1; 
+regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; class.name=Cisco rsh attempt; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone tried to connect to rshell; source.node.address.address = $1;
 

@@ -47,6 +47,54 @@
 #
 # - source.node.address.address:
 #   Address that issued the attack.
+#   There can be more than one.
+# 
+# - target.node.address.address:
+#   Address that has been attacked.
+#   There can be more than one.
+#
+# - source.node.name,
+#   target.node.name:
+#   The name of the equipment. This information MUST be provided if no Address
+#   information is given.
+#
+# - source.node.category,
+#   target.node.category:
+#   The domain from which the name information was obtained.
+#   Possible values are: unknow, ads, afs, coda, dfs, dns, hosts, kerberos,
+#   nds, nis, nisplus, nt, wfw
+#
+# - source.node.location,
+#   target.node.location:
+#   The location of the equipment.
+#
+# - source.spoofed,
+#   target.decoy:
+#   An indication of wheter the source/target is a decoy.
+#   The permitted values are: unknown, yes, no.
+#
+# - source.interface,
+#   target.interface:
+#   May be used by a network-based analyzer with multiple interfaces to
+#   indicate which interfaces this source/target was seen on.
+#
+# - source.service.name,
+#   target.service.name:
+#   The name of the service. Whenever possible, the name from the IANA list
+#   of well-known ports SHOULD be used.
+#
+# - source.service.port,
+#   target.service.port:
+#   The port number being used.
+#
+# - source.service.protocol,
+#   target.service.protocol:
+#   The protocol being used.
+#
+# - source.service.portlist,
+#   target.service.portlist:
+#   A list of port numbers beeing used.
+
 
 include = cisco.rules;
 include = zyxel.rules;
@@ -60,6 +108,4 @@ regex=PAM_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); class.name=Authentic
 regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.completion = succeeded; impact.type = other; impact.severity = medium; impact.description=A sniffer is probably running on this machine;
 
 regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tryed to log in using a non existing user;
-
-
 
