@@ -2,6 +2,8 @@
 
 	* src/udp-server.c (udp_server_process_event): 
 	use log_file_set_source().
+	(udp_server_process_event): remove trailling syslog
+	priority / facility '>' character.
 
 	* src/log-common.c (log_file_set_source): 
 	implemented. Doesn't check wether the file exist.

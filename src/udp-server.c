@@ -64,7 +64,9 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
          * we don't care about syslog priority / facility.
          */
         ptr = strchr(buf, '>');
-        if ( ! ptr )
+        if ( ptr )
+                ptr++;
+        else 
                 ptr = buf;
         
         lml_dispatch_log(list, server->lf, ptr);
