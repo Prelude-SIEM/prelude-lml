@@ -130,7 +130,8 @@ static int set_quiet_mode(prelude_option_t *opt, const char *optarg, prelude_str
 
 static int set_debug_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
-        prelude_log_set_flags(prelude_log_get_flags() | PRELUDE_LOG_FLAGS_DEBUG);
+        int level = (optarg) ? atoi(optarg) : PRELUDE_LOG_DEBUG;
+        prelude_log_set_debug_level(level);
         return 0;
 }
 
