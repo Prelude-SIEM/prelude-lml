@@ -14,6 +14,7 @@
 #include <libprelude/prelude-getopt.h>
 
 #include "log-common.h"
+#include "lml-alert.h"
 #include "log.h"
 
 
@@ -417,18 +418,12 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
 {
         idmef_alert_t *alert;
         idmef_message_t *message;
-        prelude_msgbuf_t *msgbuf;
-        idmef_assessment_t *assessment;
         idmef_classification_t *class;
-        idmef_additional_data_t *data;
+        idmef_assessment_t *assessment;
         
         message = idmef_message_new();
         if ( ! message )
                 return;
-
-        msgbuf = prelude_msgbuf_new(0);
-        if ( ! msgbuf )
-                goto errbuf;
 
         /*
          * Initialize the idmef structures
@@ -436,11 +431,6 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
         idmef_alert_new(message);
         alert = message->message.alert;
         
-        idmef_string_set_constant(&alert->analyzer.model,
-                                  "Prelude Log Monitoring Lackey");
-        idmef_string_set_constant(&alert->analyzer.class,
-                                  "Host Based Intrusion Detection System");
-
         idmef_alert_assessment_new(alert);
         assessment = alert->assessment;
 
@@ -448,34 +438,19 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
                 assessment->impact = rule->impact;
 
         if ( rule->class ) {
-                
+            
                 class = idmef_alert_classification_new(alert);
-                if ( ! class )
-                        goto err;
+                if ( ! class ) {
+                        idmef_message_free(message);
+                        return;
+                }
 
                 class->origin = rule->class->origin;
-                class->url.string = rule->class->url.string;
-                class->url.len = rule->class->url.len;
-
-                class->name.string = rule->class->name.string;
-                class->name.len = rule->class->name.len;
+                idmef_string_copy(&class->url, &rule->class->url);
+                idmef_string_copy(&class->name, &rule->class->name);
         }
 
-        data = idmef_alert_additional_data_new(alert);
-        if ( ! data )
-                goto err;
-
-        data->type = string;
-        idmef_string_set_constant(&data->meaning, "Log");
-        idmef_string_set(&data->data, log->log);
-
-        idmef_msg_send(msgbuf, message, PRELUDE_MSG_PRIORITY_MID);
-        
- err:
-        prelude_msgbuf_close(msgbuf);
-
- errbuf:
-        idmef_message_free(message);
+        lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_MID);
 }
 
 
@@ -505,6 +480,22 @@ static void simple_run(const log_container_t *log)
 
 static int set_simple_state(const char *optarg)
 {
+        int ret;
+        
+        if ( is_enabled ) {
+		ret = plugin_unsubscribe((plugin_generic_t *) & plugin);
+		if ( ret < 0 )
+			return prelude_option_error;
+
+		is_enabled = 0;
+	} else {
+		ret = plugin_subscribe((plugin_generic_t *) & plugin);
+		if ( ret < 0 )
+			return prelude_option_error;
+
+		is_enabled = 1;
+	}
+
 	return prelude_option_success;
 }
 

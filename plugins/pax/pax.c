@@ -16,6 +16,7 @@
 #include <libprelude/prelude-getopt.h>
 
 #include "log-common.h"
+#include "lml-alert.h"
 #include "log.h"
 
 #define PAX_INFO_URL "http://pageexec.virtualave.net/"
@@ -354,15 +355,10 @@ static void pax_log_processing(const log_container_t * log)
 	char *tmp = (char *) malloc((strlen(log->log) + 1) * sizeof(char));
 	idmef_message_t *message = idmef_message_new();
 	idmef_alert_t *alert;
-	prelude_msgbuf_t *msgbuf;
 	char *tmp_save = tmp;
 
 	if (!message)
 		return;
-
-	msgbuf = prelude_msgbuf_new(0);
-	if (!msgbuf)
-		goto errbuf;
 
 	/* Initialize the idmef structures */
 	idmef_alert_new(message);
@@ -543,19 +539,15 @@ static void pax_log_processing(const log_container_t * log)
 		}
 	}
 
-      msg:
-	idmef_msg_send(msgbuf, message, PRELUDE_MSG_PRIORITY_MID);
-	idmef_message_free(message);
-	prelude_msgbuf_close(msgbuf);
+ msg:
+        lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_MID);
 	if (tmp_save)
 		free(tmp_save);
 	if (log_c)
 		free(log_c);
 	return;
 
-      err:
-	prelude_msgbuf_close(msgbuf);
-      errbuf:
+ err:
 	idmef_message_free(message);
 	if (tmp_save)
 		free(tmp_save);

@@ -111,6 +111,10 @@ int main(int argc, char **argv)
 	queue_t *myqueue;
 	regex_list_t *regex_list;
 
+        ret = lml_alert_init();
+        if ( ret < 0 )
+                return -1;
+        
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {
 		log(LOG_INFO, "error initializing logs plugins.\n");

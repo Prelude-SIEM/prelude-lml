@@ -1,5 +1,13 @@
 2002-03-28  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* plugins/pax/pax.c (pax_log_processing): 
+	* plugins/simple/simple.c (emit_alert): 
+	use lml_emit_alert().
+
+	* src/lml-alert.c: 
+	new file providing facility for alert emition.
+	Every plugin should use theses functions.
+
 	* plugins/simple/simple.c: 
 
 	This is the start of the Simple plugin. This plugin
