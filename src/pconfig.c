@@ -70,7 +70,7 @@ static int print_version(prelude_option_t *opt, const char *arg)
 
 static int print_help(prelude_option_t *opt, const char *arg)
 {
-	prelude_option_print(CLI_HOOK, 25);
+	prelude_option_print(NULL, CLI_HOOK, 25);
 	return prelude_option_end;
 }
 
