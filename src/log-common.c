@@ -137,18 +137,18 @@ static int format_common(log_source_t *ls, const char *log, char delim, void **o
 
 
 
-static int handle_escaped(log_entry_t *lc, const char *fmt, const char **log)
+static int handle_escaped(log_entry_t *log_entry, const char *fmt, const char **log)
 {
         int i, ret, len;
-        void *tv = &lc->tv;
+        void *tv = &log_entry->tv;
         struct {
                 const char *name;
                 int (*cb)(log_source_t *ls, const char *log, char delim, void **out);
                 void **ptr;
         } tbl[] = {
-                { "tprog", format_common, (void **) &lc->target_program  },
-                { "thost", format_common, (void **) &lc->target_hostname },
-                { "tuser", format_common, (void **) &lc->target_user     },
+                { "tprog", format_common, (void **) &log_entry->target_program  },
+                { "thost", format_common, (void **) &log_entry->target_hostname },
+                { "tuser", format_common, (void **) &log_entry->target_user     },
                 { "ltime", format_tstamp, (void **) &tv                  },
                 { NULL, NULL                                             },
         };
@@ -160,7 +160,7 @@ static int handle_escaped(log_entry_t *lc, const char *fmt, const char **log)
                 if ( ret != 0 )
                         continue;
 
-                ret = tbl[i].cb(lc->source, *log, fmt[len], tbl[i].ptr);
+                ret = tbl[i].cb(log_entry->source, *log, fmt[len], tbl[i].ptr);
                 if ( ret < 0 )
                         return -1;
                 
@@ -177,15 +177,15 @@ static int handle_escaped(log_entry_t *lc, const char *fmt, const char **log)
 
 
 
-static int format_header(log_entry_t *lc, const char *log)
+static int format_header(log_entry_t *log_entry, const char *log)
 {
         int ret = 0;
-        const char *fmt = lc->source->log_fmt;
+        const char *fmt = log_entry->source->log_fmt;
         
         while ( *fmt ) {
                 
                 if ( *fmt == '%' && ((*fmt + 1) != '%' || *(fmt + 1) != '\0') ) {
-                        ret = handle_escaped(lc, fmt + 1, &log);
+                        ret = handle_escaped(log_entry, fmt + 1, &log);
                         if ( ret < 0 )
                                 return -1;
 
@@ -209,12 +209,12 @@ static int format_header(log_entry_t *lc, const char *log)
 
 
 
-static int format_log(log_entry_t *lc)
+static int format_log(log_entry_t *log_entry)
 {
         int ret;
-        char *entry = lc->log;
+        char *entry = log_entry->log;
 
-        ret = format_header(lc, entry);
+        ret = format_header(log_entry, entry);
         /*
          * don't return on error, a syslog header might not have a tag.
          */
@@ -242,41 +242,41 @@ static char *get_hostname(void)
 
 log_entry_t *log_entry_new(log_source_t *source)
 {
-        log_entry_t *lc;
+        log_entry_t *log_entry;
 
-        lc = calloc(1, sizeof(*lc));
-        if ( ! lc ) {
+        log_entry = calloc(1, sizeof(*log_entry));
+        if ( ! log_entry ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
-        lc->source = source;
-        gettimeofday(&lc->tv, NULL);
+        log_entry->source = source;
+        gettimeofday(&log_entry->tv, NULL);
 
         /*
          * default hostname is our.
          */
-        lc->target_hostname = get_hostname();
+        log_entry->target_hostname = get_hostname();
         
-        return lc;
+        return log_entry;
 }
 
 
 
 
-int log_entry_set_log(log_entry_t *lc, const char *entry) 
+int log_entry_set_log(log_entry_t *log_entry, const char *entry) 
 {
         int ret;
         
-        lc->log = strdup(entry);
-        if ( ! lc->log ) {
+        log_entry->log = strdup(entry);
+        if ( ! log_entry->log ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
 
-        ret = format_log(lc);
+        ret = format_log(log_entry);
         if ( ret < 0 ) {
-                gettimeofday(&lc->tv, NULL);
+                gettimeofday(&log_entry->tv, NULL);
                 return 0;
         }
                 
@@ -286,21 +286,21 @@ int log_entry_set_log(log_entry_t *lc, const char *entry)
 
 
 
-void log_entry_delete(log_entry_t *lc)
+void log_entry_delete(log_entry_t *log_entry)
 {
-        if ( lc->target_hostname )
-                free(lc->target_hostname);
+        if ( log_entry->target_hostname )
+                free(log_entry->target_hostname);
 
-        if ( lc->target_program )
-                free(lc->target_program);
+        if ( log_entry->target_program )
+                free(log_entry->target_program);
 
-        if ( lc->target_user )
-                free(lc->target_user);
+        if ( log_entry->target_user )
+                free(log_entry->target_user);
 
-        if ( lc->log )
-                free(lc->log);
+        if ( log_entry->log )
+                free(log_entry->log);
         
-	free(lc);
+	free(log_entry);
 }
 
 

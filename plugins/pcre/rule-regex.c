@@ -100,19 +100,19 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
 
 
 
-static int exec_regex(pcre_rule_t *rule, const log_entry_t *log, int *ovector, size_t size)
+static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovector, size_t size)
 {
         rule_regex_t *item;
         prelude_list_t *tmp;
         int tmpovector[size];
         int optionnal_match = 0, real_ret = 0, ret, retval = 0, i = 0;
 
-        dprint("\nInput = %s\n", log->log);
+        dprint("\nInput = %s\n", log_entry->log);
         
         prelude_list_for_each(tmp, &rule->regex_list) {
                 item = prelude_linked_object_get_object(tmp, rule_regex_t);
                                 
-                ret = do_pcre_exec(item, &real_ret, log->log, strlen(log->log),
+                ret = do_pcre_exec(item, &real_ret, log_entry->log, strlen(log_entry->log),
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
                 
                 dprint("match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
@@ -149,7 +149,7 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log, int *ovector, s
 
 
 
-static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_entry_t *log)
+static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_entry_t *log_entry)
 {
          int ret;
          int ovector[MAX_REFERENCE_PER_RULE * 3];
@@ -157,11 +157,11 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_e
          ovector[0] = 0x7fffffff;
          ovector[1] = 0;
          
-         ret = exec_regex(rule, log, ovector, sizeof(ovector) / sizeof(int));
+         ret = exec_regex(rule, log_entry, ovector, sizeof(ovector) / sizeof(int));
          if ( ret < 0 )
                  return -1;
          
-         ret = rule_object_build_message(rule->object_list, &state->idmef, log, ovector, ret);         
+         ret = rule_object_build_message(rule->object_list, &state->idmef, log_entry, ovector, ret);         
          if ( ret < 0 )
                  return -1;
          
@@ -169,14 +169,14 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_e
 }
 
 
-static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const log_entry_t *log)
+static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;
         pcre_rule_t *rule = rc->rule;
         pcre_rule_container_t *child;
                         
-        ret = match_rule_single(rule, state, log);
+        ret = match_rule_single(rule, state, log_entry);
         if ( ret < 0 && ! rc->optionnal )  
                 return -1;
         
@@ -188,7 +188,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
         prelude_list_for_each(tmp, &rule->rule_list) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
-                ret = match_rule_list(child, state, log);
+                ret = match_rule_list(child, state, log_entry);
                 if ( ret < 0 )
                         return -1;
         }
@@ -200,7 +200,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
                 return -1;
         
         if ( ! rule->chained && ! rule_object_list_empty(rule->object_list) ) {
-                lml_emit_alert(log, state->idmef, PRELUDE_MSG_PRIORITY_MID);
+                lml_emit_alert(log_entry, state->idmef, PRELUDE_MSG_PRIORITY_MID);
                 state->idmef = NULL;
         }
 
@@ -209,14 +209,14 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
 
 
 
-int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log)
+int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log_entry)
 {
         int ret;
         pcre_state_t state;
         
         memset(&state, 0, sizeof(state));
         
-        ret = match_rule_list(root, &state, log);
+        ret = match_rule_list(root, &state, log_entry);
         if ( ret < 0 )
                 return -1;
         

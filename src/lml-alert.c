@@ -56,7 +56,7 @@ static idmef_analyzer_t *idmef_analyzer;
 
 
 
-static int resolve_failed_fallback(const log_entry_t *log, idmef_node_t *node)
+static int resolve_failed_fallback(const log_entry_t *log_entry, idmef_node_t *node)
 {
         int ret;
         idmef_address_t *address;
@@ -65,13 +65,13 @@ static int resolve_failed_fallback(const log_entry_t *log, idmef_node_t *node)
         /*
          * we want to know if it's an ip address or an hostname.
          */
-        ret = inet_addr(log->target_hostname);
+        ret = inet_addr(log_entry->target_hostname);
         if ( ret < 0 ) {
                 /*
                  * hostname.
                  */
                 string = idmef_node_new_name(node);
-                prelude_string_set_ref(string, log->target_hostname);
+                prelude_string_set_ref(string, log_entry->target_hostname);
 
         } else {
                 address = idmef_node_new_address(node);
@@ -79,7 +79,7 @@ static int resolve_failed_fallback(const log_entry_t *log, idmef_node_t *node)
                         return -1;
 
                 string = idmef_address_new_address(address);
-                prelude_string_set_ref(string, log->target_hostname);
+                prelude_string_set_ref(string, log_entry->target_hostname);
         }
 
         return 0;
@@ -129,22 +129,22 @@ static int fill_target(idmef_node_t *node, struct addrinfo *ai)
 }
 
 
-static int fill_analyzer(const log_entry_t *log, idmef_analyzer_t *analyzer)
+static int fill_analyzer(const log_entry_t *log_entry, idmef_analyzer_t *analyzer)
 {
         int ret;
         idmef_node_t *node;
         idmef_process_t *process;
         prelude_string_t *process_name;
-        if ( log->target_program && ! idmef_analyzer_get_process(analyzer) ) {
+        if ( log_entry->target_program && ! idmef_analyzer_get_process(analyzer) ) {
                 process = idmef_analyzer_new_process(analyzer);
                 if ( ! process )
                         return -1;
 
                 process_name = idmef_process_new_name(process);
-                prelude_string_set_ref(process_name, log->target_program);
+                prelude_string_set_ref(process_name, log_entry->target_program);
         }
 
-        if ( log->target_hostname && ! idmef_analyzer_get_node(analyzer) ) {
+        if ( log_entry->target_hostname && ! idmef_analyzer_get_node(analyzer) ) {
                 struct addrinfo *ai, hints;
                 
                 node = idmef_analyzer_new_node(analyzer);
@@ -155,10 +155,10 @@ static int fill_analyzer(const log_entry_t *log, idmef_analyzer_t *analyzer)
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
 
-                ret = getaddrinfo(log->target_hostname, NULL, &hints, &ai);
+                ret = getaddrinfo(log_entry->target_hostname, NULL, &hints, &ai);
                 if ( ret != 0 ) {
-                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, gai_strerror(ret));
-                        return resolve_failed_fallback(log, node);
+                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log_entry->target_hostname, gai_strerror(ret));
+                        return resolve_failed_fallback(log_entry, node);
                 }
 
                 fill_target(node, ai);
@@ -169,7 +169,7 @@ static int fill_analyzer(const log_entry_t *log, idmef_analyzer_t *analyzer)
 }
 
 
-static int generate_target(const log_entry_t *log, idmef_alert_t *alert) 
+static int generate_target(const log_entry_t *log_entry, idmef_alert_t *alert) 
 {
         int ret;
         idmef_user_t *user;
@@ -186,7 +186,7 @@ static int generate_target(const log_entry_t *log, idmef_alert_t *alert)
                         return -1;
         }
 
-        if ( log->target_user && ! idmef_target_get_user(target) ) {
+        if ( log_entry->target_user && ! idmef_target_get_user(target) ) {
                 user = idmef_target_new_user(target);
                 if ( ! user )
                         return -1;
@@ -195,19 +195,19 @@ static int generate_target(const log_entry_t *log, idmef_alert_t *alert)
                 if ( ! userid )
                         return -1;
                 
-                prelude_string_set_ref(idmef_user_id_new_name(userid), log->target_user);
+                prelude_string_set_ref(idmef_user_id_new_name(userid), log_entry->target_user);
         }
         
-        if ( log->target_program && ! idmef_target_get_process(target) ) {
+        if ( log_entry->target_program && ! idmef_target_get_process(target) ) {
                 process = idmef_target_new_process(target);
                 if ( ! process )
                         return -1;
 
                 process_name = idmef_process_new_name(process);
-                prelude_string_set_ref(process_name, log->target_program);
+                prelude_string_set_ref(process_name, log_entry->target_program);
         }
         
-        if ( log->target_hostname && ! idmef_target_get_node(target) ) {
+        if ( log_entry->target_hostname && ! idmef_target_get_node(target) ) {
                 struct addrinfo *ai, hints;
                 
                 node = idmef_target_new_node(target);
@@ -218,10 +218,10 @@ static int generate_target(const log_entry_t *log, idmef_alert_t *alert)
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
 
-                ret = getaddrinfo(log->target_hostname, NULL, &hints, &ai);
+                ret = getaddrinfo(log_entry->target_hostname, NULL, &hints, &ai);
                 if ( ret != 0 ) {
-                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, gai_strerror(ret));
-                        return resolve_failed_fallback(log, node);
+                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log_entry->target_hostname, gai_strerror(ret));
+                        return resolve_failed_fallback(log_entry, node);
                 }
 
                 fill_target(node, ai);
@@ -265,7 +265,7 @@ static void insert_analyzer(idmef_alert_t *alert, idmef_analyzer_t *cur_analyzer
 
 
 
-void lml_emit_alert(const log_entry_t *log, idmef_message_t *message, uint8_t priority)
+void lml_emit_alert(const log_entry_t *log_entry, idmef_message_t *message, uint8_t priority)
 {
         const char *source;
         idmef_alert_t *alert;
@@ -285,27 +285,27 @@ void lml_emit_alert(const log_entry_t *log, idmef_message_t *message, uint8_t pr
         if ( ! detect_time )
                 goto error;
 
-        idmef_time_set_from_time(detect_time, (const time_t *) &log->tv.tv_sec);
-        idmef_time_set_usec(detect_time, log->tv.tv_usec);
+        idmef_time_set_from_time(detect_time, (const time_t *) &log_entry->tv.tv_sec);
+        idmef_time_set_usec(detect_time, log_entry->tv.tv_usec);
 
         cur_analyzer = idmef_alert_get_analyzer(alert);
         
-        if ( log->target_hostname || log->target_program ) {
-                if ( generate_target(log, alert) < 0 )
+        if ( log_entry->target_hostname || log_entry->target_program ) {
+                if ( generate_target(log_entry, alert) < 0 )
                         goto error;
 
-                if ( cur_analyzer && fill_analyzer(log, cur_analyzer) < 0 )
+                if ( cur_analyzer && fill_analyzer(log_entry, cur_analyzer) < 0 )
                         goto error;
         }
 
         insert_analyzer(alert, cur_analyzer);
 
-        source = log_source_get_name(log->source);
+        source = log_source_get_name(log_entry->source);
         if ( generate_additional_data(alert, "Log received from", source) < 0 )
                 goto error;
         
-        if ( log->log ) {
-                if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
+        if ( log_entry->log ) {
+                if ( generate_additional_data(alert, "Original Log", log_entry->log) < 0 )
                         goto error;
         }
         

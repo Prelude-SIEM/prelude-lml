@@ -27,4 +27,4 @@ void rule_regex_destroy(rule_regex_t *ptr);
 
 rule_regex_t *rule_regex_new(const char *regex, int optionnal);
 
-int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log);
+int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log_entry);

@@ -291,7 +291,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 
 static void resolve_referenced_value(rule_object_list_t *olist,
-                                     const log_entry_t *log, int *ovector, size_t osize) 
+                                     const log_entry_t *log_entry, int *ovector, size_t osize) 
 {
          int ret;
          prelude_list_t *tmp;
@@ -302,7 +302,7 @@ static void resolve_referenced_value(rule_object_list_t *olist,
                  
                  rval = prelude_list_entry(tmp, rule_referenced_value_t, list);
                  
-                 ret = pcre_copy_substring(log->log, ovector, osize, rval->refno, buf, sizeof(buf));
+                 ret = pcre_copy_substring(log_entry->log, ovector, osize, rval->refno, buf, sizeof(buf));
                  if ( ret < 0 ) {
                          if ( ret == PCRE_ERROR_NOMEMORY ) 
                                  log(LOG_ERR, "not enough memory to get backward reference %d.\n",
@@ -343,7 +343,7 @@ static void referenced_value_destroy_content(rule_object_list_t *olist)
 
 
 int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **message,
-                              const log_entry_t *log, int *ovector, size_t osize)
+                              const log_entry_t *log_entry, int *ovector, size_t osize)
 {
         int ret;
         prelude_list_t *tmp;
@@ -356,7 +356,7 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
                         return -1;
         }
         
-        resolve_referenced_value(olist, log, ovector, osize);
+        resolve_referenced_value(olist, log_entry, ovector, osize);
         
         prelude_list_for_each(tmp, &olist->rule_object_list) {
                 rule_object = prelude_list_entry(tmp, rule_object_t, list);
