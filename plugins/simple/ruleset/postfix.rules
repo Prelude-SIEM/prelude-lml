@@ -57,7 +57,7 @@ regex=reject: RCPT from [\w\-\.]+\[([\d\.]+)\]: .* Relay access denied. from=<(\
 
 #May  3 12:22:14 exademo postfix/postfix-script: starting the Postfix mail system
 regex=starting the Postfix mail system; \
- classification(0).name=Mail server started ; \
+ classification(0).name=Mail server startup; \
  id=3501; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -69,7 +69,7 @@ regex=starting the Postfix mail system; \
 
 #May  4 11:43:10 exademo postfix/postfix-script: stopping the Postfix mail system
 regex=stopping the Postfix mail system; \
- classification(0).name=Mail server stopped; \
+ classification(0).name=Mail server shutdown; \
  id=3502; \
  revision=1; \
  classification(0).origin=vendor-specific; \

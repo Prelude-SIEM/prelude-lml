@@ -103,3 +103,17 @@ regex='\S+' contains a virus \(Infection: (\S+)\); \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=A virus has been identified by P3Scan; \
  last
+
+#Jun 22 12:58:25 mail syslog: syslogd shutdown succeeded
+#Jun 22 12:58:55 mail syslog: syslogd startup succeeded
+regex=syslogd (startup|shutdown) succeeded; \
+ classification(0).name=Syslog $1; \
+ id=405; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=dos; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=The syslogd service reported a $1; \
+ last
+

@@ -50,25 +50,14 @@ regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.+reject=
  last;
 
 #Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
-regex=regex=sendmail startup succeeded; \
- classification(0).name=Mail server started ; \
+#Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
+regex=regex=sendmail (startup|shudown) succeeded; \
+ classification(0).name=Mail server $1 ; \
  id=3701; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=Mail server started; \
- assessment.impact.type=other; \
- assessment.impact.severity=low; \
- last;
-
-#Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
-regex=regex=sendmail shutdown succeeded; \
- classification(0).name=Mail server stopped; \
- id=3702; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.completion=succeeded; \
- assessment.impact.description=Mail server stopped; \
+ assessment.impact.description=Sendmail reported a $1; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  last;
@@ -76,7 +65,7 @@ regex=regex=sendmail shutdown succeeded; \
 #Jun 22 06:43:01 mail sendmail[5195]: i5MDgomk005195: AClermont-Ferrand-108-1-6-103.w81-49.abo.wanadoo.fr [81.49.192.103] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
 regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA; \
  classification(0).name=Mail server suspicious access; \
- id=3703; \
+ id=3702; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
