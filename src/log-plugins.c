@@ -19,6 +19,7 @@
 static hash_table plugins;
 
 /* Derived from /usr/CVSroot/XEmacs/xemacs/src/symbols.c 2001/04/30 09:02:41 */
+
 static int hash_string(void *k)
 {
 	unsigned int hash = 0;
@@ -31,14 +32,18 @@ static int hash_string(void *k)
 	return hash;
 }
 
+
+
 static int equal_string(void *k1, void *k2)
 {
-	if (!strcmp((char *) k1, (char *) k2))
+	if ( ! strcmp((char *) k1, (char *) k2))
 		return 1;
 	return 0;
 }
 
-static int subscribe(plugin_container_t * pc)
+
+
+static int subscribe(plugin_container_t *pc)
 {
 	dprint("- Subscribing plugin %s\n", pc->plugin->name);
 	hash_position(plugins, pc->plugin->name);
@@ -46,23 +51,33 @@ static int subscribe(plugin_container_t * pc)
 	return 0;
 }
 
-static void unsubscribe(plugin_container_t * pc)
+
+
+static void unsubscribe(plugin_container_t *pc)
 {
 	dprint("- Unsubscribing plugin %s\n", pc->plugin->name);
 	hash_position(plugins, pc->plugin->name);
 	hash_delete(plugins);
 }
 
-void log_plugins_run(char *plugin_name, log_container_t * log)
+
+
+
+void log_plugins_run(char *plugin_name, log_container_t *log)
 {
 	plugin_container_t *pc;
 
-	if (hash_position(plugins, plugin_name)) {
+	if ( hash_position(plugins, plugin_name) ) {
 		pc = (plugin_container_t *) hash_get(plugins);
-		if (pc)
-			plugin_run(pc, plugin_log_t, run, log);
+                if ( ! pc )
+                        return;
+                
+                plugin_run(pc, plugin_log_t, run, log);
 	}
 }
+
+
+
 
 /*
  * Open the plugin directory (dirname),
@@ -74,12 +89,12 @@ int log_plugins_init(const char *dirname, int argc, char **argv)
 
 	plugins = hash_create(hash_string, equal_string);
 
-	ret =
-	    plugin_load_from_dir(dirname, argc, argv, subscribe,
-				 unsubscribe);
+	ret = plugin_load_from_dir(dirname, argc, argv, subscribe,
+                                   unsubscribe);
 	if (ret < 0) {
 		log(LOG_ERR, "couldn't load plugin subsystem.\n");
 		return -1;
 	}
+        
 	return ret;
 }

@@ -1,3 +1,20 @@
+2002-03-26  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/file-server.c: 
+	monitor local files.
+
+	* src/server-logic.c: 
+	used by file-server implementation.
+
+	* src/pconfig.c: 
+	(pconfig_set): add the --file option.
+
+	* src/main.c: 
+	* src/queue.c: 
+	* src/udp-server.c: 
+	* src/log-plugins.c: coding style fix.
+
+	
 2002-03-22  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/pax/pax.c: include <inttypes.h> and <sys/types.h>

@@ -17,7 +17,9 @@ prelude_lml_SOURCES = 			\
 	hashkey.c			\
 	log-common.c			\
 	log-plugins.c			\
-	pconfig.c
+	pconfig.c			\
+	file-server.c			\
+	server-logic.c
 
 
 

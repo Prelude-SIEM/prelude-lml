@@ -29,6 +29,9 @@
 #include "pconfig.h"
 
 Pconfig_t config;
+#define MAXPLUG 1024
+
+
 
 static void sig_handler(int signum)
 {
@@ -37,54 +40,71 @@ static void sig_handler(int signum)
 	exit(2);
 }
 
-static void
-message_reader(queue_t * queue, const char *str, const char *from)
+
+
+static void message_reader(queue_t *queue, const char *str, const char *from)
 {
 	time_t t;
-	log_container_t *log = malloc(sizeof(*log));
-	assert(log);
+	log_container_t *log;
+
+        log = malloc(sizeof(*log));
+	if ( ! log ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return;
+        }
 
 	log->log = strdup(str);
 	log->source = strdup(from);
 	t = time(NULL), localtime_r(&t, &log->time_received);
-	dprint("[MSGRD] received <%s> from %s\n", str, from);
-	queue_push(queue, log);
+
+        dprint("[MSGRD] received <%s> from %s\n", str, from);
+
+        queue_push(queue, log);
 }
+
+
+
 
 static void object_dump(void *object)
 {
-	char *s = (char *) object;
-
+	char *s = object;
 	printf("[%s]\n", s);
 }
 
-static void dispatcher(regex_list_t * list, queue_t * myqueue)
+
+
+
+static void dispatcher(regex_list_t *list, queue_t *myqueue)
 {
-#define MAXPLUG 1024
-	while (1) {
-		log_container_t *log;
+        int ret, i;
+        log_container_t *log;
+        char *plugins[MAXPLUG];
+        
+	while ( 1 ) {
 
 		log = (log_container_t *) queue_pop(myqueue);
-		if (NULL != log) {
-			int ret, i;
-			char *plugins[MAXPLUG];
+                if ( ! log )
+                        continue;
 
-			dprint
-			    ("[DSPTC] dispatching object: <%s> from %s at %02d:%02d:%02d %04d/%02d/%02d\n",
-			     log->log, log->source,
-			     log->time_received.tm_hour,
-			     log->time_received.tm_min,
-			     log->time_received.tm_sec,
-			     log->time_received.tm_year + 1900,
-			     log->time_received.tm_mon + 1,
-			     log->time_received.tm_mday);
-			ret = regex_exec(list, log->log, plugins, MAXPLUG);
-			for (i = 0; i < ret; i++)
-				log_plugins_run(plugins[i], log);
-			log_container_delete(log);
-		}
+                dprint("[DSPTC] dispatching object: <%s> from %s at %02d:%02d:%02d %04d/%02d/%02d\n",
+                       log->log, log->source,
+                       log->time_received.tm_hour,
+                       log->time_received.tm_min,
+                       log->time_received.tm_sec,
+                       log->time_received.tm_year + 1900,
+                       log->time_received.tm_mon + 1,
+                       log->time_received.tm_mday);
+
+                ret = regex_exec(list, log->log, plugins, MAXPLUG);
+                for (i = 0; i < ret; i++)
+                        log_plugins_run(plugins[i], log);
+
+                log_container_delete(log);
 	}
 }
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -100,18 +120,24 @@ int main(int argc, char **argv)
 	}
 	log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
 
-/*      if( prelude_sensor_init( "prelude-lml", NULL, argc, argv ) < 0 ) { */
-/*  	fprintf( stderr, "couldn't initialize Prelude library\n" ); */
-/*  	return -1; */
-/*      } */
+        myqueue = queue_new(NULL);
+        if ( ! myqueue )
+                exit(1);
+        
+        ret = file_server_new(myqueue);
+        if ( ret < 0 )
+                exit(1);
+        
 	if (pconfig_set(argc, argv) < 0)
 		exit(1);
 
 	regex_list = regex_init(REGEX_CONF);
-
-	myqueue = queue_new(NULL);
+        
 	myudp = udp_server_new(514, message_reader, myqueue);
-	udp_server_start(myudp);
+        if ( ! myudp )
+                exit(1);
+        
+        udp_server_start(myudp);
 
 	signal(SIGTERM, sig_handler);
 	signal(SIGINT, sig_handler);

@@ -27,22 +27,29 @@ struct udp_server {
 	queue_t *queue;
 };
 
+
+
+
 udp_server_t *udp_server_new(uint16_t port,
-			     udp_server_msg_reader_t * mreader,
-			     queue_t * queue)
+			     udp_server_msg_reader_t *mreader, queue_t *queue)
 {
+        int ret;
 	udp_server_t *server;
 
 	server = malloc(sizeof(*server));
-	assert(server);
-
+        if ( ! server ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+        
 	server->mreader = mreader;
 	server->queue = queue;
 
 	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (server->sockfd == -1) {
+	if ( server->sockfd < 0 ) {
 		log(LOG_ERR, "couldn't create socket.\n");
-		return NULL;
+                free(server);
+                return NULL;
 	}
 
 	server->saddr.sin_family = AF_INET;
@@ -50,59 +57,63 @@ udp_server_t *udp_server_new(uint16_t port,
 	server->saddr.sin_addr.s_addr = INADDR_ANY;	/* automatically fill with my IP */
 	memset(&(server->saddr.sin_zero), '\0', 8);	/* zero the rest of the struct */
 
-	if (bind
-	    (server->sockfd, (struct sockaddr *) &server->saddr,
-	     sizeof(struct sockaddr)) == -1) {
+        ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
+        if ( ret < 0 ) {
 		log(LOG_ERR, "couldn't bind to socket.\n");
-		return NULL;
+                close(server->sockfd);
+                free(server);
+                return NULL;
 	}
 
-	dprint("[UDP  ] Server created on port %d, fd %d\n", port,
-	       server->sockfd);
-
+	dprint("[UDP  ] Server created on port %d, fd %d\n", port, server->sockfd);
+        
 	return server;
 }
 
-static void udp_server_standalone(udp_server_t * server)
+
+
+static void udp_server_standalone(udp_server_t *server)
 {
-	struct sockaddr_in addr;
 	int addr_len, numbytes;
-	char buf[MAX_UDP_DATA_SIZE];
+        struct sockaddr_in addr;
+        char buf[MAX_UDP_DATA_SIZE];
 
 	while (1) {
 		addr_len = sizeof(struct sockaddr);
-		numbytes =
-		    recvfrom(server->sockfd, buf, MAX_UDP_DATA_SIZE - 1, 0,
-			     (struct sockaddr *) &addr, &addr_len);
+
+                numbytes = recvfrom(server->sockfd, buf, MAX_UDP_DATA_SIZE - 1, 0,
+                                    (struct sockaddr *) &addr, &addr_len);
 		buf[MAX_UDP_DATA_SIZE - 1] = '\0';
 
-		if (numbytes == -1) {
+		if ( numbytes == -1 ) {
 			log(LOG_ERR, "couldn't receive on socket.\n");
 			exit(1);
 		}
 
-		dprint
-		    ("[UDP  ] on fd %d got packet from %s:%d - packet is %d bytes long\n",
-		     server->sockfd, inet_ntoa(addr.sin_addr),
-		     addr.sin_port, numbytes);
+		dprint("[UDP  ] on fd %d got packet from %s:%d - packet is %d bytes long\n",
+                       server->sockfd, inet_ntoa(addr.sin_addr),
+                       addr.sin_port, numbytes);
 		buf[numbytes] = '\0';
-		server->mreader(server->queue, buf,
-				inet_ntoa(addr.sin_addr));
+		server->mreader(server->queue, buf, inet_ntoa(addr.sin_addr));
 	}
 
 }
 
-void udp_server_start(udp_server_t * server)
+
+
+void udp_server_start(udp_server_t *server)
 {
 	pthread_t thread;
 
-	if (NULL == server)
+	if ( ! server )
 		return;
-	pthread_create(&thread, NULL, (void *) &udp_server_standalone,
-		       server);
+        
+	pthread_create(&thread, NULL, (void *) &udp_server_standalone, server);
 }
 
-void udp_server_close(udp_server_t * server)
+
+
+void udp_server_close(udp_server_t *server)
 {
 	close(server->sockfd);
 	free(server);

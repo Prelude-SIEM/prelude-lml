@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <assert.h>
 
+#include <libprelude/prelude-log.h>
+
 #include "common.h"
 #include "queue.h"
 
@@ -24,11 +26,18 @@ struct queue {
 	pthread_cond_t cond;
 };
 
-queue_t *queue_new(queue_object_fun_t * delete_fun)
-{
-	queue_t *queue = malloc(sizeof(*queue));
-	assert(queue);
 
+
+queue_t *queue_new(queue_object_fun_t *delete_fun)
+{
+	queue_t *queue;
+
+        queue = malloc(sizeof(*queue));
+        if ( ! queue ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+        
 	queue->entries = 0;
 	queue->head = NULL;
 	queue->tail = NULL;
@@ -40,23 +49,34 @@ queue_t *queue_new(queue_object_fun_t * delete_fun)
 	return queue;
 }
 
-void queue_delete(queue_t * queue)
+
+
+void queue_delete(queue_t *queue)
 {
 	queue_entry_t *entry = queue->head;
 
-	while (entry != NULL) {
+	while ( entry != NULL) {
 		queue_entry_t *tmp = entry->next;
-		if (queue->delete_fun)
+
+                if ( queue->delete_fun )
 			queue->delete_fun(entry->object);
+                
 		free(entry);
 		entry = tmp;
 	}
 }
 
+
+
 inline static queue_entry_t *queue_entry_new(void)
 {
-	queue_entry_t *new_entry = malloc(sizeof(*new_entry));
-	assert(new_entry);
+	queue_entry_t *new_entry;
+
+        new_entry = malloc(sizeof(*new_entry));
+	if ( ! new_entry ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
 
 	new_entry->next = NULL;
 	new_entry->object = NULL;
@@ -64,16 +84,23 @@ inline static queue_entry_t *queue_entry_new(void)
 	return new_entry;
 }
 
-void queue_push(queue_t * queue, void *object)
+
+
+
+void queue_push(queue_t *queue, void *object)
 {
-	queue_entry_t *new_entry = queue_entry_new();
-	assert(queue);
+	queue_entry_t *new_entry;
 
+        new_entry = queue_entry_new();
+        if ( ! new_entry ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return;
+        }
+        
 	new_entry->object = object;
-
 	pthread_mutex_lock(&queue->mutex);
 
-	if (queue->tail) {
+	if ( queue->tail ) {
 		queue->tail->next = new_entry;
 		queue->tail = new_entry;
 	} else {
@@ -85,23 +112,29 @@ void queue_push(queue_t * queue, void *object)
 
 	dprint("[QUEUE] new object pushed %p\n", object);
 
-	if (1 == queue->entries)
+	if ( queue->entries == 1 )
 		pthread_cond_broadcast(&queue->cond);
 
 	pthread_mutex_unlock(&queue->mutex);
 }
 
-int queue_empty(queue_t * queue)
+
+
+int queue_empty(queue_t *queue)
 {
 	int ret;
+        
 	assert(queue);
 	pthread_mutex_lock(&queue->mutex);
 	ret = (queue->entries <= 0 || NULL == queue->head) ? 1 : 0;
 	pthread_mutex_unlock(&queue->mutex);
+        
 	return ret;
 }
 
-void *queue_pop(queue_t * queue)
+
+
+void *queue_pop(queue_t *queue)
 {
 	void *object;
 	queue_entry_t *tmp;
@@ -110,21 +143,20 @@ void *queue_pop(queue_t * queue)
 
 	do {
 		pthread_mutex_lock(&queue->mutex);
-		if (queue->entries <= 0 || NULL == queue->head) {
+		if (queue->entries <= 0 || queue->head == NULL ) {
 			pthread_cond_wait(&queue->cond, &queue->mutex);
 			pthread_mutex_unlock(&queue->mutex);
 
 		} else
 			break;
-	}
-	while (1);
+	} while ( 1 );
 
 	object = queue->head->object;
 	tmp = queue->head->next;
 	free(queue->head);
 	queue->head = tmp;
 
-	if (NULL == queue->head)
+	if ( ! queue->head )
 		queue->tail = NULL;
 
 	queue->entries--;
@@ -135,16 +167,19 @@ void *queue_pop(queue_t * queue)
 	return object;
 }
 
-void queue_dump(queue_t * queue, queue_object_fun_t * dump_object)
+
+
+
+void queue_dump(queue_t *queue, queue_object_fun_t *dump_object)
 {
 	int entries = 0;
 	queue_entry_t *entry = queue->head;
 
-	printf
-	    ("=======================================================\n");
-	while (entry != NULL) {
+	printf("=======================================================\n");
+
+        while ( entry != NULL ) {
 		printf("Object #%d - ", entries);
-		if (dump_object)
+		if ( dump_object )
 			dump_object(entry->object);
 		else
 			printf(" dump function is NULL\n");
@@ -153,6 +188,6 @@ void queue_dump(queue_t * queue, queue_object_fun_t * dump_object)
 	}
 	printf("%d entrie(s) registered - %d entries in queue\n",
 	       queue->entries, entries);
-	printf
-	    ("=======================================================\n");
+
+        printf("=======================================================\n");
 }

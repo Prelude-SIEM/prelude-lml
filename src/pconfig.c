@@ -42,17 +42,23 @@
 
 extern Pconfig_t config;
 
+
+
 static int print_version(const char *arg)
 {
-	printf("prelude-nids %s.\n", VERSION);
+	printf("prelude-lml %s.\n", VERSION);
 	return prelude_option_success;
 }
 
+
+
 static int get_version(char *buf, size_t size)
 {
-	snprintf(buf, size, "prelude-nids %s\n", VERSION);
+	snprintf(buf, size, "prelude-lml %s\n", VERSION);
 	return prelude_option_success;
 }
+
+
 
 static int print_help(const char *arg)
 {
@@ -60,11 +66,15 @@ static int print_help(const char *arg)
 	return prelude_option_end;
 }
 
+
+
 static int set_quiet_mode(const char *arg)
 {
 	prelude_log_use_syslog();
 	return prelude_option_success;
 }
+
+
 
 static int set_daemon_mode(const char *arg)
 {
@@ -78,6 +88,24 @@ static int set_pidfile(const char *arg)
 	config.pidfile = arg;
 	return prelude_option_success;
 }
+
+
+
+
+static int set_file(const char *arg) 
+{
+        int ret;
+        
+        ret = file_server_monitor_file(arg);
+        if ( ret < 0 )
+                return prelude_option_error;
+
+        log(LOG_INFO, "- Added monitor for '%s'.\n", arg);
+        
+        return prelude_option_success;
+}
+
+
 
 int pconfig_set(int argc, char **argv)
 {
@@ -110,6 +138,9 @@ int pconfig_set(int argc, char **argv)
 			   "Write Prelude PID to pidfile",
 			   required_argument, set_pidfile, NULL);
 
+        prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'f', "file",
+                           "File to monitor", required_argument, set_file, NULL);
+        
 	ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
 	if (ret == prelude_option_error || ret == prelude_option_end)
 		exit(1);
