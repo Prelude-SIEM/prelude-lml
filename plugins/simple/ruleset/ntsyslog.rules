@@ -210,15 +210,15 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
 
 # 1.l other
 # No log sample; please submit
-regex= security\[success\] (\d+); \
- classification(0).name=Windows Event ID [$1]; \
- id=1411; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.description=Security Success message with identifier #$1; \
- last
+#regex= security\[success\] (\d+); \
+# classification(0).name=Windows Event ID [$1]; \
+# id=1411; \
+# revision=1; \
+# classification(0).origin=vendor-specific; \
+# assessment.impact.severity=low; \
+# assessment.impact.type=other; \
+# assessment.impact.description=Security Success message with identifier #$1; \
+# last
 
 
 # 2. Failure events
@@ -291,12 +291,12 @@ regex= security\[failure\] 681 (.+)  The logon to account: (\w+)  by:(.+)  from 
 
 # 2.e other
 # No log sample; please submit
-regex= security\[failure\] (\d+); \
- classification(0).name=Windows Event ID [$1]; \
- id=1416; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=medium; \
- assessment.impact.type=other; \
- assessment.impact.description=Security Failure message with identifier #$1; \
- last
+#regex= security\[failure\] (\d+); \
+# classification(0).name=Windows Event ID [$1]; \
+# id=1416; \
+# revision=1; \
+# classification(0).origin=vendor-specific; \
+# assessment.impact.severity=medium; \
+# assessment.impact.type=other; \
+# assessment.impact.description=Security Failure message with identifier #$1; \
+# last

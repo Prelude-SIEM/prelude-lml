@@ -47,7 +47,7 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+
 
 #Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification(0).name=Successful PIX login; \
+ classification(0).name=Successful firewall user login; \
  id=201; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -70,7 +70,7 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
- classification(0).name=Successful PIX enable; \
+ classification(0).name=Successful firewall admin login; \
  id=202; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -88,7 +88,7 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
 
 #Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
- classification(0).name=PIX configuration written to $2; \
+ classification(0).name=Firewall configuration written to $2; \
  id=203; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -100,7 +100,7 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
 
 #Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
 regex=PIX-5-611103: User logged out: Uname: (\S+); \
- classification(0).name=PIX logout; \
+ classification(0).name=Firewall logout; \
  id=204; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -115,7 +115,7 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification(0).name=Failed PIX login; \
+ classification(0).name=Failed firewall user login; \
  id=205; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -138,7 +138,7 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
- classification(0).name=Failed PIX enable; \
+ classification(0).name=Failed firewall admin login; \
  id=206; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -153,7 +153,7 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
 regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
- classification(0).name=SSH Server recognition; \
+ classification(0).name=SSH server recognition; \
  id=207; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -195,7 +195,7 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
 
 #Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
 regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
- classification(0).name=IP Options: $3; \
+ classification(0).name=IP options: $3; \
  id=209; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -251,7 +251,7 @@ regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), d
 
 #Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
 regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\d+) to ([\d\.]+)\/(\d+); \
- classification(0).name=Source or Destination port 0; \
+ classification(0).name=Source or destination port 0; \
  id=212; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -310,7 +310,7 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
 
 #Mar 15 20:55:18 gtsprodpix %PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for tcp src prod:10.100.17.27/1586 dst inside:10.100.16.255/445
 regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for (tcp|udp) src (\S+):([\d\.]+)/(\S+) dst (\S+):([\d\.]+)/(\S+); \
- classification(0).name=Broadcast Address Translation Request; \
+ classification(0).name=Broadcast address translation request; \
  id=215; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -331,7 +331,7 @@ regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed 
 
 #Mar 24 09:19:42 gtsprodpix %PIX-4-313003: Invalid destination for ICMP error message: ICMP source 12.34.56.78 destination 90.12.34.56 (type 3, code 1) on outside interface.  Original IP payload: ICMP source 1.1.1.1 destination 1.1.1.1 (type 1, code 1).
 regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+) destination ([\d\.]+) \(type \d+, code \d+\) on (\S+) interface.; \
- classification(0).name=ICMP Destination/Source Mismatch; \
+ classification(0).name=ICMP destination/source mismatch; \
  id=216; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -348,6 +348,25 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
  target(0).service.protocol=icmp; \
  last
 
+#Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:130.92.204.52/18378 dst outside:24.232.31.8/12685 by access-group "acl_in"
+#regex=PIX-4-106023: Deny (\w+) src (\S+):([\d\.]+)/(\d+) dst (\S+):([\d\.]+)/(\d+) by access-group "(\S+)"; \
+# classification(0).name=Packet denied; \
+# id=217; \
+# revision=1; \
+# classification(0).origin=vendor-specific; \
+# assessment.impact.severity=medium; \
+# assessment.impact.description=A packet was dropped by PIX access-group "$8".; \
+# source(0).interface=$2; \
+# source(0).service.protocol=$1; \
+# source(0).node.address(0).category=ipv4-addr; \
+# source(0).node.address(0).address=$3; \
+# source(0).service.port=$4; \
+# target(0).interface=$5; \
+# target(0).service.protocol=$1; \
+# target(0).node.address(0).category=ipv4-addr; \
+# target(0).node.address(0).address=$6; \
+# target(0).service.port=$7; \
+# last
 
 # Events taken from the Cisco System Log Messages List that will need rules
 # (include 'attack' || 'intrusion' || 'probe' || 'covert' in description; no log samples):

@@ -1,6 +1,5 @@
 ruleset_DATA = \
 	apc-emu.rules		\
-	checkpoint.rules	\
 	cisco-pix.rules		\
 	cisco-vpn.rules		\
 	clamav.rules		\

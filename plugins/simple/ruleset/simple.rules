@@ -154,7 +154,6 @@
 #   A process number
 
 include = apc-emu.rules;
-include = checkpoint.rules;
 include = cisco-vpn.rules;
 include = cisco-pix.rules;
 include = clamav.rules;
