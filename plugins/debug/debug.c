@@ -76,7 +76,7 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 
 
 
-static int debug_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *optarg)
+static int debug_activate(void *context, prelude_option_t *opt, const char *optarg)
 {
         debug_plugin_t *new;
                 
@@ -86,7 +86,7 @@ static int debug_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt, 
                 return prelude_option_error;
         }
 
-        prelude_plugin_instance_set_data(pi, new);
+        prelude_plugin_instance_set_data(context, new);
         
 	return prelude_option_success;
 }
@@ -103,9 +103,9 @@ static void debug_destroy(prelude_plugin_instance_t *pi)
 
 
 
-static int debug_get_output_stderr(prelude_plugin_instance_t *pi, char *buf, size_t size)
+static int debug_get_output_stderr(void *context, prelude_option_t *opt, char *buf, size_t size)
 {
-        debug_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
 	snprintf(buf, size, "%s", plugin->out_stderr ? "enabled" : "disabled");
 
@@ -114,9 +114,9 @@ static int debug_get_output_stderr(prelude_plugin_instance_t *pi, char *buf, siz
 
 
 
-static int debug_set_output_stderr(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *optarg)
+static int debug_set_output_stderr(void *context, prelude_option_t *opt, const char *optarg)
 {
-        debug_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
 	plugin->out_stderr = ! plugin->out_stderr;
 
@@ -129,15 +129,15 @@ prelude_plugin_generic_t *prelude_plugin_init(void)
 {
 	prelude_option_t *opt;
 
-	opt = prelude_plugin_option_add(NULL, CLI_HOOK | CFG_HOOK, 0, "debug",
-                                        "Debug plugin option", optionnal_argument,
-                                        debug_activate, NULL);
+	opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 0, "debug",
+                                 "Debug plugin option", optionnal_argument,
+                                 debug_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
         
-	prelude_plugin_option_add(opt, CLI_HOOK | CFG_HOOK, 's', "stderr",
-                                  "Output to stderr when plugin is called",
-                                  no_argument, debug_set_output_stderr, debug_get_output_stderr);
+	prelude_option_add(opt, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 's', "stderr",
+                           "Output to stderr when plugin is called",
+                           no_argument, debug_set_output_stderr, debug_get_output_stderr);
         
 	prelude_plugin_set_name(&plugin, "Debug");
 	prelude_plugin_set_author(&plugin, "Pierre-Jean Turpeau");

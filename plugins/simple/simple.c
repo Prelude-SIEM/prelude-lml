@@ -832,9 +832,9 @@ static void simple_run(prelude_plugin_instance_t *pi, const log_container_t *log
 
 
 
-static int set_last_first(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg)
+static int set_last_first(void *context, prelude_option_t *opt, const char *arg)
 {
-        simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        simple_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
         plugin->last_rules_first = 1;
         
@@ -844,12 +844,12 @@ static int set_last_first(prelude_plugin_instance_t *pi, prelude_option_t *opt, 
 
 
 
-static int set_simple_ruleset(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg) 
+static int set_simple_ruleset(void *context, prelude_option_t *opt, const char *arg) 
 {
         int ret;
         FILE *fd;
         char *ptr;
-        simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        simple_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
         plugin->rulesetdir = strdup(arg);
 
@@ -883,7 +883,7 @@ static int set_simple_ruleset(prelude_plugin_instance_t *pi, prelude_option_t *o
 
 
 
-static int simple_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg)
+static int simple_activate(void *context, prelude_option_t *opt, const char *arg)
 {
         simple_plugin_t *new;
         
@@ -894,7 +894,7 @@ static int simple_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt,
         }
 
         PRELUDE_INIT_LIST_HEAD(&new->rule_list);
-        prelude_plugin_instance_set_data(pi, new);
+        prelude_plugin_instance_set_data(context, new);
         
         return prelude_option_success;
 }
@@ -923,19 +923,19 @@ prelude_plugin_generic_t *prelude_plugin_init(void)
 {
         prelude_option_t *opt;
         
-        opt = prelude_plugin_option_add(NULL, CLI_HOOK|CFG_HOOK, 0, "simplemod",
-                                        "Simple plugin option", optionnal_argument,
-                                        simple_activate, NULL);
+        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 0, "simplemod",
+                                 "Simple plugin option", optionnal_argument,
+                                 simple_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &simple_plugin, opt, NULL);
         
-        prelude_plugin_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
-                                  "Ruleset to use", required_argument,
-                                  set_simple_ruleset, NULL);
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
+                           "Ruleset to use", required_argument,
+                           set_simple_ruleset, NULL);
 
-        prelude_plugin_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
-                                  "Process rules with the \"last\" attribute first", no_argument,
-                                  set_last_first, NULL);
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
+                           "Process rules with the \"last\" attribute first", no_argument,
+                           set_last_first, NULL);
         
 	prelude_plugin_set_name(&simple_plugin, "SimpleMod");
 	prelude_plugin_set_author(&simple_plugin, "Yoann Vandoorselaere");

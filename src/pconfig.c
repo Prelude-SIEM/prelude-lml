@@ -63,7 +63,7 @@ static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
 
 
-static int print_version(void **context, prelude_option_t *opt, const char *arg)
+static int print_version(void *context, prelude_option_t *opt, const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
 	return prelude_option_end;
@@ -71,7 +71,7 @@ static int print_version(void **context, prelude_option_t *opt, const char *arg)
 
 
 
-static int print_help(void **context, prelude_option_t *opt, const char *arg)
+static int print_help(void *context, prelude_option_t *opt, const char *arg)
 {
         prelude_option_print(NULL, CLI_HOOK, 25);
 	return prelude_option_end;
@@ -79,7 +79,7 @@ static int print_help(void **context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_batch_mode(void **context, prelude_option_t *opt, const char *arg)
+static int set_batch_mode(void *context, prelude_option_t *opt, const char *arg)
 {
         batch_mode = 1;
         file_server_set_batch_mode();
@@ -88,7 +88,7 @@ static int set_batch_mode(void **context, prelude_option_t *opt, const char *arg
 
 
 
-static int set_rotation_interval(void **context, prelude_option_t *opt, const char *arg) 
+static int set_rotation_interval(void *context, prelude_option_t *opt, const char *arg) 
 {
         file_server_set_rotation_interval_max_difference(atoi(arg));
         return prelude_option_success;
@@ -96,7 +96,7 @@ static int set_rotation_interval(void **context, prelude_option_t *opt, const ch
 
 
 
-static int set_quiet_mode(void **context, prelude_option_t *opt, const char *arg)
+static int set_quiet_mode(void *context, prelude_option_t *opt, const char *arg)
 {
 	prelude_log_use_syslog();
 	return prelude_option_success;
@@ -104,7 +104,7 @@ static int set_quiet_mode(void **context, prelude_option_t *opt, const char *arg
 
 
 
-static int set_daemon_mode(void **context, prelude_option_t *opt, const char *arg)
+static int set_daemon_mode(void *context, prelude_option_t *opt, const char *arg)
 {
         prelude_daemonize(pidfile);
         if ( pidfile )
@@ -116,7 +116,7 @@ static int set_daemon_mode(void **context, prelude_option_t *opt, const char *ar
 }
 
 
-static int set_pidfile(void **context, prelude_option_t *opt, const char *arg)
+static int set_pidfile(void *context, prelude_option_t *opt, const char *arg)
 {
         pidfile = strdup(arg);
         if ( ! pidfile ) {
@@ -129,7 +129,7 @@ static int set_pidfile(void **context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_logfile_format(void **context, prelude_option_t *opt, const char *arg)
+static int set_logfile_format(void *context, prelude_option_t *opt, const char *arg)
 {        
         if ( logfile_format )
                 free(logfile_format);
@@ -141,7 +141,7 @@ static int set_logfile_format(void **context, prelude_option_t *opt, const char 
 
 
 
-static int set_logfile_ts_format(void **context, prelude_option_t *opt, const char *arg)
+static int set_logfile_ts_format(void *context, prelude_option_t *opt, const char *arg)
 {        
         if ( logfile_ts_format )
                 free(logfile_ts_format);
@@ -154,7 +154,7 @@ static int set_logfile_ts_format(void **context, prelude_option_t *opt, const ch
 
 
 
-static int set_file(void **context, prelude_option_t *opt, const char *arg) 
+static int set_file(void *context, prelude_option_t *opt, const char *arg) 
 {
         int ret;
         log_source_t *ls;
@@ -199,7 +199,7 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
 
 
 
-static int enable_udp_server(void **context, prelude_option_t *opt, const char *arg) 
+static int enable_udp_server(void *context, prelude_option_t *opt, const char *arg) 
 {
         int port;
         char *ptr = NULL;
@@ -234,7 +234,7 @@ static int enable_udp_server(void **context, prelude_option_t *opt, const char *
 
 
 
-static int set_lml_group(void **context, prelude_option_t *opt, const char *arg) 
+static int set_lml_group(void *context, prelude_option_t *opt, const char *arg) 
 {
         struct group *grp;
 
@@ -252,7 +252,7 @@ static int set_lml_group(void **context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_lml_user(void **context, prelude_option_t *opt, const char *arg) 
+static int set_lml_user(void *context, prelude_option_t *opt, const char *arg) 
 {
         struct passwd *p;
         
@@ -263,7 +263,7 @@ static int set_lml_user(void **context, prelude_option_t *opt, const char *arg)
         }
 
         prelude_lml_user = p->pw_uid;
-        prelude_client_set_uid(*context, p->pw_uid);
+        prelude_client_set_uid(context, p->pw_uid);
         
         return prelude_option_success;
 }
