@@ -1,4 +1,16 @@
+2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+	
+	* plugins/simple/ruleset/ipfw.rules: new file. Rules for ipfw
+	firewall on FreeBSD.
+
+	* plugins/simple/ruleset/simple.rules: include ipfw.rules
+
 2002-04-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/log-plugins.c (subscribe): 
+	(unsubscribe): be more verbose about subscribed plugins.
+
+	* src/file-server.c: include timer.h.
 
 	* plugins/simple/simple.c: 
 	(parse_ruleset): 
