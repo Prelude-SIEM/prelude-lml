@@ -1925,7 +1925,7 @@ regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\
 # LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
 # LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
 
-regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (/d+)/(/d+); \
+regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
  classification.text=Possible buffer overflow; \
  id=690; \
  revision=1; \
