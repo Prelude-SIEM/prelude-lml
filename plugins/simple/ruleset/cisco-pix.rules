@@ -126,7 +126,7 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  target(0).user.userid(0).name=$6; \
  last
 
-#Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 1.2.3.210))
+#Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
  classification(0).name=Failed PIX enable; \
  id=206; \
@@ -139,7 +139,7 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  target(0).user.userid(0).name=enable_15; \
  last
 
-#Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 192.168.250.6 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
+#Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
 regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
  classification(0).name=SSH Server recognition; \
  id=207; \
@@ -158,7 +158,7 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" di
  target(0).service.protocol=tcp; \
  last
 
-#Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.33.8.58(192.168.250.58)/80 on interface outside
+#Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.34.56.78(90.12.34.56)/80 on interface outside
 regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\(([\d\.]+)\)\/(\d+) on interface (\S+); \
  classification(0).name=Embryonic connection limit exceeded; \
  id=208; \
@@ -181,7 +181,7 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  target(0).service.protocol=tcp; \
  last
 
-#Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 192.168.250.6 to 195.152.233.99, IP options: "Loose Src Routing"
+#Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
 regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  classification(0).name=IP Options: $3; \
  id=209; \
@@ -201,7 +201,7 @@ regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  target(0).service.protocol=tcp; \
  last
 
-#Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 192.168.250.45 to 192.168.250.253 on interface staging
+#Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging
 regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
  classification(0).name=Reverse path check failure; \
  id=210; \
@@ -221,7 +221,7 @@ regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on
  target(0).service.protocol=$1; \
  last
 
-#Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 192.168.250.6, dest = 195.152.233.99, proto = icmp, id = 48130
+#Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 12.34.56.78, dest = 90.12.34.56, proto = icmp, id = 48130
 regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), dest = ([\d\.]+), proto = (\w+); \
  classification(0).name=Fragment database limit exceeded; \
  id=211; \
@@ -239,7 +239,7 @@ regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), d
  target(0).service.protocol=$3; \
  last
 
-#Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 192.168.250.6/13798 to 10.32.168.251/0
+#Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
 regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\d+) to ([\d\.]+)\/(\d+); \
  classification(0).name=Source or Destination port 0; \
  id=212; \
