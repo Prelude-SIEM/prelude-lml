@@ -47,7 +47,8 @@ regex=denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\
  assessment.impact.description=An attempt was made to ptrace a read-only binary.  The attempt was denied by the ACL system.; \
  last
 
-# No log sample; please submit
+#LOG:Feb  3 10:50:02 matrix grsec: attempted open of /dev/kmem by (klogd:1387) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
+#
 regex=attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted kernel read/write; \
  id=601; \
@@ -68,7 +69,8 @@ regex=attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\
  assessment.impact.description=An attempt was made to open /dev/kmem.  Grsecurity denied this attempt.  If the process was any other then klogd, you should consider this a kernel compromise attempt.; \
  last
 
-# No log sample; please submit
+# no log sample, please submit
+#
 regex=not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Potential tmp race; \
  id=602; \
@@ -1470,7 +1472,7 @@ regex=attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID
  assessment.impact.description=An attempt was made to read/write to the sysctl entry $1.  Access was denied.; \
  last
 
-# No log sample; please submit
+# LOG:Jun 19 15:53:23 lomo kernel: grsec: time set by (hwclock:4638) UID(0) EUID(0), parent (rcS:31651) UID(0) EUID(0) 
 regex=time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=System time changed; \
  id=669; \
@@ -1491,7 +1493,8 @@ regex=time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+)
  assessment.impact.description=The system time was modified.; \
  last
 
-# No log sample; please submit
+# LOG:Jun 19 15:53:23 lomo kernel: grsec: attempt to mmap 278226 775 executable by (identd:4792) UID(0) EUID(0), parent (initlog:4791) UID(0) EUID(0)
+#
 regex=attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted mmap executable; \
  id=670; \
@@ -1512,7 +1515,8 @@ regex=attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+):(\d+)\
  assessment.impact.description=An attempt was made to mmap the file $3 with device $1 and inode $2 executable.  Access was denied.; \
  last
 
-# No log sample; please submit
+# LOG:Jul 10 01:15:47 worker kernel: grsec: (root:U:/usr/lib/cgi-bin/awstats.pl) attempted socket(inet,stream,ip) by /usr/lib/cgi-bin/awstats.pl[awstats.pl:22937] uid/euid:0/0 gid/egid:0/0, parent /bin/bash[bash:29005] uid/euid:0/0 gid/egid:0/0
+#
 regex=attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted socket use; \
  id=671; \
@@ -1533,7 +1537,8 @@ regex=attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EU
  assessment.impact.description=An attempt to socket($1, $2, $3) was made.  Access was denied.; \
  last
 
-# No log sample; please sumbmit
+# LOG:Jul 10 01:15:47 worker kernel: grsec: attempted bind() by (nc:273) UID(1001) EUID(1001), parent (bash:267) UID(1001) EUID(1001)
+#
 regex=attempted bind\(\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted bind; \
  id=672; \
@@ -1575,7 +1580,8 @@ regex=attempted connect\(\) to fd (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\(
  assessment.impact.description=An attempt to connect to a socket was made.  Access was denied.; \
  last
 
-# No log sample; please submit
+# LOG:Jul 10 01:15:47 worker kernel: grsec: From 1.2.3.4: (root:U:/usr/sbin/proftpd) attempted bind to x.x.x.x port 46304 sock type stream protocol tcp by /usr/sbin/proftpd[proftpd:27198] uid/euid:0/104 gid/egid:65534/65534, parent /usr/sbin/inetd[inetd:538] uid/euid:0/0 gid/egid:0/0
+#
 regex=attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted bind; \
  id=674; \
@@ -1596,7 +1602,8 @@ regex=attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\
  assessment.impact.description=An attempt was made to bind to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
-# No log sample; please submit
+# LOG:Jul 10 01:15:47 worker kernel: grsec: attempted connect to 127.0.0.1 port 111 sock type 2 protocol 17 by (rpciod:1:12991) UID(0) EUID(0), parent (init:1)
+#
 regex=attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted connect; \
  id=675; \
@@ -1617,7 +1624,8 @@ regex=attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol
  assessment.impact.description=An attempt was made to connect to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
-# No log sample; please submit
+# LOG:Oct  5 23:32:51 serpens kernel: grsec: exec of /static/bin/mount within chroot jail [03:46:2] by process (bash:5134) UID(0) EUID(0), parent (bash:30232) UID(0) EUID(0)
+#
 regex=exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Exec inside chroot jail; \
  id=676; \
@@ -1638,7 +1646,8 @@ regex=exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \(([^:]+
  assessment.impact.description=The binary $1 was executed within a chroot jail.; \
  last
 
-# No log sample; please submit
+# LOG: Oct  5 23:32:51 serpens kernel: grsec: CAP_FSETID not raised for (nfsd:16764) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
+#
 regex=([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Filesystem remounted; \
  id=677; \
@@ -1680,7 +1689,8 @@ regex=remount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent
  assessment.impact.description=The path $1 was remounted. ; \
  last
 
-# No log sample; please submit
+# LOG:Oct  5 23:32:51 serpens kernel: grsec: unmount of none by (umount:8055) UID(0) EUID(0), parent (speedtouch.sh:19925) UID(0) EUID(0)
+#
 regex=unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Filesystem unmounted; \
  id=679; \
@@ -1701,7 +1711,8 @@ regex=unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent
  assessment.impact.description=The path $1 was unmounted.; \
  last
 
-# No log sample; please submit
+# LOG:Dec 29 20:48:00 unix kernel: grsec: mount proc to /proc by (mount:19169) UID(0) EUID(0), parent (rcS:24004) UID(0)
+#
 regex=mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Filesystem mounted; \
  id=680; \
@@ -1722,7 +1733,8 @@ regex=mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
  assessment.impact.description=The device $1 was mounted to the path $2.; \
  last
 
-# No log sample; please submit
+# LOG:Dec 29 20:48:00 unix kernel: grsec: chdir to /root by /usr/sbin/crond[crond:19046] uid/euid:0/0 gid/egid:0/0, parent /usr/sbin/crond[crond:3401] uid/euid:0/0 gid/egid:0/0
+#
 regex=chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Directory changed; \
  id=681; \
@@ -1879,7 +1891,8 @@ regex=shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
  assessment.impact.description=Shared memory of size $1 was created.; \
  last
 
-# No log sample; please submit
+# LOG::Oct 13 20:56:41 emma kernel: grsec: shared memory of uid:48 euid:0 removed by (httpd:29404) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
+#
 regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Shared memory removed; \
  id=689; \
@@ -1905,8 +1918,11 @@ regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\
  assessment.impact.description=Shared memory was removed.; \
  last
 
-# No log sample; please submit
-regex=terminating task: ([^(]+)\(([^)]+)\):(\d+) uid/euid: (/d+)/(/d+), EIP: ([0-9A-F]+), ESP: ([0-9A-F]+); \
+
+# LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
+# LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
+
+regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (/d+)/(/d+)
  classification.text=Possible buffer overflow; \
  id=690; \
  revision=1; \
