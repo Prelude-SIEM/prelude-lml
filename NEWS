@@ -14,7 +14,7 @@
 	  (Guillaume Pelat).
 
 	- Dup the filename before checking if opening the file
-	  suceeded, so that re-opening inactive file work agin.
+	  suceeded, so that re-opening inactive file work again.
 	  (Yoann Vandoorselaere).
 
 	- Emit an alert if the modification time get modified,
