@@ -15,7 +15,6 @@
 #include "regex.h"
 #include "common.h"
 #include "log-common.h"
-#include "server-logic.h"
 #include "file-server.h"
 
 #define MAX_FD 1024
