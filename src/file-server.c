@@ -259,13 +259,13 @@ static void check_modification_time(monitor_fd_t *fd, struct stat *st)
         
         if ( st->st_mtime >= old_mtime && st->st_size >= fd->last_size ) 
                 return; /* everythings sound okay */
-
+	
         memset(&class, 0, sizeof(class));
         memset(&impact, 0, sizeof(impact));
         
         class.origin = origin_unknown;
         idmef_string_set_constant(&class.name, LOGFILE_MODIFICATION_CLASS);
-
+        
         impact.type = file;
         impact.completion = succeeded;
         impact.severity = impact_high;
