@@ -4,7 +4,7 @@ preludeconfdir = $(configdir)
 preludeconf_DATA = plugins.rules prelude-lml.conf
 
 EXTRA_DIST = $(preludeconf_DATA) config.h \
-             AUTHORS COPYING CREDITS INSTALL NEWS README \
+             AUTHORS COPYING COPYING.OpenSSL CREDITS INSTALL NEWS README \
              prelude.spec ChangeLog
 
 install-data-local:        

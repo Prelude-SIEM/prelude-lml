@@ -1,6 +1,10 @@
 2002-12-09  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
-	
+
+	* configure.in: bump version number to 0.8.2.
+
 	* NEWS: updated.
+	
+	* Makefile.am (EXTRA_DIST): include COPYING.OpenSSL
 	
 	* plugins/simple/ruleset/netfilter.rules: 
 	Include patch from Nicolas Delon <delon.nicolas@wanadoo.fr>:
