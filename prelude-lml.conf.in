@@ -46,7 +46,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # Example configuration for syslog output:
 #
 time-format = "%b %d %H:%M:%S" 
-prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<program>\S+)(\[(?P<pid>[0-9]+)\])?:)? "
+prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:((?P<program>\S+)(\[(?P<pid>[0-9]+)\])?)?: )?"
 
 file = /var/log/messages
 file = /var/log/auth.log

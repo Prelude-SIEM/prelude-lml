@@ -134,6 +134,7 @@ static int fill_analyzer(const log_entry_t *log_entry, idmef_analyzer_t *analyze
         idmef_node_t *node;
         idmef_process_t *process;
         prelude_string_t *process_name;
+
         if ( log_entry->target_program && ! idmef_analyzer_get_process(analyzer) ) {
                 process = idmef_analyzer_new_process(analyzer);
                 if ( ! process )
@@ -141,6 +142,9 @@ static int fill_analyzer(const log_entry_t *log_entry, idmef_analyzer_t *analyze
 
                 process_name = idmef_process_new_name(process);
                 prelude_string_set_ref(process_name, log_entry->target_program);
+
+                if ( log_entry->target_program_pid )
+                        idmef_process_set_pid(process, atoi(log_entry->target_program_pid));
         }
 
         if ( log_entry->target_hostname && ! idmef_analyzer_get_node(analyzer) ) {
@@ -190,6 +194,9 @@ static int generate_target(const log_entry_t *log_entry, idmef_alert_t *alert)
 
                 process_name = idmef_process_new_name(process);
                 prelude_string_set_ref(process_name, log_entry->target_program);
+
+                if ( log_entry->target_program_pid )
+                        idmef_process_set_pid(process, atoi(log_entry->target_program_pid));
         }
         
         if ( log_entry->target_hostname && ! idmef_target_get_node(target) ) {

@@ -46,7 +46,7 @@
  * default log fmt.
  */
 #define SYSLOG_TS_FMT "%b %d %H:%M:%S"
-#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:(?P<program>\\S+)(\\[(?P<pid>[0-9]+)\\])?:)?"
+#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:((?P<program>\\S+)(\\[(?P<pid>[0-9]+)\\])?)?: )?"
 
 
 
