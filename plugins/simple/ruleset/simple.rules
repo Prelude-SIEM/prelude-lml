@@ -172,6 +172,7 @@ include = modsecurity.rules;
 include = ms-sql.rules;
 include = nagios.rules;
 include = navce.rules;
+include = netapp-ontap.rules;
 include = netfilter.rules;
 include = ntsyslog.rules;
 include = pam.rules;
