@@ -45,6 +45,9 @@
 typedef struct {
         FILE *fd;
         char *file;
+        int index;
+        char buf[1024];
+        int need_more_read;
         time_t last_modified;
 } monitor_fd_t;
 
@@ -54,12 +57,66 @@ static monitor_fd_t *fd_tbl[MAX_FD];
 
 
 
+static int read_logfile(monitor_fd_t *fd) 
+{
+        int ret;
+        
+        while ( 1 ) {
+
+                /*
+                 * check if our buffer isn't big enough,
+                 * and truncate if it is.
+                 */
+                if ( fd->index == sizeof(fd->buf) ) {
+                        fd->buf[fd->index - 1] = '\0';
+                        fd->need_more_read = 1;
+                        break;
+                }
+
+                /*
+                 * as we use -D_REENTRANT, libc will use locked stdio function.
+                 * Override this by using *_unlocked() variant.
+                 */
+                ret = getc_unlocked(fd->fd);
+                if ( ret == EOF ) {
+                        if ( fd->index != 0 )
+                                /*
+                                 * missing end of line (\n).
+                                 */
+                                fd->need_more_read = 1;
+
+                        return -1;
+                }
+                
+                if ( ret == '\n' ) {
+                        fd->buf[fd->index] = '\0';
+                        fd->need_more_read = 0;
+                        break;
+                }
+
+                fd->buf[fd->index++] = (char) ret;
+        }
+        
+        fd->index = 0;
+        
+        return 0;
+}
+
+
+
+
 int file_server_wake_up(regex_list_t *list, queue_t *queue) 
 {
         int i, ret;
-        char buf[8192];
         struct stat st;
         monitor_fd_t *monitor;
+
+        /*
+         * this function is called every second,
+         * as we're not using prelude-async, we have to wake possibly
+         * existing timer manually.
+         */
+        prelude_wake_up_timer();
         
         for ( i = 0; i < fd_index; i++ ) {
                                
@@ -70,16 +127,14 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
                         log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
                         continue;
                 }
-
-                if ( st.st_mtime == monitor->last_modified )
+                
+                if ( ! monitor->need_more_read && st.st_mtime == monitor->last_modified ) 
                         continue;
 
                 monitor->last_modified = st.st_mtime;
 
-                if ( ! fgets(buf, sizeof(buf), monitor->fd) )
-                        continue;
-                
-                lml_dispatch_log(list, queue, buf, monitor->file);
+                while ( read_logfile(monitor) != -1 ) 
+                        lml_dispatch_log(list, queue, monitor->buf, monitor->file);
         }
 
         return 0;
