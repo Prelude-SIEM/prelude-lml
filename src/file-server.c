@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2002 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@mandrakesoft.com>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -530,13 +530,17 @@ static int initialize_fam(void)
                 return -1;
         }
 
+        log(LOG_INFO, "- Checking for FAM writev() bug...\n");
+        
         fam_initialized = check_fam_writev_bug(&fc);
         if ( fam_initialized < 0 ) {
                 FAMClose(&fc);
                 
                 log(LOG_INFO, "- An OS bug prevent FAM from monitoring writev() file modification: disabling FAM.\n");
                 return -1;
-        }       
+        }
+
+        log(LOG_INFO, "- FAM working nicely, enabling.\n");
         
         fam_initialized = 1;
 
@@ -694,8 +698,10 @@ int file_server_monitor_file(const char *file)
                 return -1;
 
         ret = monitor_open(new, 0);
-        if ( ret < 0 )
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't open %s.\n", file);
                 return -1;
+        }
         
         if ( ! new->fd )
                 return 0;
@@ -705,33 +711,11 @@ int file_server_monitor_file(const char *file)
 
 
 
-
-int file_server_standalone(regex_list_t *list)
-{        
-        if ( fam_initialized != 1 ) {
-                while ( 1 ) {
-                        file_server_wake_up(list);
-                        sleep(1);
-                        prelude_wake_up_timer();
-                }
-        }
-
-#ifdef HAVE_FAM
-        else 
-                return fam_wait_for_event(list);
-#endif
-        
-        return 0;
-}
-
-
-
-
 int file_server_wake_up(regex_list_t *list) 
 {
         monitor_fd_t *monitor;
         struct list_head *tmp, *bkp;
-
+        
         if ( fam_initialized != 1 ) {
                 /*
                  * try to open inactive fd (file was not existing previously).
@@ -758,10 +742,11 @@ int file_server_wake_up(regex_list_t *list)
 int file_server_get_event_fd(void) 
 {
 #ifdef HAVE_FAM
-        return FAMCONNECTION_GETFD(&fc);
-#else
-        return -1;
+        if ( fam_initialized == 1 )
+                return FAMCONNECTION_GETFD(&fc);
 #endif
+        
+        return -1;
 }
 
 

@@ -35,7 +35,10 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
+static char **global_argv;
 extern udp_server_t *udp_srvr;
+static volatile sig_atomic_t got_sighup = 0;
+
 
 
 static void sig_handler(int signum)
@@ -50,6 +53,46 @@ static void sig_handler(int signum)
 	exit(2);
 }
 
+
+
+
+static void sighup_handler(int signum) 
+{
+        /*
+         * We can't directly restart LML from the signal handler.
+         * It'll be restarted as soon as the main loop poll the
+         * got_sighup variable.
+         */
+        got_sighup = 1;
+}
+
+
+
+
+static void handle_sighup_if_needed(void) 
+{
+        int ret;
+
+        if ( ! got_sighup )
+                return;
+        
+        log(LOG_INFO, "- Restarting Prelude LML (%s).\n", global_argv[0]);
+
+        if ( udp_srvr )
+                /*
+                 * close the UDP server, so that we can bind the port again.
+                 */
+                udp_server_close(udp_srvr);
+
+        /*
+         * Here we go !
+         */
+        ret = execvp(global_argv[0], global_argv);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "error re-executing lml\n");
+                return;
+        }
+}
 
 
 
@@ -106,12 +149,16 @@ static void wait_for_event(regex_list_t *list)
         gettimeofday(&start, NULL);
         
         while ( 1 ) {
-
+                handle_sighup_if_needed();
+                
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
                 
                 ret = select(MAX(file_event_fd, udp_event_fd) + 1, &fds, NULL, NULL, &tv);
                 if ( ret < 0 ) {
+                        if ( errno == EINTR )
+                                continue;
+                        
                         log(LOG_ERR, "select returned an error.\n");
                         return;
                 }
@@ -147,6 +194,8 @@ int main(int argc, char **argv)
         int ret;
 	regex_list_t *regex_list;
         
+        global_argv = argv;
+        
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {
 		log(LOG_INFO, "error initializing logs plugins.\n");
@@ -165,17 +214,39 @@ int main(int argc, char **argv)
 	regex_list = regex_init(REGEX_CONF);
         if ( ! regex_list )
                 exit(1);
-
+        
         signal(SIGTERM, sig_handler);
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);
-	signal(SIGABRT, sig_handler);
+        signal(SIGABRT, sig_handler);
+        signal(SIGHUP, sighup_handler);
 
-        if ( ! udp_srvr ) 
-                file_server_standalone(regex_list);
-        else 
+        if ( udp_srvr || file_server_get_event_fd() > 0 )
                 wait_for_event(regex_list);
+        else {
+                /*
+                 * there is no way we can do polling.
+                 */
+                while ( 1 ) {
+                        handle_sighup_if_needed();
+                        file_server_wake_up(regex_list);
+                        sleep(1);
+                        prelude_wake_up_timer();
+                }
+        }
         
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

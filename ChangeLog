@@ -1,3 +1,38 @@
+2003-01-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/main.c (sighup_handler): implemented. Set the
+	global got_sighup variable to 1 in an atomic way.
+	(got_sighup is a volatile sig_atomic_t).
+
+	(main): register an handler for SIGHUP. Use the
+	wait_for_event function if we have FAM file monitoring
+	or an UDP server or both. Revert to normal polling otherwise,
+	meaning we call file_server_wake_up() every second, and check
+	for SIGHUP.
+
+	(wait_for_event): call handle_sighup_if_needed() 
+	each time we goes throught the event loop. Restart
+	the loop if select() return EINTR, so that we caught
+	the signal immediatly.
+
+	(handle_sighup_if_needed): implemented. If got_sighup
+	is then, then the udp server port will be closed (so 
+	that we can bind the port again), and prelude-lml
+	will be restarted.
+
+	* src/file-server.c (file_server_monitor_file): 
+	print an error if we can't open the monitored file.
+
+	(file_server_get_event_fd): return -1 if we have FAM
+	but it is not enabled because of the writev() bug.
+
+	(file_server_standalone): removed this function, the
+	code is being moved in another place so that we can 
+	poll for SIGHUP periodically.
+
+	* Makefile.am (install-data-local): install 
+	prelude-lml.conf-dist with mode 600.
+
 2002-12-18  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* plugins/debug/debug.c (debug_run): stop using our own

@@ -15,7 +15,7 @@ install-data-local:
                 echo "Installing default configuration in $(DESTDIR)/$(configdir)/prelude-lml.conf-dist";       \
                 echo;                                                                                    	\
                 echo "********************************************************************************"; 	\
-		$(INSTALL) $(top_srcdir)/prelude-lml.conf $(DESTDIR)/$(configdir)/prelude-lml.conf-dist;        \
+		$(INSTALL) -m 600 $(top_srcdir)/prelude-lml.conf $(DESTDIR)/$(configdir)/prelude-lml.conf-dist; \
         else                                                                                             	\
                 $(INSTALL) -m 600 $(top_srcdir)/prelude-lml.conf $(DESTDIR)/$(configdir)/;                      \
         fi
