@@ -1,0 +1,14 @@
+* Add the source field for the dispatching (not the log line only)
+
+* Integrate CLI through pconfig.[hc]
+
+* Build a simple plugin with a special config file containing regex to match
+
+* Join list of regex and plugin hashtable: each regex should contain a non empty
+  list of subscribed plugins.
+
+* Track local log files
+
+* Integrate PAX plugin
+
+* Integrate SSL

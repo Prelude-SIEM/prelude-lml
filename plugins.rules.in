@@ -1,0 +1,17 @@
+#
+# plugin-name-list      pcre-options		regex
+#
+
+Paxmod			-			.* PAX: .*
+Debug			-			.*
+
+#
+# plugin-name-list is a coma separated list of plugins
+# (list is not supported yet, specify only a single name)
+#
+# pcre-options (not implemented yet)
+#
+# x        exclusive
+# i        case insensitive
+# - no options
+#

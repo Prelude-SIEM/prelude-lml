@@ -1,0 +1,40 @@
+##############################################
+# Configuration for the Prelude LML Sensor   #
+##############################################
+
+[Prelude NIDS]
+
+# Address where the Prelude Manager Server is listening on.
+# if value is "127.0.0.1", the connection will occur throught
+# an UNIX socket.
+#
+# This entry is disabled. The default is to use the entry 
+# located in sensors-default.conf... You may overwrite the
+# default address for this sensor by uncommenting this entry.
+#
+# manager-addr = 127.0.0.1;
+
+
+
+##########################################
+# Configuration for Local Files tracking #
+##########################################
+
+[LocalFiles]
+
+file-list = /var/log/auth.log /var/log/apache/access.log
+
+
+####################################
+# Here start plugins configuration #
+####################################
+
+[Simple]
+
+ruleset=@configdir@/ruleset/simple.rules;
+
+# [Debug]
+#
+# This plugin issue an alert for each packet.
+# Carefull to the loging activity it generate.
+
