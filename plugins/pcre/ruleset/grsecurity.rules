@@ -1311,10 +1311,52 @@ regex=attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.description=An attempt was made in a chroot to renice a process to a higher priority.  Access was denied.; \
  last
 
-# LOG:May  2 18:13:42 lt kernel: grsec: signal 11 sent to (java_vm:22598) UID(501) EUID(501), parent (netscape-bin:32224) UID(501) EUID(501)
 #
+# (grsec2 version)
+# LOG:May  2 18:13:42 lt kernel: grsec: From 82.226.58.44: signal 11 sent to /usr/lib/paxtest/writetext[writetext:2806] uid/euid:0/0 gid/egid:0/0, parent /usr/lib/paxtest/writetext[writetext:23332] uid/euid:0/0 gid/egid:0/0
+
+regex=From (\S+): signal (\d+) sent to ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
+ classification.text=Signal $2 sent; \
+ id=662; \
+ revision=1; \
+ analyzer(0).name=grsecurity; \
+ analyzer(0).manufacturer=www.grsecurity.net; \
+ analyzer(0).class=IDS; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=high; \
+ source(0).node.address(0).address = $1; \
+ target(0).process.path=$3; \
+ target(0).process.name=$4; \
+ target(0).process.pid=$5; \
+ target(0).user.category=application; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$6; \
+ target(0).user.user_id(1).type=user-privs; \
+ target(0).user.user_id(1).number=$7; \
+ target(0).user.user_id(2).type=current-group; \
+ target(0).user.user_id(2).number=$8; \
+ target(0).user.user_id(3).type=group-privs; \
+ target(0).user.user_id(3).number=$9; \
+ target(1).process.path = $10; \
+ target(1).process.name = $11; \
+ target(1).process.pid = $12; \
+ target(1).user.user_id(0).type = current-user; \
+ target(1).user.user_id(0).number = $13; \
+ target(1).user.user_id(1).type = user-privs; \
+ target(1).user.user_id(1).number = $14; \
+ target(1).user.user_id(2).type = current-group; \
+ target(1).user.user_id(2).number = $15; \
+ target(1).user.user_id(3).type = group-privs; \
+ target(1).user.user_id(3).number = $16; \
+ assessment.impact.description=Signal $2 was sent to a process.; \
+ last
+
+#
+# LOG:May  2 18:13:42 lt kernel: grsec: signal 11 sent to (java_vm:22598) UID(501) EUID(501), parent (netscape-bin:32224) UID(501) EUID(501)
+
 regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification.text=Signal sent; \
+ classification.text=Signal $1 sent; \
  id=662; \
  revision=1; \
  analyzer(0).name=grsecurity; \
