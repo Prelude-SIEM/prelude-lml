@@ -161,6 +161,7 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
                         /*
                          * This file doesn't exist on the file system anymore.
                          */
+			fclose(monitor->fd);
                         list_del(&monitor->list);
                         list_add_tail(&monitor->list, &inactive_fd_list);
                         continue;
