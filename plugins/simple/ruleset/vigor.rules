@@ -31,10 +31,10 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
  id=2000; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Vigor $1 dropped a TCP packet $2:$3 -> $4:$5; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Vigor $1 dropped a TCP packet $2:$3 -> $4:$5; \
  source.node.address; \
  source.node.address.address=$2; \
  source.service.port=$3; \
@@ -55,10 +55,10 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
  id=2001; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Vigor $1 dropped an UDP packet $2:$3 -> $4:$5; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Vigor $1 dropped an UDP packet $2:$3 -> $4:$5; \
  source.node.address; \
  source.node.address.address=$2; \
  source.service.port=$3; \
@@ -79,10 +79,10 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([
  id=2002; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Vigor $1 dropped an ICMP packet $2 -> $3 ($4/$5); \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Vigor $1 dropped an ICMP packet $2 -> $3 ($4/$5); \
  source.node.address; \
  source.node.address.address=$2; \
  source.service.protocol=ICMP; \

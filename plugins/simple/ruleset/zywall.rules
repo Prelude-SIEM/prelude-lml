@@ -36,9 +36,9 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  id=2400; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address = $1; \
@@ -49,7 +49,7 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  target.node.address.address = $3; \
  target.service.port = $4; \
  target.service.protocol = $5; \
- impact.description=$5$6 packet blocked from $1 port $2 to $3 port $4 [$7]; \
+ assessment.impact.description=$5$6 packet blocked from $1 port $2 to $3 port $4 [$7]; \
  last
 
 # No log sample; please submit
@@ -58,9 +58,9 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  id=2401; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address = $1; \
@@ -71,7 +71,7 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  target.node.address.address = $3; \
  target.service.port = $4; \
  target.service.protocol = $5; \
- impact.description=$5$6 packet forwarded from $1 port $2 to $3 port $4 [$7]; \
+ assessment.impact.description=$5$6 packet forwarded from $1 port $2 to $3 port $4 [$7]; \
  last
 
 # No log sample; please submit
@@ -80,9 +80,9 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  id=2402; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address = $1; \
@@ -93,5 +93,5 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  target.node.address.address = $3; \
  target.service.port = $4; \
  target.service.protocol = $5; \
- impact.description=$5$6 packet matched from $1 port $2 to $3 port $4 [$7]; \
+ assessment.impact.description=$5$6 packet matched from $1 port $2 to $3 port $4 [$7]; \
  last

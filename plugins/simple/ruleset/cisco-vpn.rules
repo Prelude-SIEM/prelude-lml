@@ -36,8 +36,8 @@ regex=([\d\.]+)  User \[(\S+)\], Group \[\S+\] disconnected; \
  id=300; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.description=VPN user $2 disconnected; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=VPN user $2 disconnected; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -51,10 +51,10 @@ regex=([\d\.]+)  Authentication rejected: Reason = (.+) handle = \d+, server = \
  id=301; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=user; \
- impact.completion=failed; \
- impact.description=VPN user $3 failed authentication because of $2; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=user; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=VPN user $3 failed authentication because of $2; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -68,10 +68,10 @@ regex=([\d\.]+)  Group \[\S+\] User \[(\S+)\] User \(\S+\) authenticated; \
  id=302; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=user; \
- impact.completion=succeeded; \
- impact.description=VPN user $2 authenticated; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=user; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=VPN user $2 authenticated; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -85,10 +85,10 @@ regex=User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <REF
  id=303; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=admin; \
- impact.completion=failed; \
- impact.description=VPN administration authentication failure: $1 using $2; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=VPN administration authentication failure: $1 using $2; \
  target.user.userid; \
  target.user.userid.name=$1; \
  last
@@ -99,10 +99,10 @@ regex=([\d\.]+)  User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. S
  id=304; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=admin; \
- impact.completion=succeeded; \
- impact.description=VPN administration authentication success: $2 using $3; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=VPN administration authentication success: $2 using $3; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \

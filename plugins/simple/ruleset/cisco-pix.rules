@@ -36,8 +36,8 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
  id=200; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.description=Cisco PIX IDS detected an event; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Cisco PIX IDS detected an event; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$2; \
@@ -52,10 +52,10 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user
  id=201; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=admin; \
- impact.completion=succeeded; \
- impact.description=Cisco PIX detected a successful login as user $3; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Cisco PIX detected a successful login as user $3; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -72,10 +72,10 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  id=202; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=admin; \
- impact.completion=succeeded; \
- impact.description=User $1 succesfully enabled; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=User $1 succesfully enabled; \
  source.user.userid; \
  source.user.userid.name=$1; \
  target.user.userid; \
@@ -88,10 +88,10 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  id=203; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=admin; \
- impact.completion=succeeded; \
- impact.description=PIX configuration was written from $1 to $2; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=PIX configuration was written from $1 to $2; \
  last
 
 #Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
@@ -100,10 +100,10 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  id=204; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=admin; \
- impact.completion=succeeded; \
- impact.description=PIX user $1 logged out; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=PIX user $1 logged out; \
  source.user.userid; \
  source.user.userid.name=$1; \
  last
@@ -114,10 +114,10 @@ regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(
  id=205; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=admin; \
- impact.completion=failed; \
- impact.description=Cisco PIX detected a failed login as user $3; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=Cisco PIX detected a failed login as user $3; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -134,10 +134,10 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  id=206; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=admin; \
- impact.completion=failed; \
- impact.description=PIX enable password attempt on the $1 failed from $2; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
  target.user.userid; \
  target.user.userid.name=enable_15; \
  last
@@ -148,10 +148,10 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disc
  id=207; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity = medium; \
- impact.completion=failed; \
- impact.type=recon; \
- impact.description=$1 making probably a server recognition; \
+ assessment.impact.severity = medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=$1 making probably a server recognition; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \
@@ -166,10 +166,10 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  id=208; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity = medium; \
- impact.completion=failed; \
- impact.type=other; \
- impact.description=The embryonic connection limit on your PIX has been met and exceeded.; \
+ assessment.impact.severity = medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=The embryonic connection limit on your PIX has been met and exceeded.; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$1; \

@@ -40,9 +40,9 @@ regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
  id=900; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=high; \
- impact.type=user; \
- impact.description=PAM: $3; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=user; \
+ assessment.impact.description=PAM: $3; \
  target.node.name=$1; \
  target.process.pid=$2; \
  last
@@ -54,9 +54,9 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
  id=901; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=other; \
- impact.description=ALERT log from $1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=other; \
+ assessment.impact.description=ALERT log from $1; \
  target.node.name=$1; \
  last
 
@@ -73,10 +73,10 @@ regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
  id=902; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=succeeded; \
- impact.type=dos; \
- impact.description=$1 was rebooted; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=dos; \
+ assessment.impact.description=$1 was rebooted; \
  source.user.userid; \
  source.user.userid.name=$2; \
  last
@@ -87,10 +87,10 @@ regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
  id=903; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=succeeded; \
- impact.type=dos; \
- impact.description=$2 attempted to reboot $1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=dos; \
+ assessment.impact.description=$2 attempted to reboot $1; \
  source.user.userid; \
  source.user.userid.name=$2; \
  last
@@ -101,10 +101,10 @@ regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
  id=904; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=high; \
- impact.completion=succeeded; \
- impact.type=dos; \
- impact.description=$2 halted $1; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=dos; \
+ assessment.impact.description=$2 halted $1; \
  source.user.userid; \
  source.user.userid.name=$2; \
  last
@@ -115,10 +115,10 @@ regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
  id=905; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=dos; \
- impact.description=$1 is about to reboot, in $2; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=dos; \
+ assessment.impact.description=$1 is about to reboot, in $2; \
  last
 
 
@@ -129,10 +129,10 @@ regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
  id=906; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=high; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=$1 installation failure; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=$1 installation failure; \
  last
 
 
@@ -143,9 +143,9 @@ regex=regex= (\w+) \[LOG_CRIT\]; \
  id=907; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=other; \
- impact.description=CRIT log from $1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=other; \
+ assessment.impact.description=CRIT log from $1; \
  target.node.name=$1; \
  last
 
@@ -162,10 +162,10 @@ regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
  id=908; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=failed; \
- impact.type=other; \
- impact.description=A mail was refused by the SMTP server of $1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=A mail was refused by the SMTP server of $1; \
  target.node.name=$1; \
  target.process.pid=$2; \
  target.process.name=mail; \
@@ -179,9 +179,9 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\)
  id=909; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.type=dos; \
- impact.severity=low; \
- impact.description=SMTP port #$3 could not be opened on $1; \
+ assessment.impact.type=dos; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=SMTP port #$3 could not be opened on $1; \
  target.node.name=$1; \
  target.process.pid=$2; \
  target.process.name=mail; \
@@ -195,9 +195,9 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" p
  id=910; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.type=dos; \
- impact.severity=low; \
- impact.description=$1 could not connect to the SMTP server $3:$4; \
+ assessment.impact.type=dos; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=$1 could not connect to the SMTP server $3:$4; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$3; \
@@ -212,8 +212,8 @@ regex=regex= (\w+) \[LOG_ERR\]; \
  id=911; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=other; \
- impact.description=ERR log from $1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=other; \
+ assessment.impact.description=ERR log from $1; \
  target.node.name=$1; \
  last

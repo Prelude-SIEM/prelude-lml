@@ -42,10 +42,10 @@ regex= security\[success\] 515 (.*) Logon Process Name:([\w\\]+); \
  id=1400; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=$2 has registered as a trusted logon process; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=$2 has registered as a trusted logon process; \
  source.process.name=$2; \
  last
 
@@ -56,10 +56,10 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
  id=1401; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=user; \
- impact.description=$2 successfully logged on on $7 ($3 domain) via $6; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=user; \
+ assessment.impact.description=$2 successfully logged on on $7 ($3 domain) via $6; \
  source.user.userid; \
  source.user.userid.name=$1; \
  last
@@ -71,10 +71,10 @@ regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+
  id=1402; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=user; \
- impact.description=$2 logged off; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=user; \
+ assessment.impact.description=$2 logged off; \
  source.user.userid; \
  source.user.userid.name=$2; \
  last
@@ -86,10 +86,10 @@ regex= security\[success\] 560 (.*)  Object Open:  Object Server:([\w\s]+)  Obje
  id=1403; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=$11 opened an object $4 on $2; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=$11 opened an object $4 on $2; \
  source.user.userid; \
  source.user.userid.name=$11; \
  target.process.pid=$7; \
@@ -102,10 +102,10 @@ regex= security\[success\] 562 (.*) Handle Closed:  Object Server:([\w\s]+)  Han
  id=1404; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=Object Handle closed on $2; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Object Handle closed on $2; \
  target.process.pid=$4; \
  last
 
@@ -116,10 +116,10 @@ regex= security\[success\] 576 (.*)  Special privileges assigned to new logon:  
  id=1405; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=user; \
- impact.description=$2 got following privileges: $5; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=user; \
+ assessment.impact.description=$2 got following privileges: $5; \
  source.user.userid; \
  source.user.userid.name=$2; \
  last
@@ -131,10 +131,10 @@ regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:(.+)  Se
  id=1406; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=Service $3 called with the following privileges: $10; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Service $3 called with the following privileges: $10; \
  source.user.userid; \
  source.user.userid.name=$7; \
  last
@@ -146,10 +146,10 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
  id=1407; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=User $4 modified the password policy for the $2 domain; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=User $4 modified the password policy for the $2 domain; \
  source.user.userid; \
  source.user.userid.name=$4; \
  last
@@ -161,9 +161,9 @@ regex= security\[success\] 680 (.*)  Account Used for Logon by: (.+)  Account Na
  id=1408; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=user; \
- impact.description=Logon attempt on $4 using the $3 account; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=user; \
+ assessment.impact.description=Logon attempt on $4 using the $3 account; \
  target.node.name=$4; \
  last
 
@@ -174,10 +174,10 @@ regex= security\[success\] 682 (.*)  Session reconnected to winstation:  User Na
  id=1409; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=Session reconnection from $7; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Session reconnection from $7; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$7; \
@@ -192,10 +192,10 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
  id=1410; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.completion=succeeded; \
- impact.type=other; \
- impact.description=Session reconnection from $7; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Session reconnection from $7; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$7; \
@@ -210,9 +210,9 @@ regex= security\[success\] (\d+); \
  id=1411; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=other; \
- impact.description=Security Success message with identifier #$1; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Security Success message with identifier #$1; \
  last
 
 
@@ -224,10 +224,10 @@ regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\
  id=1412; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=failed; \
- impact.type=user; \
- impact.description=Logon as $4 failed: $3; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ assessment.impact.description=Logon as $4 failed: $3; \
  target.node.name=$9; \
  target.user.userid; \
  target.user.userid.name=$4; \
@@ -240,8 +240,8 @@ regex= security\[failure\] 578 (.+) Privileged object operation:  Object Server:
  id=1413; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=user; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=user; \
  target.process.pid=$3; \
  source.user.userid; \
  source.user.userid.name=$7; \
@@ -254,9 +254,9 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
  id=1414; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=user; \
- impact.description=$5 attempted to change the password for $2 on the $3 domain; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=user; \
+ assessment.impact.description=$5 attempted to change the password for $2 on the $3 domain; \
  source.user.userid; \
  source.user.userid.name=$5; \
  target.user.userid; \
@@ -269,10 +269,10 @@ regex= security\[failure\] 681 (.+)  The logon to account: (\w+)  by:(.+)  from 
  id=1415; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=failed; \
- impact.type=user; \
- impact.description=Logon as $2 from $3 failed; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ assessment.impact.description=Logon as $2 from $3 failed; \
  target.node.name=$3; \
  target.user.userid; \
  target.user.userid.name=$2; \
@@ -285,7 +285,7 @@ regex= security\[failure\] (\d+); \
  id=1416; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.type=other; \
- impact.description=Security Failure message with identifier #$1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Security Failure message with identifier #$1; \
  last

@@ -36,10 +36,10 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
  id=1000; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=failed; \
- impact.type=user; \
- impact.description=An attempt was made to login to MS-SQL instance $1 using account $2; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ assessment.impact.description=An attempt was made to login to MS-SQL instance $1 using account $2; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  target.user.userid; \
@@ -52,10 +52,10 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
  id=1001; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=medium; \
- impact.completion=failed; \
- impact.type=admin; \
- impact.description=An attempt was made to login to MS-SQL instance $1 as sa; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=admin; \
+ assessment.impact.description=An attempt was made to login to MS-SQL instance $1 as sa; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  target.user.userid; \

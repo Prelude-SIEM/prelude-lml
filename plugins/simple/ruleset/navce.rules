@@ -37,9 +37,9 @@ regex=norton antivirus\[\w+\] 5  Virus Found!Virus name: (.+) in File; \
  id=1200; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=high; \
- impact.type=file; \
- impact.description=A virus has been identified by Norton Antivirus; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=file; \
+ assessment.impact.description=A virus has been identified by Norton Antivirus; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  last
@@ -50,9 +50,9 @@ regex=norton antivirus\[\w+\] \d+  Download of virus definition file from LiveUp
  id=1201; \
  revision=1; \
  classification(0).origin=vendor-specific; \
- impact.severity=low; \
- impact.type=other; \
- impact.description=Norton Antivirus Virus definitions have been updated; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Norton Antivirus Virus definitions have been updated; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  last
