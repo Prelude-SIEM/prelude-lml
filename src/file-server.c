@@ -171,7 +171,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         if ( ! file ) 
                 goto err;
 
-        idmef_file_set_category(file, current);
+        idmef_file_set_category(file, IDMEF_FILE_CATEGORY_CURRENT);
         idmef_file_set_data_size(file, st->st_size);
 
         inode = idmef_file_new_inode(file);
@@ -242,14 +242,14 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
                 return;
         }
         
-        idmef_classification_set_origin(classification, origin_unknown);
+        idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
         
         classification_name = idmef_classification_new_name(classification);
         idmef_string_set_constant(classification_name, LOGFILE_MODIFICATION_CLASS);
         
-        idmef_impact_set_type(impact, file);
-        idmef_impact_set_completion(impact, succeeded);
-        idmef_impact_set_severity(impact, impact_high);
+        idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
+        idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
+        idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
         
         impact_description = idmef_impact_new_description(impact);
         idmef_string_set_constant(impact_description, LOGFILE_MODIFICATION_IMPACT);
@@ -708,19 +708,19 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 			return -1;
 		}
 
-		idmef_classification_set_origin(classification, origin_unknown);
+		idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
 		classification_name = idmef_classification_new_name(classification);
 		idmef_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
 
-		idmef_impact_set_type(impact, file);
-		idmef_impact_set_completion(impact, succeeded);
+		idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
+		idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
         if ( is_normal_log_rotation(monitor, st) == 0 ) {
-                idmef_impact_set_severity(impact, impact_medium);
+                idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_MEDIUM);
                 impact_description = idmef_impact_new_description(impact);
                 idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
         } else {
-                idmef_impact_set_severity(impact, impact_high);
+                idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
                 impact_description = idmef_impact_new_description(impact);
                 idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT_HIGH);
         }

@@ -10,7 +10,6 @@
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-message-send.h>
 #include <libprelude/idmef-message-id.h>
 #include <libprelude/prelude-getopt.h>
 
@@ -52,7 +51,7 @@ static void debug_run(const log_container_t *log)
 	adata = idmef_alert_new_additional_data(alert);
 	assert(adata);
 
-	idmef_additional_data_set_type(adata, string);
+	idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
 
 	adata_meaning = idmef_additional_data_new_meaning(adata);
 	idmef_string_set_constant(adata_meaning, "log message");

@@ -42,7 +42,7 @@
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-message-send.h>
+#include <libprelude/idmef-message-write.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/sensor.h>
@@ -116,7 +116,7 @@ static void send_heartbeat_cb(void *data)
 
 	idmef_heartbeat_set_create_time(heartbeat, create_time);
 
-	idmef_send_message(msgbuf, message);
+	idmef_write_message(msgbuf, message);
 	prelude_msgbuf_mark_end(msgbuf);
 
 	idmef_message_destroy(message);
@@ -178,8 +178,9 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
                 in_addr = prelude_inet_sockaddr_get_inaddr(ai->ai_addr);
                 assert(in_addr);
 
-		idmef_address_set_category(addr,
-					   (ai->ai_family == AF_INET) ? ipv4_addr : ipv6_addr);
+		idmef_address_set_category(addr, (ai->ai_family == AF_INET) ?
+                                           IDMEF_ADDRESS_CATEGORY_IPV4_ADDR :
+                                           IDMEF_ADDRESS_CATEGORY_IPV6_ADDR);
                 
                 if ( ! prelude_inet_ntop(ai->ai_family, in_addr, str, sizeof(str)) ) {
                         log(LOG_ERR, "inet_ntop returned an error.\n");
@@ -277,7 +278,7 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 	adata_meaning = idmef_additional_data_new_meaning(adata);
 	idmef_string_set_ref(adata_meaning, meaning);
 
-	idmef_additional_data_set_type(adata, string);
+	idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
 
 	adata_data = idmef_additional_data_new_data(adata);
 	idmef_data_set_ref(adata_data, data, strlen(data) + 1);
@@ -333,8 +334,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
         /*
          *
          */
-        
-        idmef_send_message(msgbuf, message);
+        idmef_write_message(msgbuf, message);
         prelude_msgbuf_mark_end(msgbuf);
         
  error:
