@@ -46,9 +46,9 @@ regex=-- (\w+) (\w+) (\w+) User: (\S+)$; id=3601; revision=1; \
 # LOG:Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
 #
 regex=AUDIT; optgoto=3600-3601; min-optgoto-match=1; \
- analyzer.name=Big-IP; \
- analyzer.manufacturer=F5; \
- analyzer.class=Load Balancer; \
+ analyzer(0).name=Big-IP; \
+ analyzer(0).manufacturer=F5; \
+ analyzer(0).class=Load Balancer; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \
