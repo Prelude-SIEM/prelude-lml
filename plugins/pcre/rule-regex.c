@@ -248,10 +248,10 @@ rule_regex_t *rule_regex_new(const char *regex, int optionnal)
         }
 
         new->regex_string = strdup(regex);
-	if ( ! new->regex_string ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		return NULL;
-	}
+	    if ( ! new->regex_string ) {
+		    log(LOG_ERR, "memory exhausted.\n");
+		    return NULL;
+	    }
 
         new->optreg = optionnal;
         new->extra = pcre_study(new->regex, 0, &err_ptr);
