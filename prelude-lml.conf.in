@@ -39,7 +39,7 @@
 # Example configuration for syslog output:
 #
 time-format = "%b %d %H:%M:%S"
-log-format = "%ltime %thost %tprog"
+log-format = "%ltime %thost %tprog "
 
 file = /var/log/messages
 file = /var/log/auth.log
