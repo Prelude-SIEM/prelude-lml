@@ -133,9 +133,7 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 
 
 static int set_logfile_format(prelude_option_t *opt, const char *arg)
-{
-        printf("set fmt\n");
-        
+{        
         if ( logfile_format )
                 free(logfile_format);
         
@@ -147,9 +145,7 @@ static int set_logfile_format(prelude_option_t *opt, const char *arg)
 
 
 static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
-{
-        printf("set ts\n");
-        
+{        
         if ( logfile_ts_format )
                 free(logfile_ts_format);
         
