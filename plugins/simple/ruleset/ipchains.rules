@@ -1,6 +1,6 @@
 # Customized prelude-lml rules file to support Ipchains events - v0.1.1
 # Simon Castro <scastro [at] entreelibre.com>
-
+# Ruleset updated for 0-9 branch by Gene R Gomez
 #
 # Deny rules : Match all IPv4 packet deny references for tcp, udp and icmp protocols.
 #

@@ -32,20 +32,19 @@
 #May  8 08:58:22 icecube portsentry[795]: attackalert: UDP scan from host: 193.63.249.24/193.63.249.24 to UDP port: 177
 #May  7 22:52:45 icecube portsentry[795]: attackalert: UDP scan from host: dynamic1.lshtm.ac.uk/194.80.231.1 to UDP port: 68
 
-regex=portsentry\[?(\d+)+\]?:.* attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
- classification(0).name=PortSentry - $2 Scan; \
+regex=attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
+ classification(0).name=$1 Scan; \
  id=1500; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- assessment.impact.description=PortSentry found someone performed a '$2' scan; \
-  \
+ assessment.impact.description=PortSentry found someone performed a '$1' scan; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.port=$6; \
- source(0).service.protocol=$5; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$5; \
+ source(0).service.protocol=$4; \
  last;
 
 # 2) Connection :
@@ -56,20 +55,19 @@ regex=portsentry\[?(\d+)+\]?:.* attackalert: (\S+) scan from host: (\S+)/([\d\.]
 #Nov 19 00:12:53 hosty portsentry[17645]: [ID 702911 daemon.notice] attackalert: Connect from host: ns1.colo.f1host.com.br/207.153.110.234 to TCP port: 80
 #Mar 28 00:03:25 hoste portsentry[103]: attackalert: Connect from host: 217.33.28.29/217.33.28.29 to TCP port: 111
 
-regex=portsentry\[?(\d+)+\]?:.* attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
- classification(0).name=PortSentry - $4/$5 connection loggued; \
+regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
+ classification(0).name=$3/$4 connection logged; \
  id=1501; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
- assessment.impact.description=PortSentry found someone connecting to port $4/$5; \
-  \
+ assessment.impact.description=PortSentry found someone connecting to port $3/$4; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
- source(0).service.port=$5; \
- source(0).service.protocol=$4; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=$3; \
  last;
 
 # 3) Rules :
@@ -77,16 +75,15 @@ regex=portsentry\[?(\d+)+\]?:.* attackalert: Connect from host: (\S+)/([\d\.]+|[
 # Sample matching logs :
 #Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
 
-regex=portsentry\[?(\d+)+\]?:.* attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
- classification(0).name=PortSentry - connection blocked \
+regex=attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
+ classification(0).name=Connection blocked \
  id=1502; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
- assessment.impact.description=PortSentry saw your firewall denied a connection via : $3; \
-  \
+ assessment.impact.description=PortSentry saw your firewall denied a connection via : $2; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$2; \
+ source(0).node.address(0).address=$1; \
  last;
