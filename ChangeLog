@@ -2,6 +2,11 @@
 
 	* src/udp-server.c (udp_server_new): verbose message
 	when the syslog server is enabled.
+	
+	(udp_server_process_event, udp_server_new): embed
+	a log_file_t within udp_server_t. Set the filename
+	to be the source of the syslog message. Avoid a crash
+	due to the recent log file handling change.
 
 2004-01-31  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 

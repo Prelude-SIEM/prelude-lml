@@ -33,6 +33,7 @@
 
 struct udp_server {
 	int sockfd;
+        log_file_t *lf;
 	struct sockaddr_in saddr;
 };
 
@@ -42,6 +43,7 @@ struct udp_server {
 void udp_server_process_event(udp_server_t *server, regex_list_t *list)
 {
         int len, ret;
+        char src[512], *sptr;
         struct sockaddr_in addr;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
         
@@ -52,11 +54,13 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
                 log(LOG_ERR, "error receiving syslog message.\n");
                 return;
         }
-                
-        dprint("[UDP  ] on fd %d got packet from %s:%d - packet is %d bytes long\n",
-               server->sockfd, inet_ntoa(addr.sin_addr), addr.sin_port, ret);
-                
+
         buf[ret] = '\0';
+        
+        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);
+        sptr = strdup(src);
+        
+        log_file_set_filename(server->lf, sptr);
 
         /*
          * we don't care about syslog priority / facility.
@@ -65,7 +69,9 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
         if ( ! ptr )
                 ptr = buf;
         
-        lml_dispatch_log(list, ptr, inet_ntoa(addr.sin_addr));
+        lml_dispatch_log(list, server->lf, inet_ntoa(addr.sin_addr));
+
+        free(sptr);
 }
 
 
@@ -98,6 +104,10 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 log(LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
+        
+        server->lf = log_file_new();
+        if ( ! server->lf )
+                return NULL;
         
 	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if ( server->sockfd < 0 ) {
