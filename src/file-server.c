@@ -44,9 +44,11 @@
 #include <libprelude/prelude-timer.h>
 #include <libprelude/prelude-log.h>
 
+#include "prelude-lml.h"
 #include "regex.h"
 #include "common.h"
 #include "log-common.h"
+#include "log-entry.h"
 #include "file-server.h"
 #include "lml-alert.h"
 
@@ -91,7 +93,7 @@
 typedef struct {
         prelude_list_t list;
         
-        log_source_t *source;
+        lml_log_source_t *source;
         
         FILE *fd;
         FILE *metadata_fd;
@@ -145,20 +147,20 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_file_t *file;
         idmef_time_t *time;
         idmef_inode_t *inode;
-        log_entry_t *log_entry;
+        lml_log_entry_t *log_entry;
         idmef_alert_t *alert;
         idmef_target_t *target;
         idmef_message_t *message;
         idmef_assessment_t *assessment;
         prelude_string_t *string;
         
-        log_entry = log_entry_new(fd->source);
+        log_entry = lml_log_entry_new();
         if ( ! log_entry )
                 return;
         
         ret = idmef_message_new(&message);
         if ( ret < 0 ) {
-                log_entry_delete(log_entry);
+                lml_log_entry_destroy(log_entry);
                 return;
         }
 
@@ -185,7 +187,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
                 goto err;
 
         idmef_inode_set_number(inode, st->st_ino);
-        snprintf(buf, sizeof(buf), "%s", log_source_get_name(fd->source));
+        snprintf(buf, sizeof(buf), "%s", lml_log_source_get_name(fd->source));
 
         ptr = strrchr(buf, '/');
         if ( ptr ) {
@@ -222,14 +224,14 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_assessment_set_impact(assessment, impact);
         idmef_alert_set_classification(alert, classification);
         
-        lml_emit_alert(log_entry, message, PRELUDE_MSG_PRIORITY_HIGH);
+        lml_alert_emit(fd->source, log_entry, message);
         
-        log_entry_delete(log_entry);
+        lml_log_entry_destroy(log_entry);
         
         return;
         
  err:
-        log_entry_delete(log_entry);
+        lml_log_entry_destroy(log_entry);
         idmef_message_destroy(message);
 }
 
@@ -300,7 +302,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         
         offptr = strchr(buf, ':');
         if ( ! offptr ) {
-                prelude_log(PRELUDE_LOG_WARN, "%s: Invalid metadata file.\n", log_source_get_name(monitor->source), line);
+                prelude_log(PRELUDE_LOG_WARN, "%s: Invalid metadata file.\n", lml_log_source_get_name(monitor->source), line);
                 ftruncate(fileno(monitor->metadata_fd), 0);
                 return -1;
         }
@@ -364,7 +366,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
                 return 0;
 
         sumptr = sumline;
-        filename = log_source_get_name(monitor->source);
+        filename = lml_log_source_get_name(monitor->source);
         
         ret = file_metadata_read(monitor, &offset, &sumptr, sizeof(sumline));
         if ( ret == 0 )
@@ -423,7 +425,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         if ( ignore_metadata )
                 return 0;
 
-        strncpy(file, log_source_get_name(monitor->source), sizeof(file));
+        strncpy(file, lml_log_source_get_name(monitor->source), sizeof(file));
 
         while ( (ptr = strchr(file, '/')) )
                 *ptr = '-'; /* strip */
@@ -559,7 +561,7 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
 
 
 
-static monitor_fd_t *monitor_new(log_source_t *ls) 
+static monitor_fd_t *monitor_new(lml_log_source_t *ls) 
 {
         int ret;
         monitor_fd_t *new;
@@ -612,7 +614,7 @@ static int monitor_open(monitor_fd_t *monitor)
         int ret;
         const char *filename;
 
-        filename = log_source_get_name(monitor->source);
+        filename = lml_log_source_get_name(monitor->source);
         
         if ( strcmp(filename, STDIN_FILENAME) == 0 )
                 monitor->fd = stdin;
@@ -728,7 +730,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         idmef_classification_t *classification;
         prelude_string_t *str;
         
-        filename = log_source_get_name(monitor->source);
+        filename = lml_log_source_get_name(monitor->source);
         
         /*
          * test if the file has been removed
@@ -939,7 +941,7 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
         if ( ret < 0 )
                 return 0;
 
-        filename = log_source_get_name(monitor->source);
+        filename = lml_log_source_get_name(monitor->source);
         
         ret = FAMMonitorFile(&fc, filename, &monitor->fam_request, monitor);
         if ( ret < 0 ) {
@@ -1027,7 +1029,7 @@ static int process_file_event(monitor_fd_t *monitor)
 
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", log_source_get_name(monitor->source));
+                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
                 return -1;
         }
         
@@ -1049,7 +1051,7 @@ static int process_file_event(monitor_fd_t *monitor)
 
 
 
-int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls) 
+int file_server_monitor_file(regex_list_t *rlist, lml_log_source_t *ls) 
 {
         monitor_fd_t *new;
         

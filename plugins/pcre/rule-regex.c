@@ -35,9 +35,7 @@
 #include <libprelude/prelude-linked-object.h>
 
 #include "libmissing.h"
-#include "log-common.h"
-#include "lml-alert.h"
-#include "log.h"
+#include "prelude-lml.h"
 
 #include "rule-object.h"
 #include "pcre-mod.h"
@@ -100,19 +98,20 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
 
 
 
-static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovector, size_t size)
+static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *ovector, size_t size)
 {
         rule_regex_t *item;
         prelude_list_t *tmp;
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
 
-        dprint("\nInput = %s\n", log_entry->message);
+        dprint("\nInput = %s\n", lml_log_entry_get_message(log_entry));
         
         prelude_list_for_each(&rule->regex_list, tmp) {
                 item = prelude_linked_object_get_object(tmp);
                                 
-                ret = do_pcre_exec(item, &real_ret, log_entry->message, log_entry->message_len,
+                ret = do_pcre_exec(item, &real_ret, lml_log_entry_get_message(log_entry),
+                                   lml_log_entry_get_message_len(log_entry),
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
                 
                 dprint("match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
@@ -149,7 +148,7 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
 
 
 
-static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_entry_t *log_entry)
+static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_log_entry_t *log_entry)
 {
          int ret;
          int ovector[MAX_REFERENCE_PER_RULE * 3];
@@ -169,7 +168,8 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_e
 }
 
 
-static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const log_entry_t *log_entry)
+static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
+                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;
@@ -188,7 +188,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
         prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
-                ret = match_rule_list(child, state, log_entry);
+                ret = match_rule_list(child, state, ls, log_entry);
                 if ( ret < 0 )
                         return -1;
         }
@@ -200,7 +200,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
                 return -1;
         
         if ( ! rule->silent && state->idmef ) {
-                lml_emit_alert(log_entry, state->idmef, PRELUDE_MSG_PRIORITY_MID);
+                lml_alert_emit(ls, log_entry, state->idmef);
                 state->idmef = NULL;
         }
 
@@ -209,14 +209,14 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
 
 
 
-int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log_entry)
+int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
         pcre_state_t state;
         
         memset(&state, 0, sizeof(state));
         
-        ret = match_rule_list(root, &state, log_entry);
+        ret = match_rule_list(root, &state, ls, log_entry);
         if ( ret < 0 )
                 return -1;
         

@@ -12,13 +12,14 @@ prelude_lml_LDFLAGS = @LIBPRELUDE_LDFLAGS@ -export-dynamic \
         "-dlopen" $(top_builddir)/plugins/debug/debug.la \
         "-dlopen" $(top_builddir)/plugins/pcre/pcre.la
 
-prelude_lml_SOURCES = \
-        prelude-lml.c \
-        udp-server.c \
-        regex.c \
-        log-common.c \
-        log-plugins.c \
-        lml-options.c \
-        file-server.c \
+prelude_lml_SOURCES = 	\
+        prelude-lml.c 	\
+        udp-server.c 	\
+        regex.c 	\
+        log-common.c 	\
+	log-entry.c	\
+        log-plugins.c 	\
+        lml-options.c 	\
+        file-server.c 	\
         lml-alert.c
 

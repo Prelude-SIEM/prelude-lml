@@ -35,10 +35,10 @@
  * unless _XOPEN_SOURCE is defined.
  */
 #include <time.h>
-
 #include <pcre.h>
-
 #include <libprelude/prelude-log.h>
+
+#include "prelude-lml.h"
 #include "log-common.h"
 
 
@@ -50,9 +50,8 @@
 
 
 
-struct log_source_s {
-        unsigned int id;
-        
+
+struct lml_log_source {        
         char *name;
         char *ts_fmt;
         pcre *prefix_regex;
@@ -60,198 +59,8 @@ struct log_source_s {
 };
 
 
-static unsigned int global_id = 0;
 
-
-
-
-static int parse_ts(log_source_t *ls, const char *string, void **out) 
-{
-        time_t now;
-        struct tm *lt;
-        const char *end;
-        struct timeval *tv = *out;
-        
-        /*
-         * We first get the localtime from this system,
-         * so that all the struct tm member are filled.
-         *
-         * As syslog header doesn't contain a complete timestamp, this
-         * avoid us some computation error.
-         */
-        now = time(NULL);
-        
-        lt = localtime(&now);
-        if ( ! lt )
-                goto err;
-
-        /*
-         * strptime() return a pointer to the first non matched character.
-         */
-        
-        end = strptime(string, ls->ts_fmt, lt);
-        if ( ! end ) 
-                goto err;
-
-        /*
-         * convert back to a timeval.
-         */
-        tv->tv_usec = 0;
-        tv->tv_sec = mktime(lt);
-
-        return 0;
-
- err:
-        prelude_log(PRELUDE_LOG_WARN, "couldn't format \"%s\" using \"%s\".\n", string, ls->ts_fmt);
-        return -1;
-}
-
-
-
-static int parse_prefix(log_entry_t *log_entry)
-{
-        char *string;
-        int ovector[5 * 3];
-        int i, ret, matches = 0;
-        void *tv = &log_entry->tv;
-        struct {
-                const char *field;
-                int (*cb)(log_source_t *ls, const char *log, void **out);
-                void **ptr;
-        } tbl[] = {
-                { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
-                { "process",   NULL,     (void **) &log_entry->target_process     },
-                { "pid",       NULL,     (void **) &log_entry->target_process_pid },
-                { "timestamp", parse_ts, (void **) &tv                            },
-                { NULL, NULL, NULL                                                },
-        };
-
-        matches = pcre_exec(log_entry->source->prefix_regex, log_entry->source->prefix_regex_extra,
-                            log_entry->original_log, log_entry->original_log_len, 0, 0, ovector, sizeof(ovector) / sizeof(int));
-        
-        if ( matches < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->original_log);
-                return -1;
-        }
-
-        for ( i = 0; tbl[i].field != NULL; i++ ) {
-                ret = pcre_get_named_substring(log_entry->source->prefix_regex, log_entry->original_log,
-                                               ovector, matches, tbl[i].field, (const char **) &string);
-                
-                if ( ret == PCRE_ERROR_NOSUBSTRING )
-                        continue;
-
-                else if ( ret < 0 ) {
-                        prelude_log(PRELUDE_LOG_WARN, "could not get referenced string: %d.\n", ret);
-                        return -1;
-                }
-                
-                if ( ! tbl[i].cb )
-                        *tbl[i].ptr = string;
-                
-                else {
-                        ret = tbl[i].cb(log_entry->source, string, tbl[i].ptr);
-                        free(string);
-                        
-                        if ( ret < 0 ) {
-                                prelude_log(PRELUDE_LOG_WARN, "failed to parse prefix field: %s.\n", tbl[i].field);
-                                return -1;
-                        }
-                }
-        }
-
-        return 0;
-}
-
-
-
-static char *get_hostname(void) 
-{
-        int ret;
-        char out[256];
-                
-        ret = gethostname(out, sizeof(out));
-        if ( ret < 0 )
-                return NULL;
-        
-        return strdup(out);
-}
-
-
-
-
-log_entry_t *log_entry_new(log_source_t *source)
-{
-        log_entry_t *log_entry;
-
-        log_entry = calloc(1, sizeof(*log_entry));
-        if ( ! log_entry ) {
-                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
-                return NULL;
-        }
-
-        log_entry->source = source;
-        gettimeofday(&log_entry->tv, NULL);
-        
-        return log_entry;
-}
-
-
-
-
-int log_entry_set_log(log_entry_t *log_entry, const char *entry, size_t size) 
-{
-        int ret;
-        
-        log_entry->original_log_len = size;
-        
-        log_entry->original_log = strdup(entry);
-        if ( ! log_entry->original_log ) {
-                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
-                return -1;
-        }
-
-        log_entry->message = log_entry->original_log;
-        log_entry->message_len = log_entry->original_log_len;
-        
-        ret = parse_prefix(log_entry);
-        
-        if ( ! log_entry->target_hostname )
-                log_entry->target_hostname = get_hostname();
-        
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "failed to parse log message prefix.\n");
-                gettimeofday(&log_entry->tv, NULL);
-                return -1;
-        }
-        
-        return 0;
-}
-
-
-
-
-void log_entry_delete(log_entry_t *log_entry)
-{
-        if ( log_entry->target_hostname )
-                free(log_entry->target_hostname);
-
-        if ( log_entry->target_process )
-                free(log_entry->target_process);
-
-        if ( log_entry->target_process_pid )
-                free(log_entry->target_process_pid);
-
-        if ( log_entry->original_log )
-                free(log_entry->original_log);
-        
-        free(log_entry);
-}
-
-
-
-
-int log_source_set_name(log_source_t *ls, const char *name) 
+int lml_log_source_set_name(lml_log_source_t *ls, const char *name) 
 {
         if ( ls->name )
                 free(ls->name);
@@ -261,17 +70,15 @@ int log_source_set_name(log_source_t *ls, const char *name)
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
-
-        ls->id = global_id++;
         
         return 0;
 }
 
 
 
-log_source_t *log_source_new(void)
+lml_log_source_t *lml_log_source_new(void)
 {
-        log_source_t *new;
+        lml_log_source_t *new;
         
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
@@ -279,12 +86,12 @@ log_source_t *log_source_new(void)
                 return NULL;
         }
 
-        if ( log_source_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
+        if ( lml_log_source_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log timestamp format.\n");
                 return NULL;
         }
 
-        if ( log_source_set_prefix_regex(new, SYSLOG_PREFIX_REGEX) < 0 ) {
+        if ( lml_log_source_set_prefix_regex(new, SYSLOG_PREFIX_REGEX) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log message prefix.\n");
                 return NULL;
         }
@@ -295,14 +102,14 @@ log_source_t *log_source_new(void)
 
 
 
-const char *log_source_get_name(log_source_t *ls)
+const char *lml_log_source_get_name(const lml_log_source_t *ls)
 {        
         return ls->name;
 }
 
 
 
-int log_source_set_prefix_regex(log_source_t *ls, const char *regex)
+int lml_log_source_set_prefix_regex(lml_log_source_t *ls, const char *regex)
 {       
         int erroffset;
         const char *errptr;
@@ -328,7 +135,7 @@ int log_source_set_prefix_regex(log_source_t *ls, const char *regex)
 
 
 
-int log_source_set_ts_fmt(log_source_t *ls, const char *fmt)
+int lml_log_source_set_ts_fmt(lml_log_source_t *ls, const char *fmt)
 {        
         if ( ls->ts_fmt )
                 free(ls->ts_fmt);
@@ -344,7 +151,7 @@ int log_source_set_ts_fmt(log_source_t *ls, const char *fmt)
 
 
 
-void log_source_destroy(log_source_t *source)
+void lml_log_source_destroy(lml_log_source_t *source)
 {
         if ( source->name )
                 free(source->name);
@@ -359,4 +166,24 @@ void log_source_destroy(log_source_t *source)
                 free(source->prefix_regex_extra);
         
         free(source);
+}
+
+
+
+const char *lml_log_source_get_timestamp_format(const lml_log_source_t *source)
+{
+        return source->ts_fmt;
+}
+
+
+
+const pcre *lml_log_source_get_prefix_regex(const lml_log_source_t *source)
+{
+        return source->prefix_regex;
+}
+
+
+const pcre_extra *lml_log_source_get_prefix_regex_extra(const lml_log_source_t *source)
+{
+        return source->prefix_regex_extra;
 }

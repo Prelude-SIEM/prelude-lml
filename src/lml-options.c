@@ -39,9 +39,11 @@
 
 #include "config.h"
 #include "libmissing.h"
+#include "prelude-lml.h"
 #include "lml-options.h"
 #include "regex.h"
 #include "log-common.h"
+#include "log-entry.h"
 #include "lml-alert.h"
 #include "file-server.h"
 #include "udp-server.h"
@@ -219,21 +221,21 @@ static int set_text_output(prelude_option_t *opt, const char *arg, prelude_strin
 static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
         int ret;
-        log_source_t *ls;
+        lml_log_source_t *ls;
         regex_list_t *rlist;
         
-        ls = log_source_new();
+        ls = lml_log_source_new();
         if ( ! ls )
                 return prelude_error_from_errno(errno);
 
         if ( config.logfile_prefix_regex ) {
-                ret = log_source_set_prefix_regex(ls, config.logfile_prefix_regex);
+                ret = lml_log_source_set_prefix_regex(ls, config.logfile_prefix_regex);
                 if ( ret < 0 )
                         return ret;
         }
 
         if ( config.logfile_ts_format ) {
-                ret = log_source_set_ts_fmt(ls, config.logfile_ts_format);
+                ret = lml_log_source_set_ts_fmt(ls, config.logfile_ts_format);
                 if ( ret < 0 )
                         return ret;
         }
@@ -244,7 +246,7 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
                 return -1;
         }
         
-        ret = log_source_set_name(ls, arg);
+        ret = lml_log_source_set_name(ls, arg);
         if ( ret < 0 ) 
                 return ret;
 

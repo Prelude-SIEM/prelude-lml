@@ -30,7 +30,7 @@ void file_server_set_ignore_metadata(void);
 
 int file_server_wake_up(void);
 
-int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls);
+int file_server_monitor_file(regex_list_t *rlist, lml_log_source_t *ls);
 
 void file_server_start_monitoring(void);
 

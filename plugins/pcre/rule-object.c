@@ -36,10 +36,7 @@
 #include <libprelude/prelude-string.h>
 
 #include "libmissing.h"
-#include "log-common.h"
-#include "lml-alert.h"
-#include "log.h"
-
+#include "prelude-lml.h"
 #include "rule-object.h"
 #include "pcre-mod.h"
 
@@ -302,7 +299,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 
 static void resolve_referenced_value(rule_object_list_t *olist,
-                                     const log_entry_t *log_entry, int *ovector, size_t osize) 
+                                     const lml_log_entry_t *log_entry, int *ovector, size_t osize) 
 {
          int ret;
          prelude_list_t *tmp;
@@ -313,7 +310,7 @@ static void resolve_referenced_value(rule_object_list_t *olist,
                  
                  rval = prelude_list_entry(tmp, rule_referenced_value_t, list);
                  
-                 ret = pcre_copy_substring(log_entry->message, ovector, osize, rval->refno, buf, sizeof(buf));
+                 ret = pcre_copy_substring(lml_log_entry_get_message(log_entry), ovector, osize, rval->refno, buf, sizeof(buf));
                  if ( ret < 0 ) {
                          if ( ret == PCRE_ERROR_NOMEMORY ) 
                                  prelude_log(PRELUDE_LOG_WARN, "not enough memory to get backward reference %d.\n",
@@ -354,7 +351,7 @@ static void referenced_value_destroy_content(rule_object_list_t *olist)
 
 
 int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **message,
-                              const log_entry_t *log_entry, int *ovector, size_t osize)
+                              const lml_log_entry_t *log_entry, int *ovector, size_t osize)
 {
         int ret;
         prelude_list_t *tmp;

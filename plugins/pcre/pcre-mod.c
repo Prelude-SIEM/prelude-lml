@@ -28,14 +28,11 @@
 #include <sys/time.h>
 #include <pcre.h>
 #include <netdb.h>
-
-#include <libprelude/prelude.h>
+#include <libprelude/prelude-log.h>
 
 #include "libmissing.h"
-#include "log-common.h"
-#include "lml-alert.h"
-#include "log.h"
 
+#include "prelude-lml.h"
 #include "pcre-mod.h"
 #include "rule-object.h"
 #include "rule-regex.h"
@@ -60,7 +57,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd);
 
 
 
-static plugin_log_t pcre_plugin;
+static lml_log_plugin_t pcre_plugin;
 
 
 
@@ -585,7 +582,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd)
 
 
 
-static void pcre_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry)
+static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;
@@ -597,7 +594,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry
         prelude_list_for_each(&plugin->rule_list, tmp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
-                ret = rule_regex_match(rc, log_entry);
+                ret = rule_regex_match(rc, ls, log_entry);
                 
                 if ( ret == 0 && rc->rule->last )
                         break;
@@ -611,7 +608,7 @@ static int set_last_first(prelude_option_t *opt, const char *optarg, prelude_str
 {
         pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
-        plugin->last_rules_first = 1;
+        plugin->last_rules_first = TRUE;
         
         return 0;
 }
@@ -627,8 +624,6 @@ static int set_pcre_ruleset(prelude_option_t *opt, const char *optarg, prelude_s
         prelude_list_t *tmp, *bkp;
         pcre_rule_container_t *rc;
         pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
-
-        printf("optarg=%s plugin=%p context=%p\n", optarg, plugin, context);
         
         plugin->rulesetdir = strdup(optarg);
 
@@ -706,7 +701,7 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_optlist)
 {
         int ret;
-        prelude_option_t *opt;
+        prelude_option_t *opt, *popt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
         ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "pcre", "Pcre plugin option",
@@ -721,18 +716,20 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_opt
         if ( ret < 0 )
                 return ret;
         
-        ret = prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'p',
-                                 "pass-first", "Process rules with the \"last\" attribute first",
+        ret = prelude_option_add(opt, &popt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'l',
+                                 "last-first", "Process rules with the \"last\" attribute first",
                                  PRELUDE_OPTION_ARGUMENT_NONE, set_last_first, NULL);
         if ( ret < 0 )
                 return ret;
+        prelude_option_set_priority(popt, PRELUDE_OPTION_PRIORITY_FIRST);
+        
         
         prelude_plugin_set_name(&pcre_plugin, "pcre");
         prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");
         prelude_plugin_set_contact(&pcre_plugin, "yoann@prelude-ids.org");
-        prelude_plugin_set_running_func(&pcre_plugin, pcre_run);
         prelude_plugin_set_destroy_func(&pcre_plugin, pcre_destroy);
         
+        pcre_plugin.run = pcre_run;
         *pret = (void *) &pcre_plugin;
 
         return 0;

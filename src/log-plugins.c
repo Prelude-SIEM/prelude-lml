@@ -34,10 +34,12 @@
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
 
+#include "prelude-lml.h"
 #include "common.h"
 #include "log-common.h"
-#include "plugin-log.h"
-#include "plugin-log-prv.h"
+#include "log-entry.h"
+#include "log-plugins.h"
+
 
 #define LML_PLUGIN_SYMBOL "lml_plugin_init"
 
@@ -67,9 +69,9 @@ static void unsubscribe(prelude_plugin_instance_t *pi)
 
 
 
-void log_plugin_run(prelude_plugin_instance_t *pi, log_entry_t *log)
+void log_plugin_run(prelude_plugin_instance_t *pi, lml_log_source_t *ls, lml_log_entry_t *log)
 {
-        prelude_plugin_run(pi, plugin_log_t, run, pi, log);
+        prelude_plugin_run(pi, lml_log_plugin_t, run, pi, ls, log);
 }
 
 
@@ -79,10 +81,24 @@ prelude_plugin_instance_t *log_plugin_register(const char *plugin)
 {
         int ret;
         char pname[256], iname[256];
+        prelude_plugin_generic_t *pl;
+        prelude_plugin_instance_t *pi;
         
         ret = sscanf(plugin, "%255[^[][%255[^]]", pname, iname);
         
-        return prelude_plugin_search_instance_by_name(pname, (ret == 2) ? iname : NULL);
+        pi = prelude_plugin_search_instance_by_name(pname, (ret == 2) ? iname : NULL);        
+        if ( pi )
+                return pi;
+        
+        pl = prelude_plugin_search_by_name(pname);
+        if ( ! pl )
+                return NULL;
+        
+        ret = prelude_plugin_new_instance(&pi, pl, (ret == 2) ? iname : NULL, NULL);
+        if ( ret < 0 )
+                return NULL;
+        
+        return pi;
 }
 
 

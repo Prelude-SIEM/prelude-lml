@@ -41,23 +41,31 @@
 #include <libprelude/prelude-timer.h>
 
 #include "config.h"
-#include "common.h"
+
 #include "regex.h"
+#include "prelude-lml.h"
+#include "common.h"
+
 #include "lml-options.h"
 #include "udp-server.h"
-#include "log-common.h"
-#include "plugin-log.h"
-#include "plugin-log-prv.h"
 #include "file-server.h"
+#include "log-entry.h"
+#include "log-plugins.h"
 #include "lml-alert.h"
 
 #ifndef MAX
  #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 
+struct regex_data {
+        lml_log_source_t *log_source;
+        lml_log_entry_t *log_entry;
+};
+
+
 extern lml_config_t config;
 static char **global_argv;
-prelude_option_t *lml_root_optlist;
+static prelude_option_t *lml_root_optlist;
 static volatile sig_atomic_t got_sighup = 0;
 
 
@@ -117,9 +125,11 @@ static void handle_sighup_if_needed(void)
 
 
 
-static void regex_match_cb(void *plugin, void *log) 
+static void regex_match_cb(void *plugin, void *data) 
 {
-        log_plugin_run(plugin, (log_entry_t *) log);
+        struct regex_data *rdata = data;
+        
+        log_plugin_run(plugin, rdata->log_source, rdata->log_entry);
 }
 
 
@@ -135,18 +145,24 @@ static void regex_match_cb(void *plugin, void *log)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str, size_t size)
+void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str, size_t size)
 {
-        log_entry_t *log_entry;
+        struct regex_data rdata;
+        lml_log_entry_t *log_entry;
 
-        log_entry = log_entry_new(ls);
+        log_entry = lml_log_entry_new();
         if ( ! log_entry )
                 return;
         
-        log_entry_set_log(log_entry, str, size);
+        lml_log_entry_set_log(log_entry, ls, str, size);
 
-        regex_exec(list, &regex_match_cb, log_entry, log_entry->message, log_entry->message_len);
-        log_entry_delete(log_entry);
+        rdata.log_source = ls;
+        rdata.log_entry = log_entry;
+        
+        regex_exec(list, &regex_match_cb, &rdata,
+                   lml_log_entry_get_message(log_entry), lml_log_entry_get_message_len(log_entry));
+
+        lml_log_entry_destroy(log_entry);
 }
 
 

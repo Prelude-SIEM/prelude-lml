@@ -28,7 +28,7 @@ int rule_object_add(rule_object_list_t *olist,
                     const char *object_name, const char *value);
 
 int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **message,
-                              const log_entry_t *log_entry, int *ovector, size_t osize);
+                              const lml_log_entry_t *log_entry, int *ovector, size_t osize);
 
 rule_object_list_t *rule_object_list_new(void);
 

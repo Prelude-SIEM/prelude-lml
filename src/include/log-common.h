@@ -24,50 +24,30 @@
 #ifndef LOG_COMMON_H
 #define LOG_COMMON_H
 
+#include <pcre.h>
 #include <sys/time.h>
 
-typedef struct log_source_s log_source_t;
 
+lml_log_source_t *lml_log_source_new(void);
 
-typedef struct {
-        char *original_log;
-        size_t original_log_len;
-        
-        char *message;
-        size_t message_len;
+void lml_log_source_destroy(lml_log_source_t *source);
 
-        struct timeval tv;
+const char *lml_log_source_get_format(lml_log_source_t *ls);
 
-        char *target_hostname;
-        char *target_process;
-        char *target_process_pid;
+const char *lml_log_source_get_source(lml_log_source_t *ls);
 
-        log_source_t *source;
-} log_entry_t;
+const char *lml_log_source_get_name(const lml_log_source_t *ls);
 
+int lml_log_source_set_name(lml_log_source_t *ls, const char *name);
 
+int lml_log_source_set_prefix_regex(lml_log_source_t *ls, const char *regex);
 
-log_entry_t *log_entry_new(log_source_t *source);
+int lml_log_source_set_ts_fmt(lml_log_source_t *lf, const char *fmt);
 
-int log_entry_set_log(log_entry_t *lc, const char *entry, size_t size);
+const char *lml_log_source_get_timestamp_format(const lml_log_source_t *ls);
 
-void log_entry_delete(log_entry_t *lc);
+const pcre *lml_log_source_get_prefix_regex(const lml_log_source_t *ls);
 
-
-log_source_t *log_source_new(void);
-
-void log_source_destroy(log_source_t *source);
-
-const char *log_source_get_format(log_source_t *ls);
-
-const char *log_source_get_source(log_source_t *ls);
-
-const char *log_source_get_name(log_source_t *ls);
-
-int log_source_set_name(log_source_t *ls, const char *name);
-
-int log_source_set_prefix_regex(log_source_t *ls, const char *regex);
-
-int log_source_set_ts_fmt(log_source_t *lf, const char *fmt);
+const pcre_extra *lml_log_source_get_prefix_regex_extra(const lml_log_source_t *ls);
 
 #endif

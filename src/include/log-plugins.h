@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 2002 - 2005 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998-2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -21,17 +21,6 @@
 *
 *****/
 
-#ifndef PLUGIN_LOG_H
-#define PLUGIN_LOG_H
-
-typedef struct {
-	PRELUDE_PLUGIN_GENERIC;
-	void (*run)(prelude_plugin_instance_t *pi, const log_entry_t * log);
-} plugin_log_t;
-
-
-
-#define plugin_run_func(p) (p)->run
-#define prelude_plugin_set_running_func(p, func) plugin_run_func(p) = (func)
-
-#endif				/* PLUGIN_LOG_H */
+prelude_plugin_instance_t *log_plugin_register(const char *pname);
+void log_plugin_run(prelude_plugin_instance_t *pc, lml_log_source_t *ls, lml_log_entry_t *log);
+int log_plugins_init(const char *dirname, void *data);

@@ -31,9 +31,7 @@
 #include <libprelude/prelude.h>
 
 #include "libmissing.h"
-#include "log-common.h"
-#include "log.h"
-#include "lml-alert.h"
+#include "prelude-lml.h"
 
 
 int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *data);
@@ -45,12 +43,12 @@ typedef struct {
 
 
 
-static plugin_log_t plugin;
+static lml_log_plugin_t plugin;
 extern prelude_option_t *lml_root_optlist;
 
 
 
-static void debug_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry)
+static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
         debug_plugin_t *plugin;
@@ -107,12 +105,12 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entr
                 goto err;
         }
         prelude_string_set_constant(str, "log message");
-        idmef_additional_data_set_string_ref(adata, log_entry->original_log);
+        idmef_additional_data_set_string_ref(adata, lml_log_entry_get_original_log(log_entry));
         
-        lml_emit_alert(log_entry, message, PRELUDE_MSG_PRIORITY_LOW);
-
+        lml_alert_emit(ls, log_entry, message);
+        
         if ( plugin->out_stderr )
-                fprintf(stderr, "Debug: log received, log=%s\n", log_entry->original_log);
+                fprintf(stderr, "Debug: log received, log=%s\n", lml_log_entry_get_original_log(log_entry));
 
  err:
         idmef_message_destroy(message);
@@ -183,8 +181,9 @@ int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_op
         prelude_plugin_set_name(&plugin, "Debug");
         prelude_plugin_set_author(&plugin, "Yoann Vandoorselaere");
         prelude_plugin_set_desc(&plugin, "Send an alert for each log.");
-        prelude_plugin_set_running_func(&plugin, debug_run);
         prelude_plugin_set_destroy_func(&plugin, debug_destroy);
+
+        plugin.run = debug_run;
         
         return 0;
 }
