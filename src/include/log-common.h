@@ -28,6 +28,8 @@ void log_container_delete(log_container_t *lc);
 
 log_source_t *log_source_new(void);
 
+void log_source_destroy(log_source_t *source);
+
 const char *log_source_get_format(log_source_t *ls);
 
 const char *log_source_get_source(log_source_t *ls);

@@ -334,8 +334,8 @@ log_source_t *log_source_new(void)
                 return NULL;
         }
 
-        new->ts_fmt = SYSLOG_TS_FMT;
-        new->log_fmt = SYSLOG_LOG_FMT;
+        new->ts_fmt = strdup(SYSLOG_TS_FMT);
+        new->log_fmt = strdup(SYSLOG_LOG_FMT);
         
         return new;
 }
@@ -351,7 +351,10 @@ const char *log_source_get_name(log_source_t *ls)
 
 
 int log_source_set_log_fmt(log_source_t *ls, const char *fmt)
-{        
+{       
+        if ( ls->log_fmt )
+                free(ls->log_fmt);
+        
         ls->log_fmt = strdup(fmt);
         if ( ! ls->log_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
@@ -366,6 +369,9 @@ int log_source_set_log_fmt(log_source_t *ls, const char *fmt)
 
 int log_source_set_timestamp_fmt(log_source_t *ls, const char *fmt)
 {        
+        if ( ls->ts_fmt )
+                free(ls->ts_fmt);
+        
         ls->ts_fmt = strdup(fmt);
         if ( ! ls->ts_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
@@ -373,4 +379,20 @@ int log_source_set_timestamp_fmt(log_source_t *ls, const char *fmt)
         }
 
         return 0;
+}
+
+
+
+void log_source_destroy(log_source_t *source)
+{
+        if ( source->name )
+                free(source->name);
+        
+        if ( source->ts_fmt )
+                free(source->ts_fmt);
+        
+        if ( source->log_fmt )
+                free(source->log_fmt);
+        
+        free(source);
 }
