@@ -1,0 +1,71 @@
+#####
+#
+# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by 
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+#Jan 13 22:19:52 (none) proftpd[7804]: leroutier.net (193.249.231.232[193.249.231.232]) - PAM(leroutier): Authentication failure.
+
+regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - PAM\((\S+)\): Authentication failure.*; \
+ class.name=proftpd - invalid password for user '$5'; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as user '$5' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=tcp; \
+ target.service.port=21; \
+ target.service.protocol=tcp;
+
+# Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
+
+regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - no such user '(\S+)'.*; \
+ class.name=proftpd - no such user '$5'; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as non-existant user '$5' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=tcp; \
+ target.service.port=21; \
+ target.service.protocol=tcp;
+
+# Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
+
+regex=.*proftpd\[(\d+)\]:.*[\(\[]([\d\.]+)[\)\]].* - USER (\S+): no such user found from .*([\d\.]+).* to ([\d\.]{7,}):(\d+).*; \
+ class.name=proftpd - no such user; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as non-existant user '$3' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$2; \
+ source.service.protocol=tcp; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.port=$6; \
+ target.service.protocol=tcp;
+

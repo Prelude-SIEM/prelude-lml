@@ -1,0 +1,57 @@
+#####
+#
+# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by 
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+# Jan 13 20:42:56 (none) popper[6754]: [AUTH] Failed attempted login to leroutier from host (www.leroutier.net) 81.91.66.90
+# Jan 13 21:05:09 (none) popper[6950]: [AUTH] Failed attempted login to vegeta from host (Mix-Dijon-114-2-232.abo.wanadoo.fr) 193.249.231.232
+
+regex=.*popper\[(\d+)\]: \[AUTH\] Failed attempted login to (\S+) from host \((\S+)\) (\S+).*; \
+ class.name=qpopper - invalid password for this user; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=tcp; \
+ target.service.port=110; \
+ target.service.protocol=tcp;
+
+# Jan 13 20:42:31 (none) popper[6752]: tamere at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "tamere" is incorrect.
+# Jan 13 20:42:56 (none) popper[6754]: leroutier at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "leroutier" is incorrect.
+# Jan 13 21:02:59 (none) popper[6936]: azerty at Mix-Dijon-114-2-232.abo.wanadoo.fr (193.249.231.232): -ERR [AUTH] Password supplied for "azerty" is incorrect.
+# Jan 13 21:05:09 (none) popper[6950]: vegeta at Mix-Dijon-114-2-232.abo.wanadoo.fr (193.249.231.232): -ERR [AUTH] Password supplied for "vegeta" is incorrect.
+
+regex=.*popper\[(\d+)\]: (\S+) at (\S+) \((\S+)\): -ERR \[AUTH\] Password supplied for "(\S+)" is incorrect.*; \
+ class.name=qpopper - invalid password for user; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=tcp; \
+ target.service.port=110; \
+ target.service.protocol=tcp;
+

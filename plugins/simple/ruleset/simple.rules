@@ -45,19 +45,13 @@
 #   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
 #
-# - source.node.address:
-#   target.node.address:
-#   Create a new Address inside a Node object (that may contain several Address).
-#
 # - source.node.address.address:
-#   target.node.address.address:
-#   Source/Destination address for the attack.
+#   Address that issued the attack.
+#   There can be more than one.
 # 
-# - source.node.address.category:
-#   target.node.address.category:
-#   The type of address represented.  The permitted values
-#   for this attribute are shown below.  The default value is
-#   "unknown".
+# - target.node.address.address:
+#   Address that has been attacked.
+#   There can be more than one.
 #
 # - source.node.name,
 #   target.node.name:
@@ -130,6 +124,9 @@ include = netfilter.rules;
 include = grsecurity.rules;
 include = ssh.rules;
 include = zywall.rules;
+include = proftpd.rules;
+include = qpopper.rules;
+include = vpopmail.rules;
 
 regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
 
@@ -138,20 +135,3 @@ regex=PAM_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); class.name=Authentic
 regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.completion = succeeded; impact.type = other; impact.severity = medium; impact.description=A sniffer is probably running on this machine;
 
 regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tried to log in using a non existing user;
-
-regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; \
-class.name=Cisco ip access; \
-impact.completion = failed; \
-impact.type = other; \
-impact.severity = medium; \
-impact.description= Someone tried to bypass access-list #$1; \
-source.node.address; \
-source.node.address.category=ipv4-addr; \
-source.node.address.address = $3; \
-source.service.port = $4; \
-source.service.protocol = $2; \
-target.node.address; \
-target.node.address.category=ipv4-addr; \
-target.node.address.address = $5; \
-target.service.port = $6; \
-target.service.protocol = $2;

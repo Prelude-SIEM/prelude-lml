@@ -1,5 +1,9 @@
 2003-02-04  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* Ruleset update from Stéphane Loeuillet 
+	<LeRoutier@wanadoo.fr>. Include new ProFTPD,
+	vpopmail, and qpopper, rulesets.
+
 	* plugins/simple/simple.c: handling of IDMEF
 	source and destination address.
 

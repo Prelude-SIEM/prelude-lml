@@ -1,0 +1,55 @@
+#####
+#
+# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by 
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+# Jan 14 17:23:02 spotk vpopmail[28353]: vchkpw: vpopmail user not found toto@:127.0.0.1
+# Feb 24 13:19:49 c vpopmail[9505]: vchkpw: vpopmail user not found temp@alexus.org:66.181.160.250
+# Jan 14 17:30:13 spotk vpopmail[28425]: vchkpw: vpopmail user not found toto@:192.168.100.50
+
+regex=.*vpopmail\[(\d+)\]: vchkpw: vpopmail user not found (\S+):(\S+).*; \
+ class.name=vpopmail - no such user; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your POP3 server as non-existant user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.protocol=tcp; \
+ target.service.port=110; \
+ target.service.protocol=tcp;
+
+# Jan 14 17:24:54 spotk vpopmail[28359]: vchkpw: password fail xxx@spotk.net:127.0.0.1
+
+regex=.*vpopmail\[(\d+)\]: vchkpw: password fail (\S+):(\S+).*; \
+ class.name=vpopmail - bad password for this user; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.protocol=tcp; \
+ target.service.port=110; \
+ target.service.protocol=tcp;
+

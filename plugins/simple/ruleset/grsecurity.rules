@@ -170,6 +170,8 @@ regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUI
 	impact.description=A possible exploit bruteforce attempt was made.  The process being bruteforced is banned from execution for $11 seconds.
 regex=grsec: Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning execution of \[(\d+:\d+):(\d+)\] for (\d+) seconds;\
 	class.name=Possible exploit bruteforcing;impact.completion=failed;impact.type=file;impact.severity=high;\
+        source.node.address; \
+        source.node.address.category=ipv4-addr; \
 	source.node.address.address=$1;\
 	target.process.name=$2;target.process.pid=$3;\
 	target.user.category=application;target.user.userid;target.user.userid.type=current-user;target.user.userid.number=$4;\
