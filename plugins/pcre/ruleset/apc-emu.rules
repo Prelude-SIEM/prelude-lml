@@ -30,7 +30,7 @@
 #
 #####
 
-#Mar 28 04:22:18 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation, '40%RH'. 0x101C
+#LOG:Mar 28 04:22:18 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation, '40%RH'. 0x101C
 regex=EMU: Probe \d+ (\'.+\') high  humidity violation, \'(\d+%); \
  classification.text=High Environmental Humidity; \
  id=2800; \
@@ -41,7 +41,7 @@ regex=EMU: Probe \d+ (\'.+\') high  humidity violation, \'(\d+%); \
  assessment.impact.description=Environmental probe $1 has reported a high humidity: $2; \
  last
 
-#Mar 28 04:06:27 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation cleared, '39%RH'. 0x101D
+#LOG:Mar 28 04:06:27 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation cleared, '39%RH'. 0x101D
 regex=EMU: Probe \d+ (\'.+\') high  humidity violation cleared, \'(\d+%); \
  classification.text=Environmental Humidity Normal; \
  id=2801; \
@@ -52,7 +52,7 @@ regex=EMU: Probe \d+ (\'.+\') high  humidity violation cleared, \'(\d+%); \
  assessment.impact.description=Environmental probe $1 has reported humidity has returned to normal: $2; \
  last
 
-#Mar 22 16:27:50 enviro1 12.34.56.78 EMU: Input Contact 4 'Rack 4 Front Door' opened, abnormal condition. 0x1013
+#LOG:Mar 22 16:27:50 enviro1 12.34.56.78 EMU: Input Contact 4 'Rack 4 Front Door' opened, abnormal condition. 0x1013
 regex=EMU: Input Contact \d+ (\'.+\') opened, abnormal condition; \
  classification.text=Device Contact Opened; \
  id=2802; \
@@ -63,7 +63,7 @@ regex=EMU: Input Contact \d+ (\'.+\') opened, abnormal condition; \
  assessment.impact.description=Contact $1 has reported an open condition; \
  last
 
-#Mar 22 16:28:51 enviro1 10.100.17.252 EMU: Input Contact 4 'Rack 4 Front Door' closed, abnormal condition cleared. 0x1014
+#LOG:Mar 22 16:28:51 enviro1 10.100.17.252 EMU: Input Contact 4 'Rack 4 Front Door' closed, abnormal condition cleared. 0x1014
 regex=EMU: Input Contact \d+ (\'.+\') closed, abnormal condition cleared; \
  classification.text=Device Contact Closed; \
  id=2803; \

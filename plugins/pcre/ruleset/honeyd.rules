@@ -23,7 +23,7 @@
 
 # Rules for honeyd version 0.5 (and perhaps later, NOT TESTED with later!)
 
-# Dec 30 20:09:03 hacklab honeyd[5711]: Killing attempted connection: tcp (127.0.0.1:46190 - 192.168.1.20:646)
+#LOG:Dec 30 20:09:03 hacklab honeyd[5711]: Killing attempted connection: tcp (127.0.0.1:46190 - 192.168.1.20:646)
 regex=Killing attempted connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
  classification.text=Killing attempted connection; \
  id=2600; \
@@ -45,7 +45,7 @@ regex=Killing attempted connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+
  assessment.impact.description=Someone tried to connect to a port on the honeypot; \
  last
 
-# Dec 30 20:09:05 hacklab honeyd[5711]: Connection to closed port: udp (127.0.0.1:37806 - 192.168.1.20:1)
+#LOG:Dec 30 20:09:05 hacklab honeyd[5711]: Connection to closed port: udp (127.0.0.1:37806 - 192.168.1.20:1)
 regex=Connection to closed port: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
  classification.text=Connection to closed port; \
  id=2601; \
@@ -67,7 +67,7 @@ regex=Connection to closed port: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\)
  assessment.impact.description=Someone tried to connect to a closed port on the honeypot; \
  last
 
-# Dec 30 20:09:08 hacklab honeyd[5711]: Killing unknown connection: tcp (127.0.0.1:37814 - 192.168.1.20:80)
+#LOG:Dec 30 20:09:08 hacklab honeyd[5711]: Killing unknown connection: tcp (127.0.0.1:37814 - 192.168.1.20:80)
 regex=Killing unknown connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
  classification.text=Connection to closed port; \
  id=2602; \
@@ -89,7 +89,7 @@ regex=Killing unknown connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\
  assessment.impact.description=Someone tried to connect to a port on the honeypot; \
  last
 
-# Dec 30 20:09:01 hacklab honeyd[5711]: Sending ICMP Echo Reply: 192.168.1.20 -> 127.0.0.1
+#LOG:Dec 30 20:09:01 hacklab honeyd[5711]: Sending ICMP Echo Reply: 192.168.1.20 -> 127.0.0.1
 regex=Sending ICMP Echo Reply: ([\d\.]+) -> ([\d\.]+); \
  classification.text=Sending ICMP Echo Reply; \
  id=2603; \
@@ -213,9 +213,9 @@ regex=Subsystem (.*) on (.*) attempts illegal bind ([\d\.]+):(\d+); \
  assessment.impact.description=Honeypot virtual service attempted an illigal bind; \
  last
 
-# Dec 30 20:08:24 hacklab honeyd[5711]: listening on eth0: ip  and not ether src 00:10:5a:7a:6c:47
-# Dec 30 20:12:21 hacklab honeyd[5752]: listening on eth0: ip and (dst 192.168.1.20) and not ether src 00:10:5a:7a:6c:47
-# Dec 30 20:15:53 hacklab honeyd[5779]: listening on lo: ip and (dst 192.168.1.20)
+#Dec 30 20:08:24 hacklab honeyd[5711]: listening on eth0: ip  and not ether src 00:10:5a:7a:6c:47
+#LOG:Dec 30 20:12:21 hacklab honeyd[5752]: listening on eth0: ip and (dst 192.168.1.20) and not ether src 00:10:5a:7a:6c:47
+#Dec 30 20:15:53 hacklab honeyd[5779]: listening on lo: ip and (dst 192.168.1.20)
 regex=listening on (\S+):; \
  classification.text=Honeypot starting up; \
  id=2610; \

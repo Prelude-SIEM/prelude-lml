@@ -30,7 +30,7 @@
 #
 #####
 
-#Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
+#LOG:Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
 regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
  classification.text=$1; \
  id=200; \
@@ -48,7 +48,7 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+
  target(0).node.address(0).address=$3; \
  last
 
-#Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
+#LOG:Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification.text=Firewall user login successful; \
  id=201; \
@@ -73,7 +73,7 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
  target(0).user.user_id(0).name=$6; \
  last
 
-#Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
+#LOG:Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  classification.text=Firewall admin login successful; \
  id=202; \
@@ -93,7 +93,7 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  target(0).user.user_id(0).name=enable_15; \
  last
 
-#Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
+#LOG:Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  classification.text=Firewall configuration written to $2; \
  id=203; \
@@ -107,7 +107,7 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  assessment.impact.description=Configuration was stored on $2, and the command was executed from $1.; \
  last
 
-#Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
+#LOG:Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
 regex=PIX-5-611103: User logged out: Uname: (\S+); \
  classification.text=Firewall logout; \
  id=204; \
@@ -124,7 +124,7 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  source(0).user.user_id(0).name=$1; \
  last
 
-#Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
+#LOG:Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification.text=Firewall user login failed; \
  id=205; \
@@ -149,7 +149,7 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  target(0).user.user_id(0).name=$6; \
  last
 
-#Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
+#LOG:Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
  classification.text=Firewall admin login failed; \
  id=206; \
@@ -166,7 +166,7 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  target(0).user.user_id(0).name=enable_15; \
  last
 
-#Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
+#LOG:Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
 regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
  classification.text=SSH server recognition; \
  id=207; \
@@ -187,7 +187,7 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" di
  target(0).service.protocol=tcp; \
  last
 
-#Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.34.56.78(90.12.34.56)/80 on interface outside
+#LOG:Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.34.56.78(90.12.34.56)/80 on interface outside
 regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\(([\d\.]+)\)\/(\d+) on interface (\S+); \
  classification.text=Embryonic connection limit exceeded; \
  id=208; \
@@ -212,7 +212,7 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  target(0).service.protocol=tcp; \
  last
 
-#Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
+#LOG:Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
 regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  classification.text=IP options: $3; \
  id=209; \
@@ -232,7 +232,7 @@ regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  target(0).service.protocol=tcp; \
  last
 
-#Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging
+#LOG:Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging
 regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
  classification.text=Reverse path check failure; \
  id=210; \
@@ -254,7 +254,7 @@ regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on
  target(0).service.protocol=$1; \
  last
 
-#Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 12.34.56.78, dest = 90.12.34.56, proto = icmp, id = 48130
+#LOG:Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 12.34.56.78, dest = 90.12.34.56, proto = icmp, id = 48130
 regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), dest = ([\d\.]+), proto = (\w+); \
  classification.text=Fragment database limit exceeded; \
  id=211; \
@@ -274,7 +274,7 @@ regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), d
  target(0).service.protocol=$3; \
  last
 
-#Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
+#LOG:Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
 regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\d+) to ([\d\.]+)\/(\d+); \
  classification.text=Source or destination port 0; \
  id=212; \
@@ -294,7 +294,7 @@ regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\
  target(0).service.port=$4; \
  last
 
-#Feb  3 01:47:37 pix %PIX-4-405001: Received ARP response collision from 12.34.56.78/000b.bf5b.9408 on interface outside
+#LOG:Feb  3 01:47:37 pix %PIX-4-405001: Received ARP response collision from 12.34.56.78/000b.bf5b.9408 on interface outside
 regex=PIX-4-405001: Received ARP (request|response) collision from ([\d\.]+)\/([A-Fa-f\d\.]+) on interface (\S+); \
  classification.text=ARP $1 mismatch; \
  id=213; \
@@ -316,7 +316,7 @@ regex=PIX-4-405001: Received ARP (request|response) collision from ([\d\.]+)\/([
  target(0).node.address(0).address=$2; \
  last; 
 
-#Jan 25 14:59:33 pix %PIX-3-710003: TCP access denied by ACL from 148.208.247.3/2984 to outside:12.40.199.252/ssh
+#LOG:Jan 25 14:59:33 pix %PIX-3-710003: TCP access denied by ACL from 148.208.247.3/2984 to outside:12.40.199.252/ssh
 regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+); \
  classification.text=Unauthorized admin session attempt; \
  id=214; \
@@ -339,7 +339,7 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
  target(0).interface=$4; \
  last
 
-#Mar 15 20:55:18 gtsprodpix %PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for tcp src prod:10.100.17.27/1586 dst inside:10.100.16.255/445
+#LOG:Mar 15 20:55:18 gtsprodpix %PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for tcp src prod:10.100.17.27/1586 dst inside:10.100.16.255/445
 regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for (tcp|udp) src (\S+):([\d\.]+)/(\S+) dst (\S+):([\d\.]+)/(\S+); \
  classification.text=Broadcast address translation request; \
  id=215; \
@@ -362,7 +362,7 @@ regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed 
  target(0).interface=$5; \
  last
 
-#Mar 24 09:19:42 gtsprodpix %PIX-4-313003: Invalid destination for ICMP error message: ICMP source 12.34.56.78 destination 90.12.34.56 (type 3, code 1) on outside interface.  Original IP payload: ICMP source 1.1.1.1 destination 1.1.1.1 (type 1, code 1).
+#LOG:Mar 24 09:19:42 gtsprodpix %PIX-4-313003: Invalid destination for ICMP error message: ICMP source 12.34.56.78 destination 90.12.34.56 (type 3, code 1) on outside interface.  Original IP payload: ICMP source 1.1.1.1 destination 1.1.1.1 (type 1, code 1).
 regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+) destination ([\d\.]+) \(type \d+, code \d+\) on (\S+) interface.; \
  classification.text=ICMP destination/source mismatch; \
  id=216; \
@@ -383,7 +383,7 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
  target(0).service.protocol=icmp; \
  last
 
-#Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:12.34.56.78/18378 dst outside:90.12.34.56/12685 by access-group "acl_in"
+#LOG:Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:12.34.56.78/18378 dst outside:90.12.34.56/12685 by access-group "acl_in"
 #regex=PIX-4-106023: Deny (\w+) src (\S+):([\d\.]+)/(\d+) dst (\S+):([\d\.]+)/(\d+) by access-group "(\S+)"; \
 # classification.text=Packet denied; \
 # id=217; \

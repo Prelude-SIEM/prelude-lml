@@ -29,7 +29,7 @@
 #
 #####
 
-#Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
+#LOG:Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
 regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
  classification.text=Load balancer $1 audit; \
  id=3600; \
@@ -48,7 +48,7 @@ regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
  target(0).node.address(0).address=$3; \
  last
 
-#Jun 10 18:05:43 12.4.18.135 bigconf.cgi: AUDIT -- Delete POOL SMDEMO User: admin
+#LOG:Jun 10 18:05:43 12.4.18.135 bigconf.cgi: AUDIT -- Delete POOL SMDEMO User: admin
 regex=bigconf.cgi: AUDIT -- (\w+) (\w+) (\w+)  User: (\S+); \
  classification.text=Load balancer $1 audit; \
  id=3601; \
@@ -65,7 +65,7 @@ regex=bigconf.cgi: AUDIT -- (\w+) (\w+) (\w+)  User: (\S+); \
  source(0).user.user_id(0).name=$4; \
  last
 
-#Jun 14 07:06:05 12.34.56.78 kernel: security: UDP port denial 90.12.34.56:20031 -> 78.90.12.34:20031
+#LOG:Jun 14 07:06:05 12.34.56.78 kernel: security: UDP port denial 90.12.34.56:20031 -> 78.90.12.34:20031
 #regex=security: (\S+) .*port denial ([\d\.]+):(\d+) -> ([\d\.]+):(\d+); \ 
 # classification.text=Packet denied; \
 # id=3602; \
