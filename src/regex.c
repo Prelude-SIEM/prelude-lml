@@ -128,7 +128,7 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
         }
 
         plugin = prelude_plugin_instance_get_plugin(entry->plugin);
-        log(LOG_INFO, "- Monitoring %s throught %s[%s]\n",
+        log(LOG_INFO, "- Monitoring %s through %s[%s]\n",
             source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
         
         /*
