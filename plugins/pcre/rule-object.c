@@ -349,6 +349,9 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
         prelude_list_t *tmp;
         idmef_value_t *value;
         rule_object_t *rule_object;
+
+        if ( prelude_list_empty(&olist->rule_object_list) )
+                return 0;
         
         if ( ! *message ) {
                 *message = idmef_message_new();
