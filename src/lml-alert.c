@@ -36,9 +36,9 @@
 #include <netdb.h>
 #include <assert.h>
 
+#include <libprelude/common.h>
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/prelude-inet.h>
 #include <libprelude/idmef-message-print.h>
 
 #include "libmissing.h"
@@ -120,15 +120,16 @@ static int fill_target(idmef_node_t *node, struct addrinfo *ai)
                 if ( ret < 0 )
                         return -1;
 
-                in_addr = prelude_inet_sockaddr_get_inaddr(ai->ai_addr);
-                assert(in_addr);
-
+                in_addr = prelude_sockaddr_get_inaddr(ai->ai_addr);
+                if ( ! in_addr )
+                        return -1;
+                
                 idmef_address_set_category(addr, (ai->ai_family == AF_INET) ?
                                            IDMEF_ADDRESS_CATEGORY_IPV4_ADDR :
                                            IDMEF_ADDRESS_CATEGORY_IPV6_ADDR);
                 
-                if ( ! prelude_inet_ntop(ai->ai_family, in_addr, str, sizeof(str)) ) {
-                        prelude_log(PRELUDE_LOG_ERR, "inet_ntop returned an error.\n");
+                if ( ! inet_ntop(ai->ai_family, in_addr, str, sizeof(str)) ) {
+                        prelude_log(PRELUDE_LOG_ERR, "inet_ntop returned an error: %s.\n", strerror(errno));
                         return -1;
                 }
 
