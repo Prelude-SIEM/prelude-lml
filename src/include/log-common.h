@@ -35,6 +35,9 @@ const char *log_file_get_format(log_file_t *lf);
 const char *log_file_get_filename(log_file_t *lf);
 
 
+
+int log_file_set_source(log_file_t *lf, const char *source);
+
 int log_file_set_filename(log_file_t *lf, const char *filename);
 
 int log_file_set_log_fmt(log_file_t *lf, const char *fmt);

@@ -67,7 +67,7 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
         if ( ! ptr )
                 ptr = buf;
         
-        lml_dispatch_log(list, server->lf, inet_ntoa(addr.sin_addr));
+        lml_dispatch_log(list, server->lf, ptr);
 }
 
 

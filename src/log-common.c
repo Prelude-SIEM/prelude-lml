@@ -54,7 +54,7 @@ static unsigned int global_id = 0;
 struct log_file_s {
         
         unsigned int id;
-        const char *filename;
+        char *filename;
         
         char *ts_fmt;
         char *log_fmt;
@@ -322,6 +322,25 @@ void log_container_delete(log_container_t *lc)
 
 
 
+int log_file_set_source(log_file_t *lf, const char *source) 
+{
+        if ( lf->filename )
+                free(lf->filename);
+        
+        lf->filename = strdup(source);
+        if ( ! lf->filename ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        lf->id = global_id++;
+        
+        return 0;
+}
+
+
+
+
 int log_file_set_filename(log_file_t *lf, const char *filename) 
 {
         int ret;
@@ -332,6 +351,9 @@ int log_file_set_filename(log_file_t *lf, const char *filename)
                 return -1;
         }
 
+        if ( lf->filename )
+                free(lf->filename);
+        
         lf->filename = strdup(filename);
         if ( ! lf->filename ) {
                 log(LOG_ERR, "memory exhausted.\n");
