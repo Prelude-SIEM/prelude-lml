@@ -1,9 +1,6 @@
 Prelude - http://www.prelude-ids.org
 by Yoann Vandoorselaere <yoann@prelude-ids.org>
 
-Prelude is a general-purpose hybrid intrusion detection system, 
-written entirely from scratch, in C. Prelude is divided into several parts: 
-
 
 - LICENSE ADDITION
 

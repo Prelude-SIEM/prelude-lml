@@ -1,3 +1,82 @@
+* 2003-10-22, prelude-lml 0.8.6:
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Automatically translate a value from base 8 and 16 to base 10. 
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Add a workaround for log using hexadecimal value without 0x prefix.
+	  This permit to handle, for example, the way ZyXel modem output the 
+	  packet port. 
+
+	- Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+	  Add a new portsentry rule concerning dropped packets.
+
+	- Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+	  New ZyXel rules for PPP logs, as well as ruleset improvment
+	  and bugfix.
+
+	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+	  Fixed handling return value of prelude_inet_getaddrinfo. Fix
+	  a BSD crash.
+
+	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+	  Fixed Ipfw ICMP rules. Thanks to mark@fantoma.net for the report. 
+
+* 2003-10-06, prelude-lml 0.8.5:
+
+	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
+	  Handle case where a file is rotated by being
+	  compressed and renamed. Not only deleted.
+
+	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
+	  Make it work on OpenBSD.
+
+* 2003-09-21, prelude-lml 0.8.4:	
+	
+	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+	  Removed bogus pcre.h test in configure.
+	  Handle situation where $fam_include_dir is undefined correctly.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Make sure we always have a target hostname to use in alert.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Avoid duplicate rotation alert. In case there was a rotation or 
+          a checksum error, we have to analyze the file from the beginning.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Use new libprelude IPv6 aware function in order to populate
+	  Node and Address members. 
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Fix a possible crash within metadata handling. I wonder
+	  how it worked before.
+	  
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  New --group (-g) option that take a groupname argument: 
+	  LML will setgid to the specified group if requested. This
+	  fix bug #0000081.
+
+	- Stephane Loeuillet <stephane.loeuillet@tiscali.fr>:
+	  Add a new variable type for [source/target].service.port
+          (VARIABLE_TYPE_PORT). now, ports could either contain a 
+	  port number or a service name (www would resolve to 80, 
+	  depending your /etc/services).
+
+	- Simon Castro <scastro@entreelibre.com>:
+	  New IPChains ruleset.
+
+	- John Green <john@giggled.org>:
+	  Add Vigor xDSl router built-in firewall support.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Stop using getc_unlocked(). This function is not available
+	  on some plateform, and we don't need it anymore as we droped
+	  the threaded architecture.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Be verbose when we fail opening a logfile.
+
 * 2003-04-24, prelude-lml 0.8.3:
 	
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>:

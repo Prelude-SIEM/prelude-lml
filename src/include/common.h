@@ -2,8 +2,9 @@
 #define COMMON_H
 
 #include "regex.h"
+#include "log-common.h"
 
-void lml_dispatch_log(regex_list_t *list, const char *str, const char *from);
+void lml_dispatch_log(regex_list_t *list, log_file_t *lf, const char *str);
 
 
 #ifdef DEBUG

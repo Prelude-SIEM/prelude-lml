@@ -29,27 +29,102 @@
 ###
 
 # starting squid
-regex=squid\[(\d+)\]: Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; class.name=Squid started; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid version $2 was started with PID $1;
+regex=squid\[(\d+)\]: Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
+ class.name=Squid started; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid version $2 was started with PID $1
 
 # accepting connections - is the node address really relevant here (-> listen on 0.0.0.0 for instance) ?
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; class.name=Squid accepts HTTP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid (PID $2) listens for incoming HTTP connections on $3:$4, file descriptor #$5; target.node.name=$1; target.node.address;target.node.address.category=ipv4-addr; target.node.address.address=$3; target.service.port=$4; target.process.pid=$2; target.process.name=squid; target.service.protocol=HTTP;
+regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts HTTP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) listens for incoming HTTP connections on $3:$4, file descriptor #$5; \
+ target.node.name=$1; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$3; \
+ target.service.port=$4; \
+ target.process.pid=$2; \
+ target.process.name=squid; \
+ target.service.protocol=HTTP
 
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; class.name=Squid accepts ICP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid (PID $2) listens for incoming ICP messages on $3:$4, file descriptor #$5; target.node.name=$1; target.node.address;target.node.address.category=ipv4-addr; target.node.address.address=$3; target.service.port=$4; target.process.pid=$2; target.process.name=squid; target.service.protocol=ICP;
+regex=([\w\.]+) squid\[([0-9]+)\]: Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts ICP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) listens for incoming ICP messages on $3:$4, file descriptor #$5; \
+ target.node.name=$1; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$3; \
+ target.service.port=$4; \
+ target.process.pid=$2; \
+ target.process.name=squid; \
+ target.service.protocol=ICP
 
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTCP messages on port (\d+), FD (\d+)\.; class.name=Squid accepts HTCP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid (PID $2) listens for incoming HTCP messages on port $3, file descriptor #$4; target.node.name=$1; target.service.port=$3; target.process.pid=$2; target.process.name=squid; target.service.protocol=HTCP;
+regex=([\w\.]+) squid\[([0-9]+)\]: Accepting HTCP messages on port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts HTCP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) listens for incoming HTCP messages on port $3, file descriptor #$4; \
+ target.node.name=$1; \
+ target.service.port=$3; \
+ target.process.pid=$2; \
+ target.process.name=squid; \
+ target.service.protocol=HTCP
 
-regex=([\w\.]+) squid\[([0-9]+)\]: Accepting WCCP messages on port (\d+), FD (\d+)\.; class.name=Squid accepts WCCP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid (PID $2) listens for incoming WCCP messages on port $3, file descriptor #$4; target.node.name=$1; target.service.port=$3; target.process.pid=$2; target.process.name=squid; target.service.protocol=WCCP;
+regex=([\w\.]+) squid\[([0-9]+)\]: Accepting WCCP messages on port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts WCCP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) listens for incoming WCCP messages on port $3, file descriptor #$4; \
+ target.node.name=$1; \
+ target.service.port=$3; \
+ target.process.pid=$2; \
+ target.process.name=squid; \
+ target.service.protocol=WCCP
 
 # disabled services (do we really need this ?)
-regex=([\w\.]+) squid\[([0-9]+)\]: HTCP Disabled\.; impact.severity=low; impact.type=other; impact.description=Squid (PID $2) was invoked without the HTCP service; target.node.name=$1; target.process.pid=$2; target.process.name=squid;
+regex=([\w\.]+) squid\[([0-9]+)\]: HTCP Disabled\.; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) was invoked without the HTCP service; \
+ target.node.name=$1; \
+ target.process.pid=$2; \
+ target.process.name=squid
 
-regex=([\w\.]+) squid\[([0-9]+)\]: WCCP Disabled\.; impact.severity=low; impact.type=other; impact.description=Squid (PID $2) was invoked without the WCCP service; target.node.name=$1; target.process.pid=$2; target.process.name=squid;
+regex=([\w\.]+) squid\[([0-9]+)\]: WCCP Disabled\.; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid (PID $2) was invoked without the WCCP service; \
+ target.node.name=$1; \
+ target.process.pid=$2; \
+ target.process.name=squid
 
 # another way (less verbose) to detect squid has started (found in /var/log/messages and /var/log/syslog, default Debian conf)
-regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) started; impact.severity=low; impact.type=other; impact.description=Squid was started on $1 with pids $2 (parent) and $3 (child); target.node.name=$1; target.process.name=squid; target.process.pid=$2;
+regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) started; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid was started on $1 with pids $2 (parent) and $3 (child); \
+ target.node.name=$1; \
+ target.process.name=squid; \
+ target.process.pid=$2
 
 # squid exiting (/var/log/syslog and /var/log/messages format)
-regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) exited; impact.severity=low; impact.type=other; impact.description=Squid (pid $2) exited; target.node.name=$1; target.process.name=squid; target.process.pid=$2;
+regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) exited; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid (pid $2) exited; \
+ target.node.name=$1; \
+ target.process.name=squid; \
+ target.process.pid=$2
 
 
 
@@ -59,26 +134,84 @@ regex=([\w\.]+) squid\[([0-9]+)\]: Squid Parent: child process (\d+) exited; imp
 ###
 
 # starting 
-regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; class.name=Squid started; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid version $1 was started;
+regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
+ class.name=Squid started; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid version $1 was started
 
 # accepting connections or disabled services
-regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; class.name=Squid accepts HTTP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid listens for incoming HTTP connections on $1:$2, file descriptor #$3; target.node.address;target.node.address.category=ipv4-addr; target.node.address.address=$1; target.service.port=$2; target.service.protocol=HTTP;
+regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts HTTP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid listens for incoming HTTP connections on $1:$2, file descriptor #$3; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$1; \
+ target.service.port=$2; \
+ target.service.protocol=HTTP
 
-regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; class.name=Squid accepts ICP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid listens for incoming ICP messages on $1:$2, file descriptor #$3; target.node.address;target.node.address.category=ipv4-addr; target.node.address.address=$1; target.service.port=$2; target.service.protocol=ICP;
+regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts ICP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid listens for incoming ICP messages on $1:$2, file descriptor #$3; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$1; \
+ target.service.port=$2; \
+ target.service.protocol=ICP
 
-regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; class.name=Squid accepts HTCP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid listens for incoming HTCP messages on port $1, file descriptor #$2; target.service.port=$1; target.service.protocol=HTCP;
+regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts HTCP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid listens for incoming HTCP messages on port $1, file descriptor #$2; \
+ target.service.port=$1; \
+ target.service.protocol=HTCP
 
-regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; class.name=Squid accepts WCCP; impact.severity=low; impact.completion=succeeded; impact.type=other; impact.description=Squid listens for incoming WCCP messages on port $1, file descriptor #$2; target.service.port=$1; target.service.protocol=WCCP;
+regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
+ class.name=Squid accepts WCCP; \
+ impact.severity=low; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.description=Squid listens for incoming WCCP messages on port $1, file descriptor #$2; \
+ target.service.port=$1; \
+ target.service.protocol=WCCP
 
-regex=HTCP Disabled\.; impact.severity=low; impact.type=other; impact.description=Squid was invoked without the HTCP service; 
+regex=HTCP Disabled\.; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid was invoked without the HTCP service
 
-regex=WCCP Disabled\.; impact.severity=low; impact.type=other; impact.description=Squid was invoked without the WCCP service;
+regex=WCCP Disabled\.; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid was invoked without the WCCP service
 
-regex=Squid Parent: child process (\d+) exited; impact.severity=low; impact.type=other; impact.description=Squid (pid $2) exited; target.node.name=$1; target.process.name=squid; target.process.pid=$2;
+regex=Squid Parent: child process (\d+) exited; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Squid (pid $2) exited; \
+ target.node.name=$1; \
+ target.process.name=squid; \
+ target.process.pid=$2
 
 
 # II. ACL log 
 # 1. From /var/log/squid/access.log
 
-regex=(\d+\.\d+\.\d+\.\d+) .*DENIED/(\d+) (.*); class.name=Squid acl violation attempt; impact.severity=medium; impact.completion=failed; impact.description=Host $1 tried to violate Squid ACL; source.node.address;source.node.address.category=ipv4-addr; source.node.address.address=$2;
+regex=(\d+\.\d+\.\d+\.\d+) .*DENIED/(\d+) (.*); \
+ class.name=Squid acl violation attempt; \
+ impact.severity=medium; \
+ impact.completion=failed; \
+ impact.description=Host $1 tried to violate Squid ACL; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$2
 

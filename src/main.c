@@ -35,6 +35,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
+extern int batch_mode;
 static char **global_argv;
 extern udp_server_t *udp_srvr;
 static volatile sig_atomic_t got_sighup = 0;
@@ -114,14 +115,17 @@ static void regex_match_cb(void *plugin, void *log)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, const char *str, const char *from)
+void lml_dispatch_log(regex_list_t *list, log_file_t *lf, const char *str)
 {
         log_container_t *log;
-
-        log = log_container_new(str, from);
+        
+        log = log_container_new();
         if ( ! log )
                 return;
-                
+        
+        log_container_set_log(lf, log, str);        
+        log_container_set_source(log, log_file_get_filename(lf));
+
         dprint("[MSGRD] received <%s> from %s\n", str, from);
 
         regex_exec(list, log->log, &regex_match_cb, log);
@@ -223,19 +227,25 @@ int main(int argc, char **argv)
         signal(SIGHUP, sighup_handler);
 
         file_server_start_monitoring(regex_list);
-        
-        if ( udp_srvr || file_server_get_event_fd() > 0 )
+
+        /*
+         * if either FAM or UDP server is enabled, we use polling to know
+         * if there are data available for reading. if batch_mode is set,
+         * then we revert to reading every data at once.
+         */
+        if ( (udp_srvr || file_server_get_event_fd() > 0) && ! batch_mode )
                 wait_for_event(regex_list);
         else {
-                /*
-                 * there is no way we can do polling.
-                 */
-                while ( 1 ) {
+                do {
                         handle_sighup_if_needed();
-                        file_server_wake_up(regex_list);
-                        sleep(1);
+                        ret = file_server_wake_up(regex_list);
+
+                        if ( ! batch_mode )
+                                sleep(1);
+                        
                         prelude_wake_up_timer();
-                }
+                        
+                } while ( batch_mode == 0 || ret > 0 );
         }
         
 	return 0;

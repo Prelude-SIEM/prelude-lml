@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2002 Laurent Oudot <oudot.laurent@wanadoo.fr>
+# Copyright (C) 2003 Laurent Oudot <oudot.laurent@wanadoo.fr>
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -21,32 +21,50 @@
 #
 #####
 
+# See this page for references : http://www.zyxel.com/support/supportnote/p650/app/syslog.htm
+
 # ZyXEL router support for Prelude-LML 
 # (should work with most ZynOS network devices)
 
-regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9]+)  dpo=([0-9]+).*; \
+# 1) CDR log : (call messages)
+
+# Feb 14 16:57:17 192.168.1.1 ZyXEL Communications Corp.: board 0 line 0 channel 0, call 18, C01 Incoming Call OK
+# Feb 14 17:07:18 192.168.1.1 ZyXEL Communications Corp.: board 0 line 0 channel 0, call 18, C02 Call Terminated
+
+# 2) Packet triggered log : (just for info)
+
+# Jul 19 11:28:39 192.168.102.2 ZyXEL Communications Corp.: Packet Trigger: Protocol=1, Data=4500003c100100001f010004c0a86614ca849a7b08004a5c020001006162636465666768696a6b6c6d6e6f7071727374
+# Jul 19 11:28:56 192.168.102.2 ZyXEL Communications Corp.: Packet Trigger: Protocol=1, Data=4500002c1b0140001f06b50ec0a86614ca849a7b0427001700195b3e00000000600220008cd40000020405b4
+
+# 3) Filter log :
+
+# Jul 19 14:44:09 192.168.1.1 ZyXEL Communications Corp.: IP[Src=202.132.154.1 Dst=192.168.1.33 UDP spo=0035  dpo=05d4]}S03>R01mF
+
+regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9A-Fa-f]+)  dpo=([0-9A-Fa-f]+).*S(\d{2})>R(\d{2})(.)(.); \
  class.name=ZyXEL ip access; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = medium; \
- impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5); \
+ impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5)  ruleset $6 rule $7; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address = $1; \
- source.service.port = $4; \
+ source.service.port = 0x$4; \
  source.service.protocol = $3; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address = $2; \
- target.service.port = $5; \
+ target.service.port = 0x$5; \
  target.service.protocol = $3;
 
-regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*; \
+# Jul 19 14:44:13 192.168.1.1 ZyXEL Communications Corp.: IP[Src=192.168.1.33 Dst=202.132.154.1 ICMP]}S03>R01mF
+
+regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*S(\d{2})>R(\d{2})(.)(.); \
  class.name=ZyXEL ip access; \
  impact.completion = failed; \
  impact.type = other;\
  impact.severity = medium; \
- impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3); \
+ impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3)  ruleset $4 rule $5; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address = $1; \
@@ -56,5 +74,16 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*
  target.node.address.address = $2; \
  target.service.protocol = $3;
 
+# 4) PPP Log :
 
+# Jul 19 11:43:25 192.168.1.1 ZyXEL Communications Corp.: ppp:LCP Starting
+# Jul 19 11:43:43 192.168.1.1 ZyXEL Communications Corp.: ppp:IPCP Opening
+# Jul 19 11:43:51 192.168.1.1 ZyXEL Communications Corp.: ppp:CCP Opening
+# Jul 19 11:44:14 192.168.1.1 ZyXEL Communications Corp.: ppp:BACP Closing
 
+regex=ZyXEL Communications Corp.: ppp:(LCP|IPCP|CCP|BACP) (Starting|Opening|Closing); \
+ class.name=ZyXEL PPP $2; \
+ class.origin=vendor-specific; \
+ impact.type = other;\
+ impact.severity = low; \
+ impact.description=$2 $1 connection;

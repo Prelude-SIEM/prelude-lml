@@ -32,8 +32,11 @@
 #include <sys/utsname.h>
 #include <sys/time.h>
 #include <time.h>
+#include <netdb.h>
+#include <assert.h>
 
 #include <libprelude/list.h>
+#include <libprelude/common.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/idmef-tree.h>
 #include <libprelude/idmef-tree-func.h>
@@ -44,17 +47,19 @@
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/sensor.h>
+#include <libprelude/prelude-inet.h>
 
 #include "log-common.h"
 #include "lml-alert.h"
 #include "config.h"
 
 
+static size_t target_buf_index;
 static prelude_msgbuf_t *msgbuf;
 
 
-#define ANALYZER_MODEL "Prelude Log Monitoring Lackey"
-#define ANALYZER_CLASS "Host based Intrusion Detection System"
+#define ANALYZER_CLASS "HIDS"
+#define ANALYZER_MODEL "Prelude LML"
 #define ANALYZER_MANUFACTURER "The Prelude Team http://www.prelude-ids.org"
 
 
@@ -95,13 +100,101 @@ static void send_heartbeat_cb(void *data)
 
 
 
+static char *keep_buffer(const char *str) 
+{
+        int ret;
+        static char buf[1024], *ptr; 
+
+        /*
+         * FIXME: ugly hack because of IDMEF API memory handling uglyness
+         */
+        ret = snprintf(&buf[target_buf_index], sizeof(buf) - target_buf_index, "%s", str);        
+        if ( (ret + target_buf_index) >= sizeof(buf) || ret < 0 )
+                return "";
+
+        
+        ptr = &buf[target_buf_index];
+        target_buf_index += ret + 1;
+
+        return ptr;
+}
+
+
+
+static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *node) 
+{
+        int ret;
+        idmef_address_t *address;
+        
+        /*
+         * we want to know if it's an Ip address or an hostname.
+         */
+        ret = inet_addr(log->target_hostname);
+        if ( ret < 0 ) {
+                /*
+                 * hostname.
+                 */
+                idmef_string_set(&node->name, log->target_hostname);
+        } else {
+                address = idmef_node_address_new(node);
+                if ( ! address ) 
+                        return -1;
+                
+                idmef_string_set(&address->address, log->target_hostname);
+        }
+
+        return 0;
+}
+
+
+
+
+static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai) 
+{
+        char str[128];
+        void *in_addr;
+        idmef_address_t *addr;
+
+        target_buf_index = 0;
+        
+        while ( ai ) {
+
+                if ( ai->ai_flags & AI_CANONNAME ) 
+                        idmef_string_set(&node->name, keep_buffer(ai->ai_canonname));
+                
+                addr = idmef_node_address_new(node);
+                if ( ! addr )
+                        return -1;
+
+                in_addr = prelude_inet_sockaddr_get_inaddr(ai->ai_addr);
+                assert(in_addr);
+                
+                if ( ai->ai_family == AF_INET ) 
+                        addr->category = ipv4_addr;
+                else
+                        addr->category = ipv6_addr;
+                
+                if ( ! prelude_inet_ntop(ai->ai_family, in_addr, str, sizeof(str)) ) {
+                        log(LOG_ERR, "inet_ntop returned an error.\n");
+                        return -1;
+                }
+                
+                idmef_string_set(&addr->address, keep_buffer(str));
+                
+                ai = ai->ai_next;
+        }
+
+        return 0;
+}
+
+
+
 static int generate_target(const log_container_t *log, idmef_alert_t *alert) 
 {
         int ret;
         idmef_node_t *node;
         idmef_target_t *target;
         idmef_process_t *process;
-        idmef_address_t *address;
         
         target = idmef_alert_target_new(alert);
         if ( ! target ) 
@@ -116,28 +209,26 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         }
 
         if ( log->target_hostname ) {
+                prelude_addrinfo_t *ai, hints;
                 
                 node = idmef_target_node_new(target);
                 if ( ! node ) 
                         return -1;
 
-                /*
-                 * we want to know if it's an Ip address or an hostname.
-                 */
-                ret = inet_addr(log->target_hostname);
-                if ( ret < 0 ) {
-                        /*
-                         * hostname.
-                         */
-
-                        idmef_string_set(&node->name, log->target_hostname);
-                } else {
-                        address = idmef_node_address_new(node);
-                        if ( ! address ) 
-                                return -1;
-
-                        idmef_string_set(&address->address, log->target_hostname);
+                memset(&hints, 0, sizeof(hints));
+                hints.ai_flags = AI_CANONNAME;
+                hints.ai_socktype = SOCK_STREAM;
+                
+                /* This function conforms to getaddrinfo(3), not a general calling convention in libprelude */
+                ret = prelude_inet_getaddrinfo(log->target_hostname, NULL, &hints, &ai);
+                if ( ret != 0 ) {
+                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, prelude_inet_gai_strerror(ret));
+                        return resolve_failed_fallback(log, node);
                 }
+
+                fill_target(node, ai);
+
+                prelude_inet_freeaddrinfo(ai);
         }
 
         return 0;

@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <pcre.h>
+#include <netdb.h>
 
 #include <libprelude/list.h>
 #include <libprelude/common.h>
@@ -46,8 +47,11 @@
 #include "lml-alert.h"
 #include "log.h"
 
-#define VARIABLE_TYPE_INT    0
-#define VARIABLE_TYPE_STRING 1
+#define VARIABLE_TYPE_INT    0x01
+#define VARIABLE_TYPE_STRING 0x02
+#define VARIABLE_TYPE_PORT   0x04
+#define VARIABLE_CONTENT_TYPE_HEX 0x08
+
 
 
 #define generic_free_list(type, head) do {           \
@@ -77,6 +81,9 @@ typedef struct {
         pcre *regex;
         pcre_extra *extra;
 
+        uint16_t id;
+        uint16_t revision;
+        
         int last;
         char *regex_string;
      
@@ -359,10 +366,10 @@ static int create_target_decoy(idmef_target_t *target, const char *decoy, int *v
 
 
 
-static void create_source_interface(idmef_source_t *source, const char * interface, int *var_type, void **var_ptr)
+static void create_source_interface(idmef_source_t *source, const char *interface, int *var_type, void **var_ptr)
 {
         *var_type = VARIABLE_TYPE_STRING;
-        *var_ptr  = &source->interface;
+        *var_ptr  = &(source->interface);
         idmef_string_set(&source->interface, strdup(interface));
 }
 
@@ -391,9 +398,12 @@ static int create_source_service(idmef_source_t *source)
 
 static void create_service_port(idmef_service_t *service, const char *port, int *var_type, void **var_ptr)
 {
-        *var_type = VARIABLE_TYPE_INT;
+        *var_type = VARIABLE_TYPE_PORT;
         *var_ptr  = &service->port;
         service->port = atoi(port);
+
+	if ( strstr(port, "0x") || strstr(port, "0X") ) 
+		*var_type |= VARIABLE_CONTENT_TYPE_HEX;
 }
 
 
@@ -845,6 +855,25 @@ static int parse_impact_desc(simple_rule_t *rule, const char *desc, int *var_typ
         
         idmef_string_set(&rule->impact->description, strdup(desc));
         
+        return 0;
+}
+
+
+
+
+
+static int parse_id(simple_rule_t *rule, const char *id, int *var_type, void **var_ptr) 
+{
+        rule->id = (uint16_t) strtol(id, NULL, 0);
+        return 0;
+}
+
+
+
+
+static int parse_revision(simple_rule_t *rule, const char *revision, int *var_type, void **var_ptr) 
+{
+        rule->revision = (uint16_t) strtol(revision, NULL, 0);
         return 0;
 }
 
@@ -1691,7 +1720,7 @@ static int filter_string(char *input, char **key, char **value)
 
 static int store_runtime_variable(simple_rule_t *rule, const char *line, int var_type, void *var_ptr) 
 {
-        char c;
+        int c;
         const char *str;
         char outvar[10];
         variable_t *new;
@@ -1783,18 +1812,57 @@ static int parse_include(simple_rule_t *rule, const char *value, int *var_type, 
 
 
 
+static char *cut_line(char *buf, char **sptr) 
+{
+        int escaped = 0;
+        char *ptr, *wptr;
+
+        if ( ! buf && ! *sptr )
+                return NULL;
+
+        buf = wptr = (ptr = (*sptr) ? *sptr : buf);
+        *sptr = NULL;
+
+        while ( *ptr ) {
+                
+                if ( *ptr == '\\' ) 
+                        escaped = 1;
+
+                else if ( ! escaped && *ptr == ';' ) {
+                        *wptr = '\0';
+                        *sptr = ptr + 1;
+                        break;
+                }
+
+                else if ( escaped ) {
+                        if ( *ptr == ';' )
+                                wptr--;
+
+                        escaped = 0;
+                }
+                
+                *wptr++ = *ptr++;
+        }
+
+        return buf;
+}
+
+
+
 
 static int parse_rule(const char *filename, int line, simple_rule_t *rule, char *buf) 
 {
         void *var_ptr;
         int i, ret, var_type;
-        char *in, *ptr, *key, *val;
+        char *ptr = NULL, *key, *val, *in;
         struct {
                 const char *key;
                 int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
                 { "include",                      parse_include                      },
                 { "regex",                        parse_regex                        },
+                { "id",                           parse_id                           },
+                { "revision",                     parse_revision                     },
                 { "last",                         parse_last                         },
                 { "class.origin",                 parse_class_origin                 },
                 { "class.name",                   parse_class_name                   },
@@ -1851,10 +1919,9 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 { NULL,                           NULL                               },
         };
 
-        ptr = buf;
-        while ( (in = strtok(ptr, ";")) ) {
-                ptr = NULL;
-                
+        while ( (in = cut_line(buf, &ptr)) ) {
+                buf = NULL;
+                                
                 /*
                  * filter space at the begining of the line.
                  */
@@ -2076,7 +2143,7 @@ static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_so
         idmef_process_env_t *env_tmp;
         idmef_userid_t *uid, *uid_tmp;
         struct list_head *tmp;
-       
+
         idmef_string_copy(&alert_source->interface, &source->interface);
         
         if ( source->node ) {
@@ -2348,8 +2415,41 @@ static int replace_str(idmef_string_t *str, const char *needle, const char *repl
 
 
 
-static void resolve_variable(const log_container_t *log,
-                             simple_rule_t *rule, int *ovector, size_t osize) 
+static void resolve_variable(variable_t *variable, char *buf)
+{
+	int base = 0;
+        struct servent *service;
+
+	if ( variable->type & VARIABLE_CONTENT_TYPE_HEX ) 
+		base = 16;
+	
+        if ( variable->type & VARIABLE_TYPE_INT ) 
+		*(int *) variable->ptr = strtol(buf, NULL, base);
+	
+        else if ( variable->type & VARIABLE_TYPE_STRING ) 
+                replace_str(variable->ptr, variable->reference_str, buf);
+        
+        else if ( variable->type & VARIABLE_TYPE_PORT ) {
+                if ( variable->type & VARIABLE_CONTENT_TYPE_HEX || isdigit(*buf) ) 
+			*(int *) variable->ptr = strtol(buf, NULL, base);
+		else {
+                        service = getservbyname(buf, NULL);
+                        if ( ! service ) {
+                                *(int *) variable->ptr = 0;
+                                log(LOG_ERR, "Service name '%s' could not be found in /etc/services.\n", buf);
+                                return;
+                        }
+
+                        *(int *) variable->ptr = ntohs(service->s_port);
+                }
+        }
+}
+
+
+
+
+static void resolve_variable_list(const log_container_t *log,
+                                  simple_rule_t *rule, int *ovector, size_t osize) 
 {
         int ret;
         char buf[1024];
@@ -2373,12 +2473,7 @@ static void resolve_variable(const log_container_t *log,
                         continue;
                 }
                 
-                
-                if ( var->type == VARIABLE_TYPE_INT ) 
-                        *(int *) var->ptr = atoi(buf);
-                
-                else if ( var->type == VARIABLE_TYPE_STRING ) 
-                        replace_str(var->ptr, var->reference_str, buf);
+                resolve_variable(var, buf);
         }
 }
 
@@ -2422,15 +2517,15 @@ static void simple_run(const log_container_t *log)
                 if ( ret < 0 )
                         continue;
                 
-                resolve_variable(log, rule, ovector, ret);
+                resolve_variable_list(log, rule, ovector, ret);
                 emit_alert(rule, log);
+                
                 free_variable_allocated_data(rule);
                 
                 if ( rule->last )
                         return;
         }
 }
-
 
 
 
@@ -2514,5 +2609,5 @@ plugin_generic_t *plugin_init(int argc, char **argv)
 	plugin_set_contact(&plugin, "yoann@prelude-ids.org");
 	plugin_set_running_func(&plugin, simple_run);
 
-	return (plugin_generic_t *) & plugin;
+	return (plugin_generic_t *) &plugin;
 }

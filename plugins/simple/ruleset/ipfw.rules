@@ -46,15 +46,13 @@ regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  impact.description=Denied incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=$2; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
- target.service.port=$6; \
  target.service.protocol=$2; \
- source.interface=$7;
+ source.interface=$6;
 
 regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  class.name=Packet dropped by firewall; \
@@ -64,15 +62,13 @@ regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  impact.description=Denied outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=$2; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=$2; \
- target.interface=$7;
+ target.service.protocol=ICMP; \
+ target.interface=$6;
 
 # 2. Accept rules
 regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
@@ -119,15 +115,13 @@ regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  impact.description=Accepted incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=$2; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=$2; \
- source.interface=$7;
+ target.service.protocol=ICMP; \
+ source.interface=$6;
 
 regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  class.name=Packet accepted by firewall; \
@@ -137,13 +131,11 @@ regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  impact.description=Accepted outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;  \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=$2; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=$2; \
- target.interface=$7; 
+ target.service.protocol=ICMP; \
+ target.interface=$6; 
 

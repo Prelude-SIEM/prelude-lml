@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2002 Laurent Oudot <oudot.laurent@wanadoo.fr>
+# Copyright (C) 2002, 2003 Laurent Oudot <oudot.laurent@wanadoo.fr>
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -60,6 +60,7 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=TCP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -77,6 +78,7 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=TCP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -95,6 +97,7 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=UDP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -112,6 +115,7 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=UDP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -129,6 +133,7 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
  source.service.protocol=ICMP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -144,6 +149,7 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
  source.service.protocol=ICMP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -171,6 +177,7 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=TCP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -189,6 +196,7 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
  source.node.address.address=$4; \
  source.service.port=$17; \
  source.service.protocol=UDP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -206,6 +214,7 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
  source.service.protocol=ICMP; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -222,6 +231,7 @@ regex=IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
  source.service.protocol=$16; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
@@ -238,6 +248,7 @@ regex=IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
  source.service.protocol=$16; \
+ target.interface=$1; \
  target.node.address; \
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \

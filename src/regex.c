@@ -28,23 +28,27 @@ struct regex_entry {
 
 static char *trim(char *str)
 {
-        char *ibuf, *obuf;
+        char *rptr, *wptr;        
 
         if ( ! str )
                 return NULL;
 
-        for ( ibuf = str, obuf = str; *ibuf; ) {
-                while ( *ibuf && isspace((int) *ibuf) )
-                        ibuf++;
-                
-                if ( *ibuf && (obuf != str) )
-                        *(obuf++) = ' ';
-                
-                while ( *ibuf && (!isspace((int) *ibuf)) )
-                        *(obuf++) = *(ibuf++);
-        }
-        *obuf = '\0';
+        wptr = rptr = str;
+        
+        while ( *rptr != '\0' ) {
 
+                if ( isspace((int) *rptr) ) {
+                        do {
+                                rptr++;
+                        } while ( isspace((int) *rptr) );
+
+                        *wptr++ = ' ';
+                } else
+                        *wptr++ = *rptr++;
+        }
+
+        *wptr = '\0';
+        
         return str;
 }
 
@@ -96,7 +100,7 @@ static int regex_create_entry(regex_list_t *list, const char *filename,
         pcre *compiled;
         const char *errptr;
         regex_entry_t *entry;
-        
+
         compiled = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! compiled ) {
                 log(LOG_INFO, "%s:%d : unable to compile: %s.\n", filename, line, errptr);
@@ -133,26 +137,28 @@ static int regex_create_entry(regex_list_t *list, const char *filename,
 
 regex_list_t *regex_init(char *filename)
 {
-        FILE *f;
+        FILE *fd;
+        char buf[1024];
         int line = 1, ret;
-        char *token, *tmp = NULL;
-        char buf[MAX_LINE_LEN];
-        char name[MAX_NAME_LEN];
-        char regex[MAX_LINE_LEN];
-        char options[MAX_OPTIONS_LEN];
+        regex_list_t *conf;
+        char *name, *regex, *options;
 
-        regex_list_t *conf = malloc(sizeof(*conf));
-        assert(conf);
+        conf = malloc(sizeof(*conf));
+        if ( ! conf ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+        
         INIT_LIST_HEAD(conf);
 
-        f = fopen(filename, "r");
-        if (NULL == f) {
-                log(LOG_ERR, "couldn't open config file.\n");
+        fd = fopen(filename, "r");
+        if ( ! fd ) {
+                log(LOG_ERR, "couldn't open config file %s.\n", filename);
                 return NULL;
         }
 
-        while ( fgets(buf, MAX_LINE_LEN, f) ) {
-                
+        while ( fgets(buf, sizeof(buf), fd) ) {
+
                 trim(buf);
 
                 if ( buf[0] == '#' || buf[0] == '\0' )
@@ -161,34 +167,32 @@ regex_list_t *regex_init(char *filename)
                          */
                         continue;
                 
-                token = strtok_r(buf, " \t", &tmp);
-                if (NULL == token) {
+                name = strtok(buf, " \t");
+                if ( ! name ) {
                         line++;
                         continue;
                 }
-                snprintf(name, MAX_NAME_LEN, "%s", token);
                 
-                token = strtok_r(NULL, " \t", &tmp);
-                if (NULL == token) {
+                options = strtok(NULL, " \t");
+                if ( ! options ) {
                         line++;
                         continue;
                 }
-                snprintf(options, MAX_OPTIONS_LEN, "%s", token);
                 
-                token = strtok_r(NULL, "", &tmp);
-                if (NULL == token) {
+                regex = strtok(NULL, "");
+                if ( ! regex ) {
                         line++;
                         continue;
                 }
-                snprintf(regex, MAX_LINE_LEN, "%s", token);
-        
+                
                 ret = regex_create_entry(conf, filename, line, name, regex, options);
                 if ( ret < 0 )
                         continue;
                 
                 line++;
         }
-        fclose(f);
+        
+        fclose(fd);
     
         return conf;
 }

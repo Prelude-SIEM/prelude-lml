@@ -29,6 +29,10 @@
 #
 # Files to monitor
 #
+[LogWatch]
+
+log-fmt = %tag %log
+time-fmt = %b %d %H:%M:%S;
 file = /var/log/auth.log
 file = /var/log/messages
 

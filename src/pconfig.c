@@ -26,10 +26,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <grp.h>
 #include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 
 #include <libprelude/list.h>
 #include <libprelude/plugin-common.h>
@@ -47,17 +49,21 @@
 #include "config.h"
 #include "pconfig.h"
 #include "regex.h"
+#include "log-common.h"
 #include "file-server.h"
 #include "udp-server.h"
 
 #define MAX_FD 1024
 
 
-udp_server_t *udp_srvr = NULL;
-static uint16_t udp_srvr_port = 514;
-static char *udp_srvr_addr = NULL;
+int batch_mode = 0;
 static char *pidfile = NULL;
+udp_server_t *udp_srvr = NULL;
+static char *udp_srvr_addr = NULL;
+static uint16_t udp_srvr_port = 514;
 static uid_t prelude_lml_user = 0;
+static gid_t prelude_lml_group = 0;
+
 
 
 static int print_version(prelude_option_t *opt, const char *arg)
@@ -72,6 +78,15 @@ static int print_help(prelude_option_t *opt, const char *arg)
 {
         prelude_option_print(NULL, CLI_HOOK, 25);
 	return prelude_option_end;
+}
+
+
+
+static int set_batch_mode(prelude_option_t *opt, const char *arg)
+{
+        batch_mode = 1;
+        file_server_set_batch_mode();
+        return prelude_option_success;
 }
 
 
@@ -117,22 +132,71 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 
 
 
+static int set_logfile_format(prelude_option_t *opt, const char *arg)
+{
+        log_file_t *lf;
+
+        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
+        assert(lf);
+        
+        log_file_set_log_fmt(lf, arg);
+        
+        return prelude_option_success;
+}
+
+
+
+static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
+{
+        log_file_t *lf;
+        
+        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
+        assert(lf);
+        
+        log_file_set_timestamp_fmt(lf, arg);
+        
+        return prelude_option_success;
+}
+
+
+
+
 static int set_file(prelude_option_t *opt, const char *arg) 
 {
         int ret;
+        log_file_t *lf;
 
-        ret = access(arg, F_OK);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "%s does not exist at program startup: check your configuration.\n", arg);
+        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
+        assert(lf);
+
+        ret = log_file_set_filename(lf, arg);
+        if ( ret < 0 )
                 return prelude_option_error;
-        }
         
-        ret = file_server_monitor_file(arg);
+        ret = file_server_monitor_file(lf);
         if ( ret < 0 ) 
                 return prelude_option_error;
         
-        log(LOG_INFO, "- Added monitor for '%s'.\n", arg);
+        log(LOG_INFO, "- Added monitor for '%s' in %p.\n", arg, lf);
+        
+        return prelude_option_success;
+}
 
+
+
+static int set_logwatch(prelude_option_t *opt, const char *arg)
+{
+        log_file_t *lf;
+        
+        lf = log_file_new();
+        if ( ! lf )
+                return prelude_option_error;
+
+        prelude_option_set_private_data(opt, lf);
+        printf("set new = %p\n", lf);
+
+        prelude_option_parse_from_context(opt, NULL);
+        
         return prelude_option_success;
 }
 
@@ -168,6 +232,25 @@ static int set_udp_server_port(prelude_option_t *opt, const char *arg)
         udp_srvr_port = atoi(arg);
         return prelude_option_success;
 }
+
+
+
+
+static int set_lml_group(prelude_option_t *opt, const char *arg) 
+{
+        struct group *grp;
+
+        grp = getgrnam(arg);
+        if ( ! grp ) {
+                log(LOG_ERR, "couldn't find group %s.\n", arg);
+                return prelude_option_error;
+        }
+
+        prelude_lml_group = grp->gr_gid;
+
+        return prelude_option_success;
+}
+
 
 
 
@@ -214,6 +297,10 @@ int pconfig_set(int argc, char **argv)
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'u', "user",
                            "Run as the specified user", required_argument,
                            set_lml_user, NULL);
+
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'g', "group",
+                           "Run in the specified group", required_argument,
+                           set_lml_group, NULL);
         
 	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'd', "daemon",
 			   "Run in daemon mode", no_argument,
@@ -242,14 +329,41 @@ int pconfig_set(int argc, char **argv)
                            "severity alert will be emited", required_argument,
                            set_rotation_interval, NULL);
         
-        prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'f', "file",
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'b', "batchmode",
+                           "Tell LML to run in batch mode", no_argument,
+                           set_batch_mode, NULL);
+        
+        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'w', "logwatch",
+                                 "Specify a file to monitor (you might specify \"stdin\")",
+                                 no_argument, set_logwatch, NULL);
+        prelude_option_set_priority(opt, option_run_first);
+        
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'f', "file",
                            "Specify a file to monitor (you might specify \"stdin\")",
                            required_argument, set_file, NULL);
-
+        
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 't', "time-format", 
+                           "Specify the input timestamp format", required_argument,
+                           set_logfile_ts_format, NULL);
+        
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'l', "log-format", 
+                           "Specify the input format", required_argument,
+                           set_logfile_format, NULL);
+        
         ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
 	if ( ret == prelude_option_error || ret == prelude_option_end )
-                exit(1);        
+                exit(1);
+
+        if ( batch_mode && udp_srvr ) {
+                log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
+                return -1;
+        }
         
+        if ( prelude_lml_group && setgid(prelude_lml_group) < 0 ) {
+                log(LOG_ERR, "couldn't set GID to %d.\n", prelude_lml_group);
+                return -1;
+        }
+
         if ( prelude_lml_user && setuid(prelude_lml_user) < 0 ) {
                 log(LOG_ERR, "couldn't set UID to %d.\n", prelude_lml_user);
                 return -1;

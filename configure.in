@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src)
 AC_PREREQ(2.53)
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(prelude-lml, 0.8.3)
+AM_INIT_AUTOMAKE(prelude-lml, 0.8.6)
 AM_CONFIG_HEADER(config.h)
 AM_DISABLE_STATIC
 
@@ -12,6 +12,7 @@ AM_MAINTAINER_MODE
 AM_PROG_LIBTOOL
 
 dnl Checks for programs.
+AC_PROG_CPP
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
@@ -42,51 +43,16 @@ dnl **************************************************
 dnl * Check for libprelude                           *
 dnl **************************************************
 
-AC_PATH_GENERIC(libprelude, 0.8.0, ,
+AC_PATH_GENERIC(libprelude, 0.8.6, ,
   AC_MSG_ERROR(Cannot find libprelude: Is libprelude-config in the path?) )
-
 
 
 dnl **************************************************
 dnl * Check for PCRE                                 *
 dnl **************************************************
 
-AC_PATH_GENERIC2(pcre, 3.0, ,
+AC_PATH_GENERIC(pcre, 3.0, ,
   AC_MSG_ERROR(Cannot find pcre: Is pcre-config in the path?) )
-
-
-
-dnl **************************************************
-dnl * Enable / Disable gprof profiling.              *
-dnl **************************************************
-
-AC_ARG_ENABLE(profiling, [  --enable-profiling Enable Gprof profiling - with thread workaround [default=no]], \
-	      enable_profiling=yes, enable_profiling=no)
-
-if test x$enable_profiling = xyes ; then
-	CFLAGS="$CFLAGS -O0 -pg"
-	
-	dnl *** for gcc3 ***
-	
-	cat > conftest.c << EOF 
-
-	int main(void)
-	{
-		exit(0);
-	}
-EOF
-
-	AC_MSG_CHECKING(whether compiler support -fprofile-arcs)
-
-        ${CC-cc} -o conftest $CFLAGS $CPPFLAGS $LDFLAGS conftest.c $LIBS >/dev/null 2>&1
-	if test -x conftest ; then
-        	CFLAGS="$CFLAGS -fprofile-arcs";
-		AC_MSG_RESULT(yes);
-		rm -f conftest;
-	else
-		AC_MSG_RESULT(no);
-	fi
-fi
 
 
 
@@ -133,7 +99,7 @@ if test -n "$fam_lib_dir" && test -n "$fam_include_dir"; then
 	enable_fam=yes
 fi
 
-if test $fam_include_dir = /usr; then
+if test x$fam_include_dir = x/usr; then
 	fam_include_dir=""
 else
 	fam_include="-I$fam_include_dir/include"
@@ -150,7 +116,6 @@ AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
 
 AC_CHECK_DECL(FILENAME_MAX, have_filename_max=yes, have_filename_max=no)
 if test x$have_filename_max = xno; then
-	echo "defining by ourself"
 	AC_DEFINE_UNQUOTED(FILENAME_MAX, 256, Define the maximum value of a filename)
 fi
 
@@ -175,7 +140,7 @@ prelude_conf=$configdir/prelude-lml.conf
 regex_conf=$configdir/plugins.rules
 
 plugindir=$libdir/prelude-lml
-log_plugin_dir=$plugindir/
+log_plugin_dir=$plugindir
 
 AC_DEFINE_UNQUOTED(PRELUDE_CONF, "$prelude_conf", Path to the LML configuration file)
 
@@ -188,10 +153,6 @@ AC_SUBST(prelude_conf)
 AC_SUBST(regex_conf)
 AC_SUBST(log_plugin_dir)
 AC_SUBST(LIBWRAP_LIBS)
-
-if test x$enable_profiling = xno; then
-	CFLAGS="$CFLAGS -O2 -fomit-frame-pointer"
-fi
 
 CFLAGS="$CFLAGS -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
 -Wbad-function-cast -Wcast-qual -Wcast-align -Wnested-externs -Wunused"
@@ -221,5 +182,4 @@ plugins/simple/ruleset/Makefile
 echo
 echo "*** Dumping configuration ***"
 echo "    - Enable FAM support     : $enable_fam"
-echo "    - Enable profiling       : $enable_profiling"
 echo "    - Generate documentation : $enable_gtk_doc"
