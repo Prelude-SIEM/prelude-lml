@@ -31,15 +31,13 @@
 #include <inttypes.h>
 #include <errno.h>
 #include <assert.h>
+#include <time.h>
 #include <sys/uio.h>
 
 #include "config.h"
 
 #ifdef HAVE_FAM 
  #include <fam.h>
-
- #define FAM_FILENAME "testfam.tmp"
- #define FAM_STRING "test string\n"
 #endif
 
 #include <libprelude/timer.h>
@@ -56,23 +54,57 @@
 #include "lml-alert.h"
 
 
+#define MIN(x, y) ( ((x) < (y)) ? (x) : (y) )
+#define MAX(x, y) ( ((x) > (y)) ? (x) : (y) )
+
+
+
+#define STDIN_FILENAME "stdin"
+
+
+/*
+ * If we get more than ROTATION_MAX_DIFFERENCE seconds
+ * of difference between the time the logfile is rotated,
+ * and a third rotation, issue an alert.
+ */
+#define DEFAULT_ROTATION_INTERVAL_MAX_DIFFERENCE 1800
+
+
+/*
+ * Logfile metadata stuff.
+ */
+#define METADATA_MAXSIZE 8192
+#define METADATA_DIR     CONFIG_DIR"/metadata"
+
+
 #define LOGFILE_DELETION_CLASS "Logfile deletion"
-#define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"              \
-                                "or a log rotation program may have rotated the logfile "
+#define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"               \
+                                "or a log rotation program may have rotated the logfile."
+
+#define LOGFILE_DELETION_IMPACT_HIGH "An attacker seems to have erased the logfile, "      \
+                                     "and the change doesn't seem to be related to a log " \
+                                     "rotation program." 
 
 #define LOGFILE_MODIFICATION_CLASS "Logfile inconsistency"
 #define LOGFILE_MODIFICATION_IMPACT "An attacker might have modified the logfile in order " \
-                                    "to remove the trace he left"
+                                    "to remove the trace he left."
 
 
 
 typedef struct {
         FILE *fd;
+        FILE *metadata_fd;
+
+        time_t last_rotation;
+        time_t rotation_average;
+        
         char *file;
         int index;
         char buf[1024];
-        int need_more_read;
+
+        off_t need_more_read;
         off_t last_size;
+
         time_t last_mtime;
         struct list_head list;
 
@@ -83,6 +115,8 @@ typedef struct {
 } monitor_fd_t;
 
 
+
+
 #ifdef HAVE_FAM
 
 static int fam_setup_monitor(monitor_fd_t *monitor);
@@ -91,9 +125,12 @@ static FAMConnection fc;
 #endif
 
 
+
+
 static int fam_initialized = 0;
 static LIST_HEAD(active_fd_list);
 static LIST_HEAD(inactive_fd_list);
+static int rotation_interval_max_difference = DEFAULT_ROTATION_INTERVAL_MAX_DIFFERENCE;
 
 
 
@@ -110,7 +147,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_message_t *message;
         idmef_classification_t *class;
         idmef_assessment_t *assessment;
-                
+        
         log = log_container_new(NULL, fd->file);
         if ( ! log )
                 return;
@@ -175,7 +212,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         class->origin = cl->origin;
         idmef_string_copy(&class->url, &cl->url);
         idmef_string_copy(&class->name, &cl->name);
-               
+
         lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_HIGH);
 
         log_container_delete(log);
@@ -190,9 +227,187 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
 
 
 
-static int read_logfile(monitor_fd_t *fd) 
+
+static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st) 
 {
-        int ret, len = 0;
+        idmef_impact_t impact;
+        idmef_classification_t class;
+
+        memset(&class, 0, sizeof(class));
+        memset(&impact, 0, sizeof(impact));
+        
+        class.origin = origin_unknown;
+        idmef_string_set_constant(&class.name, LOGFILE_MODIFICATION_CLASS);
+        
+        impact.type = file;
+        impact.completion = succeeded;
+        impact.severity = impact_high;
+        idmef_string_set_constant(&impact.description, LOGFILE_MODIFICATION_IMPACT);
+        
+        logfile_alert(monitor, st, &class, &impact);
+}
+
+
+
+
+static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumline)
+{
+        int line = 0;
+        char buf[METADATA_MAXSIZE], *offptr;
+
+        rewind(monitor->metadata_fd);
+
+        *start = 0;
+        *sumline = NULL;
+        
+        if ( ! fgets(buf, sizeof(buf), monitor->metadata_fd) )
+                return 0;
+        
+        offptr = strchr(buf, ':');
+        if ( ! offptr ) {
+                log(LOG_ERR, "%s: Invalid metadata file.\n", monitor->file, line);
+                return ftruncate(fileno(monitor->metadata_fd), 0);
+        }
+
+        *offptr++ = '\0';
+
+        *start = strtoull(buf, NULL, 10);
+        *sumline = offptr;
+
+        return 0;
+}
+
+
+
+
+static int file_metadata_save(monitor_fd_t *monitor, off_t offset) 
+{
+        int len, ret;
+        char buf[METADATA_MAXSIZE];
+        
+        len = snprintf(buf, sizeof(buf), "%llu:%s\n", offset, monitor->buf);
+        if ( len >= sizeof(buf) || len < 0 )
+                return -1;
+        
+        rewind(monitor->metadata_fd);
+
+        ret = ftruncate(fileno(monitor->metadata_fd), 0);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't truncate metadata file.\n");
+                return -1;
+        }
+        
+        ret = fwrite(buf, 1, len, monitor->metadata_fd);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't write out metadata.\n");
+                return -1;
+        }
+        
+        return 0;
+}
+
+
+
+static int file_metadata_get_position(monitor_fd_t *monitor) 
+{
+        off_t offset;
+        struct stat st;
+        char buf[1024], *sumline;
+        int ret, have_metadata = 0;
+        
+        ret = file_metadata_read(monitor, &offset, &sumline);
+        if ( ret == 0 && (offset || sumline) )
+                have_metadata = 1;
+        
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "stat: error on file %s.\n", monitor->file);
+                return -1;
+        }
+        
+        monitor->last_mtime = st.st_mtime;
+
+        if ( ! have_metadata ) {
+                log(LOG_INFO, "- %s: No metadata available.\n", monitor->file);
+                monitor->last_size = st.st_size;
+                return fseek(monitor->fd, st.st_size, SEEK_SET);;
+        }
+
+        if ( st.st_size < offset ) {
+                log(LOG_INFO, "- %s: Metadata available, but logfile got rotated, starting at 0.\n", monitor->file);
+                logfile_modified_alert(monitor, &st);
+                return 0;
+        }
+        
+        ret = fseek(monitor->fd, offset, SEEK_SET);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "- %s: couldn't seek to byte %llu.\n", monitor->file, offset);
+                return -1; 
+        }
+        
+        if ( ! fgets(buf, sizeof(buf), monitor->fd) || strcmp(buf, sumline) != 0 ) {
+                log(LOG_INFO, "- %s: Metadata available, but checksum is invalid, starting at 0.\n", monitor->file);
+                logfile_modified_alert(monitor, &st);
+                return fseek(monitor->fd, 0, SEEK_SET);
+        }
+                
+        monitor->last_size = offset + strlen(sumline);
+        log(LOG_INFO, "- %s: Metadata available, starting log analyzis at offset %llu.\n", monitor->file, monitor->last_size);
+        
+        return 0;
+}
+
+
+
+
+static int file_metadata_open(monitor_fd_t *monitor) 
+{
+        int ret;
+        char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
+
+        strncpy(file, monitor->file, sizeof(file));
+
+        while ( (ptr = strchr(file, '/')) )
+                *ptr = '-'; /* strip */
+
+        snprintf(path, sizeof(path), "%s/%s", METADATA_DIR, file);        
+
+        ret = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
+        if ( ret < 0 && errno != EEXIST ) {
+                log(LOG_ERR, "error creating %s.\n", path);
+                return -1;
+        }
+
+        monitor->metadata_fd = fdopen(ret, "r+");
+        if ( ! monitor->metadata_fd ) {
+                log(LOG_ERR, "fdopen failed.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+
+
+/*
+ * This function return -1 if it couldn't read a full syslog line.
+ *
+ * The size of the whole syslog line is returned otherwise (not only what
+ * has been read uppon this call).
+ *
+ * rlen is always updated to reflect how many byte has been read.
+ */
+static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen) 
+{
+        int ret, len, i = 0;
+
+        if ( available == 0 ) {
+                *rlen = 0;
+                return -1;
+        }
+        
+        len = fd->index;
         
         while ( 1 ) {
 
@@ -210,24 +425,35 @@ static int read_logfile(monitor_fd_t *fd)
                  * Override this by using *_unlocked() variant.
                  */
                 ret = getc_unlocked(fd->fd);
-                if ( ret == EOF ) {                        
-			clearerr(fd->fd);
+                if ( ret == EOF ) {
+                        *rlen = i;
+                        clearerr(fd->fd);
                         return -1;
                 }
 
+                i++;
                 len++;
                 
                 if ( ret == '\n' ) {
                         fd->buf[fd->index] = '\0';
                         break;
                 }
-
+                
                 fd->buf[fd->index++] = (char) ret;
+                
+                if ( i == available ) {
+                        *rlen = i;
+                        return -1;
+                }
         }
-        
+
+        /*
+         * sucess.
+         */
+        *rlen = i;
         fd->index = 0;
         
-        return len;
+        return len;        
 }
 
 
@@ -235,24 +461,42 @@ static int read_logfile(monitor_fd_t *fd)
 
 static void check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct stat *st) 
 {
-        int len, ret;
+        off_t len, ret, rlen;
         
         if ( ! monitor->need_more_read && st->st_size == monitor->last_size ) 
                 return;
+
+        if ( st->st_size < monitor->last_size ) {
+                monitor->last_size = 0;
+                rewind(monitor->fd);
+        }
         
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
+        
+        while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
 
-        while ( (ret = read_logfile(monitor)) != -1 ) {
-                len -= ret;                
                 lml_dispatch_log(list, monitor->buf, monitor->file);
+                file_metadata_save(monitor, st->st_size - len);
+                
+                len -= rlen;
         }
 
         /*
          * if len isn't 0, it mean we got EOF before reading every new byte,
          * we want to retry reading even if st_size isn't modified then.
          */
-        monitor->need_more_read = len;
+        monitor->need_more_read = len - rlen;
+        
+        if ( monitor->need_more_read ) {
+                log(LOG_INFO,
+                    "If you hit this point, please contact the Prelude mailing list\n" \
+                    "and include the following information in your report: st_size=%llu\n" \
+                    "remaining=%llu, rlen=%llu, len=%llu\n",
+                    st->st_size, monitor->need_more_read, rlen, len);
+
+                abort();
+        }
 }
 
 
@@ -260,6 +504,7 @@ static void check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct
 
 static monitor_fd_t *monitor_new(const char *file) 
 {
+        int ret;
         monitor_fd_t *new;
         
         new = calloc(1, sizeof(*new));
@@ -275,6 +520,13 @@ static monitor_fd_t *monitor_new(const char *file)
                 return NULL;
         }
 
+        ret = file_metadata_open(new);
+        if ( ret < 0 ) {
+                free(new->file);
+                free(new);
+                return NULL;
+        }
+        
         list_add(&new->list, &inactive_fd_list);
 
         return new;
@@ -282,7 +534,7 @@ static monitor_fd_t *monitor_new(const char *file)
 
 
 
-
+#if 0
 static void monitor_destroy(monitor_fd_t *monitor) 
 {
         if ( monitor->fd )
@@ -294,14 +546,13 @@ static void monitor_destroy(monitor_fd_t *monitor)
         
         free(monitor);
 }
+#endif
 
 
 
-
-static int monitor_open(monitor_fd_t *monitor, int start_from_zero) 
+static int monitor_open(monitor_fd_t *monitor) 
 {
         int ret;
-        struct stat st;
         
 #ifdef HAVE_FAM
         ret = fam_setup_monitor(monitor);
@@ -309,35 +560,23 @@ static int monitor_open(monitor_fd_t *monitor, int start_from_zero)
                 return -1;
 #endif
         
-        monitor->fd = fopen(monitor->file, "r");
-        if ( ! monitor->fd )
-                return -1;
+        if ( strcmp(monitor->file, STDIN_FILENAME) == 0 )
+                monitor->fd = stdin;
+        else {
+                monitor->fd = fopen(monitor->file, "r");
+                if ( ! monitor->fd )
+                        return -1;
+
+                ret = file_metadata_get_position(monitor);
+                if ( ret < 0 )
+                        return -1;
+        }
         
         monitor->index = 0;
         monitor->need_more_read = 0;
         
-        if ( start_from_zero )                 
-                monitor->last_size = 0;
-        else {
-                ret = fseek(monitor->fd, 0, SEEK_END);
-                if ( ret < 0 ) {
-                        log(LOG_ERR, "couldn't seek to the end of the file.\n");
-                        monitor_destroy(monitor);
-                        return -1;
-                }
-        }
-        
         list_del(&monitor->list);
         list_add_tail(&monitor->list, &active_fd_list);
-        
-        ret = fstat(fileno(monitor->fd), &st);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "stat: error on file %s.\n", monitor->file);
-                return -1;
-        }
-                
-        monitor->last_size = (start_from_zero) ? 0 : st.st_size;
-        monitor->last_mtime = st.st_mtime;
 
         return 0;
 }
@@ -350,7 +589,7 @@ static void try_reopening_inactive_monitor(void)
         struct list_head *tmp, *bkp;
 
         list_for_each_safe(tmp, bkp, &inactive_fd_list) 
-                monitor_open(list_entry(tmp, monitor_fd_t, list), 1);
+                monitor_open(list_entry(tmp, monitor_fd_t, list));
 }
 
 
@@ -362,29 +601,40 @@ static void try_reopening_inactive_monitor(void)
  * cause heavy performance problem. The best solution may be to centralize
  * the logging on a remote host.
  */
-static void check_modification_time(monitor_fd_t *fd, struct stat *st) 
+static void check_modification_time(monitor_fd_t *monitor, struct stat *st) 
 {
-        idmef_impact_t impact;
-        idmef_classification_t class;
-        time_t old_mtime = fd->last_mtime;
+        time_t old_mtime = monitor->last_mtime;
 
-        fd->last_mtime = st->st_mtime;
+        monitor->last_mtime = st->st_mtime;
         
-        if ( st->st_mtime >= old_mtime && st->st_size >= fd->last_size ) 
+        if ( st->st_mtime >= old_mtime && st->st_size >= monitor->last_size ) 
                 return; /* everythings sound okay */
+
+        logfile_modified_alert(monitor, st);
+}
+
+
+
+
+static int is_normal_log_rotation(monitor_fd_t *monitor, struct stat *st)
+{
+        int ret = 0;
+        time_t diff, now, rtt;
+              
+        now = time(NULL);
+        diff = now - monitor->last_rotation;
         
-        memset(&class, 0, sizeof(class));
-        memset(&impact, 0, sizeof(impact));
+        rtt = MAX(monitor->rotation_average, diff) - MIN(monitor->rotation_average, diff);
+              
+        if ( monitor->rotation_average && rtt > rotation_interval_max_difference )
+                ret = -1;
+
+        if ( monitor->last_rotation )
+                monitor->rotation_average = diff;
         
-        class.origin = origin_unknown;
-        idmef_string_set_constant(&class.name, LOGFILE_MODIFICATION_CLASS);
+        monitor->last_rotation = now;
         
-        impact.type = file;
-        impact.completion = succeeded;
-        impact.severity = impact_high;
-        idmef_string_set_constant(&impact.description, LOGFILE_MODIFICATION_IMPACT);
-        
-        logfile_alert(fd, st, &class, &impact);
+        return ret;
 }
 
 
@@ -395,12 +645,14 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         idmef_classification_t class;
         
         if ( st->st_nlink > 0 )
-                return 0;
+                return 0;        
         
         /*
          * This file doesn't exist on the file system anymore.
          */
         fclose(monitor->fd);
+        monitor->fd = NULL;
+        
         list_del(&monitor->list);
         list_add_tail(&monitor->list, &inactive_fd_list);
 
@@ -414,9 +666,15 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
         impact.type = file;
         impact.completion = succeeded;
-        impact.severity = impact_medium;
-        idmef_string_set_constant(&impact.description, LOGFILE_DELETION_IMPACT);
-        
+
+        if ( is_normal_log_rotation(monitor, st) == 0 ) {
+                impact.severity = impact_medium;
+                idmef_string_set_constant(&impact.description, LOGFILE_DELETION_IMPACT);
+        } else {
+                impact.severity = impact_high;
+                idmef_string_set_constant(&impact.description, LOGFILE_DELETION_IMPACT_HIGH);
+        }
+                
         logfile_alert(monitor, st, &class, &impact);
         
         return -1;
@@ -464,6 +722,7 @@ static int check_fam_writev_bug(FAMConnection *fc)
 	FAMRequest fr;
         char buf[1024];
 	struct iovec iov[1];
+        char teststring[] = "testfam";
 
         snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
 
@@ -494,11 +753,11 @@ static int check_fam_writev_bug(FAMConnection *fc)
 	if ( ret < 0 )
                 goto err;
 
-	iov[0].iov_len = sizeof(FAM_STRING);
-	iov[0].iov_base = FAM_STRING;
+	iov[0].iov_len = sizeof(teststring);
+	iov[0].iov_base = teststring;
         
 	ret = writev(fd, iov, 1);
-	if ( ret != sizeof(FAM_STRING) ) {
+	if ( ret != sizeof(teststring) ) {
 		log(LOG_ERR, "error writing test string to %s: %s.\n", buf);
 		goto err;
 	}
@@ -574,15 +833,23 @@ static int fam_process_event(regex_list_t *list, FAMEvent *event)
         struct stat st;
         monitor_fd_t *monitor = event->userdata;
 
+        if ( ! monitor->fd ) {
+                if ( event->code == FAMCreated )  
+                        return monitor_open(monitor);
+                else
+                        /*
+                         * sometime it happen that FAM notify us
+                         * several time for FAMDeleted event. Which would
+                         * result in a crash without this check.
+                         */
+                        return -1;
+        }
+
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 )
                 log(LOG_ERR, "fstat returned an error.\n");
         
         switch (event->code) {
-
-        case FAMCreated:
-                monitor_open(monitor, 1);
-                break;
                 
         case FAMChanged:                
                 /*
@@ -672,21 +939,17 @@ static int process_file_event(regex_list_t *list, monitor_fd_t *monitor)
 
 int file_server_monitor_file(const char *file) 
 {
-        int ret;
         monitor_fd_t *new;
-
+        
+        /*
+         * Don't open the monitor right now,
+         * we want all unread bytes to be processed before activating
+         * FAM notification (if enabled).
+         */
+        
         new = monitor_new(file);
         if ( ! new )
                 return -1;
-
-        ret = monitor_open(new, 0);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't open %s.\n", file);
-                return -1;
-        }
-        
-        if ( ! new->fd )
-                return 0;
         
         return 0;
 }
@@ -705,7 +968,7 @@ int file_server_wake_up(regex_list_t *list)
                 try_reopening_inactive_monitor();
                 
                 list_for_each_safe(tmp, bkp, &active_fd_list) {
-                        monitor = list_entry(tmp, monitor_fd_t, list);
+                        monitor = list_entry(tmp, monitor_fd_t, list);                        
                         process_file_event(list, monitor);
                 }
         }
@@ -734,17 +997,18 @@ int file_server_get_event_fd(void)
 
 
 
+void file_server_set_rotation_interval_max_difference(int val) 
+{
+        rotation_interval_max_difference = val;
+}
 
 
 
 
-
-
-
-
-
-
-
-
-
-
+void file_server_start_monitoring(regex_list_t *list)
+{
+        /*
+         * Initialize everythings once by calling file_server_wake_up().
+         */
+        file_server_wake_up(list);
+}
