@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <sys/time.h>
 
 #include <libprelude/list.h>
 #include <libprelude/prelude-log.h>

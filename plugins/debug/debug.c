@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <assert.h>
+#include <sys/time.h>
 
 #include <libprelude/list.h>
 #include <libprelude/idmef-tree.h>

@@ -1,3 +1,11 @@
+2002-09-19  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* plugins/debug/debug.c:
+	* plugins/pax/pax.c:
+	* plugins/simple/simple.c:
+	* src/regex.c:
+	include <sys/time.h>. That allows the code to build on FreeBSD.
+
 2002-09-18  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/udp-server.c (udp_server_process_event): 
