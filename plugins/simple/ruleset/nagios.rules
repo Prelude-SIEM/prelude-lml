@@ -37,8 +37,10 @@ regex=SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
- assessment.impact.type=other; \
+ assessment.impact.type=dos; \
  assessment.impact.description=Service $2 on $1 reported status $3 with $4; \
+ target(0).node.name=$1; \
+ target(0).process.name=$2; \
  last
 
 #Oct 28 11:42:33 shadowcat nagios: HOST ALERT: rcts2;UP;HARD;2;PING OK - Packet loss = 0%, RTA = 0.26 ms
@@ -48,6 +50,7 @@ regex=HOST ALERT: (\w+).(DOWN|UP).HARD.\d.(.+)$; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
- assessment.impact.type=other; \
+ assessment.impact.type=dos; \
  assessment.impact.description=Host $1 reported status $2 with $3; \
+ target(0).node.name=$1; \
  last

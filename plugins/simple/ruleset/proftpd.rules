@@ -32,14 +32,13 @@ regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): Authentication fa
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as user '$2' but failed; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \
-  \
  target(0).user.userid(0).name=$2; \
+ target(0).user.userid(0).type=target-user; \
  last;
 
 # Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
@@ -53,14 +52,13 @@ regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)'; \
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \
-  \
  target(0).user.userid(0).name=$2; \
+ target(0).user.userid(0).type=target-user; \
  last;
 
 # Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
@@ -74,15 +72,13 @@ regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such user found from [
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  target(0).service.port=$4; \
  target(0).service.protocol=tcp; \
-  \
  target(0).user.userid(0).name=$2; \
+ target(0).user.userid(0).type=target-user; \
  last;

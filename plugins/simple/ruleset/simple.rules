@@ -10,18 +10,39 @@
 # the rule language, please take the 5 minutes needed to implement a simple
 # parsing function to the simple.c plugin distributed with Prelude LML.
 #
+# CREATING AND CONTRIBUTING RULES:
+# Rulesets that you contribute to the Prelude-LML maintainer should follow these
+# guidelines:
+# - Avoid using .+ or .* in regex entries unless actually neccessary.  Doing so will
+#   make your rule CPU-costly to implement.
+# - At a minimum, include regex, classification().name, classification().origin,
+#   assessement.impact.severity, assessment.impact.type, impact.description, and last.
+# - Put only a single field on each line of your rules.
+# - Include a sample log entry with each rule.
+# - Gather as many pieces of data, and fill as many IDMEF fields as possible from the
+#   log entry.
+# - If a similar rule exists in another ruleset (same function, different software),
+#   use the classification().name from the other rule.
+# - Use only the actual log message, none of the syslog headers (this generally
+#   includes timestamp, originating node, originating process, and pid).
+#
+# Below you will find a listing of most of the IDMEF fields Prelude-LML accepts.  Where
+# you see an item listed with (), it means that item is indexed.  Indexing starts at 0,
+# so, for example, an event with multiple targets would have the first target listed as
+# target(0), followed by whatever IDMEF fields you use.  See the existing rulesets for
+# examples.
 #
 # - regex:
 #   A PCRE regex that should be matched to trigger the alert.
 #
-# - classification(0).name: 
+# - classification().name: 
 #   The name of the alert, from one of the origins listed below.
 #
-# - classification(0).origin:
+# - classification().origin:
 #   The source from which the name of the alert originates. 
 #   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is unknown.
 #
-# - classification(0).url:
+# - classification().url:
 #   A URL at which the manager (or the human
 #   operator of the manager) can find additional information about the
 #   alert.  The document pointed to by the URL may include an in-depth
@@ -45,76 +66,81 @@
 #   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
 #
-# - source(0).node.address(0).address:
-#   Address that issued the attack.
+# - source().node.address().address,
+#   target().node.address().address:
+#   Address that has been attacked/Address that issued the attack.
 #   There can be more than one.
 # 
-# - target(0).node.address(0).address:
-#   Address that has been attacked.
-#   There can be more than one.
-#
-# - source(0).node.name,
-#   target(0).node.name:
+# - source().node.name,
+#   target().node.name:
 #   The name of the equipment. This information MUST be provided if no Address
 #   information is given.
 #
-# - source(0).node.category,
-#   target(0).node.category:
+# - source().node.category,
+#   target().node.category:
 #   The domain from which the name information was obtained.
 #   Possible values are: unknow, ads, afs, coda, dfs, dns, hosts, kerberos,
 #   nds, nis, nisplus, nt, wfw
 #
-# - source(0).node.location,
-#   target(0).node.location:
+# - source().node.location,
+#   target().node.location:
 #   The location of the equipment.
 #
-# - source(0).spoofed,
-#   target(0).decoy:
+# - source().spoofed,
+#   target().decoy:
 #   An indication of wheter the source/target is a decoy.
 #   The permitted values are: unknown, yes, no.
 #
-# - source(0).interface,
-#   target(0).interface:
+# - source().interface,
+#   target().interface:
 #   May be used by a network-based analyzer with multiple interfaces to
 #   indicate which interfaces this source/target was seen on.
 #
-# - source(0).service.name,
-#   target(0).service.name:
+# - source().service.name,
+#   target().service.name:
 #   The name of the service. Whenever possible, the name from the IANA list
 #   of well-known ports SHOULD be used.
 #
-# - source(0).service.port,
-#   target(0).service.port:
+# - source().service.port,
+#   target().service.port:
 #   The port number being used.
 #
-# - source(0).service.protocol,
-#   target(0).service.protocol:
+# - source().service.protocol,
+#   target().service.protocol:
 #   The protocol being used.
 #
-# - source(0).service.portlist,
-#   target(0).service.portlist:
+# - source().service.portlist,
+#   target().service.portlist:
 #   A list of port numbers beeing used.
 #
-# - source(0).user.category,
-#   target(0).user.category:
+# - source().user.category,
+#   target().user.category:
 #   The type of user represented (unknown, application, os-device).
 #
-# - source(0).user.userid(0).
-#   target(0).user.userid(0).
+# - source().user.userid().
+#   target().user.userid().
 #   Create a new UserId inside an User object (that may contain several UserId).
 #
-# - source(0).user.userid(0).type,
-#   target(0).user.userid(0).type:
+# - source().user.userid().type,
+#   target().user.userid().type:
 #   The type of user information represented (current-user, original-user, target-user,
 #   user-privs, current-group, group-privs, other-privs).
 #
-# - source(0).user.userid(0).name,
-#   target(0).user.userid(0).name:
+# - source().user.userid().name,
+#   target().user.userid().name:
 #   A user or group name.
 #
-# - source(0).user.userid(0).number,
-#   target(0).user.userid(0).number:
+# - source().user.userid().number,
+#   target().user.userid().number:
 #   A user or group number.
+# 
+# - source().process.name,
+#   target().process.name:
+#   A process name
+# 
+# - source().process.pid,
+#   target().process.pid:
+#   A process number
 
 include = ms-sql.rules;
 include = nagios.rules;

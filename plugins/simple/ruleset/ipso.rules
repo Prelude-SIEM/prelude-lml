@@ -1,6 +1,7 @@
 #####
 #
-# Copyright (C) 2003 Vincent Glaume <vglaume@exaprobe.com>
+# Copyright (C) 2003 Vincent Glaume
+# Currently supported by David Maciejak <dmaciejak@exaprobe.com>
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -77,8 +78,8 @@ regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$1 was rebooted; \
-  \
  source(0).user.userid(0).name=$2; \
+ source(0).user.userid(0).type=current-user; \
  last
 
 # No log sample; please submit
@@ -91,8 +92,8 @@ regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 attempted to reboot $1; \
-  \
  source(0).user.userid(0).name=$2; \
+ source(0).user.userid(0).type=current-user; \
  last
 
 # No log sample; please submit
@@ -105,8 +106,8 @@ regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 halted $1; \
-  \
  source(0).user.userid(0).name=$2; \
+ source(0).user.userid(0).type=current-user; \
  last
 
 # No log sample; please submit

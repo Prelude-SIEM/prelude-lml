@@ -33,15 +33,14 @@ regex=\[AUTH\] Failed attempted login to (\S+) from host \([\w\-\.]+\) ([\d\.]+)
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your POP3 server as user '$1' but failed; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
-  \
  target(0).user.userid(0).name=$1; \
- last;
+ target(0).user.userid(0).type=target-user; \
+ last
 
 # Jan 13 20:42:31 (none) popper[6752]: tamere at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "tamere" is incorrect.
 # Jan 13 20:42:56 (none) popper[6754]: leroutier at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "leroutier" is incorrect.
@@ -57,12 +56,11 @@ regex=(\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password supplied for "\S+
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your POP3 server as user '$1' but failed; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
-  \
  target(0).user.userid(0).name=$1; \
- last;
+ target(0).user.userid(0).type=target-user; \
+ last
