@@ -416,7 +416,7 @@ int pconfig_set(int argc, char **argv)
         if ( ret < 0 )
                 return -1;
         
-        ret = prelude_client_init(lml_client, "prelude-lml", PRELUDE_CONF, argc, argv);
+        ret = prelude_client_init(lml_client, "prelude-lml", PRELUDE_CONF, &argc, argv);
         if ( ret < 0 )
                 exit(1);
         
