@@ -56,7 +56,7 @@ static idmef_analyzer_t *idmef_analyzer;
 
 
 
-static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *node)
+static int resolve_failed_fallback(const log_entry_t *log, idmef_node_t *node)
 {
         int ret;
         idmef_address_t *address;
@@ -129,7 +129,7 @@ static int fill_target(idmef_node_t *node, struct addrinfo *ai)
 }
 
 
-static int fill_analyzer(const log_container_t *log, idmef_analyzer_t *analyzer)
+static int fill_analyzer(const log_entry_t *log, idmef_analyzer_t *analyzer)
 {
         int ret;
         idmef_node_t *node;
@@ -169,7 +169,7 @@ static int fill_analyzer(const log_container_t *log, idmef_analyzer_t *analyzer)
 }
 
 
-static int generate_target(const log_container_t *log, idmef_alert_t *alert) 
+static int generate_target(const log_entry_t *log, idmef_alert_t *alert) 
 {
         int ret;
         idmef_user_t *user;
@@ -265,7 +265,7 @@ static void insert_analyzer(idmef_alert_t *alert, idmef_analyzer_t *cur_analyzer
 
 
 
-void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_t priority)
+void lml_emit_alert(const log_entry_t *log, idmef_message_t *message, uint8_t priority)
 {
         const char *source;
         idmef_alert_t *alert;

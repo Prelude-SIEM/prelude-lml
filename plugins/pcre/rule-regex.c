@@ -100,7 +100,7 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
 
 
 
-static int exec_regex(pcre_rule_t *rule, const log_container_t *log, int *ovector, size_t size)
+static int exec_regex(pcre_rule_t *rule, const log_entry_t *log, int *ovector, size_t size)
 {
         rule_regex_t *item;
         prelude_list_t *tmp;
@@ -149,7 +149,7 @@ static int exec_regex(pcre_rule_t *rule, const log_container_t *log, int *ovecto
 
 
 
-static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_container_t *log)
+static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_entry_t *log)
 {
          int ret;
          int ovector[MAX_REFERENCE_PER_RULE * 3];
@@ -169,7 +169,7 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const log_c
 }
 
 
-static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const log_container_t *log)
+static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const log_entry_t *log)
 {
         int ret;
         prelude_list_t *tmp;
@@ -209,7 +209,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
 
 
 
-int rule_regex_match(pcre_rule_container_t *root, const log_container_t *log)
+int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log)
 {
         int ret;
         pcre_state_t state;

@@ -137,7 +137,7 @@ static int format_common(log_source_t *ls, const char *log, char delim, void **o
 
 
 
-static int handle_escaped(log_container_t *lc, const char *fmt, const char **log)
+static int handle_escaped(log_entry_t *lc, const char *fmt, const char **log)
 {
         int i, ret, len;
         void *tv = &lc->tv;
@@ -177,7 +177,7 @@ static int handle_escaped(log_container_t *lc, const char *fmt, const char **log
 
 
 
-static int format_header(log_container_t *lc, const char *log)
+static int format_header(log_entry_t *lc, const char *log)
 {
         int ret = 0;
         const char *fmt = lc->source->log_fmt;
@@ -209,12 +209,12 @@ static int format_header(log_container_t *lc, const char *log)
 
 
 
-static int format_log(log_container_t *lc)
+static int format_log(log_entry_t *lc)
 {
         int ret;
-        char *log = lc->log;
+        char *entry = lc->log;
 
-        ret = format_header(lc, log);
+        ret = format_header(lc, entry);
         /*
          * don't return on error, a syslog header might not have a tag.
          */
@@ -240,9 +240,9 @@ static char *get_hostname(void)
 
 
 
-log_container_t *log_container_new(log_source_t *source)
+log_entry_t *log_entry_new(log_source_t *source)
 {
-        log_container_t *lc;
+        log_entry_t *lc;
 
         lc = calloc(1, sizeof(*lc));
         if ( ! lc ) {
@@ -264,7 +264,7 @@ log_container_t *log_container_new(log_source_t *source)
 
 
 
-int log_container_set_log(log_container_t *lc, const char *entry) 
+int log_entry_set_log(log_entry_t *lc, const char *entry) 
 {
         int ret;
         
@@ -286,7 +286,7 @@ int log_container_set_log(log_container_t *lc, const char *entry)
 
 
 
-void log_container_delete(log_container_t *lc)
+void log_entry_delete(log_entry_t *lc)
 {
         if ( lc->target_hostname )
                 free(lc->target_hostname);

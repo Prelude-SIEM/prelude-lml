@@ -144,15 +144,15 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_file_t *file;
         idmef_time_t *time;
         idmef_inode_t *inode;
-        log_container_t *log;
+        log_entry_t *log_entry;
         idmef_alert_t *alert;
         idmef_target_t *target;
         idmef_message_t *message;
         idmef_assessment_t *assessment;
         prelude_string_t *string;
         
-        log = log_container_new(fd->source);
-        if ( ! log )
+        log_entry = log_entry_new(fd->source);
+        if ( ! log_entry )
                 return;
         
         message = idmef_message_new();
@@ -213,14 +213,14 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_assessment_set_impact(assessment, impact);
         idmef_alert_set_classification(alert, classification);
         
-        lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_HIGH);
+        lml_emit_alert(log_entry, message, PRELUDE_MSG_PRIORITY_HIGH);
         
-        log_container_delete(log);
+        log_entry_delete(log_entry);
         
         return;
         
  err:
-        log_container_delete(log);
+        log_entry_delete(log_entry);
         idmef_message_destroy(message);
 }
 

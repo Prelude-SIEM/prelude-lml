@@ -96,7 +96,7 @@ static void handle_sighup_if_needed(void)
 
 static void regex_match_cb(void *plugin, void *log) 
 {
-        log_plugin_run(plugin, (log_container_t *) log);
+        log_plugin_run(plugin, (log_entry_t *) log);
 }
 
 
@@ -114,16 +114,16 @@ static void regex_match_cb(void *plugin, void *log)
  */
 void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str)
 {
-        log_container_t *log;
+        log_entry_t *log_entry;
 
-        log = log_container_new(ls);
-        if ( ! log )
+        log_entry = log_entry_new(ls);
+        if ( ! log_entry )
                 return;
         
-        log_container_set_log(log, str);
+        log_entry_set_log(log_entry, str);
 
-        regex_exec(list, log->log, &regex_match_cb, log);
-        log_container_delete(log);
+        regex_exec(list, log_entry->log, &regex_match_cb, log_entry);
+        log_entry_delete(log_entry);
 }
 
 

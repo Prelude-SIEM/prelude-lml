@@ -15,16 +15,15 @@ typedef struct {
         char *target_hostname;
 
         log_source_t *source;
-        
-} log_container_t;
+} log_entry_t;
 
 
 
-log_container_t *log_container_new(log_source_t *source);
+log_entry_t *log_entry_new(log_source_t *source);
 
-int log_container_set_log(log_container_t *lc, const char *entry);
+int log_entry_set_log(log_entry_t *lc, const char *entry);
 
-void log_container_delete(log_container_t *lc);
+void log_entry_delete(log_entry_t *lc);
 
 
 log_source_t *log_source_new(void);

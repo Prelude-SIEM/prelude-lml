@@ -3,7 +3,7 @@
 
 typedef struct {
 	PRELUDE_PLUGIN_GENERIC;
-	void (*run)(prelude_plugin_instance_t *pi, const log_container_t * log);
+	void (*run)(prelude_plugin_instance_t *pi, const log_entry_t * log);
 } plugin_log_t;
 
 

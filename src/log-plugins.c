@@ -42,7 +42,7 @@ static void unsubscribe(prelude_plugin_instance_t *pi)
 
 
 
-void log_plugin_run(prelude_plugin_instance_t *pi, log_container_t *log)
+void log_plugin_run(prelude_plugin_instance_t *pi, log_entry_t *log)
 {
         prelude_plugin_run(pi, plugin_log_t, run, pi, log);
 }

@@ -554,7 +554,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd)
 
 
 
-static void pcre_run(prelude_plugin_instance_t *pi, const log_container_t *log)
+static void pcre_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;
@@ -566,7 +566,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const log_container_t *log)
         prelude_list_for_each(tmp, &plugin->rule_list) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
-                ret = rule_regex_match(rc, log);
+                ret = rule_regex_match(rc, log_entry);
                 
                 if ( ret == 0 && rc->rule->last )
                         break;

@@ -291,7 +291,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 
 static void resolve_referenced_value(rule_object_list_t *olist,
-                                     const log_container_t *log, int *ovector, size_t osize) 
+                                     const log_entry_t *log, int *ovector, size_t osize) 
 {
          int ret;
          prelude_list_t *tmp;
@@ -343,7 +343,7 @@ static void referenced_value_destroy_content(rule_object_list_t *olist)
 
 
 int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **message,
-                              const log_container_t *log, int *ovector, size_t osize)
+                              const log_entry_t *log, int *ovector, size_t osize)
 {
         int ret;
         prelude_list_t *tmp;
