@@ -1,3 +1,8 @@
+2002-03-28  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* plugins/simple/simple.c: include <inttypes.h> and <sys/types.h>
+	(needed for libprelude/* on FreeBSD)
+
 2002-03-28  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/lml-alert.c (lml_emit_alert): 
