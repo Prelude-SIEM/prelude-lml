@@ -193,9 +193,7 @@ static int set_logwatch(prelude_option_t *opt, const char *arg)
                 return prelude_option_error;
 
         prelude_option_set_private_data(opt, lf);
-        printf("set new = %p\n", lf);
-
-        prelude_option_parse_from_context(opt, NULL);
+        //prelude_option_parse_from_context(opt, NULL);
         
         return prelude_option_success;
 }
@@ -332,12 +330,12 @@ int pconfig_set(int argc, char **argv)
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'b', "batchmode",
                            "Tell LML to run in batch mode", no_argument,
                            set_batch_mode, NULL);
-        
+
         opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'w', "logwatch",
                                  "Specify a file to monitor (you might specify \"stdin\")",
                                  no_argument, set_logwatch, NULL);
         prelude_option_set_priority(opt, option_run_first);
-        
+
         prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'f', "file",
                            "Specify a file to monitor (you might specify \"stdin\")",
                            required_argument, set_file, NULL);

@@ -432,7 +432,7 @@ static int parse_rule_object_value(simple_rule_t *rule, rule_object_t *rule_obje
 
 	while ( *str ) {
 
-                if ( *str == '$' && *(str + 1) == '$' ) {
+                if ( *str == '$' && *(str + 1) != '$' ) {
 
                         i = 0;
 			str++;

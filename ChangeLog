@@ -1,3 +1,12 @@
+2003-12-21    <yoann@prelude-ids.org>
+
+	* plugins/simple/simple.c (parse_rule_object_value): 
+	fix a typo.
+
+	* src/pconfig.c (pconfig_set, set_logwatch): 
+	comment call to prelude_option_parse_from_context
+	for now so that LML is usable...
+
 2003-12-21  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/simple/simple.c: 
