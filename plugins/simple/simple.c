@@ -147,6 +147,8 @@ static int create_target(simple_rule_t *rule)
                 return -1;
         }
 
+        INIT_LIST_HEAD(&rule->target->file_list);
+
         return 0;
 }
 
@@ -379,6 +381,114 @@ static void create_service_portlist(idmef_service_t *service, const char *portli
         *var_type = VARIABLE_TYPE_STRING;
         *var_ptr  = &service->portlist;
         idmef_string_set(&service->portlist, strdup(portlist));
+}
+
+
+
+
+static int create_source_process(idmef_source_t *source)
+{
+        idmef_process_t *process;
+        
+        if ( ! source->process && ! (process = idmef_source_process_new(source)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        return 0;
+}
+
+
+#define create_target_process(target) create_source_process((idmef_source_t *) target)
+
+
+static void create_process_name(idmef_process_t *process, const char *name, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &process->name;
+        idmef_string_set(&process->name, strdup(name));
+}
+
+
+
+
+static void create_process_path(idmef_process_t *process, const char *path, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &process->path;
+        idmef_string_set(&process->path, strdup(path));
+}
+
+
+
+
+static void create_process_pid(idmef_process_t *process, const char *pid, int *var_type, void **var_ptr)
+{
+        *var_type = VARIABLE_TYPE_INT;
+        *var_ptr  = &process->pid;
+        process->pid = atoi(pid);
+}
+
+
+
+
+static int create_process_arg(idmef_process_t *process, const char *arg, int *var_type, void **var_ptr) 
+{
+        idmef_process_arg_t *arg_tmp;
+
+        if ( ! (arg_tmp = idmef_process_arg_new(process)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+ 
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &arg_tmp->string;
+
+        idmef_string_set(&arg_tmp->string, strdup(arg));
+ 
+        return 0;
+}
+
+
+
+
+static int create_process_env(idmef_process_t *process, const char *env, int *var_type, void **var_ptr) 
+{
+        idmef_process_env_t *env_tmp;
+
+        if ( ! (env_tmp = idmef_process_env_new(process)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+ 
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &env_tmp->string;
+
+        idmef_string_set(&env_tmp->string, strdup(env));
+ 
+        return 0;
+}
+
+
+
+
+static int create_target_file(idmef_target_t *target, const char *name, int *var_type, void **var_ptr) 
+{
+        idmef_file_t *file;
+
+        if ( ! (file = idmef_target_file_new(target)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &file->name;
+
+        idmef_string_set(&file->name, strdup(name));
+
+        return 0;
 }
 
 
@@ -916,6 +1026,184 @@ static int parse_target_service_portlist(simple_rule_t *rule, const char *portli
 
 
 
+static int parse_source_process_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_process(rule->source) < 0 )
+                return -1;
+
+        create_process_name(rule->source->process, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_process_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_process(rule->target) < 0 )
+                return -1;
+
+        create_process_name(rule->target->process, name, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_process_path(simple_rule_t *rule, const char *path, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_process(rule->source) < 0 )
+                return -1;
+
+        create_process_path(rule->source->process, path, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_process_path(simple_rule_t *rule, const char *path, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_process(rule->target) < 0 )
+                return -1;
+
+        create_process_path(rule->target->process, path, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_process_pid(simple_rule_t *rule, const char *pid, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_process(rule->source) < 0 )
+                return -1;
+
+        create_process_pid(rule->source->process, pid, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_target_process_pid(simple_rule_t *rule, const char *pid, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_process(rule->target) < 0 )
+                return -1;
+
+        create_process_pid(rule->target->process, pid, var_type, var_ptr);
+
+        return 0;
+}
+
+
+
+
+static int parse_source_process_arg(simple_rule_t *rule, const char *arg, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_process(rule->source) < 0 )
+                return -1;
+
+        if ( create_process_arg(rule->source->process, arg, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_target_process_arg(simple_rule_t *rule, const char *arg, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_process(rule->target) < 0 )
+                return -1;
+
+        if ( create_process_arg(rule->target->process, arg, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_source_process_env(simple_rule_t *rule, const char *env, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_process(rule->source) < 0 )
+                return -1;
+
+        if ( create_process_env(rule->source->process, env, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_target_process_env(simple_rule_t *rule, const char *env, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_process(rule->target) < 0 )
+                return -1;
+
+        if ( create_process_env(rule->target->process, env, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
+static int parse_target_file_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
+{
+        if ( create_target(rule) < 0 )
+                return -1;
+        
+        if ( create_target_file(rule->target, name, var_type, var_ptr) < 0 )
+                return -1;
+
+        return 0;
+}
+
+
+
+
 static int filter_string(char *input, char **key, char **value) 
 {
         char *ptr, *tmp;
@@ -1069,15 +1357,15 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 const char *key;
                 int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
-                { "include", parse_include                                          },
-                { "regex", parse_regex                                              },
-                { "class.origin", parse_class_origin                                },
-                { "class.name",   parse_class_name                                  },
-                { "class.url",    parse_class_url                                   },
-                { "impact.completion", parse_impact_completion                      },
-                { "impact.type",       parse_impact_type                            },
-                { "impact.severity",   parse_impact_severity                        },
-                { "impact.description", parse_impact_desc                           },
+                { "include",                     parse_include                      },
+                { "regex",                       parse_regex                        },
+                { "class.origin",                parse_class_origin                 },
+                { "class.name",                  parse_class_name                   },
+                { "class.url",                   parse_class_url                    },
+                { "impact.completion",           parse_impact_completion            },
+                { "impact.type",                 parse_impact_type                  },
+                { "impact.severity",             parse_impact_severity              },
+                { "impact.description",          parse_impact_desc                  },
                 { "source.node.address.address", parse_source_node_address_address  },
                 { "source.node.category",        parse_source_node_category         },
                 { "source.node.location",        parse_source_node_location         },
@@ -1088,6 +1376,11 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 { "source.service.protocol",     parse_source_service_protocol      },
                 { "source.service.name",         parse_source_service_name          },
                 { "source.service.portlist",     parse_source_service_portlist      },
+                { "source.process.name",         parse_source_process_name          },
+                { "source.process.path",         parse_source_process_path          },
+                { "source.process.pid",          parse_source_process_pid           },
+                { "source.process.arg",          parse_source_process_arg           },
+                { "source.process.env",          parse_source_process_env           },
                 { "target.node.address.address", parse_target_node_address_address  },
                 { "target.node.category",        parse_target_node_category         },
                 { "target.node.location",        parse_target_node_location         },
@@ -1098,7 +1391,13 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 { "target.service.protocol",     parse_target_service_protocol      },
                 { "target.service.name",         parse_target_service_name          },
                 { "target.service.portlist",     parse_target_service_portlist      },
-		        { NULL, NULL                                                        },
+                { "target.process.name",         parse_target_process_name          },
+                { "target.process.path",         parse_target_process_path          },
+                { "target.process.pid",          parse_target_process_pid           },
+                { "target.process.arg",          parse_target_process_arg           },
+                { "target.process.env",          parse_target_process_env           },
+                { "target.file.name",            parse_target_file_name             },
+                { NULL,                          NULL                               },
         };
 
         ptr = buf;
@@ -1162,6 +1461,18 @@ static void free_node(idmef_node_t *node)
 
 
 
+static void free_process(idmef_process_t *process)
+{
+        if ( process ) {
+                generic_free_list(idmef_process_arg_t, &process->arg_list);
+                generic_free_list(idmef_process_env_t, &process->env_list);
+                free(process);
+        }
+}
+
+
+
+
 static void free_rule(simple_rule_t *rule) 
 {
         if ( rule->regex_string )
@@ -1183,6 +1494,7 @@ static void free_rule(simple_rule_t *rule)
                 free_node(rule->source->node);
                 if ( rule->source->service )
                         free(rule->source->service);
+                free_process(rule->source->process);
                 free(rule->source);
         } 
 
@@ -1190,6 +1502,9 @@ static void free_rule(simple_rule_t *rule)
                 free_node(rule->target->node);
                 if ( rule->target->service )
                         free(rule->target->service);
+                free_process(rule->target->process);
+                
+                generic_free_list(idmef_file_t, &rule->target->file_list);
                 free(rule->target);
         } 
 
@@ -1273,7 +1588,12 @@ static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_so
         idmef_address_t *address;
         idmef_address_t *address_tmp;
         idmef_service_t *service;
-        
+        idmef_process_t *process;
+        idmef_process_arg_t *arg;
+        idmef_process_arg_t *arg_tmp;
+        idmef_process_env_t *env;
+        idmef_process_env_t *env_tmp;
+
         struct list_head *tmp;
        
         idmef_string_copy(&alert_source->interface, &source->interface);
@@ -1313,6 +1633,39 @@ static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_so
                 idmef_string_copy(&service->portlist, &source->service->portlist);
         }
         
+        
+         if ( source->process ) {
+ 
+                 process = idmef_source_process_new(alert_source);
+ 
+                 if ( ! process )
+                         return -1;
+ 
+                 process->pid = source->process->pid;
+                 idmef_string_copy(&process->name, &source->process->name);
+                 idmef_string_copy(&process->path, &source->process->path);
+ 
+                 list_for_each(tmp, &source->process->arg_list) {
+                         arg = idmef_process_arg_new(process);
+ 
+                         if ( ! arg )
+                                 return -1;
+ 
+                         arg_tmp = list_entry(tmp, idmef_process_arg_t, list);
+                         idmef_string_copy(&arg->string, &arg_tmp->string);
+                 }
+
+                 list_for_each(tmp, &source->process->env_list) {
+                         env = idmef_process_env_new(process);
+ 
+                         if ( ! env )
+                                 return -1;
+ 
+                         env_tmp = list_entry(tmp, idmef_process_env_t, list);
+                         idmef_string_copy(&env->string, &env_tmp->string);
+                 }
+         }
+
         return 0;
 }
 
@@ -1321,6 +1674,28 @@ static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_so
 
 #define record_target_fields(target, alert_target) \
         record_source_fields((idmef_source_t *) target, (idmef_source_t *) alert_target)
+
+
+
+
+static int record_file_list(idmef_target_t *target, idmef_target_t *alert_target)
+{
+        idmef_file_t *file;
+        idmef_file_t *file_tmp;
+        struct list_head *tmp;
+
+        list_for_each(tmp, &target->file_list) {
+                file = idmef_target_file_new(alert_target);
+
+                if ( ! file )
+                        return -1;
+
+                file_tmp = list_entry(tmp, idmef_file_t, list);
+                idmef_string_copy(&file->name, &file_tmp->name);
+        }
+
+        return 0;
+}
 
 
 
@@ -1357,8 +1732,15 @@ static int record_target(idmef_alert_t *alert, idmef_target_t *target)
         
         if ( ! alert_target )
                 return -1;
-        
+
+        INIT_LIST_HEAD(&alert_target->file_list);
+
         alert_target->decoy = target->decoy;
+        
+        ret = record_file_list(target, alert_target);
+
+        if ( ret < 0 )
+                return -1;
 
         ret = record_target_fields(target, alert_target);
 
@@ -1642,7 +2024,6 @@ plugin_generic_t *plugin_init(int argc, char **argv)
 	return (plugin_generic_t *) & plugin;
 }
 
-
-
-
+/* vim:ts=8:sw=8:et: 
+ */
 
