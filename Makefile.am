@@ -4,7 +4,7 @@ SUBDIRS = libmissing plugins src
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
-             AUTHORS COPYING COPYING.OpenSSL CREDITS INSTALL NEWS README \
+             AUTHORS COPYING INSTALL NEWS README \
              prelude.spec ChangeLog
 
 install-data-local:
