@@ -36,10 +36,11 @@
  */
 #include <time.h>
 #include <pcre.h>
+
 #include <libprelude/prelude-log.h>
 
 #include "prelude-lml.h"
-#include "log-common.h"
+#include "log-source.h"
 
 
 /*

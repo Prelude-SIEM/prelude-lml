@@ -43,7 +43,6 @@
 
 #include "libmissing.h"
 #include "log-entry.h"
-#include "log-common.h"
 #include "lml-alert.h"
 #include "lml-options.h"
 #include "config.h"

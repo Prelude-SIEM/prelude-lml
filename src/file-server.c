@@ -47,7 +47,6 @@
 #include "prelude-lml.h"
 #include "regex.h"
 #include "common.h"
-#include "log-common.h"
 #include "log-entry.h"
 #include "file-server.h"
 #include "lml-alert.h"

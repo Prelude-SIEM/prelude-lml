@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 2002 - 2005 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 2003, 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -21,18 +21,16 @@
 *
 *****/
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef _LOG_ENTRY_H
+#define _LOG_ENTRY_H
 
-#include "regex.h"
+#include "prelude-lml.h"
+#include "log-source.h"
 
-void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str, size_t size);
+lml_log_entry_t *lml_log_entry_new(void);
 
+int lml_log_entry_set_log(lml_log_entry_t *lc, lml_log_source_t *ls, const char *entry, size_t size);
 
-#ifdef DEBUG
-#define dprint(args...)		fprintf( stderr, args )
-#else				/* DEBUG */
-#define dprint(args...)
-#endif				/* DEBUG */
+void lml_log_entry_destroy(lml_log_entry_t *lc);
 
-#endif				/* COMMON_H */
+#endif /* _LOG_ENTRY_H */

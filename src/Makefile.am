@@ -16,8 +16,8 @@ prelude_lml_SOURCES = 	\
         prelude-lml.c 	\
         udp-server.c 	\
         regex.c 	\
-        log-common.c 	\
-	log-entry.c	\
+        log-entry.c 	\
+	log-source.c	\
         log-plugins.c 	\
         lml-options.c 	\
         file-server.c 	\

@@ -35,8 +35,7 @@
 #include <libprelude/prelude-log.h>
 
 #include "prelude-lml.h"
-#include "common.h"
-#include "log-common.h"
+#include "log-source.h"
 #include "log-entry.h"
 #include "log-plugins.h"
 
