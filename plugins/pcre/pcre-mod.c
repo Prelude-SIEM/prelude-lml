@@ -108,7 +108,6 @@ static int parse_rule_regex(pcre_plugin_t *plugin, pcre_rule_t *rule, const char
         if ( ! new )
                 return -1;
         
-        rule->required++;
         prelude_linked_object_add_tail((prelude_linked_object_t *) new, &rule->regex_list);
         
         return 0;
