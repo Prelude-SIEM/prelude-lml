@@ -56,6 +56,7 @@ static uint16_t udp_srvr_port;
 udp_server_t *udp_srvr = NULL;
 
 int batch_mode = 0;
+int ignore_metadata = 0;
 prelude_client_t *lml_client;
 prelude_bool_t dry_run = FALSE;
 prelude_io_t *text_output_fd = NULL;
@@ -98,6 +99,13 @@ static int set_batch_mode(void *context, prelude_option_t *opt, const char *opta
 }
 
 
+
+static int set_ignore_metadata(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+{
+        ignore_metadata = 1;
+        file_server_set_ignore_metadata();
+        return 0;
+}
 
 static int set_rotation_time_offset(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err) 
 {
@@ -340,9 +348,9 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
 
-	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
-			   "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
-			   print_version, NULL);
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+                           "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
+                           print_version, NULL);
 
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
@@ -391,6 +399,10 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batchmode",
                            "Tell LML to run in batch mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_batch_mode, NULL);
+
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "ignore-metadata",
+                           "Tell LML not to read/write metadata", PRELUDE_OPTION_ARGUMENT_NONE,
+                           set_ignore_metadata, NULL);
         
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                            't', "time-format", "Specify the input timestamp format", PRELUDE_OPTION_ARGUMENT_REQUIRED,

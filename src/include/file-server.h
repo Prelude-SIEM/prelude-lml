@@ -26,6 +26,8 @@ int file_server_get_event_fd(void);
 
 void file_server_set_batch_mode(void);
 
+void file_server_set_ignore_metadata(void);
+
 int file_server_wake_up(void);
 
 int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls);

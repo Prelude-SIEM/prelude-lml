@@ -118,7 +118,7 @@ static void regex_match_cb(void *plugin, void *log)
 void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str)
 {
         log_container_t *log;
-        
+
         log = log_container_new(ls);
         if ( ! log )
                 return;

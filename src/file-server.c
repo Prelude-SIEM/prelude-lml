@@ -129,6 +129,7 @@ static FAMConnection fc;
 
 static int batch_mode = 0;
 static int fam_initialized = 0;
+static int ignore_metadata = 0;
 static PRELUDE_LIST_HEAD(active_fd_list);
 static PRELUDE_LIST_HEAD(inactive_fd_list);
 static unsigned int max_rotation_size_offset = DEFAULT_MAX_ROTATION_SIZE_OFFSET;
@@ -265,6 +266,9 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         int line = 0, ret;
         char *offptr, *buf;
 
+        if ( ignore_metadata )
+                return 0;
+
         rewind(monitor->metadata_fd);
 
         *start = 0;
@@ -301,6 +305,9 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 {
         int len, ret;
         char buf[METADATA_MAXSIZE];
+
+        if ( ignore_metadata )
+                return 0;
         
         len = snprintf(buf, sizeof(buf), "%" PRIu64 ":%s\n", offset, monitor->buf);
         if ( len >= sizeof(buf) || len < 0 )
@@ -332,6 +339,9 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         const char *filename;
         int ret, have_metadata = 0;
         char buf[1024], sumline[METADATA_MAXSIZE], *sumptr;
+
+        if ( ignore_metadata )
+                return 0;
 
         sumptr = sumline;
         filename = log_source_get_name(monitor->source);
@@ -389,6 +399,9 @@ static int file_metadata_open(monitor_fd_t *monitor)
 {
         int ret;
         char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
+
+        if ( ignore_metadata )
+                return 0;
 
         strncpy(file, log_source_get_name(monitor->source), sizeof(file));
 
@@ -1123,6 +1136,10 @@ void file_server_start_monitoring(void)
 }
 
 
+void file_server_set_ignore_metadata(void)
+{
+        ignore_metadata = 1;
+}
 
 
 void file_server_set_batch_mode(void)
