@@ -45,6 +45,9 @@
 #   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
 
+
+include = cisco.rules;
+include = zyxel.rules;
  
 regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
 
@@ -54,6 +57,5 @@ regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.com
 
 regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tryed to log in using a non existing user;
 
-include = cisco.rules ;
-include = zyxel.rules ;
+
 

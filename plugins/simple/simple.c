@@ -71,6 +71,7 @@ typedef struct {
 static int parse_ruleset(const char *filename, FILE *fd);
 
 
+static int rulesnum = 0;
 static int is_enabled = 0;
 static plugin_log_t plugin;
 static LIST_HEAD(rules_list);
@@ -340,7 +341,7 @@ static int filter_string(char *input, char **key, char **value)
         /*
          * strip whitespace at the end of the value.
          */
-        ptr = ptr + strlen(ptr);
+        ptr = ptr + strlen(ptr) - 1;
         while ( isspace(*ptr) )
                 *ptr-- = '\0';
         
@@ -539,9 +540,9 @@ static void free_rule(simple_rule_t *rule)
 
 static int parse_ruleset(const char *filename, FILE *fd) 
 {
+        int ret, line = 0;
         simple_rule_t *rule;
         char buf[1024], *ptr;
-        int ret, line = 0, rulenum = 0;
         
         while ( fgets(buf, sizeof(buf), fd) ) {
 
@@ -576,10 +577,8 @@ static int parse_ruleset(const char *filename, FILE *fd)
                 }
 
                 list_add_tail(&rule->list, &rules_list);
-                rulenum++;
+                rulesnum++;
         }
-
-        log(LOG_INFO, "- SimpleMod plugin added %d rules.\n", rulenum);
         
         return 0;
 }
@@ -810,6 +809,8 @@ static int set_simple_ruleset(const char *arg)
         
         if ( ret < 0 )
                 return prelude_option_error;
+
+        log(LOG_INFO, "- SimpleMod plugin added %d rules.\n", rulesnum);
         
         return prelude_option_success;
 }
