@@ -205,6 +205,19 @@ static int parse_impact_severity(simple_rule_t *rule, const char *severity)
 
 
 
+static int parse_impact_desc(simple_rule_t *rule, const char *desc) 
+{
+        if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+        
+        idmef_string_set(&rule->impact->description, strdup(desc));
+        
+        return 0;
+}
+
+
 
 static int parse_regex(simple_rule_t *rule, const char *regex) 
 {
@@ -295,6 +308,7 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 { "impact.completion", parse_impact_completion },
                 { "impact.type",       parse_impact_type       },
                 { "impact.severity",   parse_impact_severity   },
+                { "impact.description", parse_impact_desc      },
                 { NULL, NULL                                   },
         };
 
@@ -438,7 +452,7 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
 
         if ( rule->impact ) 
                 assessment->impact = rule->impact;
-
+        
         if ( rule->class ) {
             
                 class = idmef_alert_classification_new(alert);
@@ -472,7 +486,7 @@ static void simple_run(const log_container_t *log)
                 if ( ret < 0 )
                         continue;
 
-                printf("matched %s\n", rule->regex_string);
+                printf("[%s]: matched %s\n", log->source, rule->regex_string);
                 emit_alert(rule, log);
         }
 }

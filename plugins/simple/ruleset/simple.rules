@@ -1,2 +1,56 @@
+#
+# Rule format :
+#
+# For more information about the fields described above and their meaning,
+# please have a look to the IDMEF Draft located at :
+#
+# http://www.silicondefense.com/idwg/draft-ietf-idwg-idmef-xml-07.txt
+#
+# If one of the IDMEF field you wish to add information too isn't covered in
+# the rule language, please take the 5 minutes needed to implement a simple
+# parsing function to the simple.c plugin distributed with Prelude LML.
+#
+#
+# - regex:
+#   A PCRE regex that should be matched to trigger the alert.
+#
+# - class.name: 
+#   The name of the alert, from one of the origins listed below.
+#
+# - class.origin:
+#   The source from which the name of the alert originates. 
+#   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is unknown.
+#
+# - class.url:
+#   A URL at which the manager (or the human
+#   operator of the manager) can find additional information about the
+#   alert.  The document pointed to by the URL may include an in-depth
+#   description of the attack, appropriate countermeasures, or other
+#   information deemed relevant by the vendor.
+# 
+# - impact.severity:
+#   An estimate of the relative severity of the event.
+#   Possible values are: low, medium, high.
+#
+# - impact.completion:
+#   An indication of whether the analyzer believes the attempt that
+#   the event describes was successful or not.
+#   The permitted values are: faile, succeeded.
+#
+# - impact.type:
+#   The type of attempt represented by this event, in relatively broad categories.
+#   The permitted values are: admin, dos, file, recon, user, other.
+#
+# - impact.description:
+#   May contain a textual description of the impact, if the analyzer
+#   is able to provide additional details.
+
+ 
 regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
+
 regex=authentication failure; class.name=Authentication Failure; impact.completion = failed; impact.type = other; impact.severity = high;
+
+regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.completion = succeeded; impact.type = other; impact.severity = medium; impact.description=A sniffer is probably running on this machine;
+
+regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tryed to log in using a non existing user;
+

@@ -1,5 +1,15 @@
 2002-03-29  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* plugins/simple/simple.c (parse_impact_desc): 
+	new function, parse impact description.
+	(parse_rule): 
+	Handle impact description.
+
+	(simple_run): detail debuging output a little more.
+
+	* plugins/simple/ruleset/simple.rules: 
+	some more rules, and some documentation.
+
 	* src/main.c (lml_dispatch_log): 
 	new public function that should be called when we have a new log
 	line. This function handle both the case when we're threaded
