@@ -1,3 +1,15 @@
+2002-10-26  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+	
+	* plugins/simple/ruleset/ssh.rules: 
+	Include sshd ruleset contributed by 
+	Nicolas Delon <delon.nicolas@wanadoo.fr>.
+	
+	* plugins/simple/ruleset/simple.rules (include): 
+	include ssh.rules
+
+	* plugins/simple/ruleset/Makefile.am (ruleset_DATA): 
+	add ssh.rules
+
 2002-10-13  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* plugins/simple/ruleset/grsecurity.rules: 

@@ -122,6 +122,7 @@ include = zyxel.rules;
 include = ipfw.rules;
 include = netfilter.rules;
 include = grsecurity.rules;
+include = ssh.rules;
 
 regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
 
