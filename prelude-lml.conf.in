@@ -2,9 +2,7 @@
 # Configuration for the Prelude LML Sensor   #
 ##############################################
 
-
-include = @prefix@/etc/prelude/default/global.conf
-include = @prefix@/etc/prelude/default/client.conf
+include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 
 
 # Address where the Prelude Manager Server is listening on.
