@@ -10,9 +10,11 @@ typedef struct {
 	char *source;
         
         struct timeval tv;
-        
+
+        char *target_user;
         char *target_program;
         char *target_hostname;
+        
 } log_container_t;
 
 

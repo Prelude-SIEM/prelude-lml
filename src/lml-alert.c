@@ -200,7 +200,9 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
 static int generate_target(const log_container_t *log, idmef_alert_t *alert) 
 {
         int ret;
+        idmef_user_t *user;
         idmef_node_t *node;
+        idmef_userid_t *userid;
         idmef_target_t *target;
         idmef_process_t *process;
 	idmef_string_t *process_name;
@@ -209,6 +211,18 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         if ( ! target ) 
                 return -1;
 
+        if ( log->target_user ) {
+                user = idmef_target_new_user(target);
+                if ( ! user )
+                        return -1;
+
+                userid = idmef_user_new_userid(user);
+                if ( ! userid )
+                        return -1;
+                
+                idmef_string_set_ref(idmef_userid_new_name(userid), log->target_user);
+        }
+        
         if ( log->target_program ) {
                 process = idmef_target_new_process(target);
                 if ( ! process )
@@ -315,7 +329,8 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
          */
         
         idmef_send_message(msgbuf, message);
-
+        prelude_msgbuf_mark_end(msgbuf);
+        
  error:
         idmef_message_destroy(message);
 }

@@ -32,12 +32,23 @@
 # You should define the log format / log timestamp format before
 # you define a file to monitor. If not specified, syslog format is
 # used.
+#
+# In order to set log-fmt, you can use the token :
+# %p (process name)
+# %h (hostname).
+#
+# In order to set time-fmt, please have a look at the strptime(3) manpage.
+#
+# Example configuration for syslog output:
+log-format = %h %p:;
+time-format = %b %d %H:%M:%S ;
+#
+# Example configuration for metalog output:
+# log-format = [%p];
+# time-format = %b %d %H:%M:%S ;
 
-log-fmt = %tag %log
-time-fmt = %b %d %H:%M:%S;
-file = /var/log/auth.log
 file = /var/log/messages
-
+file = /var/log/auth.log
 
 #
 # Specifies the maximum difference, in seconds, between

@@ -1,5 +1,10 @@
 2003-12-26  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* src/lml-alert.c (generate_target): 
+	if target_user is set add to the alert.
+	(lml_emit_alert): call prelude_msgbuf_mark_end() to flush
+	the alert.
+
 	* src/pconfig.c (pconfig_set): workaround prelude-getopt
 	flaw...
 

@@ -90,16 +90,27 @@ static int handle_escaped(log_container_t *lc, const char *log, char escaped, ch
 
         tmp = *ptr;
         *ptr = '\0';
+
+        if ( escaped == 'p' ) {
+                if ( lc->target_program ) 
+                        free(lc->target_program);
+                        
+                lc->target_program = strdup(log);
+        }
         
-        if ( escaped == 'h' ) {
+        else if ( escaped == 'h' ) {
                 if ( lc->target_hostname )
                         free(lc->target_hostname);
                 
                 lc->target_hostname = strdup(log);
         }
-        
-        if ( escaped == 'p' ) 
-                lc->target_program = strdup(log);
+
+        else if ( escaped == 'u' ) {
+                if ( lc->target_user )
+                        free(lc->target_user);
+
+                lc->target_user = strdup(log);
+        }
         
         *ptr = tmp;
         
@@ -268,6 +279,9 @@ void log_container_delete(log_container_t *lc)
         if ( lc->target_program )
                 free(lc->target_program);
 
+        if ( lc->target_user )
+                free(lc->target_user);
+        
         if ( lc->source )
                 free(lc->source);
 
@@ -324,14 +338,14 @@ log_file_t *log_file_new(void)
 
 
 const char *log_file_get_filename(log_file_t *lf)
-{
+{        
         return lf->filename;
 }
 
 
 
 int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt)
-{
+{        
         lf->time_fmt = strdup(fmt);
         if ( ! lf->time_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
@@ -344,7 +358,7 @@ int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt)
 
 
 int log_file_set_log_fmt(log_file_t *lf, const char *fmt)
-{
+{        
         lf->log_fmt = strdup(fmt);
         if ( ! lf->log_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
