@@ -184,6 +184,8 @@ static int set_logfile_ts_format(void *context, prelude_option_t *opt, const cha
 static int set_dry_run(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {
         dry_run = TRUE;
+
+        return 0;
 }
 
 
