@@ -342,8 +342,6 @@ int lml_alert_init(prelude_client_t *lml_client)
 {
         int ret;
         prelude_string_t *string;
-
-        printf("INIT\n");
         
         idmef_analyzer = prelude_client_get_analyzer(lml_client);
         if ( ! idmef_analyzer )
