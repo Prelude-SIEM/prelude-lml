@@ -170,11 +170,11 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         if ( ret < 0 )
                 goto err;
 
-        ret = idmef_alert_new_target(alert, &target);
+        ret = idmef_alert_new_target(alert, &target, -1);
         if ( ret < 0 )
                 goto err;
 
-        ret = idmef_target_new_file(target, &file);        
+        ret = idmef_target_new_file(target, &file, -1);
         if ( ret < 0 ) 
                 goto err;
 
