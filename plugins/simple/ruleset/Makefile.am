@@ -1,4 +1,4 @@
-ruleset_DATA = simple.rules
+ruleset_DATA = simple.rules cisco.rules zyxel.rules
 rulesetdir = $(configdir)/ruleset
 
 EXTRA_DIST = $(ruleset_DATA)
