@@ -107,7 +107,7 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
 
-        dprint("\nInput = %s\n", log_entry->log);
+        dprint("\nInput = %s\n", log_entry->message);
         
         prelude_list_for_each(tmp, &rule->regex_list) {
                 item = prelude_linked_object_get_object(tmp, rule_regex_t);
