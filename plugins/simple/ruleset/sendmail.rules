@@ -32,7 +32,7 @@
 
 #Jun 20 04:21:33 mail sendmail[28792]: ruleset=check_relay, arg1=c-67-181-100-174.client.comcast.net, arg2=67.181.100.174, relay=c-67-181-100-174.client.comcast.net [67.181.100.174], reject=550 5.7.1 Mail from 67.181.100.174 refused - see http://dsbl.org/
 #Jun 22 09:01:52 mail sendmail[5475]: ruleset=check_relay, arg1=[61.102.237.129], arg2=61.102.237.129, relay=[61.102.237.129], reject=550 5.7.1 Mail from 61.102.237.129 refused - see http://dsbl.org/
-regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.+reject=; \
+regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.*\[[\d\.]+\], reject=550 5\.7\.1; \
  classification(0).name=Mail server relay access denied; \
  id=3700; \
  revision=1; \
@@ -40,11 +40,46 @@ regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.+reject=
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- assessment.impact.description=$1 attempted to use mail server as relay; \
- source(0).user.category=os-device; \
+ assessment.impact.description=$1 attempted to use mail server as relay, and was denied.; \
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ target(0).service.protocol=tcp; \
+ target(0).service.port=25; \
+ last;
+
+#Jun 19 23:20:27 mail sendmail[28096]: i5K6KJmk028096: ruleset=check_rcpt, arg1=<support@microsoft.com>, relay=[211.243.40.167], reject=550 5.7.1 <support@microsoft.com>... Relaying denied. IP name lookup failed [211.243.40.167]
+regex=ruleset=check_rcpt, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=550 5\.7\.1; \
+ classification(0).name=Mail server relay access denied; \
+ id=3701; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=$1 attempted to use mail server as relay, and was denied.; \
+ source(0).node.address(0).category=e-mail; \
+ source(0).node.address(0).address=$1; \
+ source(0).node.address(1).category=ipv4-addr; \
+ source(0).node.address(1).address=$2; \
+ target(0).service.protocol=tcp; \
+ target(0).service.port=25; \
+ last;
+
+#Jun 25 17:30:55 mail sendmail[29822]: i5Q0Ukjt029822: ruleset=check_mail, arg1=<vrrfvbvwzihdz@cninfo.net>, relay=[211.210.172.167], reject=553 5.1.8 <vrrfvbvwzihdz@cninfo.net>... Domain of sender address vrrfvbvwzihdz@cninfo.net does not exist
+regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\.1\.8; \
+ classification(0).name=Mail server relay access denied; \
+ id=3702; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=$1 attempted to use mail server as relay, and was denied.; \
+ source(0).node.address(0).category=e-mail; \
+ source(0).node.address(0).address=$1; \
+ source(0).node.address(1).category=ipv4-addr; \
+ source(0).node.address(1).address=$2; \
  target(0).service.protocol=tcp; \
  target(0).service.port=25; \
  last;
@@ -53,7 +88,7 @@ regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.+reject=
 #Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
 regex=regex=sendmail (startup|shudown) succeeded; \
  classification(0).name=Mail server $1 ; \
- id=3701; \
+ id=3703; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
@@ -65,14 +100,51 @@ regex=regex=sendmail (startup|shudown) succeeded; \
 #Jun 22 06:43:01 mail sendmail[5195]: i5MDgomk005195: AClermont-Ferrand-108-1-6-103.w81-49.abo.wanadoo.fr [81.49.192.103] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
 regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA; \
  classification(0).name=Mail server suspicious access; \
- id=3702; \
+ id=3704; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
- assessment.impact.description=Lost connection from $1; \
- assessment.impact.type=other; \
+ assessment.impact.description=Lost connection from $1.  Might be a version scanner or a spammer.; \
+ assessment.impact.type=recon; \
  assessment.impact.severity=low; \
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ target(0).service.protocol=tcp; \
+ target(0).service.port=25; \
  last;
+
+#Jun 25 18:59:39 mail sendmail[29873]: i5Q1xRjt029873: <boagcxwl@gomezbrothers.com>... User unknown
+regex=<(\S+@\S+)>... User unknown; \
+ classification(0).name=Mail server unknown user; \
+ id=3705; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=Mail was sent to unknown user $1.  This could be a scan for valid email addresses, or email to an old, now invalid account.; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=low; \
+ target(0).node.address(0).category=e-mail; \
+ target(0).node.address(0).address=$1; \
+ target(0).service.protocol=tcp; \
+ target(0).service.port=25; \
+ last;
+
+#Jun  4 12:25:26 mail sendmail[21691]: i54JPQCi021691: Authentication-Warning: mail.somehost.com: apache set sender to someguy@somehost.com using -f
+regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; \
+ classification(0).name=Mail server user obfuscation; \
+ id=3706; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=$2 sent email as $3 instead of the assigned e-mail address.  This may be normal (webmail systems do this), or it could be an attempt to hide the email originator.; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=low; \
+ source(0).user.userid(0).type=current-user; \
+ source(0).user.userid(0).name=$2; \
+ target(0).node.name=$1; \
+ target(0).node.address(0).category=e-mail; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=tcp; \
+ target(0).service.port=25; \
+ last; 
