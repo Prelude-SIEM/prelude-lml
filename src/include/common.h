@@ -4,7 +4,7 @@
 #include "regex.h"
 #include "queue.h"
 
-void lml_dispatch_log(regex_list_t *list, queue_t *queue, const char *str, const char *from);
+void lml_dispatch_log(regex_list_t *list, lml_queue_t *queue, const char *str, const char *from);
 
 
 #ifdef DEBUG

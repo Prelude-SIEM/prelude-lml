@@ -78,7 +78,7 @@ static int read_logfile(monitor_fd_t *fd)
                  */
                 ret = getc_unlocked(fd->fd);
                 if ( ret == EOF ) {                        
-			clearerr_unlocked(fd->fd);
+			clearerr(fd->fd);
                         return -1;
                 }
 
@@ -126,7 +126,7 @@ static void try_reopening_inactive_fd(void)
 
 
 
-int file_server_wake_up(regex_list_t *list, queue_t *queue) 
+int file_server_wake_up(regex_list_t *list, lml_queue_t *queue) 
 {
         int ret, len;
         struct stat st;
@@ -235,7 +235,7 @@ int file_server_monitor_file(const char *file)
 
 
 
-int file_server_standalone(regex_list_t *list, queue_t *queue) 
+int file_server_standalone(regex_list_t *list, lml_queue_t *queue) 
 {
         /*
          * there is no way for select / read to block on EOF

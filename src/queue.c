@@ -28,9 +28,9 @@ struct queue {
 
 
 
-queue_t *queue_new(queue_object_fun_t *delete_fun)
+lml_queue_t *queue_new(queue_object_fun_t *delete_fun)
 {
-	queue_t *queue;
+	lml_queue_t *queue;
 
         queue = malloc(sizeof(*queue));
         if ( ! queue ) {
@@ -51,7 +51,7 @@ queue_t *queue_new(queue_object_fun_t *delete_fun)
 
 
 
-void queue_delete(queue_t *queue)
+void queue_delete(lml_queue_t *queue)
 {
 	queue_entry_t *entry = queue->head;
 
@@ -87,7 +87,7 @@ inline static queue_entry_t *queue_entry_new(void)
 
 
 
-void queue_push(queue_t *queue, void *object)
+void queue_push(lml_queue_t *queue, void *object)
 {
 	queue_entry_t *new_entry;
 
@@ -120,7 +120,7 @@ void queue_push(queue_t *queue, void *object)
 
 
 
-int queue_empty(queue_t *queue)
+int queue_empty(lml_queue_t *queue)
 {
 	int ret;
         
@@ -134,7 +134,7 @@ int queue_empty(queue_t *queue)
 
 
 
-void *queue_pop(queue_t *queue)
+void *queue_pop(lml_queue_t *queue)
 {
 	void *object;
 	queue_entry_t *tmp;
@@ -170,7 +170,7 @@ void *queue_pop(queue_t *queue)
 
 
 
-void queue_dump(queue_t *queue, queue_object_fun_t *dump_object)
+void queue_dump(lml_queue_t *queue, queue_object_fun_t *dump_object)
 {
 	int entries = 0;
 	queue_entry_t *entry = queue->head;

@@ -55,7 +55,7 @@ static void regex_match_cb(void *plugin, void *log)
 
 
 
-static void dispatcher(regex_list_t *list, queue_t *myqueue)
+static void dispatcher(regex_list_t *list, lml_queue_t *myqueue)
 {
         int ret;
         log_container_t *log;
@@ -97,7 +97,7 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, queue_t *queue, const char *str, const char *from)
+void lml_dispatch_log(regex_list_t *list, lml_queue_t *queue, const char *str, const char *from)
 {
         log_container_t *log;
 
@@ -122,7 +122,7 @@ void lml_dispatch_log(regex_list_t *list, queue_t *queue, const char *str, const
 int main(int argc, char **argv)
 {
         int ret;
-	queue_t *myqueue;
+	lml_queue_t *myqueue;
 	regex_list_t *regex_list;
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);

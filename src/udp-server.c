@@ -39,7 +39,7 @@ struct udp_server {
 	pthread_t thread;
 	struct sockaddr_in saddr;
 
-        queue_t *queue;
+        lml_queue_t *queue;
         regex_list_t *list;
 };
 
@@ -107,7 +107,7 @@ static void udp_server_standalone(udp_server_t *server)
 
 
 
-void udp_server_start(udp_server_t *server, regex_list_t *list, queue_t *queue)
+void udp_server_start(udp_server_t *server, regex_list_t *list, lml_queue_t *queue)
 {
 	pthread_t thread;
 

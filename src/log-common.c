@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE 600
 
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

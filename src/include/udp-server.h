@@ -11,7 +11,7 @@ typedef struct udp_server udp_server_t;
  * the raw UDP datas and the from argument is the IP address of the
  * sender.
  */
-typedef void (udp_server_msg_reader_t)(queue_t *queue,
+typedef void (udp_server_msg_reader_t)(lml_queue_t *queue,
                                        const char *str, const char *from);
 
 /*
@@ -25,7 +25,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port);
  * during creation of the server by a statically allocated string
  * buffer.
  */
-void udp_server_start(udp_server_t *server, regex_list_t *list, queue_t *queue);
+void udp_server_start(udp_server_t *server, regex_list_t *list, lml_queue_t *queue);
 
 void udp_server_close(udp_server_t *server);
 
