@@ -784,12 +784,12 @@ static idmef_message_t *build_message(simple_rule_t *rule)
 			return NULL;
                 }
 
-		ret = idmef_message_set(message, rule_object->object, value);
+		ret = idmef_object_set(message, rule_object->object, value);
                 
 		idmef_value_destroy(value);
 
 		if ( ret < 0 ) {
-			log(LOG_ERR, "idmef_message_set failed for %s.\n", idmef_object_get_name(rule_object->object));
+			log(LOG_ERR, "idmef_object_set failed for %s.\n", idmef_object_get_name(rule_object->object));
 			idmef_message_destroy(message);
 			return NULL;
 		}
