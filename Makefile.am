@@ -1,5 +1,4 @@
 ACLOCAL_AMFLAGS = -I m4 -I libmissing/m4
-AUTOMAKE_OPTIONS = 1.8
 SUBDIRS = libmissing plugins src
 
 preludeconfdir = $(configdir)
