@@ -201,8 +201,9 @@ src/include/Makefile
 plugins/Makefile
 
 plugins/debug/Makefile
-plugins/simple/Makefile
-plugins/simple/ruleset/Makefile
+
+plugins/pcre/Makefile
+plugins/pcre/ruleset/Makefile
 
 ])
 AC_OUTPUT

@@ -10,7 +10,7 @@ bin_PROGRAMS = prelude-lml
 prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@ $(top_builddir)/libmissing/libmissing.la
 prelude_lml_LDFLAGS = @LIBPRELUDE_LDFLAGS@ -export-dynamic 	\
 	"-dlopen" $(top_builddir)/plugins/debug/debug.la   	\
-	"-dlopen" $(top_builddir)/plugins/simple/simple.la
+	"-dlopen" $(top_builddir)/plugins/pcre/pcre.la
 
 prelude_lml_SOURCES = 			\
 	main.c				\
