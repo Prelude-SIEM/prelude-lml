@@ -58,10 +58,10 @@
 struct rule_regex {
         PRELUDE_LINKED_OBJECT;
         
-        int optreg;
         pcre *regex;
         pcre_extra *extra;
         char *regex_string;
+        prelude_bool_t optreg;
 };
 
 
@@ -105,14 +105,14 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
         rule_regex_t *item;
         prelude_list_t *tmp;
         int tmpovector[size];
-        int optionnal_match = 0, real_ret = 0, ret, retval = 0, i = 0;
+        int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
 
-        dprint("\nInput = %s\n", log_entry->message);
+        dprint("\nInput = %s\n", log_entry->log);
         
         prelude_list_for_each(tmp, &rule->regex_list) {
                 item = prelude_linked_object_get_object(tmp, rule_regex_t);
                                 
-                ret = do_pcre_exec(item, &real_ret, log_entry->message, log_entry->message_len,
+                ret = do_pcre_exec(item, &real_ret, log_entry->log, log_entry->log_len,
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
                 
                 dprint("match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
@@ -123,7 +123,7 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
                 ovector[1] = MAX(tmpovector[1], ovector[1]);
                 
                 if ( item->optreg && real_ret > 0 )
-                        optionnal_match++;
+                        optional_match++;
                 
                 if ( ret == 1 )
                         continue;
@@ -140,8 +140,8 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
         retval++;
          
         if ( rule->min_optregex_match ) {
-                dprint("optmatch=%d >= wanted=%d\n", optionnal_match, rule->min_optregex_match);
-                return (optionnal_match >= rule->min_optregex_match) ? retval : -1;
+                dprint("optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
+                return (optional_match >= rule->min_optregex_match) ? retval : -1;
         }
         
         return retval;
@@ -177,10 +177,10 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
         pcre_rule_container_t *child;
                         
         ret = match_rule_single(rule, state, log_entry);
-        if ( ret < 0 && ! rc->optionnal )  
+        if ( ret < 0 && ! rc->optional )  
                 return -1;
         
-        if ( rc->optionnal )
+        if ( rc->optional )
                 state->optmatch++;
         else
                 state->reqmatch++;
@@ -228,7 +228,7 @@ int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log_entry)
 
 
 
-rule_regex_t *rule_regex_new(const char *regex, int optionnal) 
+rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional) 
 {
         int err_offset;
         rule_regex_t *new;
@@ -252,7 +252,7 @@ rule_regex_t *rule_regex_new(const char *regex, int optionnal)
                 return NULL;
         }
 
-        new->optreg = optionnal;
+        new->optreg = optional;
         new->extra = pcre_study(new->regex, 0, &err_ptr);
 
         return new;

@@ -25,6 +25,6 @@ typedef struct rule_regex rule_regex_t;
 
 void rule_regex_destroy(rule_regex_t *ptr);
 
-rule_regex_t *rule_regex_new(const char *regex, int optionnal);
+rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optionnal);
 
 int rule_regex_match(pcre_rule_container_t *root, const log_entry_t *log_entry);

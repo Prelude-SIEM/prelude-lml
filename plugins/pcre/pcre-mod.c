@@ -104,7 +104,7 @@ static int parse_rule_regex(pcre_plugin_t *plugin, pcre_rule_t *rule, const char
 {
         rule_regex_t *new;
 
-        new = rule_regex_new(regex, 0);
+        new = rule_regex_new(regex, FALSE);
         if ( ! new )
                 return -1;
         
@@ -120,7 +120,7 @@ static int parse_rule_optregex(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
 {
         rule_regex_t *new;
 
-        new = rule_regex_new(regex, 1);
+        new = rule_regex_new(regex, TRUE);
         if ( ! new )
                 return -1;
 
@@ -131,10 +131,10 @@ static int parse_rule_optregex(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
 
 
 
-static int parse_rule_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr)
+
+static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, prelude_bool_t optional)
 {
         prelude_list_t *tmp;
-        int id = atoi(idstr);
         pcre_rule_container_t *new, *cur;
         
         prelude_list_for_each(tmp, &plugin->rule_list) {
@@ -146,8 +146,12 @@ static int parse_rule_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char 
                 new = create_rule_container(cur->rule);
                 if ( ! new ) 
                         return -1;
+
+                if ( ! optional )
+                        rule->required++;
+                else
+                        new->optional = TRUE;
                 
-                rule->required++;
                 prelude_list_add_tail(&new->list, &rule->rule_list);
                 
                 return 0;
@@ -159,22 +163,40 @@ static int parse_rule_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char 
 }
 
 
+static int add_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr, prelude_bool_t optional)
+{
+        int ret, i, idmin = 0, idmax = 0;
+        
+        ret = sscanf(idstr, "%d-%d", &idmin, &idmax);
+        if ( ret < 1 ) {
+                log(LOG_ERR, "could not parse goto value '%s'.\n", idstr);
+                return -1;
+        }
+
+        if ( ret == 1 )
+                idmax = idmin;
+                
+        for ( i = idmin; i <= idmax; i++ ) {
+                                
+                ret = add_goto_single(plugin, rule, atoi(idstr), optional);
+                if ( ret < 0 )
+                        return -1;
+        }
+
+        return 0;
+}
+
+
+static int parse_rule_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr)
+{
+        return add_goto(plugin, rule, idstr, FALSE);
+}
+
+
 
 static int parse_rule_optgoto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr)
 {
-        int ret;
-        pcre_rule_container_t *last;
-        
-        ret = parse_rule_goto(plugin, rule, idstr);
-        if ( ret < 0 )
-                return -1;
-        
-        last = prelude_list_entry(rule->rule_list.prev, pcre_rule_container_t, list);
-        last->optionnal = 1;
-        
-        rule->required--;
-        
-        return 0;
+        return add_goto(plugin, rule, idstr, TRUE);
 }
 
 
