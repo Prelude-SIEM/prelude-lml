@@ -420,7 +420,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
         
         
-        ret = prelude_option_parse_arguments(ropt, &config_file, &argc, argv, &err, NULL);
+        ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {
                 if ( err )
                         prelude_log(PRELUDE_LOG_WARN, "%s.\n", prelude_string_get_string(err));
