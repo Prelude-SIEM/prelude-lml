@@ -418,6 +418,7 @@ static int store_runtime_variable(simple_rule_t *rule, const char *line, int var
 
 static int parse_include(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr) 
 {
+        int ret;
         FILE *fd;
         char filename[256];
 
@@ -432,7 +433,11 @@ static int parse_include(simple_rule_t *rule, const char *value, int *var_type, 
                 return -1;
         }
 
-        return parse_ruleset(filename, fd);
+        ret = parse_ruleset(filename, fd);
+        if ( ret < 0 )
+                return -1;
+
+        return -2;
 }
 
 
@@ -487,7 +492,8 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                         
                         ret = tbl[i].func(rule, val, &var_type, &var_ptr);
                         if ( ret < 0 ) {
-                                log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, key);
+                                if ( ret == -1 )
+                                        log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, key);
                                 return -1;
                         }
 

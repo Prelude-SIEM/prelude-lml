@@ -156,7 +156,7 @@ int file_server_monitor_file(const char *file, int fd)
                 return -1;
         }
         
-        new = malloc(sizeof(*new));
+        new = calloc(1, sizeof(*new));
         if ( ! new ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 close(fd);
