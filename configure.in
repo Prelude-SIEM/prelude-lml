@@ -28,15 +28,15 @@ AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
 if test "x$prefix" = "xNONE"; then
-	prefix="/usr/local"
+   prefix="/usr/local"
 fi
 
 if test "x$localstatedir" = "x\${prefix}/var"; then
-	localstatedir="$prefix/var"
+   localstatedir="$prefix/var"
 fi
 
 if test "x$sysconfdir" = "x\${prefix}/etc"; then
-    sysconfdir="$prefix/etc"
+   sysconfdir="$prefix/etc"
 fi
 
 
@@ -53,8 +53,10 @@ dnl **************************************************
 dnl * Check for libprelude                           *
 dnl **************************************************
 
-AC_PATH_GENERIC(libprelude, 0.8.6, ,
-  AC_MSG_ERROR(Cannot find libprelude: Is libprelude-config in the path?) )
+AM_PATH_LIBPRELUDE(0.8.6, libprelude=yes, libprelude=no)
+if test x$libprelude != xyes; then
+	AC_MSG_ERROR(libprelude is required in order to build prelude-lml.)
+fi
 
 
 dnl **************************************************
