@@ -1,3 +1,9 @@
+2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* plugins/simple/ruleset/ipfw.rules: fixes, cleanup, ICMP support. 
+
+	* plugins/simple/ruleset/Makefile.am: added ifpw.rules
+
 2002-04-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/file-server.c (read_logfile): 
