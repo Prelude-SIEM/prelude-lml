@@ -215,7 +215,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                         return -1;
         }
 
-        if ( log->target_user ) {
+        if ( log->target_user && ! idmef_target_get_user(target) ) {
                 user = idmef_target_new_user(target);
                 if ( ! user )
                         return -1;
@@ -227,7 +227,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                 idmef_string_set_ref(idmef_userid_new_name(userid), log->target_user);
         }
         
-        if ( log->target_program ) {
+        if ( log->target_program && ! idmef_target_get_process(target) ) {
                 process = idmef_target_new_process(target);
                 if ( ! process )
                         return -1;
@@ -236,7 +236,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 		idmef_string_set_ref(process_name, log->target_program);
         }
 
-        if ( log->target_hostname ) {
+        if ( log->target_hostname && ! idmef_target_get_node(target) ) {
                 prelude_addrinfo_t *ai, hints;
                 
                 node = idmef_target_new_node(target);

@@ -1,3 +1,9 @@
+2004-02-10  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/lml-alert.c (generate_target): 
+	check for user/process/node before inserting a default
+	value for theses.
+
 2004-02-01  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* src/file-server.c: 
