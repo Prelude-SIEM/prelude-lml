@@ -429,8 +429,6 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
         
-        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
-        
         ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {
                 if ( err )
