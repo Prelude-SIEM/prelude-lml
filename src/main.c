@@ -35,9 +35,9 @@
 #include "file-server.h"
 #include "lml-alert.h"
 
-
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-
+#ifndef MAX
+ #define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#endif
 
 extern int batch_mode;
 static char **global_argv;
