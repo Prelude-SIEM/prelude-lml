@@ -3,7 +3,7 @@
 #
 
 Paxmod			-			.* PAX: .*
-Debug			-			.*
+#Debug			-			.*
 SimpleMod		-			.*
 
 #
