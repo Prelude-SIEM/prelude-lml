@@ -68,10 +68,13 @@ typedef struct {
 } simple_rule_t;
 
 
+static int parse_ruleset(const char *filename, FILE *fd);
+
 
 static int is_enabled = 0;
 static plugin_log_t plugin;
 static LIST_HEAD(rules_list);
+static char *rulesetdir = NULL;
 
 
 static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_type, void **var_ptr) 
@@ -413,6 +416,28 @@ static int store_runtime_variable(simple_rule_t *rule, const char *line, int var
 
 
 
+static int parse_include(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr) 
+{
+        FILE *fd;
+        char filename[256];
+
+        if ( rulesetdir && value[0] != '/' )
+                snprintf(filename, sizeof(filename), "%s/%s", rulesetdir, value);
+        else
+                strncpy(filename, value, sizeof(filename));
+        
+        fd = fopen(filename, "r");
+        if ( ! fd ) {
+                log(LOG_ERR, "couldn't open %s for reading.\n", filename);
+                return -1;
+        }
+
+        return parse_ruleset(filename, fd);
+}
+
+
+
+
 static int parse_rule(const char *filename, int line, simple_rule_t *rule, char *buf) 
 {
         void *var_ptr;
@@ -422,6 +447,7 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 const char *key;
                 int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
+                { "include", parse_include                     },
                 { "regex", parse_regex                         },
                 { "class.origin", parse_class_origin           },
                 { "class.name", parse_class_name               },
@@ -515,6 +541,7 @@ static int parse_ruleset(const char *filename, FILE *fd)
 
                 line++;
                 ptr = buf;
+                buf[strlen(buf) - 1] = '\0'; /* strip \n */
 
                  /*
                   * filter space at the begining of the line.
@@ -525,7 +552,7 @@ static int parse_ruleset(const char *filename, FILE *fd)
                 /*
                  * empty line or comment. 
                  */
-                if ( *ptr == '\0' || *ptr == '\n' || *ptr == '#' )
+                if ( *ptr == '\0' || *ptr == '#' )
                         continue;
                 
                 rule = calloc(1, sizeof(*rule));
@@ -751,6 +778,17 @@ static int set_simple_ruleset(const char *arg)
 {
         int ret;
         FILE *fd;
+        char *ptr;
+        
+        rulesetdir = strdup(arg);
+
+        ptr = strrchr(rulesetdir, '/');
+        if ( ptr )
+                *ptr = '\0';
+        else {
+                free(rulesetdir);
+                rulesetdir = NULL;
+        }
         
         fd = fopen(arg, "r");
         if ( ! fd ) {
@@ -761,6 +799,8 @@ static int set_simple_ruleset(const char *arg)
         ret = parse_ruleset(arg, fd);
 
         fclose(fd);
+        if ( rulesetdir )
+                free(rulesetdir);
         
         if ( ret < 0 )
                 return prelude_option_error;
@@ -780,7 +820,7 @@ plugin_generic_t *plugin_init(int argc, char **argv)
                                  set_simple_state, NULL);
 
         prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
-                           "Ruleset to user", required_argument,
+                           "Ruleset to use", required_argument,
                            set_simple_ruleset, NULL);
         
 	plugin_set_name(&plugin, "SimpleMod");
