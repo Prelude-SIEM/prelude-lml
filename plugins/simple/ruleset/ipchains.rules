@@ -1,0 +1,76 @@
+# Customized prelude-lml rules file to support Ipchains events - v0.1.1
+# Simon Castro <scastro [at] entreelibre.com>
+
+#
+# Deny rules : Match all IPv4 packet deny references for tcp, udp and icmp protocols.
+#
+
+# TCP
+regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet denied by Ipchains firewall; \
+ impact.completion=failed; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains denied a TCP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=tcp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=tcp; \
+ source(0).interface=$2;
+
+# UDP
+regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet denied by Ipchains firewall; \
+ impact.completion=failed; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains denied an UDP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=udp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=udp; \
+ source(0).interface=$2;
+
+# ICMP
+regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet denied by Ipchains firewall; \
+ impact.completion=failed; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains denied an ICMP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=icmp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=icmp; \
+ source(0).interface=$2;
+
+#
+# Accept rules : Match all IPv4 packet accept references for tcp, udp and icmp protocols.
+#
+
+# TCP
+regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet accepted by Ipchains firewall; \
+ impact.completion=succeeded; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains accepted a TCP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=tcp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=tcp; \
+ source(0).interface=$2;
+
+# UDP
+regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet accepted by Ipchains firewall; \
+ impact.completion=succeeded; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains accepted an UDP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=udp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=udp; \
+ source(0).interface=$2;
+
+# ICMP
+regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+ classification(0).name=Packet accepted by Ipchains firewall; \
+ impact.completion=succeeded; impact.type=other; impact.severity=medium; \
+ impact.description=Ipchains accepted an ICMP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; source(0).service.port=$4; source(0).service.protocol=icmp; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; target(0).service.port=$6; target(0).service.protocol=icmp; \
+ source(0).interface=$2;

@@ -1,0 +1,77 @@
+#####
+#
+# Copyright (C) 2003 John Green <john@giggled.org>
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+# 1) TCP :
+
+# Sample matching logs :
+#Apr 27 02:55:31 81.2.127.129 r00t3r: 295:34:52.730 lan @Group:Rule=0:10 b 200.187.15.1,18775 -> 81.2.127.129,www    PR tcp len 20 48 -S 895123185 0 16384 IN
+
+regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR tcp len \d+ \d+ -\S+ \d+ \d+ \d+ IN; \
+ classification(0).name=Packet dropped by Vigor; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Vigor $1 dropped a TCP packet $2:$3 -> $4:$5; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=TCP; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
+ target(0).service.protocol=TCP; \
+ last;
+
+# 2) UDP :
+
+# Sample matching logs :
+#Apr 27 02:55:53 81.2.127.129 r00t3r: 295:35:14.930 lan @Group:Rule=0:10 b 66.57.40.6,1295 -> 81.2.127.138,1434    PR udp len 20 404  IN
+
+regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR udp len \d+ \d+ IN; \
+ classification(0).name=Packet dropped by Vigor; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Vigor $1 dropped an UDP packet $2:$3 -> $4:$5; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=UDP; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
+ target(0).service.protocol=UDP; \
+ last;
+
+# 3) ICMP :
+
+# Sample matching logs :
+#Apr 27 00:38:25 81.2.127.129 r00t3r: 293:17:47.390 lan @Group:Rule=0:10 b 66.112.44.26 -> 81.2.127.142    PR icmp len 20 28 icmp 8/0 IN
+
+regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([\d\.]+)    PR icmp len \d+ \d+ icmp (\d+)/(\d+) IN; \
+ classification(0).name=Packet dropped by Vigor; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Vigor $1 dropped an ICMP packet $2 -> $3 ($4/$5); \
+ source(0).node.address(0).address=$2; \
+ source(0).service.protocol=ICMP; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=ICMP; \
+ last;
