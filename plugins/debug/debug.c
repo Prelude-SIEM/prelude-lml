@@ -18,6 +18,9 @@
 #include "lml-alert.h"
 
 
+prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void);
+
+
 typedef struct {
         int out_stderr;
 } debug_plugin_t;
@@ -125,7 +128,7 @@ static int debug_set_output_stderr(void *context, prelude_option_t *opt, const c
 
 
 
-prelude_plugin_generic_t *prelude_plugin_init(void)
+prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
 {
 	prelude_option_t *opt;
 

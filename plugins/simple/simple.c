@@ -42,6 +42,8 @@
 #include "lml-alert.h"
 #include "log.h"
 
+prelude_plugin_generic_t *simple_LTX_prelude_plugin_init(void);
+
 
 /*
  * we can store up to 64 reference value in a rule
@@ -919,7 +921,7 @@ static void simple_destroy(prelude_plugin_instance_t *pi)
 
 
 
-prelude_plugin_generic_t *prelude_plugin_init(void)
+prelude_plugin_generic_t *simple_LTX_prelude_plugin_init(void)
 {
         prelude_option_t *opt;
         
