@@ -432,7 +432,7 @@ static void pax_log_processing(const log_container_t * log)
 		additional->type = string;
 		idmef_string_set_constant(&additional->meaning,
 					  "PaX log message");
-		idmef_string_set(&additional->data, log->log);
+                idmef_additional_data_set_data(additional, string, log->log, strlen(log->log) + 1);
 
 		/*
 		 * Target section: the target is the machine using PaX

@@ -27,8 +27,8 @@ static void debug_run(const log_container_t * log)
 	idmef_alert_t *alert;
 	prelude_msgbuf_t *msgbuf;
 	idmef_additional_data_t *additional;
-
 	idmef_message_t *message = idmef_message_new();
+        
 	assert(message);
 
 	msgbuf = prelude_msgbuf_new(0);
@@ -47,7 +47,7 @@ static void debug_run(const log_container_t * log)
 
 	additional->type = string;
 	idmef_string_set_constant(&additional->meaning, "log message");
-	idmef_string_set(&additional->data, log->log);
+        idmef_additional_data_set_data(additional, string, log->log, strlen(log->log) + 1);
 
 	idmef_msg_send(msgbuf, message, PRELUDE_MSG_PRIORITY_MID);
 	idmef_message_free(message);

@@ -139,10 +139,9 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
                 return;
         }
         
-        data->type = string;
         idmef_string_set_constant(&data->meaning, "Log received from");
-        idmef_string_set(&data->data, log->source);
-
+        idmef_additional_data_set_data(data, string, log->source, strlen(log->source) + 1);
+        
         /*
          *
          */
@@ -152,9 +151,8 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
                 return;
         }
 
-        data->type = string;
         idmef_string_set_constant(&data->meaning, "Original Log");
-        idmef_string_set(&data->data, log->log);
+        idmef_additional_data_set_data(data, string, log->log, strlen(log->log) + 1);
         
         /*
          *
