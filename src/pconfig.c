@@ -66,14 +66,7 @@ static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
 
 
-static int get_version(void *context, prelude_option_t *opt, char *buf, size_t size)
-{
-        snprintf(buf, size, "prelude-lml %s", VERSION);
-        return 0;
-}
-
-
-static int print_version(void *context, prelude_option_t *opt, const char *arg)
+static int print_version(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         printf("prelude-lml %s.\n", VERSION);
         return prelude_error(PRELUDE_ERROR_EOF);
@@ -81,7 +74,7 @@ static int print_version(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int print_help(void *context, prelude_option_t *opt, const char *arg)
+static int print_help(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         prelude_option_print(NULL, PRELUDE_OPTION_TYPE_CLI, 25);
         return prelude_error(PRELUDE_ERROR_EOF);
@@ -89,7 +82,7 @@ static int print_help(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_batch_mode(void *context, prelude_option_t *opt, const char *arg)
+static int set_batch_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         batch_mode = 1;
         file_server_set_batch_mode();
@@ -98,22 +91,21 @@ static int set_batch_mode(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_rotation_time_offset(void *context, prelude_option_t *opt, const char *arg) 
+static int set_rotation_time_offset(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err) 
 {
-        file_server_set_max_rotation_time_offset(atoi(arg));
+        file_server_set_max_rotation_time_offset(atoi(optarg));
         return 0;
 }
 
 
 
-static int get_rotation_time_offset(void *context, prelude_option_t *opt, char *buf, size_t size)
+static int get_rotation_time_offset(void *context, prelude_option_t *opt, prelude_string_t *out)
 {
-        snprintf(buf, size, "%u", file_server_get_max_rotation_time_offset());
-        return 0;
+        return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_time_offset());
 }
 
 
-static int set_rotation_size_offset(void *context, prelude_option_t *opt, const char *arg) 
+static int set_rotation_size_offset(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
 {
         file_server_set_max_rotation_size_offset(atoi(arg));
         return 0;
@@ -121,14 +113,13 @@ static int set_rotation_size_offset(void *context, prelude_option_t *opt, const 
 
 
 
-static int get_rotation_size_offset(void *context, prelude_option_t *opt, char *buf, size_t size)
+static int get_rotation_size_offset(void *context, prelude_option_t *opt, prelude_string_t *out)
 {
-        snprintf(buf, size, "%u", file_server_get_max_rotation_size_offset());
-        return 0;
+        return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_size_offset());
 }
 
 
-static int set_quiet_mode(void *context, prelude_option_t *opt, const char *arg)
+static int set_quiet_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         prelude_log_use_syslog();
         return 0;
@@ -136,7 +127,7 @@ static int set_quiet_mode(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_daemon_mode(void *context, prelude_option_t *opt, const char *arg)
+static int set_daemon_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         prelude_daemonize(pidfile);
         if ( pidfile )
@@ -148,32 +139,30 @@ static int set_daemon_mode(void *context, prelude_option_t *opt, const char *arg
 }
 
 
-static int set_pidfile(void *context, prelude_option_t *opt, const char *arg)
+static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {
         pidfile = strdup(arg);
-        if ( ! pidfile ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( ! pidfile )
                 return prelude_error_from_errno(errno);
-        }
         
         return 0;
 }
 
 
 
-static int set_logfile_format(void *context, prelude_option_t *opt, const char *arg)
+static int set_logfile_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {        
         if ( logfile_format )
                 free(logfile_format);
         
-        logfile_format = strdup(arg);       
+        logfile_format = strdup(arg);
 
         return 0;
 }
 
 
 
-static int set_logfile_ts_format(void *context, prelude_option_t *opt, const char *arg)
+static int set_logfile_ts_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {        
         if ( logfile_ts_format )
                 free(logfile_ts_format);
@@ -186,7 +175,7 @@ static int set_logfile_ts_format(void *context, prelude_option_t *opt, const cha
 
 
 
-static int set_file(void *context, prelude_option_t *opt, const char *arg) 
+static int set_file(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
 {
         int ret;
         log_source_t *ls;
@@ -210,7 +199,7 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg)
         
         ret = access(arg, R_OK);
         if ( ret < 0 ) {
-                log(LOG_ERR, "%s does not exist or have wrong permissions: check your configuration.\n", arg);
+                prelude_string_sprintf(err, "%s does not exist or have wrong permissions", arg);
                 return -1;
         }
         
@@ -231,12 +220,12 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int destroy_udp_server(void *context, prelude_option_t *opt)
+static int destroy_udp_server(void *context, prelude_option_t *opt, prelude_string_t *err)
 {
         if ( ! udp_srvr )
                 return 0;
                 
-        log(LOG_INFO, "- Closing syslog server listening at %s:%d.\n", udp_srvr_addr, udp_srvr_port);
+        log(LOG_INFO, "- closing syslog server listening at %s:%d.\n", udp_srvr_addr, udp_srvr_port);
 
         udp_server_close(udp_srvr);
         udp_srvr = NULL;
@@ -246,22 +235,24 @@ static int destroy_udp_server(void *context, prelude_option_t *opt)
 
 
 
-static int get_udp_server(void *context, prelude_option_t *opt, char *out, size_t size)
+static int get_udp_server(void *context, prelude_option_t *opt, prelude_string_t *out)
 {
         if ( ! udp_srvr )
                 return 0;
         
-        snprintf(out, size, "%s:%u", udp_srvr_addr, udp_srvr_port);
-        return 0;
+        return prelude_string_sprintf(out, "%s:%u", udp_srvr_addr, udp_srvr_port);
 }
 
 
-static int set_udp_server(void *context, prelude_option_t *opt, const char *arg) 
+static int set_udp_server(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
 {
         char *ptr = NULL;
         regex_list_t *rlist;
         
-        destroy_udp_server(context, opt);
+        destroy_udp_server(context, opt, err);
+
+        if ( ! arg )
+                return 0;
         
         udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
 
@@ -295,68 +286,24 @@ static int set_udp_server(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_lml_group(void *context, prelude_option_t *opt, const char *arg) 
-{
-        struct group *grp;
-
-        grp = getgrnam(arg);
-        if ( ! grp ) {
-                log(LOG_ERR, "couldn't find group %s.\n", arg);
-                return -1;
-        }
-
-        prelude_lml_group = grp->gr_gid;
-        prelude_client_profile_set_gid(prelude_client_get_profile(context), grp->gr_gid);
-        
-        return 0;
-}
-
-
-
-
-static int set_lml_user(void *context, prelude_option_t *opt, const char *arg) 
-{
-        struct passwd *p;
-        
-        p = getpwnam(arg);
-        if ( ! p ) {
-                log(LOG_ERR, "couldn't find user %s.\n", arg);
-                return -1;
-        }
-
-        prelude_lml_user = p->pw_uid;
-        prelude_client_profile_set_uid(prelude_client_get_profile(context), p->pw_uid);
-        
-        return 0;
-}
-
-
-
 
 int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
 {
         int ret;
         prelude_option_t *opt;
+        prelude_string_t *err;
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
-                           "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
-                           print_version, get_version);
+	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+			   "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
+			   print_version, NULL);
 
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
-        
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'u', "user",
-                           "Run as the specified user", PRELUDE_OPTION_ARGUMENT_REQUIRED,
-                           set_lml_user, NULL);
-
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'g', "group",
-                           "Run in the specified group", PRELUDE_OPTION_ARGUMENT_REQUIRED,
-                           set_lml_group, NULL);
-        
+                
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_daemon_mode, NULL);
@@ -372,7 +319,6 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                                  "address:port pair to listen to syslog to UDP messages (default port 514)", 
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
 
-        prelude_option_set_destroy_callback(opt, destroy_udp_server);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
                 
         prelude_option_add(ropt, all_hook, 't', "max-rotation-time-offset",
@@ -427,9 +373,15 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
         
-        ret = prelude_option_parse_arguments(lml_client, ropt, PRELUDE_CONF, &argc, argv);
-        if ( ret < 0 )
+        ret = prelude_option_parse_arguments(lml_client, ropt, PRELUDE_CONF, &argc, argv, &err);
+        if ( ret < 0 ) {
+                if ( err )
+                        log(LOG_INFO, "%s.\n", prelude_string_get_string(err));
+                else
+                        prelude_perror(ret, "failed parsing LML options.\n");
+                
                 return -1;
+        }
         
         if ( batch_mode && udp_srvr ) {
                 log(LOG_ERR, "UDP server and batch modes can't be used together.\n");

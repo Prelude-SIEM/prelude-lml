@@ -105,7 +105,7 @@ static int format_tstamp(log_source_t *ls, const char *log, char delim, void **o
         return end - log;
 
  err:
-        log(LOG_ERR, "couldn't format \"%s\" using \"%s\".\n", log, ls->ts_fmt);
+        log(LOG_INFO, "couldn't format \"%s\" using \"%s\".\n", log, ls->ts_fmt);
         return -1;
 }
 

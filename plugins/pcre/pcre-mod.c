@@ -576,7 +576,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 
 
 
-static int set_last_first(void *context, prelude_option_t *opt, const char *arg)
+static int set_last_first(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
@@ -588,7 +588,7 @@ static int set_last_first(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *arg) 
+static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err) 
 {
         int ret;
         FILE *fd;
@@ -597,7 +597,7 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
         pcre_rule_container_t *rc;
         pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
-        plugin->rulesetdir = strdup(arg);
+        plugin->rulesetdir = strdup(optarg);
 
         ptr = strrchr(plugin->rulesetdir, '/');
         if ( ptr )
@@ -607,13 +607,13 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
                 plugin->rulesetdir = NULL;
         }
         
-        fd = fopen(arg, "r");
+        fd = fopen(optarg, "r");
         if ( ! fd ) {
-                log(LOG_ERR, "couldn't open %s for reading.\n", arg);
+                prelude_string_sprintf(err, "couldn't open %s for reading", optarg);
                 return -1;
         }
         
-        ret = parse_ruleset(plugin, arg, fd);
+        ret = parse_ruleset(plugin, optarg, fd);
 
         fclose(fd);
         if ( plugin->rulesetdir )
@@ -622,7 +622,7 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
         if ( ret < 0 )
                 return -1;
 
-        log(LOG_INFO, "- Pcre plugin added %d rules.\n", plugin->rulesnum);
+        log(LOG_INFO, "- pcre plugin added %d rules.\n", plugin->rulesnum);
         
         prelude_list_for_each_safe(tmp, bkp, &plugin->rule_list) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
@@ -636,15 +636,13 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
 
 
 
-static int pcre_activate(void *context, prelude_option_t *opt, const char *arg)
+static int pcre_activate(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         pcre_plugin_t *new;
         
         new = calloc(1, sizeof(*new));
-        if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( ! new )
                 return prelude_error_from_errno(errno);
-        }
 
         PRELUDE_INIT_LIST_HEAD(&new->rule_list);
         prelude_plugin_instance_set_data(context, new);
@@ -655,7 +653,7 @@ static int pcre_activate(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static void pcre_destroy(prelude_plugin_instance_t *pi)
+static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 {
         prelude_list_t *tmp, *bkp;
         pcre_rule_container_t *rule;

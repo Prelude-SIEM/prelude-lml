@@ -72,15 +72,13 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 
 
 
-static int debug_activate(void *context, prelude_option_t *opt, const char *optarg)
+static int debug_activate(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         debug_plugin_t *new;
                 
         new = calloc(1, sizeof(*new));
-        if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        if ( ! new ) 
                 return prelude_error_from_errno(errno);
-        }
 
         prelude_plugin_instance_set_data(context, new);
         
@@ -90,27 +88,23 @@ static int debug_activate(void *context, prelude_option_t *opt, const char *opta
 
 
 
-static void debug_destroy(prelude_plugin_instance_t *pi)
+static void debug_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 {
         debug_plugin_t *debug = prelude_plugin_instance_get_data(pi);
-        
         free(debug);
 }
 
 
 
-static int debug_get_output_stderr(void *context, prelude_option_t *opt, char *buf, size_t size)
+static int debug_get_output_stderr(void *context, prelude_option_t *opt, prelude_string_t *out)
 {
         debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
-        
-	snprintf(buf, size, "%s", plugin->out_stderr ? "enabled" : "disabled");
-
-	return 0;
+	return prelude_string_sprintf(out, "%s", plugin->out_stderr ? "true" : "false");
 }
 
 
 
-static int debug_set_output_stderr(void *context, prelude_option_t *opt, const char *optarg)
+static int debug_set_output_stderr(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
