@@ -206,7 +206,7 @@ int main(int argc, char **argv)
         }
         log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
         
-        ret = pconfig_init(lml_root_optlist, argc, argv);
+        ret = lml_options_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )
                 exit(1);
         

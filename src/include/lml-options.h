@@ -28,7 +28,7 @@
 #include "regex.h"
 #include "udp-server.h"
 
-int pconfig_init(prelude_option_t *lml_optlist, int argc, char **argv);
+int lml_options_init(prelude_option_t *lml_optlist, int argc, char **argv);
 
 typedef struct {
         char *pidfile;

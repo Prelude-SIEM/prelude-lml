@@ -321,7 +321,7 @@ static int set_udp_server(void *context, prelude_option_t *opt, const char *arg,
 
 
 
-int pconfig_init(prelude_option_t *ropt, int argc, char **argv)
+int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 {
         int ret;
         prelude_option_t *opt;
