@@ -65,6 +65,10 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
                 if ( ! log )
                         continue;
 
+                dprint("[DSPTC] dispatching object: <%s> from %s.\n",
+                       log->log, log->source);
+                
+#if 0
                 dprint("[DSPTC] dispatching object: <%s> from %s at %02d:%02d:%02d %04d/%02d/%02d\n",
                        log->log, log->source,
                        log->time_received.tm_hour,
@@ -73,6 +77,7 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
                        log->time_received.tm_year + 1900,
                        log->time_received.tm_mon + 1,
                        log->time_received.tm_mday);
+#endif
                 
                 ret = regex_exec(list, log->log, regex_match_cb, log);
                 log_container_delete(log);
