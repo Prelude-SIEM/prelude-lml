@@ -40,7 +40,8 @@ extern udp_server_t *udp_srvr;
 
 static void sig_handler(int signum)
 {
-	fprintf(stderr, "\n\nCaught signal %d.\n", signum);
+	log(LOG_INFO, "\n\nCaught signal %d.\n", signum);
+        
         signal(signum, SIG_DFL);
 
         if ( udp_srvr )

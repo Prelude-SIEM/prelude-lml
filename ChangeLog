@@ -1,3 +1,32 @@
+2002-12-09  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+	
+	* NEWS: updated.
+	
+	* plugins/simple/ruleset/netfilter.rules: 
+	Include patch from Nicolas Delon <delon.nicolas@wanadoo.fr>:
+	the pattern "(MAC=[\w:]+)?" is used to match the MAC string 
+	reported by netfilter in log. This rule works fine for packets 
+	received on a LAN where IP packets are encapsulated in an ethernet (for 
+	example) frame, but do not work for packets directly received from 
+	internet where MAC as no value and is reported as the simple string 
+	"MAC=" in the log line.
+	The "(MAC=[\w:]+)?" string should be replaced by "MAC=([\w:]+)?", so 
+	that the pattern can match in both cases.
+	
+	* configure.in (enable_fam): check that FAM library
+	and headers are available on this system before compiling
+	in FAM support.
+
+	* configure.in:
+	* src/file-server.c: 
+	Move test issued to see if the operating system we're running
+	on is vulnerable to the writev() issued change not being notified
+	to file-server.c. The check is now done at runtime, this will 
+	prevent people from recompiling LML when reinstalling a new kernel.
+
+	* src/main.c (sig_handler): don't use fprintf, use the 
+	log() function.
+
 2002-12-05  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/file-server.c: include config.h before checking

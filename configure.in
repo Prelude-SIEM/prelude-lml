@@ -117,138 +117,36 @@ AC_SUBST(HTML_DIR)
 
 
 dnl **************************************************
-dnl * Check if FAM detect writev() issued changes    *
+dnl * Check for FAM.                                 *
 dnl **************************************************
 
+enable_fam=no
+                                                                                                
+AC_ARG_ENABLE(fam, [  --enable-fam      Use FAM for file change notification [default=auto]], enable_fam="$enableval", enable_fam=yes)
 
-cat > conftest.c << EOF
+for dir in /usr /usr/local /usr/pkg; do
+	AC_CHECK_FILE($dir/lib/libfam.so, fam_lib_dir=$dir)
+	AC_CHECK_FILE($dir/include/fam.h, fam_include_dir=$dir)
+done
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/uio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <fam.h>
-
-#define FAM_FILENAME "testfam.tmp"
-#define FAM_STRING "test string\n"
-
-
-
-static int get_expected_event(FAMConnection *fc, int eventno)
-{
-	int ret;
-	fd_set fds;
-	FAMEvent event;
-	struct timeval tv;
-
-	FD_ZERO(&fds);
-	FD_SET(fc->fd, &fds);
-
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
-
-	if ( ! FAMPending(fc) ) {
-		ret = select(fc->fd + 1, &fds, NULL, NULL, &tv);
-		if ( ret <= 0 )
-			return -1;
-	}
-
-	/*
-	 * Wait for the notification started event.
-	 */
-	ret = FAMNextEvent(fc, &event);
-        if ( ret < 0 || event.code != eventno ) 
-                return -1;
-
-	return 0;
-}
-
-
-
-int main(void)
-{
-	int ret, fd;
-	FAMRequest fr;
-	char buf[[1024]];
-	FAMConnection fc;
-	struct iovec iov[[1]];
-
-        getcwd(buf, sizeof(buf));
-        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "/%s", FAM_FILENAME);
-        
-	fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
-	if ( fd < 0 ) {
-		fprintf(stderr, "error opening %s for writing: %s.\n", buf, strerror(errno));
-		return -1;
-	}
-
-	ret = FAMOpen(&fc);
-	if ( ret < 0 ) {
-		fprintf(stderr, "error initializing FAM: %s.\n", FamErrlist[[FAMErrno]]);
-		return -1;
-	}
-
-	ret = FAMMonitorFile(&fc, buf, &fr, NULL);
-	if ( ret < 0 ) {
-		fprintf(stderr, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[[FAMErrno]]);
-		return -1;
-	}
-
-	ret = get_expected_event(&fc, FAMExists);
-	if ( ret < 0 )
-		return -1;
-
-	ret = get_expected_event(&fc, FAMEndExist);
-	if ( ret < 0 )
-		return -1;
-
-	iov[[0]].iov_len = sizeof(FAM_STRING);
-	iov[[0]].iov_base = FAM_STRING;
-        
-	/* ret = write(fd, FAM_STRING, sizeof(FAM_STRING)); */
-
-	ret = writev(fd, iov, 1);
-	if ( ret != sizeof(FAM_STRING) ) {
-		fprintf(stderr, "error writing test string to %s: %s.\n", buf, strerror(errno));
-		return -1;
-	}
-	
-	ret = get_expected_event(&fc, FAMChanged);
-	if ( ret < 0 )
-		return -1;
-
-	printf("Got expected FAMChanged event.\n");
-
-        return 0;
-}
-EOF
-
-AC_MSG_CHECKING(whether FAM detect writev change)
-
-${CC-cc} -o conftest $CFLAGS -Wall $CPPFLAGS $LDFLAGS conftest.c -lfam
-if test ! -x conftest; then
-	AC_MSG_RESULT(couldn't compile FAM test program)
-	enable_fam=no;
-else
-	./conftest > conftest.out
-
-	if test -s conftest.out; then
-		rm -f conftest.out
-
-		AC_MSG_RESULT(FAM working)
-		AC_DEFINE(HAVE_FAM,, compiled in FAM support)
-		enable_fam=yes
-        else
-		AC_MSG_RESULT(FAM not working)
-		enable_fam=no
-        fi
+if test -n "$fam_lib_dir" && test -n "$fam_include_dir"; then
+	enable_fam=yes
 fi
 
-rm -f conftest conftest.out
+if test $fam_include_dir = /usr; then
+	fam_include_dir=""
+else
+	fam_include="-I$fam_include_dir/include"
+fi
+
+if test x$enable_fam = xyes; then
+	LIBPRELUDE_LIBS="$LIBPRELUDE_LIBS -lfam"
+	LIBPRELUDE_CFLAGS="$LIBPRELUDE_CFLAGS $fam_include"
+        AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
+fi
+                                                                                      
+AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
+
 
 
 dnl Checks for header files.

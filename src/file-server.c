@@ -31,12 +31,15 @@
 #include <inttypes.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/uio.h>
 
 #include "config.h"
 
-#ifdef HAVE_FAM
+#ifdef HAVE_FAM 
  #include <fam.h>
- static FAMConnection fc;
+
+ #define FAM_FILENAME "testfam.tmp"
+ #define FAM_STRING "test string\n"
 #endif
 
 #include <libprelude/timer.h>
@@ -81,14 +84,16 @@ typedef struct {
 
 
 #ifdef HAVE_FAM
-        static int fam_setup_monitor(monitor_fd_t *monitor);
+
+static int fam_setup_monitor(monitor_fd_t *monitor);
+static FAMConnection fc;
+
 #endif
 
 
 static int fam_initialized = 0;
 static LIST_HEAD(active_fd_list);
 static LIST_HEAD(inactive_fd_list);
-
 
 
 
@@ -239,7 +244,7 @@ static void check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct
         monitor->last_size = st->st_size;
 
         while ( (ret = read_logfile(monitor)) != -1 ) {
-                len -= ret;
+                len -= ret;                
                 lml_dispatch_log(list, monitor->buf, monitor->file);
         }
 
@@ -367,7 +372,7 @@ static void check_modification_time(monitor_fd_t *fd, struct stat *st)
         
         if ( st->st_mtime >= old_mtime && st->st_size >= fd->last_size ) 
                 return; /* everythings sound okay */
-	
+        
         memset(&class, 0, sizeof(class));
         memset(&impact, 0, sizeof(impact));
         
@@ -381,9 +386,6 @@ static void check_modification_time(monitor_fd_t *fd, struct stat *st)
         
         logfile_alert(fd, st, &class, &impact);
 }
-
-
-
 
 
 
@@ -422,54 +424,134 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
 
 
-static int process_file_event(regex_list_t *list, monitor_fd_t *monitor) 
+
+#ifdef HAVE_FAM
+
+static int get_expected_event(FAMConnection *fc, int eventno)
 {
-        int ret;
-        struct stat st;
-        
-        ret = fstat(fileno(monitor->fd), &st);
+	int ret;
+	fd_set fds;
+	FAMEvent event;
+	struct timeval tv;
+
+	FD_ZERO(&fds);
+	FD_SET(fc->fd, &fds);
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+
+	while ( ! FAMPending(fc) ) {
+                ret = select(fc->fd + 1, &fds, NULL, NULL, &tv);
+		if ( ret <= 0 )
+			return -1;
+	}
+
+	/*
+	 * Wait for the notification started event.
+	 */
+	ret = FAMNextEvent(fc, &event);
+        if ( ret < 0 || event.code != eventno ) 
+                return -1;
+
+	return 0;
+}
+
+
+
+static int check_fam_writev_bug(FAMConnection *fc)
+{
+	int ret, fd;
+	FAMRequest fr;
+        char buf[1024];
+	struct iovec iov[1];
+
+        snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
+
+        ret = mkstemp(buf);        
         if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
+                log(LOG_ERR, "error creating unique temporary filename.\n");
                 return -1;
         }
         
-        ret = is_file_already_used(monitor, &st);
-        if ( ret < 0 )
+	fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
+	if ( fd < 0 ) {
+		log(LOG_ERR, "error opening %s for writing.\n", buf);
+		return -1;
+	}
+        
+	ret = FAMMonitorFile(fc, buf, &fr, NULL);
+	if ( ret < 0 ) {
+                log(LOG_ERR, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[FAMErrno]);
+                close(fd);
                 return -1;
+	}
+
+	ret = get_expected_event(fc, FAMExists);
+	if ( ret < 0 )
+		goto err;
+
+	ret = get_expected_event(fc, FAMEndExist);
+	if ( ret < 0 )
+                goto err;
+
+	iov[0].iov_len = sizeof(FAM_STRING);
+	iov[0].iov_base = FAM_STRING;
         
-        /*
-         * check mtime consistency.
-         */ 
-        check_modification_time(monitor, &st);
+	ret = writev(fd, iov, 1);
+	if ( ret != sizeof(FAM_STRING) ) {
+		log(LOG_ERR, "error writing test string to %s: %s.\n", buf);
+		goto err;
+	}
+	
+	ret = get_expected_event(fc, FAMChanged);
+	if ( ret < 0 )
+                goto err;
         
-        /*
-         * read and analyze available data. 
-         */
-        check_logfile_data(list, monitor, &st);
+ err:
+        FAMCancelMonitor(fc, &fr);
+        get_expected_event(fc, FAMAcknowledge);        
+
+        close(fd);
+        unlink(buf);
+
+        return ret;
+}
+
+
+
+static int initialize_fam(void) 
+{
+        if ( fam_initialized != 0 )
+                return fam_initialized;
+        
+        fam_initialized = FAMOpen(&fc);
+        if ( fam_initialized < 0 ) {
+                log(LOG_ERR, "error initializing FAM: %s.\n", FamErrlist[FAMErrno]);
+                return -1;
+        }
+
+        fam_initialized = check_fam_writev_bug(&fc);
+        if ( fam_initialized < 0 ) {
+                FAMClose(&fc);
+                
+                log(LOG_INFO, "- An OS bug prevent FAM from monitoring writev() file modification: disabling FAM.\n");
+                return -1;
+        }       
+        
+        fam_initialized = 1;
 
         return 0;
 }
 
 
 
-#ifdef HAVE_FAM
-
 static int fam_setup_monitor(monitor_fd_t *monitor)
 {
         int ret;
-        static int initialized = 0;
 
-        if ( ! initialized ) {
-                initialized = 1;
-
-                ret = FAMOpen(&fc);
-                if ( ret < 0 ) {
-                        log(LOG_ERR, "error initializing FAM: %s.\n", FamErrlist[FAMErrno]);
-                        return -1;
-                }
-                
-                fam_initialized = 1;
-        }
+        ret = initialize_fam();
+        if ( ret < 0 )
+                return 0;
         
         ret = FAMMonitorFile(&fc, monitor->file, &monitor->fam_request, monitor);
         if ( ret < 0 ) {
@@ -567,8 +649,37 @@ static int fam_process_queued_events(regex_list_t *list)
 
         return 0;
 }
-
 #endif
+
+
+
+static int process_file_event(regex_list_t *list, monitor_fd_t *monitor) 
+{
+        int ret;
+        struct stat st;
+        
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
+                return -1;
+        }
+        
+        ret = is_file_already_used(monitor, &st);
+        if ( ret < 0 )
+                return -1;
+        
+        /*
+         * check mtime consistency.
+         */ 
+        check_modification_time(monitor, &st);
+        
+        /*
+         * read and analyze available data. 
+         */
+        check_logfile_data(list, monitor, &st);
+
+        return 0;
+}
 
 
 
@@ -596,8 +707,8 @@ int file_server_monitor_file(const char *file)
 
 
 int file_server_standalone(regex_list_t *list)
-{
-        if ( ! fam_initialized ) {
+{        
+        if ( fam_initialized != 1 ) {
                 while ( 1 ) {
                         file_server_wake_up(list);
                         sleep(1);
@@ -621,7 +732,7 @@ int file_server_wake_up(regex_list_t *list)
         monitor_fd_t *monitor;
         struct list_head *tmp, *bkp;
 
-        if ( ! fam_initialized ) {
+        if ( fam_initialized != 1 ) {
                 /*
                  * try to open inactive fd (file was not existing previously).
                  */
