@@ -162,7 +162,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
         
         server->saddr.sin_family = AF_INET;
         server->saddr.sin_port = htons(port);
-        memset(&(server->saddr.sin_zero), '\0', 8);                
+        memset(server->saddr.sin_zero, 0, sizeof(server->saddr));                
 
         ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
         if ( ret < 0 ) {
