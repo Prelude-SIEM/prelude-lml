@@ -155,7 +155,6 @@
 
 include = apc-emu.rules;
 include = checkpoint.rules;
-include = cisco.rules;
 include = cisco-vpn.rules;
 include = cisco-pix.rules;
 include = clamav.rules;
@@ -168,7 +167,6 @@ include = modsecurity.rules;
 include = ms-sql.rules;
 include = nagios.rules;
 include = navce.rules;
-include = netfilter.rules;
 include = ntsyslog.rules;
 include = pam.rules;
 include = pcanywhere.rules;
@@ -185,5 +183,3 @@ include = vpopmail.rules;
 include = wap11.rules;
 include = webmin.rules;
 include = wu-ftp.rules;
-include = zywall.rules;
-include = zyxel.rules;

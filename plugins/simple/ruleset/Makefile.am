@@ -1,7 +1,6 @@
 ruleset_DATA = \
 	apc-emu.rules		\
 	checkpoint.rules	\
-	cisco.rules		\
 	cisco-pix.rules		\
 	cisco-vpn.rules		\
 	clamav.rules		\
@@ -14,7 +13,6 @@ ruleset_DATA = \
 	ms-sql.rules		\
 	nagios.rules		\
 	navce.rules		\
-	netfilter.rules		\
 	ntsyslog.rules		\
 	pam.rules		\
 	pcanywhere.rules	\
@@ -31,9 +29,7 @@ ruleset_DATA = \
 	vpopmail.rules		\
 	wap11.rules		\
 	webmin.rules		\
-	wu-ftp.rules		\
-	zywall.rules		\
-	zyxel.rules
+	wu-ftp.rules		
 
 
 
