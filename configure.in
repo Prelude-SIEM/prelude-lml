@@ -114,6 +114,15 @@ fi
                                                                                       
 AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
 
+dnl **************************************************
+dnl * Check for socklen_t.                           *
+dnl **************************************************
+
+AC_DATATYPE_GENERIC([
+ #include <sys/types.h>
+ #include <sys/socket.h>
+], socklen_t, int size_t "unsigned long")
+
 
 AC_CHECK_DECL(FILENAME_MAX, have_filename_max=yes, have_filename_max=no)
 if test x$have_filename_max = xno; then

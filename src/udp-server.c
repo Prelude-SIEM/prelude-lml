@@ -20,6 +20,7 @@
 #include "udp-server.h"
 #include "file-server.h"
 
+#include "config.h"
 
 /*
  * From RFC 3164, section 4.1:
@@ -43,7 +44,8 @@ struct udp_server {
 
 void udp_server_process_event(udp_server_t *server)
 {
-        int len, ret;
+        int ret;
+        socklen_t len;
         char src[512];
         struct sockaddr_in addr;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
