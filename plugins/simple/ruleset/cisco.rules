@@ -25,10 +25,10 @@
 
 regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; \
  classification(0).name=Cisco ip access; \
- impact.completion = failed; \
- impact.type = other; \
- impact.severity = medium; \
- impact.description= Someone tried to bypass access-list #$1; \
+ assessment.impact.completion = failed; \
+ assessment.impact.type = other; \
+ assessment.impact.severity = medium; \
+ assessment.impact.description= Someone tried to bypass access-list #$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $3; \
  source(0).service.port = $4; \
@@ -40,9 +40,9 @@ regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9
 
 regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; \
  classification(0).name=Cisco rsh attempt; \
- impact.completion = failed; \
- impact.type = other; \
- impact.severity = medium; \
- impact.description= Someone tried to connect to rshell; \
+ assessment.impact.completion = failed; \
+ assessment.impact.type = other; \
+ assessment.impact.severity = medium; \
+ assessment.impact.description= Someone tried to connect to rshell; \
  source(0).node.address(0).category=ipv4-addr; \ 
  source(0).node.address(0).address = $1;

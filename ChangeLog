@@ -1,4 +1,9 @@
-2003-12-21    <yoann@prelude-ids.org>
+2003-12-22  Nicolas Delon  <delon.nicolas@wanadoo.fr>
+
+	* plugins/simple/ruleset/*.rules:
+	change all impact.* to assessement.impact.*
+
+2003-12-21  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/simple/simple.c (parse_rule_object_value): 
 	fix a typo.

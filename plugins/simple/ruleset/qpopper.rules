@@ -26,10 +26,10 @@
 
 regex=.*popper\[(\d+)\]: \[AUTH\] Failed attempted login to (\S+) from host \((\S+)\) (\S+).*; \
  classification(0).name=qpopper - invalid password for this user; \
- impact.completion=failed; \
- impact.type=user; \
- impact.severity=medium; \
- impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=tcp; \
@@ -44,10 +44,10 @@ regex=.*popper\[(\d+)\]: \[AUTH\] Failed attempted login to (\S+) from host \((\
 
 regex=.*popper\[(\d+)\]: (\S+) at (\S+) \((\S+)\): -ERR \[AUTH\] Password supplied for "(\S+)" is incorrect.*; \
  classification(0).name=qpopper - invalid password for user; \
- impact.completion=failed; \
- impact.type=user; \
- impact.severity=medium; \
- impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=tcp; \

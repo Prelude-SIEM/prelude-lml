@@ -51,10 +51,10 @@
 # Netfilter TCP Matching 
 regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=TCP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) (SEQ=\d+ ACK=\d+ )?WINDOW=(\d+) RES=(\w+) (CWR )?(ECE )?(URG )?(ACK )?(PSH )?(RST )?(SYN )?(FIN )?URGP=(\d+) (OPT \(\w+\) )?.*; \
  classification(0).name=Packet accepted by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter accepted a TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter accepted a TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -67,10 +67,10 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
 
 regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=TCP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) (SEQ=\d+ ACK=\d+ )?WINDOW=(\d+) RES=(\w+) (CWR )?(ECE )?(URG )?(ACK )?(PSH )?(RST )?(SYN )?(FIN )?URGP=(\d+) (OPT \(\w+\) )?.*; \
  classification(0).name=Packet dropped by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter dropped a TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter dropped a TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -84,10 +84,10 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
 # Netfilter UDP Matching 
 regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=UDP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) LEN=(\d+).*; \
  classification(0).name=Packet accepted by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter accepted an UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter accepted an UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -100,10 +100,10 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
 
 regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=UDP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) LEN=(\d+).*; \
  classification(0).name=Packet dropped by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter dropped an UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter dropped an UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -117,10 +117,10 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
 # Netfilter ICMP Matching 
 regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=ICMP (INCOMPLETE \[\d+ bytes\] )?TYPE=(\d+) CODE=(\d+) (INCOMPLETE \[\d+ bytes\] )?(ID=\d+ SEQ=\d+ )?(PARAMETER=\d+ )?(GATEWAY=[\d\.]+ )?(\[\w+\])?(MTU=\d+ )?.*; \
  classification(0).name=Packet accepted by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter accepted an ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter accepted an ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=icmp; \
@@ -131,10 +131,10 @@ regex=Accept IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\
 
 regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=ICMP (INCOMPLETE \[\d+ bytes\] )?TYPE=(\d+) CODE=(\d+) (INCOMPLETE \[\d+ bytes\] )?(ID=\d+ SEQ=\d+ )?(PARAMETER=\d+ )?(GATEWAY=[\d\.]+ )?(\[\w+\])?(MTU=\d+ )?.*; \
  classification(0).name=Packet dropped by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Netfilter dropped an ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Netfilter dropped an ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=icmp; \
@@ -156,10 +156,10 @@ regex=Drop IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+
 # Netfilter TCP Matching  
 regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=TCP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) (SEQ=\d+ ACK=\d+ )?WINDOW=(\d+) RES=(\w+) (CWR )?(ECE )?(URG )?(ACK )?(PSH )?(RST )?(SYN )?(FIN )?URGP=(\d+) (OPT \(\w+\) )?.*; \
  classification(0).name=Packet matched by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Matching TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Matching TCP packet $4:$17 -> $5:$18 [$24 $25 $26 $27 $28 $29] on interface $1$2 [ TTL=$9 ]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -173,10 +173,10 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
 # Netfilter UDP Matching 
 regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=UDP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) LEN=(\d+).*; \
  classification(0).name=Packet matched by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Matching UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Matching UDP packet $4:$17 -> $5:$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$17; \
@@ -190,10 +190,10 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
 # Netfilter ICMP Matching 
 regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=ICMP (INCOMPLETE \[\d+ bytes\] )?TYPE=(\d+) CODE=(\d+) (INCOMPLETE \[\d+ bytes\] )?(ID=\d+ SEQ=\d+ )?(PARAMETER=\d+ )?(GATEWAY=[\d\.]+ )?(\[\w+\])?(MTU=\d+ )?.*; \
  classification(0).name=Packet matched by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Matching ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Matching ICMP packet $4 -> $5 type=$17 code=$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=icmp; \
@@ -205,10 +205,10 @@ regex=(?<!Accept )(?<!Drop )IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=(
 # Netfilter AH and ESP Matching for IPSEC
 regex=IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(AH|ESP) (INCOMPLETE \[\d+ bytes\] )?SPI=(\w+).*; \
  classification(0).name=Packet matched by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Matching $16 packet $4 -> $5 SPI=$18 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Matching $16 packet $4 -> $5 SPI=$18 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=$16; \
@@ -220,10 +220,10 @@ regex=IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS
 # Other protocols matched by Netfilter
 regex=IN=(\w*) OUT=(\w*) MAC=([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(\d+).*; \
  classification(0).name=Packet matched by Netfilter firewall; \
- impact.completion=failed; \
- impact.type=other; \
- impact.severity=medium; \
- impact.description=Matching a packet from the protocol number $16 : $4 -> $5 on interface $1$2 [TTL=$9]; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Matching a packet from the protocol number $16 : $4 -> $5 on interface $1$2 [TTL=$9]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.protocol=$16; \
