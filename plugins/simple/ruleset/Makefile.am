@@ -24,7 +24,8 @@ ruleset_DATA = \
 	wap11.rules		\
 	wu-ftp.rules		\
 	zywall.rules		\
-	zyxel.rules
+	zyxel.rules		\
+	honeyd.rules
 
 
 rulesetdir = $(configdir)/ruleset

@@ -1,7 +1,9 @@
-2004-01-16  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+2004-01-20   Gene R Gomez  <gene@gomezbrothers.com>
 
-	* plugins/simple/ruleset/simple.rules (regex): 
-	keep classification name static, for correlation need.
+	* plugins/simple/ruleset:
+	Cleaned up regex to remove some syslog dependencies (vigor.rules
+	and a few others without sample logs remain).  Added honeyd.rules
+	ruleset.
 
 2004-01-15  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
