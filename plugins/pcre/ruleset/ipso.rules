@@ -72,7 +72,8 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
 ###
 
 # 1. Rebooting or halting the system: severity should depend on the machine ?
-# No log sample; please submit
+# LOG:Jan 16 14:12:42 spcssl [LOG_CRIT] reboot: rebooted by admin
+#
 regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
  classification.text=Firewall: Reboot; \
  id=902; \
@@ -89,6 +90,7 @@ regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
  last
 
 # No log sample; please submit
+#
 regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
  classification.text=Firewall: Reboot attempt; \
  id=903; \

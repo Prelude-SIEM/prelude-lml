@@ -145,8 +145,8 @@ regex=Illegal user (\S+) from (\S+); \
 # User listed in DenyGroups or DenyUsers (sshd_config directives) tried to login #
 ##################################################################################
 
-# No log sample; please submit
-regex=User (\S+) not allowed because .*listed in (\w+); \
+# LOG:Jan 6 22:50:24 localhost sshd[15489]: User nobody not allowed because none of user's groups are listed in AllowGroups
+regex=User (\S+) not allowed because (.*)listed in (\w+); \
  classification.text=SSH Remote login failed with a denied user; \
  id=1905; \
  revision=1; \
@@ -156,7 +156,7 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
- assessment.impact.description=User $1 failed to login because he is listed in $2; \
+ assessment.impact.description=User $1 failed to login because $2 listed in $3; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
@@ -169,7 +169,8 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
 # (maybe a ssh server recognition)                               #
 ##################################################################
 
-# No log sample; please submit
+# LOG:Jun 10 09:51:57 server sshd[9100]: Did not receive identification string from 1.2.3.4
+#
 regex=Did not receive identification string from (.+); \
  classification.text=SSH Server recognition; \
  id=1906; \
@@ -193,7 +194,8 @@ regex=Did not receive identification string from (.+); \
 # of the sshd_config file)                                              #
 #########################################################################
 
-# No log sample; please submit
+# LOG:Jan  5 01:31:41 www sshd[1643]: ROOT LOGIN REFUSED FROM 1.2.3.4
+#
 regex=ROOT LOGIN REFUSED FROM (\w+); \
  classification.text=SSH Remote root login forbidden; \
  id=1907; \
