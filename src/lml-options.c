@@ -450,7 +450,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         if ( config.dry_run )
                 return 0;
         
-        ret = prelude_client_new(&(config.lml_client), PRELUDE_CONNECTION_CAPABILITY_CONNECT, "prelude-lml", config_file);
+        ret = prelude_client_new(&config.lml_client, "prelude-lml", config_file);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-client");
                 
