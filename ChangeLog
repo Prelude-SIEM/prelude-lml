@@ -1,5 +1,12 @@
 2002-04-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/file-server.c (read_logfile): 
+	return the number of byte read.
+	
+	(file_server_wake_up): if we get EOF, without reading all
+	the new available byte, remeber how many byte are left to 
+	be read, and retry even thought st_size isn't modified.
+
 	* src/log-plugins.c (subscribe): 
 	(unsubscribe): be more verbose - not only debug.
 

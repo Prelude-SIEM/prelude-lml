@@ -60,7 +60,7 @@ static monitor_fd_t *fd_tbl[MAX_FD];
 
 static int read_logfile(monitor_fd_t *fd) 
 {
-        int ret;
+        int ret, len = 0;
         
         while ( 1 ) {
 
@@ -70,7 +70,6 @@ static int read_logfile(monitor_fd_t *fd)
                  */
                 if ( fd->index == sizeof(fd->buf) ) {
                         fd->buf[fd->index - 1] = '\0';
-                        fd->need_more_read = 1;
                         break;
                 }
 
@@ -80,20 +79,14 @@ static int read_logfile(monitor_fd_t *fd)
                  */
                 ret = getc_unlocked(fd->fd);
                 if ( ret == EOF ) {
-                        if ( fd->index != 0 )
-                                /*
-                                 * missing end of line (\n).
-                                 */
-                                fd->need_more_read = 1;
-	    
 			clearerr_unlocked(fd->fd);
-
                         return -1;
                 }
+
+                len++;
                 
                 if ( ret == '\n' ) {
                         fd->buf[fd->index] = '\0';
-                        fd->need_more_read = 0;
                         break;
                 }
 
@@ -102,7 +95,7 @@ static int read_logfile(monitor_fd_t *fd)
         
         fd->index = 0;
         
-        return 0;
+        return len;
 }
 
 
@@ -110,8 +103,8 @@ static int read_logfile(monitor_fd_t *fd)
 
 int file_server_wake_up(regex_list_t *list, queue_t *queue) 
 {
-        int i, ret;
         struct stat st;
+        int i, ret, len;
         monitor_fd_t *monitor;
 
         /*
@@ -133,11 +126,21 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
                 
                 if ( ! monitor->need_more_read && st.st_size == monitor->last_size ) 
                         continue;
-
+                
+                len = (st.st_size - monitor->last_size) + monitor->need_more_read;
                 monitor->last_size = st.st_size;
 
-                while ( read_logfile(monitor) != -1 ) 
+                while ( (ret = read_logfile(monitor)) != -1 ) {
+                        len -= ret;
                         lml_dispatch_log(list, queue, monitor->buf, monitor->file);
+                }
+
+                /*
+                 * if len isn't 0, it mean we got EOF before reading
+                 * every new byte, we want to retry reading even if st_size isn't
+                 * modified then.
+                 */
+                monitor->need_more_read = len;
         }
 
         return 0;
