@@ -14,10 +14,10 @@
 # - regex:
 #   A PCRE regex that should be matched to trigger the alert.
 #
-# - classification(0).name: 
+# - class.name: 
 #   The name of the alert, from one of the origins listed below.
 #
-# - classification(0).origin:
+# - class.origin:
 #   The source from which the name of the alert originates. 
 #   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is unknown.
 #
@@ -28,96 +28,101 @@
 #   description of the attack, appropriate countermeasures, or other
 #   information deemed relevant by the vendor.
 # 
-# - assessment.impact.severity:
+# - impact.severity:
 #   An estimate of the relative severity of the event.
 #   Possible values are: low, medium, high.
 #
-# - assessment.impact.completion:
+# - impact.completion:
 #   An indication of whether the analyzer believes the attempt that
 #   the event describes was successful or not.
 #   The permitted values are: failed, succeeded.
 #
-# - assessment.impact.type:
+# - impact.type:
 #   The type of attempt represented by this event, in relatively broad categories.
 #   The permitted values are: admin, dos, file, recon, user, other.
 #
-# - assessment.impact.description:
-#   May contain a textual description of the assessment.impact. if the analyzer
+# - impact.description:
+#   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
 #
-# - source(0).node.address(0).address:
+# - source.node.address.address:
 #   Address that issued the attack.
 #   There can be more than one.
 # 
-# - target(0).node.address(0).address:
+# - target.node.address.address:
 #   Address that has been attacked.
 #   There can be more than one.
 #
-# - source(0).node.name,
-#   target(0).node.name:
+# - source.node.name,
+#   target.node.name:
 #   The name of the equipment. This information MUST be provided if no Address
 #   information is given.
 #
-# - source(0).node.category,
-#   target(0).node.category:
+# - source.node.category,
+#   target.node.category:
 #   The domain from which the name information was obtained.
 #   Possible values are: unknow, ads, afs, coda, dfs, dns, hosts, kerberos,
 #   nds, nis, nisplus, nt, wfw
 #
-# - source(0).node.location,
-#   target(0).node.location:
+# - source.node.location,
+#   target.node.location:
 #   The location of the equipment.
 #
-# - source(0).spoofed,
-#   target(0).decoy:
+# - source.spoofed,
+#   target.decoy:
 #   An indication of wheter the source/target is a decoy.
 #   The permitted values are: unknown, yes, no.
 #
-# - source(0).interface,
-#   target(0).interface:
+# - source.interface,
+#   target.interface:
 #   May be used by a network-based analyzer with multiple interfaces to
 #   indicate which interfaces this source/target was seen on.
 #
-# - source(0).service.name,
-#   target(0).service.name:
+# - source.service.name,
+#   target.service.name:
 #   The name of the service. Whenever possible, the name from the IANA list
 #   of well-known ports SHOULD be used.
 #
-# - source(0).service.port,
-#   target(0).service.port:
+# - source.service.port,
+#   target.service.port:
 #   The port number being used.
 #
-# - source(0).service.protocol,
-#   target(0).service.protocol:
+# - source.service.protocol,
+#   target.service.protocol:
 #   The protocol being used.
 #
-# - source(0).service.portlist,
-#   target(0).service.portlist:
+# - source.service.portlist,
+#   target.service.portlist:
 #   A list of port numbers beeing used.
 #
-# - source(0).user.category,
-#   target(0).user.category:
+# - source.user.category,
+#   target.user.category:
 #   The type of user represented (unknown, application, os-device).
 #
-# - source(0).user.userid,
-#   target(0).user.userid:
+# - source.user.userid,
+#   target.user.userid:
 #   Create a new UserId inside an User object (that may contain several UserId).
 #
-# - source(0).user.userid(0).type,
-#   target(0).user.userid(0).type:
+# - source.user.userid.type,
+#   target.user.userid.type:
 #   The type of user information represented (current-user, original-user, target-user,
 #   user-privs, current-group, group-privs, other-privs).
 #
-# - source(0).user.userid(0).name,
-#   target(0).user.userid(0).name:
+# - source.user.userid.name,
+#   target.user.userid.name:
 #   A user or group name.
 #
-# - source(0).user.userid(0).number,
-#   target(0).user.userid(0).number:
+# - source.user.userid.number,
+#   target.user.userid.number:
 #   A user or group number.
 
-
+include = ms-sql.rules;
+include = nagios.rules;
+include = wu-ftp.rules;
 include = cisco.rules;
+include = cisco-vpn.rules;
+include = cisco-pix.rules;
+include = navce.rules;
 include = exim.rules;
 include = zyxel.rules;
 include = ipfw.rules;
@@ -136,29 +141,47 @@ include = portsentry.rules;
 include = vigor.rules;
 include = ipchains.rules;
 
+#Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user root by (uid=0)
 regex=session opened for user root; \
- classification(0).name=Root login; \
- assessment.impact.completion = succeeded; \
- assessment.impact.type = admin; \
- assessment.impact.severity = medium
+ class.name=Root login; \
+ class.origin=vendor-specific; \
+ impact.completion = succeeded; \
+ impact.type = admin; \
+ impact.severity = medium; \
+ target.user.userid; \
+ target.user.userid.name=root; \
+ last
 
+# No log sample; please submit
 regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
- classification(0).name=Authentication Failure; \
- assessment.impact.completion = failed; \
- assessment.impact.type = other; \
- assessment.impact.severity = high; \
- assessment.impact.description=Process $1 attempted to change UID from $2 to $3
+ class.name=Authentication Failure; \
+ class.origin=vendor-specific; \
+ impact.completion = failed; \
+ impact.type = other; \
+ impact.severity = high; \
+ impact.description=Process $1 attempted to change UID from $2 to $3; \
+ source.user.userid; \
+ source.user.userid.number=$2; \
+ target.user.userid; \
+ target.user.userid.number=$3; \
+ last
 
+# No log sample; please submit
 regex=entered promiscuous mode; \
- classification(0).name=Promiscuous mode detected; \
- assessment.impact.completion = succeeded; \
- assessment.impact.type = other; \
- assessment.impact.severity = medium; \
- assessment.impact.description=A sniffer is probably running on this machine
+ class.name=Promiscuous mode detected; \
+ class.origin=vendor-specific; \
+ impact.completion = succeeded; \
+ impact.type = other; \
+ impact.severity = medium; \
+ impact.description=A sniffer is probably running on this machine; \
+ last
 
+# No log sample; please submit
 regex=no such user; \
- classification(0).name=Invalid User; \
- assessment.impact.completion = failed; \
- assessment.impact.type = other; \
- assessment.impact.severity = medium; \
- assessment.impact.description = Someone tried to log in using a non existing user
+ class.name=Invalid User; \
+ class.origin=vendor-specific; \
+ impact.completion = failed; \
+ impact.type = other; \
+ impact.severity = medium; \
+ impact.description = Someone tried to log in using a non existing user; \
+ last

@@ -1,0 +1,190 @@
+#####
+#
+# Copyright (C) 2003 Gene R Gomez <gene at gomezbrothers dot com>
+# Tyco Fire and Security GTS (www.tycofireandsecurity.com)
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+#####
+#
+# The rules included here were developed using a Cisco PIX 525.  Please report
+# any inconsistencies on other models to Gene Gomez at the address provided 
+# above
+#
+#####
+
+#Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
+regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
+ class.name=$1; \
+ class.origin=vendor-specific; \
+ impact.severity=medium; \
+ impact.description=Cisco PIX IDS detected an event; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$3; \
+ last
+
+#Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
+regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
+ class.name=Successful PIX login; \
+ class.origin=vendor-specific; \
+ impact.severity=low; \
+ impact.type=admin; \
+ impact.completion=succeeded; \
+ impact.description=Cisco PIX detected a successful login as user $3; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$2; \
+ target.user.userid; \
+ target.user.userid.name=$3; \
+ last
+
+#Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
+regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
+ class.name=Successful PIX enable; \
+ class.origin=vendor-specific; \
+ impact.severity=low; \
+ impact.type=admin; \
+ impact.completion=succeeded; \
+ impact.description=User $1 succesfully enabled; \
+ source.user.userid; \
+ source.user.userid.name=$1; \
+ target.user.userid; \
+ target.user.userid.name=enable_15; \
+ last
+
+#Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
+regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
+ class.name=PIX configuration written to $2; \
+ class.origin=vendor-specific; \
+ impact.severity=low; \
+ impact.type=admin; \
+ impact.completion=succeeded; \
+ impact.description=PIX configuration was written from $1 to $2; \
+ last
+
+#Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
+regex=PIX-5-611103: User logged out: Uname: (\S+); \
+ class.name=PIX logout; \
+ class.origin=vendor-specific; \
+ impact.severity=low; \
+ impact.type=admin; \
+ impact.completion=succeeded; \
+ impact.description=PIX user $1 logged out; \
+ source.user.userid; \
+ source.user.userid.name=$1; \
+ last
+
+#Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
+regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
+ class.name=Failed PIX login; \
+ class.origin=vendor-specific; \
+ impact.severity=medium; \
+ impact.type=admin; \
+ impact.completion=failed; \
+ impact.description=Cisco PIX detected a failed login as user $3; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$2; \
+ target.user.userid; \
+ target.user.userid.name=$3; \
+ last
+
+#Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 1.2.3.210))
+regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
+ class.name=Failed PIX enable; \
+ class.origin=vendor-specific; \
+ impact.severity=medium; \
+ impact.type=admin; \
+ impact.completion=failed; \
+ impact.description=PIX enable password attempt on the $1 failed from $2; \
+ target.user.userid; \
+ target.user.userid.name=enable_15; \
+ last
+
+#Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 192.168.250.6 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
+regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
+ class.name=SSH Server recognition; \
+ class.origin=vendor-specific; \
+ impact.severity = medium; \
+ impact.completion=failed; \
+ impact.type=recon; \
+ impact.description=$1 making probably a server recognition; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ source.service.protocol=tcp; \
+ target.service.port=22; \
+ target.service.protocol=tcp; \
+ last
+
+#Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.33.8.58(192.168.250.58)/80 on interface outside
+regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\([\d\.]+\)\/(\d+); \
+ class.name=Embryonic connection limit exceeded; \
+ class.origin=vendor-specific; \
+ impact.severity = medium; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.description=The embryonic connection limit on your PIX has been met and exceeded.; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ source.service.port=$2; \
+ source.service.protocol=tcp; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$3; \
+ target.service.port=$4; \
+ target.service.protocol=tcp; \
+ last
+
+# Events taken from the Cisco System Log Messages list that will need rules
+# (include 'attack' or 'intrusion' in description; no log samples):
+# %PIX-2-106017: Deny IP due to Land Attack from IP_address to IP_address 
+# %PIX-1-106021: Deny protocol reverse path check from source_address to dest_address on interface interface_name 
+# %PIX-1-106022: Deny protocol connection spoof from source_address to dest_address on interface interface_name 
+# %PIX-1-106101 The number of ACL log deny-flows has reached limit (number).
+# %PIX-1-107001: RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name 
+# %PIX-1-107002: RIP pkt failed from IP_address: version=number on interface interface_name 
+# %PIX-4-109017: User at IP_address exceeded auth proxy connection limit (max)
+# %PIX-2-201003: Embryonic limit exceeded nconns/elimit for outside_address/outside_port (global_address) inside_address/inside_port on interface interface_name 
+# %PIX-4-209003: Fragment database limit of number exceeded: src = IP_address,dest = IP_address, proto = protocol, id = number
+# %PIX-3-320001: The subject name of the peer cert is not allowed for connection 
+# %PIX-4-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number
+# %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol 
+# %PIX-4-405001: Received ARP {request | response} collision from IP_address/mac_address on interface interface_name 
+# %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host 
+# %PIX-6-605004: Login denied from {source_address/source_port | serial} to {interface_name:dest_address/service | console} for user "user"
+# %PIX-3-710003: {TCP|UDP} access denied by ACL from source_address/source_port to interface_name:dest_address/service 
+# %PIX-7-710005: {TCP|UDP} request discarded from source_address/source_port to interface_name:dest_address/service 
+# %PIX-7-710006: protocol request discarded from source_address to interface_name:dest_address
+# %PIX-2-106020: Deny IP teardrop fragment (size = number, offset = number) from IP_address to IP_address
+# %PIX-4-209004: Invalid IP fragment, size = bytes exceeds maximum size = bytes: src = IP_address, dest = IP_address, proto = protocol, id = number
+# %PIX-4-209005: Discard IP fragment set with more than number elements: src = IP_address, dest = IP_address, proto = protocol, id = number 
+

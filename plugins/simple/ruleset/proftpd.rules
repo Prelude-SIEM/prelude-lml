@@ -23,47 +23,60 @@
 
 # Jan 13 22:19:52 (none) proftpd[7804]: leroutier.net (193.249.231.232[193.249.231.232]) - PAM(leroutier): Authentication failure.
 
-regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - PAM\((\S+)\): Authentication failure.*; \
- classification(0).name=proftpd - invalid password for user '$5'; \
- assessment.impact.completion=failed; \
- assessment.impact.type=user; \
- assessment.impact.severity=medium; \
- assessment.impact.description= Someone tried to login to your FTP server as user '$5' but failed; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=tcp; \
- target(0).service.port=21; \
- target(0).service.protocol=tcp; \
+regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): Authentication failure; \
+ class.name=FTP logon failed; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ source.service.protocol=tcp; \
+ target.service.port=21; \
+ target.service.protocol=tcp; \
+ target.user.userid; \
+ target.user.userid.name=$2; \
  last;
 
 # Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
 
-regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - no such user '(\S+)'.*; \
- classification(0).name=proftpd - no such user '$5'; \
- assessment.impact.completion=failed; \
- assessment.impact.type=user; \
- assessment.impact.severity=medium; \
- assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$5' but failed; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=tcp; \
- target(0).service.port=21; \
- target(0).service.protocol=tcp; \
+regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)'; \
+ class.name=FTP logon failed; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ source.service.protocol=tcp; \
+ target.service.port=21; \
+ target.service.protocol=tcp; \
+ target.user.userid; \
+ target.user.userid.name=$2; \
  last;
 
 # Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
 
-regex=.*proftpd\[(\d+)\]:.*[\(\[]([\d\.]+)[\)\]].* - USER (\S+): no such user found from .*([\d\.]+).* to ([\d\.]{7,}):(\d+).*; \
- classification(0).name=proftpd - no such user; \
- assessment.impact.completion=failed; \
- assessment.impact.type=user; \
- assessment.impact.severity=medium; \
- assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$3' but failed; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$2; \
- source(0).service.protocol=tcp; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.port=$6; \
- target(0).service.protocol=tcp; \
+regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such user found from [\w\-\.]+ \[[\w\-\.]+\] to ([\w\-\.]+):(\d+); \
+ class.name=FTP logon failed; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.type=user; \
+ impact.severity=medium; \
+ impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$1; \
+ source.service.protocol=tcp; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$3; \
+ target.service.port=$4; \
+ target.service.protocol=tcp; \
+ target.user.userid; \
+ target.user.userid.name=$2; \
  last;

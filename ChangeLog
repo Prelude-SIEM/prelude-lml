@@ -1,3 +1,8 @@
+2004-01-08  Gene Gomez  <gene@gomezbrothers.com>
+
+        * plugins/simple/ruleset:
+        Rulesets "sanitized"; standardized format introduced.
+
 2004-01-07  Nicolas Delon  <delon.nicolas@wanadoo.fr>
 
 	* plugins/simple/simple.c:

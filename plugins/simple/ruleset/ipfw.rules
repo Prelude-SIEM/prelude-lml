@@ -2,124 +2,163 @@
 
 # 1. Deny rules
 
+# No log sample; please submit
 regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
- classification(0).name=Packet dropped by firewall; \
- assessment.impact.completion=failed; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Denied incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
- source(0).service.port=$4; \
- source(0).service.protocol=$2; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.port=$6; \
- target(0).service.protocol=$2; \
- source(0).interface=$7;
+ class.name=$2 packet dropped; \
+ class.origin=vendor-specific; \ 
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Denied incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.port=$4; \
+ source.service.protocol=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.port=$6; \
+ target.service.protocol=$2; \
+ source.interface=$7; \
+ last
 
+# No log sample; please submit
 regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
- classification(0).name=Packet dropped by firewall; \
- assessment.impact.completion=failed; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Denied outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
- source(0).service.port=$4; \
- source(0).service.protocol=$2; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.port=$6; \
- target(0).service.protocol=$2; \
- target(0).interface=$7;
+ class.name=Packet dropped by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Denied outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.port=$4; \
+ source.service.protocol=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.port=$6; \
+ target.service.protocol=$2; \
+ target.interface=$7; \
+ last
 
+# No log sample; please submit
 regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
- classification(0).name=Packet dropped by firewall; \
- assessment.impact.completion=failed; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Denied incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.protocol=$2; \
- source(0).interface=$6;
+ class.name=Packet dropped by firewall; \
+ class.origin=vendor-specific ; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Denied incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.protocol=$2; \
+ source.interface=$6; \
+ last
 
+# No log sample; please submit
 regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
- classification(0).name=Packet dropped by firewall; \
- assessment.impact.completion=failed; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Denied outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.protocol=ICMP; \
- target(0).interface=$6;
+ class.name=Packet dropped by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Denied outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.protocol=ICMP; \
+ target.interface=$6; \
+ last
 
 # 2. Accept rules
+# No log sample; please submit
 regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
- classification(0).name=Packet accepted by firewall; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Accepted incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
- source(0).service.port=$4; \
- source(0).service.protocol=$2; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.port=$6; \
- target(0).service.protocol=$2; \
- source(0).interface=$7;
+ class.name=Packet accepted by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Accepted incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.port=$4; \
+ source.service.protocol=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.port=$6; \
+ target.service.protocol=$2; \
+ source.interface=$7; \
+ last
 
+# No log sample; please submit
 regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
- classification(0).name=Packet accepted by firewall; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Accepted outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;  \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
- source(0).service.port=$4; \
- source(0).service.protocol=$2; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.port=$6; \
- target(0).service.protocol=$2; \
- target(0).interface=$7;
+ class.name=Packet accepted by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Accepted outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;  \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$3; \
+ source.service.port=$4; \
+ source.service.protocol=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.port=$6; \
+ target.service.protocol=$2; \
+ target.interface=$7; \
+ last
 
+# no log sample; please submit
 regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
- classification(0).name=Packet accepted by firewall; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Accepted incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.protocol=ICMP; \
- source(0).interface=$6;
+ class.name=Packet accepted by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Accepted incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.protocol=ICMP; \
+ source.interface=$6; \
+ last
 
+# No log sample; please submit
 regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
- classification(0).name=Packet accepted by firewall; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.severity=medium; \
- assessment.impact.description=Accepted outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;  \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
- target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$5; \
- target(0).service.protocol=ICMP; \
- target(0).interface=$6; 
-
+ class.name=Packet accepted by firewall; \
+ class.origin=vendor-specific; \
+ impact.completion=succeeded; \
+ impact.type=other; \
+ impact.severity=medium; \
+ impact.description=Accepted outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;  \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ source.node.address.address=$4; \
+ source.service.protocol=ICMP; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$5; \
+ target.service.protocol=ICMP; \
+ target.interface=$6; \
+ last

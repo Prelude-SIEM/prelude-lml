@@ -24,24 +24,33 @@
 
 # x.x.x.x Wireless PC connected   00-03-2F-0C-D4-D1^M 
 
-regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); 		\
- classification(0).name=Wireless PC connected;				\
- assessment.impact.completion=succeeded;      			      		\
- assessment.impact.severity=low;		    					\
- assessment.impact.description=Successful wireless PC connection from $2 to AP $1; \
- source(0).node.address(0).category=mac;  				\
- source(0).node.address(0).address=$2;         				\
- target(0).node.address(0).category=ipv4-addr; 				\
- target(0).node.address(0).address=$1;
+regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
+ class.name=Wireless PC connected; \
+ class.origin=vendor-specific; \
+ impact.completion=succeeded; \
+ impact.severity=low; \
+ impact.description=Successful wireless PC connection from $2 to AP $1; \
+ source.node.address; \
+ source.node.address.category=mac; \
+ source.node.address.address=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$1; \
+ last
 
 # x.x.x.x Unauthorized wireless PC try to connected   00-03-2F-0C-D4-D1^M 
 
-regex=([\d\.]+)[\s]+Unauthorized wireless PC try to connected[\s]+([A-Fa-f\d\-]+).*; 	\
- classification(0).name=Unauthorized wireless PC connection attempt; 			\
- assessment.impact.completion=failed;								\
- assessment.impact.severity=medium;								\
- assessment.impact.description=Unauthorized wireless PC connection attempt from $2 to $1;		\
- source(0).node.address(0).category=mac;						\
- source(0).node.address(0).address=$2;							\
- target(0).node.address(0).category=ipv4-addr;						\
- target(0).node.address(0).address=$1;
+regex=([\d\.]+)[\s]+Unauthorized wireless PC try to connected[\s]+([A-Fa-f\d\-]+); \
+ class.name=Unauthorized wireless PC connection attempt; \
+ class.origin=vendor-specific; \
+ impact.completion=failed; \
+ impact.severity=medium; \
+ impact.description=Unauthorized wireless PC connection attempt from $2 to $1; \
+ source.node.address; \
+ source.node.address.category=mac; \
+ source.node.address.address=$2; \
+ target.node.address; \
+ target.node.address.category=ipv4-addr; \
+ target.node.address.address=$1; \
+ last
+

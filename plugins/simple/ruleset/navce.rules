@@ -1,0 +1,54 @@
+#####
+#
+# Copyright (C) 2003 Gene R Gomez <gene at gomezbrothers dot com>
+# Tyco Fire and Security GTS (www.tycofireandsecurity.com)
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+#####
+#
+# The rules included here were developed using Norton Antivirus Corportate
+# Edition 7.60 events collected using NTSysLog.  Please report any 
+# inconsistencies on other versions to Gene Gomez at the address provided
+# above
+#
+#####
+
+#Nov  3 17:10:28 mrfreeze.itg.sac.tfs norton antivirus[error] 5  Virus Found!Virus name: W32.Yaha.F@mm.enc in File: C:\Program Files\Exchsrvr\Mailroot\vsi 1\Queue\NTFS_6e44a57a01c3a270000282de.EML by: Realtime Protection scan.  Action: Clean failed : Quarantine failed : Access denied
+regex=norton antivirus\[\w+\] 5  Virus Found!Virus name: (.+) in File; \
+ class.name=Virus found: $1; \
+ class.origin=vendor-specific; \
+ impact.severity=high; \
+ impact.type=file; \
+ impact.description=A virus has been identified by Norton Antivirus; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ last
+
+#Nov  6 00:23:51 superman.itg.sac.tfs norton antivirus[info] 16  Download of virus definition file from LiveUpdate server succeeded.
+regex=norton antivirus\[\w+\] \d+  Download of virus definition file from LiveUpdate server succeeded; \
+ class.name=Virus definitions updated; \
+ class.origin=vendor-specific; \
+ impact.severity=low; \
+ impact.type=other; \
+ impact.description=Norton Antivirus Virus definitions have been updated; \
+ source.node.address; \
+ source.node.address.category=ipv4-addr; \
+ last
