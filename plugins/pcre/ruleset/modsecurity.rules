@@ -33,10 +33,9 @@
 
 #May 10 08:35:36 somehost httpd[24775]: [error] [client 12.34.56.78] mod_security: Warning. Pattern match "/test\.php" at THE_REQUEST.
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\.; \
- classification(0).name=HTTP $3 "$2"; \
+ classification.text=HTTP $3 "$2"; \
  id=3100; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3.  No reactive action taken.; \
@@ -47,10 +46,9 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\
 
 #May 10 08:36:43 somehost httpd[24776]: [error] [client 12.34.56.78] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+)\.; \
- classification(0).name=HTTP $4 "$3" Blocked; \
+ classification.text=HTTP $4 "$3" Blocked; \
  id=3101; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
@@ -61,10 +59,9 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern
 
 #No log sample; please submit
 regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. Pattern match "(\S+)" at (\S+)\.; \
- classification(0).name=HTTP $4 "$3" Redirected; \
+ classification.text=HTTP $4 "$3" Redirected; \
  id=3102; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \
@@ -75,10 +72,9 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. 
 
 #May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
 regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
- classification(0).name=HTTP Invalid $2; \
+ classification.text=HTTP Invalid $2; \
  id=3103; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found "Invalid $2"; \
@@ -98,10 +94,9 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
 
 #Jun 16 08:42:23 metatron httpd[10837]: [error] [client 127.0.0.1] mod_security: Warning. Pattern match "/cgforum\\.cgi" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/cgforum.cgi"] [unique_id Kxq9XgoBSmsAACpVN4MAAAAE]
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\]; \
- classification(0).name=HTTP $3 "$2"; \
+ classification.text=HTTP $3 "$2"; \
  id=3104; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3.  No reactive action taken.; \
@@ -113,10 +108,9 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) 
 
 #Jun 16 08:42:23 metatron httpd[10833]: [error] [client 127.0.0.1] mod_security: Access denied with code 403. Pattern match "/bb-replog\\.sh" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/bb-replog.sh"] [unique_id KxpIRgoBSmsAACpRNmAAAAAD]
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\]; \
- classification(0).name=HTTP $4 "$3" Blocked; \
+ classification.text=HTTP $4 "$3" Blocked; \
  id=3105; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
@@ -128,10 +122,9 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern
 
 #No log sample; please submit
 regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to \[(\S+)\]\. Pattern match "(\S+)" at (\S+) \[hostname "(\S+)"\]; \
- classification(0).name=HTTP $4 "$3" Redirected; \
+ classification.text=HTTP $4 "$3" Redirected; \
  id=3106; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \

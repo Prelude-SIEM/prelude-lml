@@ -32,10 +32,9 @@
 
 #Jun 8 18:12:44 12.34.56.78 server administrator[warning] 1306  Redundancy lost Redundancy unit: System Power Unit Chassis location: Main System Chassis Previous redundancy state was: FULL Number of devices required for full redundancy: 2
 regex=1306  Redundancy lost Redundancy unit: (.+) Chassis location:; \
- classification(0).name=Power supply redundancy failure; \
+ classification.text=Power supply redundancy failure; \
  id=3800; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -44,10 +43,9 @@ regex=1306  Redundancy lost Redundancy unit: (.+) Chassis location:; \
 
 #Jun 24 08:56:25 neo server administrator[info] 1352  Power supply returned to normal Sensor location: Power supply 2 Chassis location: Main System Chassis Previous state was: Critical (Failed)
 regex=1352  Power supply returned to normal Sensor location: (.+) Chassis location:; \
- classification(0).name=Power supply normal; \
+ classification.text=Power supply normal; \
  id=3801; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -56,10 +54,9 @@ regex=1352  Power supply returned to normal Sensor location: (.+) Chassis locati
 
 #Jun 8 18:12:44 12.34.56.78 server administrator[warning] 1353  Power supply detected a warning Sensor location: Power supply 1 Chassis location: Main System Chassis Previous state was: OK (Normal) Power supply fan has failed
 regex=1353  Power supply detected a warning Sensor location: (.+) Chassis location: .+ Previous state was: (\w+ \(\w+\)|Unknown) (.+); \
- classification(0).name=Power supply warning; \
+ classification.text=Power supply warning; \
  id=3802; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -68,10 +65,9 @@ regex=1353  Power supply detected a warning Sensor location: (.+) Chassis locati
 
 #Jun 24 08:46:30 neo server administrator[error] 1354  Power supply detected a failure Sensor location: Power supply 2 Chassis location: Main System Chassis Previous state was: OK (Normal) Power supply input AC is off Power supply POK signal is not normal Power supply is turned off
 regex=1354  Power supply detected a failure Sensor location: (.+) Chassis location: .+ Previous state was: (\w+ \(\w+\)|Unknown) (.+); \
- classification(0).name=Power supply failure; \
+ classification.text=Power supply failure; \
  id=3803; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \

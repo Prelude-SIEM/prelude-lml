@@ -5,10 +5,9 @@
 #Feb  3 16:02:18 lhotse /kernel: ipfw: 65000 Deny UDP 200.65.7.49:1033 12.34.56.78:137 in via tun0
 #Feb  3 16:02:58 lhotse /kernel: ipfw: 2700 Deny TCP 213.76.70.104:1103 12.34.56.78:135 in via tun0
 regex=(\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
- classification(0).name=$2 packet dropped; \
+ classification.text=$2 packet dropped; \
  id=800; \
  revision=1; \
- classification(0).origin=vendor-specific; \ 
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -26,10 +25,9 @@ regex=(\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
 
 # No log sample; please submit
 regex=(\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
- classification(0).name=Packet dropped by firewall; \
+ classification.text=Packet dropped by firewall; \
  id=801; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -47,10 +45,9 @@ regex=(\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
 
 # No log sample; please submit
 regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
- classification(0).name=Packet dropped by firewall; \
+ classification.text=Packet dropped by firewall; \
  id=802; \
  revision=1; \
- classification(0).origin=vendor-specific ; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -66,10 +63,9 @@ regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
 
 #Feb 3 16:33:00 lhotse /kernel: ipfw: 65000 Deny ICMP:0.0 12.34.56.78 206.99.235.10 out via tun0 
 regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
- classification(0).name=Packet dropped by firewall; \
+ classification.text=Packet dropped by firewall; \
  id=803; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -86,10 +82,9 @@ regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
 # 2. Accept rules
 # No log sample; please submit
 regex=(\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
- classification(0).name=Packet accepted by firewall; \
+ classification.text=Packet accepted by firewall; \
  id=804; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -107,10 +102,9 @@ regex=(\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
 
 # No log sample; please submit
 regex=(\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
- classification(0).name=Packet accepted by firewall; \
+ classification.text=Packet accepted by firewall; \
  id=805; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -128,10 +122,9 @@ regex=(\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
 
 # no log sample; please submit
 regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
- classification(0).name=Packet accepted by firewall; \
+ classification.text=Packet accepted by firewall; \
  id=806; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -147,10 +140,9 @@ regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
 
 # No log sample; please submit
 regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
- classification(0).name=Packet accepted by firewall; \
+ classification.text=Packet accepted by firewall; \
  id=807; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \

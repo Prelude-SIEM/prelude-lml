@@ -33,10 +33,9 @@
 #May  7 22:52:45 icecube portsentry[795]: attackalert: UDP scan from host: dynamic1.lshtm.ac.uk/194.80.231.1 to UDP port: 68
 
 regex=attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
- classification(0).name=$1 Scan; \
+ classification.text=$1 Scan; \
  id=1500; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -56,10 +55,9 @@ regex=attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|U
 #Mar 28 00:03:25 hoste portsentry[103]: attackalert: Connect from host: 217.33.28.29/217.33.28.29 to TCP port: 111
 
 regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
- classification(0).name=$3/$4 connection logged; \
+ classification.text=$3/$4 connection logged; \
  id=1501; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
@@ -76,10 +74,9 @@ regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP)
 #Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
 
 regex=attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
- classification(0).name=Connection blocked \
+ classification.text=Connection blocked \
  id=1502; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \

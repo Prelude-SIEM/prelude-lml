@@ -32,10 +32,9 @@
 
 #Oct 27 23:22:53 shadowcat nagios: SERVICE ALERT: adtcadb;SQL Server;CRITICAL;HARD;3;Socket timeout after 10 seconds
 regex=SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$; \
- classification(0).name=Service $3; \
+ classification.text=Service $3; \
  id=1100; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.type=dos; \
  assessment.impact.description=Service $2 on $1 reported status $3 with $4; \
@@ -45,10 +44,9 @@ regex=SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$; \
 
 #Oct 28 11:42:33 shadowcat nagios: HOST ALERT: rcts2;UP;HARD;2;PING OK - Packet loss = 0%, RTA = 0.26 ms
 regex=HOST ALERT: (\w+).(DOWN|UP).HARD.\d.(.+)$; \
- classification(0).name=Host $2; \
+ classification.text=Host $2; \
  id=1101; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.type=dos; \
  assessment.impact.description=Host $1 reported status $2 with $3; \

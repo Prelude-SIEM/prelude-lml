@@ -32,10 +32,9 @@
 
 #May 10 15:19:28 mail clamd[14292]: /usr/share/doc/clamav-0.70/test/test2.badext: ClamAV-Test-Signature FOUND
 regex=\S+: (\S+) FOUND; \
- classification(0).name=Virus found: $1; \
+ classification.text=Virus found: $1; \
  id=3200; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -44,10 +43,9 @@ regex=\S+: (\S+) FOUND; \
 
 #May 10 15:18:56 mail clamd[14292]: Database correctly reloaded (21517 viruses)
 regex=Database correctly reloaded \(\d+ viruses\); \
- classification(0).name=Virus definitions updated; \
+ classification.text=Virus definitions updated; \
  id=3201; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \

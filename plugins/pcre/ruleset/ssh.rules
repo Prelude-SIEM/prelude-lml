@@ -26,10 +26,9 @@
 
 #Dec  8 14:45:17 itguxweb1 sshd[32112]: Accepted publickey for root from 12.34.56.78 port 56634 ssh2
 regex=Accepted (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
- classification(0).name=Admin login successful; \
+ classification.text=Admin login successful; \
  id=1900; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
@@ -40,16 +39,15 @@ regex=Accepted (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=root; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=root; \
  last;
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
 regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
- classification(0).name=User login successful; \
+ classification.text=User login successful; \
  id=1901; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
@@ -60,8 +58,8 @@ regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$2; \
  last
 
 ################
@@ -70,10 +68,9 @@ regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
 
 #Dec  9 16:00:35 itguxweb2 sshd[24541]: Failed password for root from 12.34.56.78 port 1806
 regex=Failed (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
- classification(0).name=SSH Remote root login failed; \
+ classification.text=SSH Remote root login failed; \
  id=1902; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
@@ -84,16 +81,15 @@ regex=Failed (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=root; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=root; \
  last
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
 regex=Failed (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
- classification(0).name=SSH Remote user login failed; \
+ classification.text=SSH Remote user login failed; \
  id=1903; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
@@ -104,8 +100,8 @@ regex=Failed (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$2; \
  last
 
 ##############################################
@@ -114,10 +110,9 @@ regex=Failed (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
 
 #Dec  9 18:48:29 itguxweb2 sshd[29536]: Failed password for illegal user ROOT from 12.34.56.78 port 2886
 regex=Illegal user (\S+) from (\S+); \
- classification(0).name=SSH Remote login failed with an invalid user; \
+ classification.text=SSH Remote login failed with an invalid user; \
  id=1904; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
@@ -127,8 +122,8 @@ regex=Illegal user (\S+) from (\S+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$1; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$1; \
  last
 
 ##################################################################################
@@ -137,10 +132,9 @@ regex=Illegal user (\S+) from (\S+); \
 
 # No log sample; please submit
 regex=User (\S+) not allowed because .*listed in (\w+); \
- classification(0).name=SSH Remote login failed with a denied user; \
+ classification.text=SSH Remote login failed with a denied user; \
  id=1905; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
@@ -148,8 +142,8 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$1; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$1; \
  last
 
 ##################################################################
@@ -159,10 +153,9 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
 
 # No log sample; please submit
 regex=Did not receive identification string from (.+); \
- classification(0).name=SSH Server recognition; \
+ classification.text=SSH Server recognition; \
  id=1906; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
@@ -181,10 +174,9 @@ regex=Did not receive identification string from (.+); \
 
 # No log sample; please submit
 regex=ROOT LOGIN REFUSED FROM (\w+); \
- classification(0).name=SSH Remote root login forbidden; \
+ classification.text=SSH Remote root login forbidden; \
  id=1907; \
  revision=2; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
@@ -194,6 +186,6 @@ regex=ROOT LOGIN REFUSED FROM (\w+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target.user; \
- target(0).user.userid(0).name=root; \
+ target(0).user.user_id(0).type=target.user; \
+ target(0).user.user_id(0).name=root; \
  last

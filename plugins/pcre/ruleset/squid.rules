@@ -33,10 +33,9 @@
 # starting 
 # No log sample; please submit
 regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
- classification(0).name=Squid started; \
+ classification.text=Squid started; \
  id=1801; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -46,10 +45,9 @@ regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
 # accepting connections or disabled servicesa
 # No log sample; please submit
 regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts HTTP; \
+ classification.text=Squid accepts HTTP; \
  id=1802; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -62,10 +60,9 @@ regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts ICP; \
+ classification.text=Squid accepts ICP; \
  id=1803; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -78,10 +75,9 @@ regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts HTCP; \
+ classification.text=Squid accepts HTCP; \
  id=1804; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -92,10 +88,9 @@ regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
- classification(0).name=Squid accepts WCCP; \
+ classification.text=Squid accepts WCCP; \
  id=1805; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -106,10 +101,9 @@ regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=HTCP Disabled\.; \
- classification(0).name=Squid started without HTCP; \
+ classification.text=Squid started without HTCP; \
  id=1806; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid was invoked without the HTCP service; \
@@ -117,10 +111,9 @@ regex=HTCP Disabled\.; \
 
 # No log sample; please submit
 regex=WCCP Disabled\.; \
- classification(0).name=Squid started without WCCP; \
+ classification.text=Squid started without WCCP; \
  id=1807; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid was invoked without the WCCP service; \
@@ -128,10 +121,9 @@ regex=WCCP Disabled\.; \
 
 # No log sample; please submit
 regex=Squid Parent: child process (\d+) exited; \
- classification(0).name=Squid stopped; \
+ classification.text=Squid stopped; \
  id=1808; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid (pid $2) exited; \
@@ -146,10 +138,9 @@ regex=Squid Parent: child process (\d+) exited; \
 
 # No log sample; please submit
 regex=(\d+\.\d+\.\d+\.\d+) .*DENIED/(\d+) (.*); \
- classification(0).name=Squid acl violation attempt; \
+ classification.text=Squid acl violation attempt; \
  id=1809; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.description=Host $1 tried to violate Squid ACL; \

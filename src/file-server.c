@@ -235,7 +235,7 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
 {
         idmef_impact_t *impact;
         idmef_classification_t *classification;
-        prelude_string_t *classification_name;
+        prelude_string_t *classification_text;
         prelude_string_t *impact_description;
         
         impact = idmef_impact_new();
@@ -248,11 +248,9 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
                 return;
         }
         
-        idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
-        
-        classification_name = idmef_classification_new_name(classification);
-        prelude_string_set_constant(classification_name, LOGFILE_MODIFICATION_CLASS);
-        
+        classification_text = idmef_classification_new_text(classification);
+        prelude_string_set_constant(classification_text, LOGFILE_MODIFICATION_CLASS);
+                
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
         idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
@@ -737,8 +735,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                 return -1;
         }
         
-        idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
-        classification_name = idmef_classification_new_name(classification);
+        classification_name = idmef_classification_new_text(classification);
         prelude_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
         
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);

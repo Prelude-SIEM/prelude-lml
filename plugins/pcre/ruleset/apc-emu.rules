@@ -32,10 +32,9 @@
 
 #Mar 28 04:22:18 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation, '40%RH'. 0x101C
 regex=EMU: Probe \d+ (\'.+\') high  humidity violation, \'(\d+%); \
- classification(0).name=High Environmental Humidity; \
+ classification.text=High Environmental Humidity; \
  id=2800; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -44,10 +43,9 @@ regex=EMU: Probe \d+ (\'.+\') high  humidity violation, \'(\d+%); \
 
 #Mar 28 04:06:27 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation cleared, '39%RH'. 0x101D
 regex=EMU: Probe \d+ (\'.+\') high  humidity violation cleared, \'(\d+%); \
- classification(0).name=Environmental Humidity Normal; \
+ classification.text=Environmental Humidity Normal; \
  id=2801; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -56,10 +54,9 @@ regex=EMU: Probe \d+ (\'.+\') high  humidity violation cleared, \'(\d+%); \
 
 #Mar 22 16:27:50 enviro1 12.34.56.78 EMU: Input Contact 4 'Rack 4 Front Door' opened, abnormal condition. 0x1013
 regex=EMU: Input Contact \d+ (\'.+\') opened, abnormal condition; \
- classification(0).name=Device Contact Opened; \
+ classification.text=Device Contact Opened; \
  id=2802; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -68,10 +65,9 @@ regex=EMU: Input Contact \d+ (\'.+\') opened, abnormal condition; \
 
 #Mar 22 16:28:51 enviro1 10.100.17.252 EMU: Input Contact 4 'Rack 4 Front Door' closed, abnormal condition cleared. 0x1014
 regex=EMU: Input Contact \d+ (\'.+\') closed, abnormal condition cleared; \
- classification(0).name=Device Contact Closed; \
+ classification.text=Device Contact Closed; \
  id=2803; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \

@@ -32,36 +32,34 @@
 
 #Feb 11 06:52:09 12.34.56.78 sudo:   cpatel : TTY=pts/0 ; PWD=/etc/rc.d/init.d ; USER=root ; COMMAND=./resin start
 regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
- classification(0).name=SUDO Command Executed; \
+ classification.text=SUDO Command Executed; \
  id=2700; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.severity=low; \
  assessment.impact.description=User $1 successfully executed the command '$3' as $2.; \
  source(0).user.category=os-device; \
- source(0).user.userid(0).type=original-user; \
- source(0).user.userid(0).name=$1;  \
+ source(0).user.user_id(0).type=original-user; \
+ source(0).user.user_id(0).name=$1;  \
  target(0).user.category = os-device; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).name=$2; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).name=$2; \
  last
 
 #Jan 15 09:53:11 12.34.56.78 sudo:   ekwong : user NOT in sudoers ; TTY=pts/2 ; PWD=/ ; USER=root ; COMMAND=/bin/ls
 regex=(\S+) : user NOT in sudoers . TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
- classification(0).name=SUDO from Unauthorized User; \
+ classification.text=SUDO from Unauthorized User; \
  id=2701; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Unauthorized user $1 tried to execute the command '$3' as $2.;\
  source(0).user.category=os-device; \
- source(0).user.userid(0).type=original-user; \
- source(0).user.userid(0).name=$1;  \
+ source(0).user.user_id(0).type=original-user; \
+ source(0).user.user_id(0).name=$1;  \
  target(0).user.category = os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$2; \
  last

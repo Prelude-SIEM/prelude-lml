@@ -25,7 +25,7 @@
 
 # Dec 30 20:09:03 hacklab honeyd[5711]: Killing attempted connection: tcp (127.0.0.1:46190 - 192.168.1.20:646)
 regex=Killing attempted connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
- classification(0).name=Killing attempted connection; \
+ classification.text=Killing attempted connection; \
  id=2600; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -40,12 +40,11 @@ regex=Killing attempted connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Someone tried to connect to a port on the honeypot; \
- classification(0).origin=vendor-specific; \
  last
 
 # Dec 30 20:09:05 hacklab honeyd[5711]: Connection to closed port: udp (127.0.0.1:37806 - 192.168.1.20:1)
 regex=Connection to closed port: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
- classification(0).name=Connection to closed port; \
+ classification.text=Connection to closed port; \
  id=2601; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -60,12 +59,11 @@ regex=Connection to closed port: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\)
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Someone tried to connect to a closed port on the honeypot; \
- classification(0).origin=vendor-specific; \
  last
 
 # Dec 30 20:09:08 hacklab honeyd[5711]: Killing unknown connection: tcp (127.0.0.1:37814 - 192.168.1.20:80)
 regex=Killing unknown connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\); \
- classification(0).name=Connection to closed port; \
+ classification.text=Connection to closed port; \
  id=2602; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -80,12 +78,11 @@ regex=Killing unknown connection: (tcp|udp) \(([\d\.]+):(\d+) - ([\d\.]+):(\d+)\
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Someone tried to connect to a port on the honeypot; \
- classification(0).origin=vendor-specific; \
  last
 
 # Dec 30 20:09:01 hacklab honeyd[5711]: Sending ICMP Echo Reply: 192.168.1.20 -> 127.0.0.1
 regex=Sending ICMP Echo Reply: ([\d\.]+) -> ([\d\.]+); \
- classification(0).name=Sending ICMP Echo Reply; \
+ classification.text=Sending ICMP Echo Reply; \
  id=2603; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -98,7 +95,6 @@ regex=Sending ICMP Echo Reply: ([\d\.]+) -> ([\d\.]+); \
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Honeypot replied to a ICMP echo request; \
- classification(0).origin=vendor-specific; \
  last
 
 # Entries created from scanning syslog() calls in the honeyd (0.7a) source(0).
@@ -106,7 +102,7 @@ regex=Sending ICMP Echo Reply: ([\d\.]+) -> ([\d\.]+); \
 # Connection established: %s -> proxy to %s:%s
 # Connection established: <attacker ip> -> proxy to <target(0).ip>:<target(0).port>
 regex=Connection established: ([\d\.]+) -> proxy to ([\d\.]+):(\d+); \
- classification(0).name=Proxy connection establised; \
+ classification.text=Proxy connection establised; \
  id=2604; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -118,14 +114,13 @@ regex=Connection established: ([\d\.]+) -> proxy to ([\d\.]+):(\d+); \
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Honeypot established a proxy connection; \
- classification(0).origin=vendor-specific; \
  last
 
 
 # Connection established: %s -> subsystem \"%s\"
 # Connection established: <attacker ip> -> subsystem "<script name>"
 regex=Connection established: ([\d\.]+) -> subsystem "(.*)"; \
- classification(0).name=Subsystem connection establised; \
+ classification.text=Subsystem connection establised; \
  id=2605; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -135,13 +130,12 @@ regex=Connection established: ([\d\.]+) -> subsystem "(.*)"; \
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Attacker accessed virtual service on honeypot; \
- classification(0).origin=vendor-specific; \
  last
 
 # Connection established: subsystem \"%s\" -> %s
 # Connection established: subsystem "<script name>" -> <attacker ip>
 regex=Connection established: subsystem \"(.*)\" -> ([\d\.]+); \
- classification(0).name=Subsystem connection establised; \
+ classification.text=Subsystem connection establised; \
  id=2606; \
  revision=1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -152,58 +146,53 @@ regex=Connection established: subsystem \"(.*)\" -> ([\d\.]+); \
  assessment.impact.type=recon; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Honeypot virtual service responded to attacker; \
- classification(0).origin=vendor-specific; \
  last
 
 # switching to polling mode
 regex=switching to polling mode; \
- classification(0).name=Subsystem connection establised; \
+ classification.text=Subsystem connection establised; \
  id=2607; \
  revision=1; \
  assessment.impact.completion=success; \
  assessment.impact.type=recon; \
  assessment.impact.severity=low; \
  assessment.impact.description=Honeypot switched to polling mode; \
- classification(0).origin=vendor-specific; \
  last
 
 # Subsystem \"%s\" died
 # Subsystem "<script name>" died
 regex=Subsystem \"(.*)\" died; \
- classification(0).name=Honeypot virtual service died; \
+ classification.text=Honeypot virtual service died; \
  id=2608; \
  revision=1; \
  assessment.impact.completion=success; \
  assessment.impact.type=recon; \
  assessment.impact.severity=high; \
  assessment.impact.description=Honeypot virtual service died; \
- classification(0).origin=vendor-specific; \
  last
 
 # Subsystem %s on %s attempts illegal bind %s:%d
 # Subsystem <script name> on <honeyd template> attempts illegal bind <address(0).:<port>
 regex=Subsystem (.*) on (.*) attempts illegal bind ([\d\.]+):(\d+); \
- classification(0).name=Honeypot virtual service attempts illegal bind; \
+ classification.text=Honeypot virtual service attempts illegal bind; \
  id=2609; \
  revision=1; \
  assessment.impact.completion=success; \
  assessment.impact.type=recon; \
  assessment.impact.severity=high; \
  assessment.impact.description=Honeypot virtual service attempted an illigal bind; \
- classification(0).origin=vendor-specific; \
  last
 
 # Dec 30 20:08:24 hacklab honeyd[5711]: listening on eth0: ip  and not ether src 00:10:5a:7a:6c:47
 # Dec 30 20:12:21 hacklab honeyd[5752]: listening on eth0: ip and (dst 192.168.1.20) and not ether src 00:10:5a:7a:6c:47
 # Dec 30 20:15:53 hacklab honeyd[5779]: listening on lo: ip and (dst 192.168.1.20)
 regex=listening on (\S+):; \
- classification(0).name=Honeypot starting up; \
+ classification.text=Honeypot starting up; \
  id=2610; \
  revision=1; \
  assessment.impact.completion=success; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Honeypot started; \
- classification(0).origin=vendor-specific; \
  source(0).interface=$1; \
  last

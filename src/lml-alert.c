@@ -138,8 +138,8 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         int ret;
         idmef_user_t *user;
         idmef_node_t *node;
-        idmef_userid_t *userid;
         idmef_target_t *target;
+        idmef_user_id_t *userid;
         idmef_process_t *process;
 	prelude_string_t *process_name;
 
@@ -155,11 +155,11 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                 if ( ! user )
                         return -1;
 
-                userid = idmef_user_new_userid(user);
+                userid = idmef_user_new_user_id(user);
                 if ( ! userid )
                         return -1;
                 
-                prelude_string_set_ref(idmef_userid_new_name(userid), log->target_user);
+                prelude_string_set_ref(idmef_user_id_new_name(userid), log->target_user);
         }
         
         if ( log->target_program && ! idmef_target_get_process(target) ) {
@@ -231,7 +231,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
         
 	alert = idmef_message_get_alert(message);
 
-	create_time = idmef_time_new_gettimeofday();
+	create_time = idmef_time_new_from_gettimeofday();
 	if ( ! create_time )
 		goto error;
 
@@ -241,7 +241,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 	if ( ! detect_time )
 		goto error;
 
-	idmef_time_set_sec(detect_time, log->tv.tv_sec);
+	idmef_time_set_from_time(detect_time, (const time_t *) &log->tv.tv_sec);
 	idmef_time_set_usec(detect_time, log->tv.tv_usec);
 
         if ( log->target_hostname || log->target_program ) {

@@ -37,10 +37,9 @@
 # 1. PAM alerts: often an authentification issue; high severity to comply with simple.rules
 # No log sample; please submit
 regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
- classification(0).name=Firewall: PAM alert; \
+ classification.text=Firewall: PAM alert; \
  id=900; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.type=user; \
  assessment.impact.description=PAM: $3; \
@@ -51,10 +50,9 @@ regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
 # 2. Misc ALERT logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_ALERT\]; \
- classification(0).name=Firewall: Misc. ALERT logs; \
+ classification.text=Firewall: Misc. ALERT logs; \
  id=901; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=ALERT log from $1; \
@@ -70,52 +68,48 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
 # 1. Rebooting or halting the system: severity should depend on the machine ?
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
- classification(0).name=Firewall: Reboot; \
+ classification.text=Firewall: Reboot; \
  id=902; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$1 was rebooted; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$2; \
  last
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
- classification(0).name=Firewall: Reboot attempt; \
+ classification.text=Firewall: Reboot attempt; \
  id=903; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 attempted to reboot $1; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$2; \
  last
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
- classification(0).name=Firewall: Stopping system; \
+ classification.text=Firewall: Stopping system; \
  id=904; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 halted $1; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$2; \
  last
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
- classification(0).name=Firewall: Reboot announce; \
+ classification.text=Firewall: Reboot announce; \
  id=905; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
@@ -126,10 +120,9 @@ regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
 # 2. Installation failure
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
- classification(0).name=Firewall: Install/upgrade failure; \
+ classification.text=Firewall: Install/upgrade failure; \
  id=906; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -140,10 +133,9 @@ regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
 # 3. Misc CRIT logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_CRIT\]; \
- classification(0).name=Firewall: Misc. CRIT logs; \
+ classification.text=Firewall: Misc. CRIT logs; \
  id=907; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=CRIT log from $1; \
@@ -159,10 +151,9 @@ regex=regex= (\w+) \[LOG_CRIT\]; \
 # 1. SMTP: mail rejection
 # No log sample; please submit
 regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
- classification(0).name=Firewall: Unauthorized SMTP use; \
+ classification.text=Firewall: Unauthorized SMTP use; \
  id=908; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
@@ -176,10 +167,9 @@ regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
 # 2. SMTP: can't open port 25
 # No log sample; please submit
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\) on ([\d\.]+); \
- classification(0).name=Firewall: SMTP port failure; \
+ classification.text=Firewall: SMTP port failure; \
  id=909; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.type=dos; \
  assessment.impact.severity=low; \
  assessment.impact.description=SMTP port #$3 could not be opened on $1; \
@@ -192,10 +182,9 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\)
 # 3. SMTP: can't connect service SMTP
 # no log sample; please submit
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" port (\d+); \
- classification(0).name=Firewall: SMTP unreachable; \
+ classification.text=Firewall: SMTP unreachable; \
  id=910; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.type=dos; \
  assessment.impact.severity=low; \
  assessment.impact.description=$1 could not connect to the SMTP server $3:$4; \
@@ -208,10 +197,9 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" p
 # 4. Misc ERR logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_ERR\]; \
- classification(0).name=Firewall: Misc. ERR logs; \
+ classification.text=Firewall: Misc. ERR logs; \
  id=911; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=ERR log from $1; \

@@ -28,10 +28,9 @@
 
 #Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
 regex=entered promiscuous mode; \
- classification(0).name=Promiscuous mode detected; \
+ classification.text=Promiscuous mode detected; \
  id=400; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = other; \
  assessment.impact.severity = medium; \
@@ -43,8 +42,7 @@ regex=entered promiscuous mode; \
 
 # No sample log; please submit
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
- classification(0).name=Mail server request rejected; \
- classification(0).origin=vendor-specific; \
+ classification.text=Mail server request rejected; \
  id=401; \
  revision=1; \
  assessment.impact.severity = low; \
@@ -60,26 +58,24 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
 
 #Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
 regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMINAL: (\S+); \
- classification(0).name=Database audit; \
+ classification.text=Database audit; \
  id=402; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.description=The command $1 was executed; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=original-user; \
- source(0).user.userid(0).name=$2; \
+ source(0).user.user_id(0).type=original-user; \
+ source(0).user.user_id(0).name=$2; \
  source(0).node.name=$3; \
  last
 
 #Apr 28 08:56:46 somehost xinetd[17300]: START: tftp pid=10590 from=12.34.56.78
 regex=START: tftp pid=(\d+) from=([\d\.]+); \
- classification(0).name=TFTP Session; \
+ classification.text=TFTP Session; \
  id=403; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
@@ -94,10 +90,9 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
 
 #Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
 regex='\S+' contains a virus \(Infection: (\S+)\); \
- classification(0).name=Virus found: $1; \
+ classification.text=Virus found: $1; \
  id=404; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -107,10 +102,9 @@ regex='\S+' contains a virus \(Infection: (\S+)\); \
 #Jun 22 12:58:25 mail syslog: syslogd shutdown succeeded
 #Jun 22 12:58:55 mail syslog: syslogd startup succeeded
 regex=syslogd (startup|shutdown) succeeded; \
- classification(0).name=Syslog $1; \
+ classification.text=Syslog $1; \
  id=405; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=dos; \
  assessment.impact.completion=succeeded; \

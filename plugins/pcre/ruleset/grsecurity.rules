@@ -26,10 +26,9 @@
 
 # No log sample; please submit
 regex=denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted ptrace; \
+ classification.text=Attempted ptrace; \
  id=600; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
@@ -38,459 +37,435 @@ regex=denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\
  target(0).process.name=$1; \
  target(0).process.pid=$2;\
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3;\
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4;\
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3;\
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4;\
  assessment.impact.description=An attempt was made to ptrace a read-only binary.  The attempt was denied by the ACL system.; \
  last
 
 # No log sample; please submit
 regex=attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted kernel read/write; \
+ classification.text=Attempted kernel read/write; \
  id=601; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was made to open /dev/kmem.  Grsecurity denied this attempt.  If the process was any other then klogd, you should consider this a kernel compromise attempt.; \
  last
 
 # No log sample; please submit
 regex=not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Potential tmp race; \
+ classification.text=Potential tmp race; \
  id=602; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$6; \
  source(0).process.pid=$7; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$8; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$9; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$8; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$9; \
  assessment.impact.description=An attempt was made to follow a link in a world-writable +t directory owned by a non-root user pointing to a file not owned by that user.  It is possible that this was the result of an intentional tmp race exploit.; \
  last
 
 # No log sample; please submit
 regex=attempt to open ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted open; \
+ classification.text=Attempted open; \
  id=603; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to open ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted open; \
+ classification.text=Attempted open; \
  id=604; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading and writing.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to open ([^ ]+) for reading appending by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted open; \
+ classification.text=Attempted open; \
  id=605; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading and appending.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to open ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted open; \
+ classification.text=Attempted open; \
  id=606; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for writing.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to open ([^ ]+) for appending by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted open; \
+ classification.text=Attempted open; \
  id=607; \
  revision=1; \
- classification(0).origin=vendor-specific; \ 
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high;\
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for appending.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to access hidden file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted access of hidden file; \
+ classification.text=Attempted access of hidden file; \
  id=608; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to access the hidden file with device number $1 and inode $2.  This access was denied by the ACL system.  This could have resulted from an incomplete ACL, or an attack may be in progress on your system.; \
  last
 
 # No log sample; please submit
 regex=denied writing FIFO \(([^)]+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Potential FIFO race; \
+ classification.text=Potential FIFO race; \
  id=609; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt was made to write to a FIFO in a world-writable +t directory that was created by a non-root user.  This attempt was denied.  It is possible that this was the result of an intentional FIFO race on your system.; \
  last
 
 # No log sample; please submit
 regex=refused attempt to mknod\([a-z]:(\d+:\d+)\) \(([^)]+)\) from chroot jail \[(\d+:\d+):(\d+)\] owned by (\d+) (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted mknod in chroot; \
+ classification.text=Attempted mknod in chroot; \
  id=610; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$7; \
  source(0).process.pid=$8; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$9; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$10; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$9; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$10; \
  assessment.impact.description=An attempt was made to mknod the device $2 in a chroot jail.; \
  last
 
 # No log sample; please submit
 regex=attempt to mknod ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted mknod; \
+ classification.text=Attempted mknod; \
  id=611; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to create the device $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to mkdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted mkdir; \
+ classification.text=Attempted mkdir; \
  id=612; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to create the directory $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to rmdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted rmdir; \
+ classification.text=Attempted rmdir; \
  id=613; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to remove the directory $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to unlink ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted delete; \
+ classification.text=Attempted delete; \
  id=614; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4;\
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4;\
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to remove the file $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to symlink ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted symlink; \
+ classification.text=Attempted symlink; \
  id=615; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to symlink $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample, please submit
 regex=denied hardlink of ([^ ]+) \(owned by (\d+).(\d+)\) to ([^ ]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted hardlink; \
+ classification.text=Attempted hardlink; \
  id=616; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$5; \
  source(0).process.pid=$6; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$7; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$8; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$7; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$8; \
  assessment.impact.description=An attempt was made to hardlink $1 to $4.  This could have been attempted by a malicious user wanting to exploit a /tmp race condition.; \
  last
 
 # No log sample, please submit
 regex=attempt to link ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted link; \
+ classification.text=Attempted link; \
  id=617; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to link $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to rename ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted rename; \
+ classification.text=Attempted rename; \
  id=618; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to rename $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=denied ptrace of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted ptrace; \
+ classification.text=Attempted ptrace; \
  id=619; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt was made to ptrace $3.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to overstep process limit by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted process limit overstep; \
+ classification.text=Attempted process limit overstep; \
  id=620; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was made to overstep the process limit via execve(2).; \
  last
 
 # No log sample; please submit
 regex=denying execution of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted execution; \
+ classification.text=Attempted execution; \
  id=621; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to execute $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sabmple; please submit
 regex=Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning uid (\d+) from login for (\d+) seconds; \
- classification(0).name=Possible exploit bruteforcing; \
+ classification.text=Possible exploit bruteforcing; \
  id=622; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  target(0).process.name=$1; \
  target(0).process.pid=$2; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$3; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$4; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$3; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=original-user; \
- source(0).user.userid(0).number=$9; \
+ source(0).user.user_id(0).type=original-user; \
+ source(0).user.user_id(0).number=$9; \
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The user with uid $9 has been banned from logging in for $10 seconds for causing this alert.; \
  last
  
 # No log sample; please submit
 regex=Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning execution of \[(\d+:\d+):(\d+)\] for (\d+) seconds; \
- classification(0).name=Possible exploit bruteforcing; \
+ classification.text=Possible exploit bruteforcing; \
  id=623; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  target(0).process.name=$1; \
  target(0).process.pid=$2; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$3; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$4; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$3; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$4; \
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The process being bruteforced is banned from execution for $11 seconds.; \
  last
 
 # No log sample; please submit
 regex=Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning execution of \[(\d+:\d+):(\d+)\] for (\d+) seconds; \
- classification(0).name=Possible exploit bruteforcing; \
+ classification.text=Possible exploit bruteforcing; \
  id=624; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
@@ -499,437 +474,414 @@ regex=Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d+)\) UI
  target(0).process.name=$2; \
  target(0).process.pid=$3; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$4; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$5;\
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$4; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$5;\
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The process being bruteforced is banned from execution for $11 seconds.; \
  last
 
 # No log sample; please submit
 regex=denied attempt to mount \(([^)]+)\) as ([^ ]+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted mount in chroot; \
+ classification.text=Attempted mount in chroot; \
  id=625; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$7; \
  source(0).process.pid=$8; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$9; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$10; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$9; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$10; \
  assessment.impact.description=An attempt was made to mount $1 as $2 in a chroot jail.  The attempt was denied.; \
  last
 
 # No log sample; please submit
 regex=denied attempt to pivot_root\(([^,]+),([^)]+)\) from chroot jail \[(\d+:\d+):(\d+)\] of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted pivot_root in chroot; \
+ classification.text=Attempted pivot_root in chroot; \
  id=626; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$7; \
  source(0).process.pid=$8; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$9; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$10; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$9; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$10; \
  assessment.impact.description=An attempt was made to pivot_root (move the current root to $2 and use $1 as the new root) in a chroot jail.  The attempt was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted to truncate file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted truncate; \
+ classification.text=Attempted truncate; \
  id=627; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to truncate the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempted to change access time for file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted file time modification; \
+ classification.text=Attempted file time modification; \
  id=628; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to modify the access time of the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempted to access file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted file access; \
+ classification.text=Attempted file access; \
  id=629; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to access(2) the file with device $1 and inode $2 for more privilege than the ACL system allowed.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=Attempted to chdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted chdir; \
+ classification.text=Attempted chdir; \
  id=630; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to chdir to the directory with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=Attempted fchdir outside of chroot to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted fchdir out of chroot; \
+ classification.text=Attempted fchdir out of chroot; \
  id=631; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to fchdir out of a chroot jail to the director $1.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted to fchdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted fchdir; \
+ classification.text=Attempted fchdir; \
  id=632; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to fchdir to the directory with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=fchdir\((\d+)\) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Successful fchdir; \
+ classification.text=Successful fchdir; \
  id=633; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=A successful fchdir to $2 was made.; \
  last
 
 # No log sample; please submit
 regex=denied attempt to chroot\(\) from \((\d+:\d+):(\d+)\) to \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted chroot in a chroot jail; \
+ classification.text=Attempted chroot in a chroot jail; \
  id=634; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt was made to chroot to $3 in a chroot jail.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=Attempt to fchmod file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted fchmod; \
+ classification.text=Attempted fchmod; \
  id=635; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to fchmod to the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=denied attempt to fchmod +s \((\d+:\d+):(\d+)\) owned by (\d+).(\d+) to mode (\d+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted fchmod +s in chroot; \
+ classification.text=Attempted fchmod +s in chroot; \
  id=636; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$10; \
  source(0).process.pid=$11; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$12; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$13; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$12; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$13; \
  assessment.impact.description=An attempt was made to fchmod +s the file with device $1 inode $2.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=Attempt to chmod file \[(\d+:\d+):(\d+)\] ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted chmod; \
+ classification.text=Attempted chmod; \
  id=637; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt was made to chmod the file $3 with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=denied attempt to chmod +s \((\d+:\d+):(\d+)\) \(([^)]+)\) owned by (\d+).(\d+) to mode (\d+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted chmod +s in chroot; \
+ classification.text=Attempted chmod +s in chroot; \
  id=638; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$11; \
  source(0).process.pid=$12; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$13; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$14; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$13; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$14; \
  assessment.impact.description=An attempt was made to fchmod +s the file $3 with device $1 inode $2.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=Attempt to chown file \[(\d+:\d+):(\d+)\] to (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted chown; \
+ classification.text=Attempted chown; \
  id=639; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$5; \
  source(0).process.pid=$6; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$7; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$8; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$7; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$8; \
  assessment.impact.description=An attempt was made to chown to file with device $1 and inode $2 to uid $3 gid $4.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=attempt to load writable library \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempt to load a writable library; \
+ classification.text=Attempt to load a writable library; \
  id=640; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to load a writable library with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
 # No log sample; please submit
 regex=shutdown auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system shutdown success; \
+ classification.text=ACL system shutdown success; \
  id=641; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=The ACL system was successfully disabled.; \
  last
 
 # No log sample; please submit
 regex=shutdown auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system shutdown failure; \
+ classification.text=ACL system shutdown failure; \
  id=642; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=The ACL system was unsuccessfully disabled.; \
  last
 
 # No log sample; please submit
 regex=ignoring shutdown for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system shutdown ignored; \
+ classification.text=ACL system shutdown ignored; \
  id=643; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A request to disable the ACL system was ignored.; \
  last
 
 # No log sample; please submit
 regex=segvmod auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system segvmod success; \
+ classification.text=ACL system segvmod success; \
  id=644; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A ban on a user or binary due to possible exploit bruteforcing has been successfully removed.; \
  last
 
 # No log sample; please submit
 regex=segvmod auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system segvmod failure; \
+ classification.text=ACL system segvmod failure; \
  id=645; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A ban on a user or binary due to possible exploit bruteforcing has failed to be removed.; \
  last
 
 # No log sample; please submit
 regex=ignoring segvmod for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system segvmod ignored; \
+ classification.text=ACL system segvmod ignored; \
  id=646; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was ignored to remove a ban on a user or binary due to possible exploit bruteforcing.; \
  last
 
 # No log sample; please submit
 regex=Loaded grsecurity ([0-9.]+); \
- classification(0).name=ACL system enabled; \
+ classification.text=ACL system enabled; \
  id=647; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
@@ -938,29 +890,27 @@ regex=Loaded grsecurity ([0-9.]+); \
 
 # No log sample; please submit
 regex=Unable to load grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) ACL system may already be enabled.; \
- classification(0).name=ACL system failed to load; \
+ classification.text=ACL system failed to load; \
  id=648; \
  revision=1; \
- classification(0).origin=vendor-specific; \ 
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt to enable the ACL system failed.  This is most likely due to being out of memory.; \
  last
 
 # No log sample; please submit
 regex=Ignoring reload request for disabled ACL; \
- classification(0).name=ACL reload ignored; \
+ classification.text=ACL reload ignored; \
  id=649; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
@@ -969,10 +919,9 @@ regex=Ignoring reload request for disabled ACL; \
 
 # No log sample; please submit
 regex=Reloaded grsecurity ([0-9.]+); \
- classification(0).name=ACL system reloaded; \
+ classification.text=ACL system reloaded; \
  id=650; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
@@ -981,124 +930,117 @@ regex=Reloaded grsecurity ([0-9.]+); \
 
 #No log sample; please submit
 regex=Failed reload of grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL system failed to reload; \
+ classification.text=ACL system failed to reload; \
  id=651; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt to reload the ACL system failed.  This is most likely due to incorrect authentication.; \
  last
 
 # No log sample; please submit
 regex=Ignoring change to admin mode for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL change to admin ignored; \
+ classification.text=ACL change to admin ignored; \
  id=652; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was ignored to change to administration mode.; \
  last
 
 # No log sample; please submit
 regex=successful change to admin mode by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL change to admin; \
+ classification.text=ACL change to admin; \
  id=653; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A successful attempt was made to change to administration mode.; \
  last
 
 # No log sample; please submit
 regex=admin mode exited by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL admin exited; \
+ classification.text=ACL admin exited; \
  id=654; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An ACL administrator exited administration mode.; \
  last
 
 # No log sample; please submit
 regex=admin auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL admin auth failure; \
+ classification.text=ACL admin auth failure; \
  id=655; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An ACL administrator exited administration mode.; \
  last
 
 # No log sample; please submit
 regex=Invalid mode (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=ACL invalid mode; \
+ classification.text=ACL invalid mode; \
  id=656; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was made to pass an invalid mode to the ACL system.; \
  last
 
 # No log sample; please submit
 regex=Maximum pw attempts reached \((\d+)\), locking password authentication; \
- classification(0).name=ACL maximum pw attempts reached; \
+ classification.text=ACL maximum pw attempts reached; \
  id=657; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
@@ -1107,10 +1049,9 @@ regex=Maximum pw attempts reached \((\d+)\), locking password authentication; \
 
 # No log sample; please submit
 regex=attempted priority change of process \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted priority change in chroot; \
+ classification.text=Attempted priority change in chroot; \
  id=658; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
@@ -1119,19 +1060,18 @@ regex=attempted priority change of process \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=An attempt was made to raise the priority of a process in a chroot.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=denied capset of \(([^:]+):(\d+)\) within chroot jail \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted capset in chroot; \
+ classification.text=Attempted capset in chroot; \
  id=659; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
@@ -1140,608 +1080,578 @@ regex=denied capset of \(([^:]+):(\d+)\) within chroot jail \[(\d+:\d+):(\d+)\] 
  source(0).process.name=$5; \
  source(0).process.pid=$6; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$7; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$8; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$7; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$8; \
  assessment.impact.description=An attempt was made to change the capabilities of a process in a chroot.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=failed fork with errno (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Failed fork; \
+ classification.text=Failed fork; \
  id=660; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=A fork failed with errno $1.  A user may be attempting a fork bomb on your system.; \
  last
 
 # No log sample; please submit
 regex=attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted renice in chroot; \
+ classification.text=Attempted renice in chroot; \
  id=661; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt was made in a chroot to renice a process to a higher priority.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Signal sent; \
+ classification.text=Signal sent; \
  id=662; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  target(0).process.name=$2; \
  target(0).process.pid=$3; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$4; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$5; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$4; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$5; \
  assessment.impact.description=Signal $1 was sent to a process.; \
  last
 
 # No log sample; please submit
 regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Signal sent; \
+ classification.text=Signal sent; \
  id=663; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  target(0).process.name=$2; \
  target(0).process.pid=$3; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$4; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$5; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$4; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$5; \
  source(0).process.name=$9; \
  source(0).process.pid=$10; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$11; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$12; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$11; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$12; \
  assessment.impact.description=Signal $1 was sent to a process.; \
  last
 
 # No log sample; please submit
 regex=Attempted send of signal (\d+) to protected task \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted signal to protected process; \
+ classification.text=Attempted signal to protected process; \
  id=664; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  target(0).process.name=$2; \
  target(0).process.pid=$3; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$4; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$5; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$4; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$5; \
  source(0).process.name=$9; \
  source(0).process.pid=$10; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$11; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$12; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$11; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$12; \
  assessment.impact.description=An attempt was made to send signal $1 to a protected process.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempt to modify grsecurity sysctl value : ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempt to modify grsecurity sysctl; \
+ classification.text=Attempt to modify grsecurity sysctl; \
  id=665; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to modify the grsecurity sysctl value $1 after the lock had been set.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempt to sysctl\(\) ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted sysctl read; \
+ classification.text=Attempted sysctl read; \
  id=666; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to read from the sysctl entry $1.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempt to sysctl\(\) ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted sysctl write; \
+ classification.text=Attempted sysctl write; \
  id=667; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to write to the sysctl entry $1.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted sysctl read/write; \
+ classification.text=Attempted sysctl read/write; \
  id=668; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt was made to read/write to the sysctl entry $1.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=System time changed; \
+ classification.text=System time changed; \
  id=669; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=The system time was modified.; \
  last
 
 # No log sample; please submit
 regex=attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted mmap executable; \
+ classification.text=Attempted mmap executable; \
  id=670; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt was made to mmap the file $3 with device $1 and inode $2 executable.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted socket use; \
+ classification.text=Attempted socket use; \
  id=671; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=An attempt to socket($1, $2, $3) was made.  Access was denied.; \
  last
 
 # No log sample; please sumbmit
 regex=attempted bind\(\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted bind; \
+ classification.text=Attempted bind; \
  id=672; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=An attempt to bind to a socket was made.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted connect\(\) to fd (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted connect; \
+ classification.text=Attempted connect; \
  id=673; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=An attempt to connect to a socket was made.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted bind; \
+ classification.text=Attempted bind; \
  id=674; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$5; \
  source(0).process.pid=$6; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$7; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$8; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$7; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$8; \
  assessment.impact.description=An attempt was made to bind to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Attempted connect; \
+ classification.text=Attempted connect; \
  id=675; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).process.name=$5; \
  source(0).process.pid=$6;\
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$7; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$8; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$7; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$8; \
  assessment.impact.description=An attempt was made to connect to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
 # No log sample; please submit
 regex=exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Exec inside chroot jail; \
+ classification.text=Exec inside chroot jail; \
  id=676; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=The binary $1 was executed within a chroot jail.; \
  last
 
 # No log sample; please submit
 regex=([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Filesystem remounted; \
+ classification.text=Filesystem remounted; \
  id=677; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=The path $1 was remounted.; \
  last
 
 # No log sample; please submit
 regex=remount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Filesystem remounted; \
+ classification.text=Filesystem remounted; \
  id=678; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=The path $1 was remounted. ; \
  last
 
 # No log sample; please submit
 regex=unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Filesystem unmounted; \
+ classification.text=Filesystem unmounted; \
  id=679; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=The path $1 was unmounted.; \
  last
 
 # No log sample; please submit
 regex=mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Filesystem mounted; \
+ classification.text=Filesystem mounted; \
  id=680; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  assessment.impact.description=The device $1 was mounted to the path $2.; \
  last
 
 # No log sample; please submit
 regex=chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Directory changed; \
+ classification.text=Directory changed; \
  id=681; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=The current working directory for a process was changed to $1.; \
  last
 
 # No log sample; please submit
 regex=exec of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Binary executed; \
+ classification.text=Binary executed; \
  id=682; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$4; \
  source(0).process.pid=$5; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$6; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$7; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$6; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$7; \
  assessment.impact.description=The command: $3 was executed.; \
  last
 
 # No log sample; please submit
 regex=message queue created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Message queue created; \
+ classification.text=Message queue created; \
  id=683; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A message queue was created.; \
  last
 
 # No log sample; please submit
 regex=message queue of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Message queue removed; \
+ classification.text=Message queue removed; \
  id=684; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$1; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$2; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$1; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$2; \
  assessment.impact.description=A message queue was removed.; \
  last
 
 # No log sample; please submit
 regex=semaphore created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Semaphore created; \
+ classification.text=Semaphore created; \
  id=685; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$1; \
  source(0).process.pid=$2; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$3; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$3; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$4; \
  assessment.impact.description=A semaphore was created.; \
  last
 
 # No log sample; please submit
 regex=semaphore of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Semaphore removed; \
+ classification.text=Semaphore removed; \
  id=686; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$1; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$2; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$1; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$2; \
  assessment.impact.description=A semaphore was removed.; \
  last
 
 # No log sample; please submit
 regex=shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Shared memory created; \
+ classification.text=Shared memory created; \
  id=688; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=Shared memory of size $1 was created.; \
  last
 
 # No log sample; please submit
 regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification(0).name=Shared memory removed; \
+ classification.text=Shared memory removed; \
  id=689; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
  source(0).process.name=$3; \
  source(0).process.pid=$4; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$5; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$6; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$5; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$6; \
  target(0).user.category=application; \
- target(0).user.userid(0).type=current-user; \
- target(0).user.userid(0).number=$1; \
- target(0).user.userid(1).type=original-user; \
- target(0).user.userid(1).number=$2; \
+ target(0).user.user_id(0).type=current-user; \
+ target(0).user.user_id(0).number=$1; \
+ target(0).user.user_id(1).type=original-user; \
+ target(0).user.user_id(1).number=$2; \
  assessment.impact.description=Shared memory was removed.; \
  last
 
 # No log sample; please submit
 regex=terminating task: ([^(]+)\(([^)]+)\):(\d+) uid/euid: (/d+)/(/d+), EIP: ([0-9A-F]+), ESP: ([0-9A-F]+); \
- classification(0).name=Possible buffer overflow; \
+ classification.text=Possible buffer overflow; \
  id=690; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
  source(0).process.name=$2; \
  source(0).process.pid=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).type=current-user; \
- source(0).user.userid(0).number=$4; \
- source(0).user.userid(1).type=original-user; \
- source(0).user.userid(1).number=$5; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
  assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
  last

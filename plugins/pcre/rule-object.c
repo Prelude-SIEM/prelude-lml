@@ -368,8 +368,8 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
 		idmef_value_destroy(value);
 
 		if ( ret < 0 ) {
-			log(LOG_ERR, "idmef_object_set failed for %s.\n",
-                            idmef_object_get_name(rule_object->object));
+			log(LOG_ERR, "idmef_object_set failed for %s: %d.\n",
+                            idmef_object_get_name(rule_object->object), ret);
 			idmef_message_destroy(*message);
                         referenced_value_destroy_content(olist);
                         return -1;
