@@ -296,8 +296,8 @@ void lml_emit_alert(const log_entry_t *log_entry, idmef_message_t *message, uint
         if ( generate_additional_data(alert, "Log received from", source) < 0 )
                 goto error;
         
-        if ( log_entry->log ) {
-                if ( generate_additional_data(alert, "Original Log", log_entry->log) < 0 )
+        if ( log_entry->original_log ) {
+                if ( generate_additional_data(alert, "Original Log", log_entry->original_log) < 0 )
                         goto error;
         }
         

@@ -122,7 +122,7 @@ void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str, siz
         
         log_entry_set_log(log_entry, str, size);
 
-        regex_exec(list, &regex_match_cb, log_entry, log_entry->log, log_entry->log_len);
+        regex_exec(list, &regex_match_cb, log_entry, log_entry->message, log_entry->message_len);
         log_entry_delete(log_entry);
 }
 

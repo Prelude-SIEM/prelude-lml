@@ -127,15 +127,15 @@ static int parse_prefix(log_entry_t *log_entry)
         };
 
         matches = pcre_exec(log_entry->source->prefix_regex, log_entry->source->prefix_regex_extra,
-                            log_entry->log, log_entry->log_len, 0, 0, ovector, sizeof(ovector) / sizeof(int));
+                            log_entry->original_log, log_entry->original_log_len, 0, 0, ovector, sizeof(ovector) / sizeof(int));
         
         if ( matches < 0 ) {
-                log(LOG_ERR, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->log);
+                log(LOG_ERR, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->original_log);
                 return -1;
         }
 
         for ( i = 0; tbl[i].field != NULL; i++ ) {
-                ret = pcre_get_named_substring(log_entry->source->prefix_regex, log_entry->log,
+                ret = pcre_get_named_substring(log_entry->source->prefix_regex, log_entry->original_log,
                                                ovector, matches, tbl[i].field, (const char **) &string);
                 
                 if ( ret == PCRE_ERROR_NOSUBSTRING )
@@ -203,13 +203,16 @@ int log_entry_set_log(log_entry_t *log_entry, const char *entry, size_t size)
 {
         int ret;
         
-        log_entry->log_len = size;
+        log_entry->original_log_len = size;
         
-        log_entry->log = strdup(entry);
-        if ( ! log_entry->log ) {
+        log_entry->original_log = strdup(entry);
+        if ( ! log_entry->original_log ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
+
+        log_entry->message = log_entry->original_log;
+        log_entry->message_len = log_entry->original_log_len;
         
         ret = parse_prefix(log_entry);
         
@@ -239,8 +242,8 @@ void log_entry_delete(log_entry_t *log_entry)
         if ( log_entry->target_process_pid )
                 free(log_entry->target_process_pid);
 
-        if ( log_entry->log )
-                free(log_entry->log);
+        if ( log_entry->original_log )
+                free(log_entry->original_log);
         
         free(log_entry);
 }

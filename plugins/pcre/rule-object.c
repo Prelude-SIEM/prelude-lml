@@ -302,7 +302,7 @@ static void resolve_referenced_value(rule_object_list_t *olist,
                  
                  rval = prelude_list_entry(tmp, rule_referenced_value_t, list);
                  
-                 ret = pcre_copy_substring(log_entry->log, ovector, osize, rval->refno, buf, sizeof(buf));
+                 ret = pcre_copy_substring(log_entry->message, ovector, osize, rval->refno, buf, sizeof(buf));
                  if ( ret < 0 ) {
                          if ( ret == PCRE_ERROR_NOMEMORY ) 
                                  log(LOG_ERR, "not enough memory to get backward reference %d.\n",

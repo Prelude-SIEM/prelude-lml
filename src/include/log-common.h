@@ -7,9 +7,12 @@ typedef struct log_source_s log_source_t;
 
 
 typedef struct {
-        char *log;
-        size_t log_len;
+        char *original_log;
+        size_t original_log_len;
         
+        char *message;
+        size_t message_len;
+
         struct timeval tv;
 
         char *target_hostname;

@@ -62,12 +62,12 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entr
         adata_meaning = idmef_additional_data_new_meaning(adata);
         prelude_string_set_constant(adata_meaning, "log message");
 
-        idmef_additional_data_set_string_ref(adata, log_entry->log);
+        idmef_additional_data_set_string_ref(adata, log_entry->original_log);
 
         lml_emit_alert(log_entry, message, PRELUDE_MSG_PRIORITY_LOW);
 
         if ( plugin->out_stderr )
-                fprintf(stderr, "Debug: log received, log=%s\n", log_entry->log);
+                fprintf(stderr, "Debug: log received, log=%s\n", log_entry->original_log);
 }
 
 
