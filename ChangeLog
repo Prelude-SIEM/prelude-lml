@@ -1,4 +1,10 @@
 2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* file-server.c: (read_logfile): 
+	use clearerr_unlocked() after hitting EOF on observed file. 
+	Fixes problem on FreeBSD. 
+
+2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 	
 	* plugins/simple/ruleset/ipfw.rules: new file. Rules for ipfw
 	firewall on FreeBSD.
