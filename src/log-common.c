@@ -33,7 +33,7 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
                 { "Dec", 12 },
         };
         
-        ret = sscanf(buf, "%3s %d %d:%d:%d %255s %32s", month, &day, &hour, &minute, &second, host, tag);
+        ret = sscanf(buf, "%.3s %d %d:%d:%d %.255s %.32s", month, &day, &hour, &minute, &second, host, tag);
         if ( ret != 7 )
                 /*
                  * Not syslog format.
