@@ -43,7 +43,7 @@
 #include "config.h"
 
 
-static prelude_msgbuf_t *msgbuf;
+extern prelude_client_t *lml_client;
 static idmef_analyzer_t *idmef_analyzer;
 
 
@@ -254,10 +254,9 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 		if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
 			goto error;
         }
-        
-        idmef_message_write(message, msgbuf);
-        prelude_msgbuf_mark_end(msgbuf);
-        
+
+        prelude_client_send_idmef(lml_client, message);
+                
  error:
         idmef_message_destroy(message);
 }
@@ -269,17 +268,9 @@ int lml_alert_init(prelude_client_t *lml_client)
 {
         prelude_string_t *string;
         
-        msgbuf = prelude_msgbuf_new(lml_client);
-        if ( ! msgbuf ) {
-                log(LOG_ERR, "couldn't create a message stream.\n");
-                return -1;
-        }
-
 	idmef_analyzer = prelude_client_get_analyzer(lml_client);
-	if ( ! idmef_analyzer ) {
-		prelude_msgbuf_close(msgbuf);
+	if ( ! idmef_analyzer )
 		return -1;
-	}
         
 	string = idmef_analyzer_new_model(idmef_analyzer);
 	prelude_string_set_constant(string, ANALYZER_MODEL);
