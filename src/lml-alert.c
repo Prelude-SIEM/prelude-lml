@@ -251,6 +251,21 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 
 
 
+static void insert_analyzer(idmef_alert_t *alert, idmef_analyzer_t *cur_analyzer)
+{
+        if ( dry_run )
+                return;
+        
+        if ( cur_analyzer ) 
+                idmef_analyzer_set_analyzer(cur_analyzer, idmef_analyzer_ref(idmef_analyzer));
+        else
+                cur_analyzer = idmef_analyzer;
+
+        idmef_alert_set_analyzer(alert, idmef_analyzer_ref(cur_analyzer));
+}
+
+
+
 void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_t priority)
 {
         const char *source;
@@ -283,13 +298,8 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
                 if ( cur_analyzer && fill_analyzer(log, cur_analyzer) < 0 )
                         goto error;
         }
-        
-        if ( cur_analyzer ) 
-                idmef_analyzer_set_analyzer(cur_analyzer, idmef_analyzer_ref(idmef_analyzer));
-        else
-                cur_analyzer = idmef_analyzer;
 
-        idmef_alert_set_analyzer(alert, idmef_analyzer_ref(cur_analyzer));
+        insert_analyzer(alert, cur_analyzer);
 
         source = log_source_get_name(log->source);
         if ( generate_additional_data(alert, "Log received from", source) < 0 )
@@ -299,7 +309,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
                 if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
                         goto error;
         }
-
+        
         if ( text_output_fd )
                 idmef_message_print(message, text_output_fd);
         

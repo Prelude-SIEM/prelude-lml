@@ -416,7 +416,15 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                 
                 return -1;
         }
+        
+        if ( batch_mode && udp_srvr ) {
+                log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
+                return -1;
+        }
 
+        if ( dry_run )
+                return 0;
+        
         ret = prelude_client_new(&lml_client, PRELUDE_CONNECTION_CAPABILITY_CONNECT, "prelude-lml", config_file);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-client");
@@ -430,19 +438,12 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         ret = lml_alert_init(lml_client);
         if ( ret < 0 )
                 return -1;
-
-        if ( ! dry_run ) {
-                ret = prelude_client_start(lml_client);
-                if ( ret < 0 ) {
-                        prelude_perror(ret, "error starting prelude-client");
-                        return -1;
-                }
-        }
         
-        if ( batch_mode && udp_srvr ) {
-                log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
+        ret = prelude_client_start(lml_client);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error starting prelude-client");
                 return -1;
         }
-        
+                
         return 0;
 }
