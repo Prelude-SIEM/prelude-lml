@@ -199,7 +199,7 @@ int main(int argc, char **argv)
         
         global_argv = argv;
 
-        PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
+	PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {
