@@ -240,7 +240,7 @@ static void free_rule_object_value_list(rule_object_t *object)
 
 static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 {
-	char *str;
+	const char *str;
         prelude_list_t *tmp;
         idmef_value_t *value;
         struct servent *service;
