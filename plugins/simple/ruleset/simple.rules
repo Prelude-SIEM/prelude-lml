@@ -163,6 +163,7 @@ include = honeyd.rules;
 include = ipchains.rules;
 include = ipfw.rules;
 include = ipso.rules;
+include = modsecurity.rules;
 include = ms-sql.rules;
 include = nagios.rules;
 include = navce.rules;
