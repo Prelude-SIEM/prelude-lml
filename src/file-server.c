@@ -1023,7 +1023,6 @@ static int process_file_event(monitor_fd_t *monitor)
 
 int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls) 
 {
-        int ret;
         monitor_fd_t *new;
         
         /*
@@ -1128,7 +1127,10 @@ void file_server_start_monitoring(void)
         /*
          * Initialize everythings once by calling file_server_wake_up().
          */
-        file_server_wake_up();
+        if ( fam_initialized == 1 )
+                try_reopening_inactive_monitor();
+        
+        file_server_wake_up();        
 }
 
 
