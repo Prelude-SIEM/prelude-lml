@@ -383,8 +383,9 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
  target(0).service.protocol=icmp; \
  last
 
+#LOG:Dec 30 03:10:48 www.xxx.yyy.zzz Dec 30 2003 02:13:28: %PIX-4-106023: Deny icmp src outside:64.89.17.26 dst inside:www.xxx.yyy.zzz (type 3, code 3) by access-group "outside"
 #LOG:Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:12.34.56.78/18378 dst outside:90.12.34.56/12685 by access-group "acl_in"
-#regex=PIX-4-106023: Deny (\w+) src (\S+):([\d\.]+)/(\d+) dst (\S+):([\d\.]+)/(\d+) by access-group "(\S+)"; \
+#regex=PIX-4-106023: Deny (\w+) src (\S+):([\d\.]+)(/(\d+))? dst (\S+):([\d\.]+)(/(\d+))?.*by access-group "(\S+)"; \
 # classification.text=Packet denied; \
 # id=217; \
 # revision=1; \
