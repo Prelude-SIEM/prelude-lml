@@ -1,3 +1,9 @@
+2004-01-07  Nicolas Delon  <delon.nicolas@wanadoo.fr>
+
+	* plugins/simple/simple.c:
+	(build_message)
+	fit idmef_message changes
+
 2003-12-29  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins.rules.in: remove paxmod. Obsoleted.

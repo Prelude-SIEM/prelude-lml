@@ -736,6 +736,7 @@ static idmef_message_t *build_message(simple_rule_t *rule)
 	struct list_head *tmp;
 	rule_object_t *rule_object;
 	idmef_value_t *value;
+	int ret;
 
 	message = idmef_message_new();
 	if ( ! message )
@@ -749,8 +750,12 @@ static idmef_message_t *build_message(simple_rule_t *rule)
 			idmef_message_destroy(message);
 			return NULL;
                 }
-                
-		if ( idmef_message_set(message, idmef_object_ref(rule_object->object), value) < 0 ) {
+
+		ret = idmef_message_set(message, rule_object->object, value);
+
+		idmef_value_destroy(value);
+
+		if ( ret < 0 ) {
 			log(LOG_ERR, "idmef_message_set failed.\n");
 			idmef_message_destroy(message);
 			return NULL;
