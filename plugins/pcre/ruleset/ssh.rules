@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2002 Nicolas Delon <delon.nicolas@wanadoo.fr>
+# Copyright (C) 2002,2004 Nicolas Delon <nicolas@prelude-ids.org>
 # All Rights Reserved
 # Ruleset updated for 0-9 branch by Gene R Gomez
 #
@@ -20,32 +20,20 @@
 #
 #####
 
-#####
-#
-# Started on  Thu Oct 17 12:01:59 2002
-# Last update Fri Oct 25 23:32:44 2002
-#
-# Version 0.1
-#
-# Comment: tested with OpenSSH 3.5
-#
-#####
- 
 ###################
 # Logging succeed #
 ###################
 
 #Dec  8 14:45:17 itguxweb1 sshd[32112]: Accepted publickey for root from 12.34.56.78 port 56634 ssh2
-regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  classification(0).name=Admin login successful; \
  id=1900; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.description=Root logged in from $2:$3 using the $1 method; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.port=$3; \
  source(0).service.protocol=tcp; \
@@ -57,16 +45,15 @@ regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  last;
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
-regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
  classification(0).name=User login successful; \
  id=1901; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.description=User $2 logged in from $3:$4 using the $1 method; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
  source(0).service.protocol=tcp; \
@@ -82,16 +69,15 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 ################
 
 #Dec  9 16:00:35 itguxweb2 sshd[24541]: Failed password for root from 12.34.56.78 port 1806
-regex=Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  classification(0).name=SSH Remote root login failed; \
  id=1902; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.description=Someone tried to login as root from $2:$3 using the $1 method; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.port=$3; \
  source(0).service.protocol=tcp; \
@@ -103,16 +89,15 @@ regex=Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  last
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
-regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
  classification(0).name=SSH Remote user login failed; \
  id=1903; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.description=Someone tried to login as $2 from $3:$4 using the $1 method; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
  source(0).service.protocol=tcp; \
@@ -173,16 +158,15 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
 ##################################################################
 
 # No log sample; please submit
-regex=Did not receive identification string from ([\d\.]+); \
+regex=Did not receive identification string from (.+); \
  classification(0).name=SSH Server recognition; \
  id=1906; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
  assessment.impact.description=$1 is probably making a server recognition; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.port=22; \
@@ -199,13 +183,12 @@ regex=Did not receive identification string from ([\d\.]+); \
 regex=ROOT LOGIN REFUSED FROM (\w+); \
  classification(0).name=SSH Remote root login forbidden; \
  id=1907; \
- revision=1; \
+ revision=2; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.description=Root tried to login while it is forbidden; \
- source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.port=22; \
