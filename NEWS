@@ -1,3 +1,23 @@
+* 2005-03-29, prelude-lml 0.9.0-rc1:
+
+        Note: due to several years of work and the habit of working with the new
+	version, it is hard to remind all the enhancement made in this release.
+	Please bear with us and try it for yourself :-)
+
+	- Handle the whole IDMEF set of object.
+	- Support any kind of log format.
+	- Support for multiple/optional regular expressions.
+	- Support jump/optional jump between different rules.
+
+	- New rules for: Dell OM, Shadow Utils, Modsecurity, P3Scan, Tripwire, 
+	  ClamAV, Sendmail, Tripwire, APC Environmental Monitoring Unit, CISCO PIX, 
+	  Cisco VPN Concentrator, Microsoft SQL Server, PAM, pcAnywhere, Oracle, Webmin, Wu-Ftpd.
+
+	- Per log file ruleset are now possible. 
+	- Optimization work.
+	- Support plugin dl-preopening on platform without dlopen() or dlsym().
+
+
 * 2003-10-22, prelude-lml 0.8.6:
 
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
