@@ -242,7 +242,7 @@ int main(int argc, char **argv)
                  * only call prelude_client_destroy in case we are running in batch
                  * mode, causing an heartbeat to be sent to notice of a normal exit.
                  */
-                prelude_client_destroy(lml_client);
+                prelude_client_destroy(lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
         }
         
 	return 0;
