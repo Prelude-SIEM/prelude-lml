@@ -74,42 +74,13 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. 
  last
 
 #May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
-regex=\[client ([\d\.]+)\] mod_security: Invalid URL encoding (#\d) detected\.; \
- classification(0).name=HTTP Invalid URL encoding $2; \
+regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
+ classification(0).name=HTTP Invalid $2; \
  id=3103; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
- assessment.impact.completion=succeeded; \
- assessment.impact.description=mod_security found invalid URL encoding $2; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$1; \
- target(0).service.name=http; \
- last
-
-#No log sample; please submit
-regex=\[client ([\d\.]+)\] mod_security: Invalid character detected (\S+); \
- classification(0).name=HTTP Invalid character "$2"; \
- id=3104; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=high; \
- assessment.impact.completion=succeeded; \
- assessment.impact.description=mod_security found invalid character $2; \
- source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$1; \
- target(0).service.name=http; \
- last
-
-#No log sample; please submit
-regex=\[client ([\d\.]+)\] mod_security: Invalid Unicode encoding: (not enough bytes|invalid byte value|overlong character); \
- classification(0).name=HTTP Invalid Unicode encoding "$2"; \
- id=3105; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.severity=high; \
- assessment.impact.completion=succeeded; \
- assessment.impact.description=mod_security found invalid Unicode encoding $2; \
+ assessment.impact.description=mod_security found "Invalid $2"; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  target(0).service.name=http; \
