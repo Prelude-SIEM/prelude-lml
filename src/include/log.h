@@ -9,11 +9,6 @@
 
 #include "plugin-log.h"
 
-/*
- * Definition of plugin configuration API.
- */
-#include <libprelude/config-engine.h>
-
 #define MAX_LOG_SIZE MAX_UDP_DATA_SIZE
 
 #endif				/* LOG_H */

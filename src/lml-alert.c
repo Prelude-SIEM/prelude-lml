@@ -34,13 +34,8 @@
 #include <netdb.h>
 #include <assert.h>
 
-#include <libprelude/prelude-inttypes.h>
-#include <libprelude/common.h>
+#include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/idmef.h>
-#include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-message-write.h>
-#include <libprelude/prelude-client.h>
 #include <libprelude/prelude-inet.h>
 
 #include "log-common.h"
