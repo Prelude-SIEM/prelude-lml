@@ -266,7 +266,9 @@ void lml_emit_alert(const log_entry_t *log_entry, idmef_message_t *message, uint
         idmef_analyzer_t *cur_analyzer;
         
         alert = idmef_message_get_alert(message);
-
+        if ( ! alert )
+                goto error;
+        
         create_time = idmef_time_new_from_gettimeofday();
         if ( ! create_time )
                 goto error;
