@@ -10,9 +10,9 @@ typedef struct {
         char *log;        
         struct timeval tv;
 
-        char *target_user;
-        char *target_program;
         char *target_hostname;
+        char *target_program;
+        char *target_program_pid;
 
         log_source_t *source;
 } log_entry_t;
@@ -38,8 +38,8 @@ const char *log_source_get_name(log_source_t *ls);
 
 int log_source_set_name(log_source_t *ls, const char *name);
 
-int log_source_set_log_fmt(log_source_t *ls, const char *fmt);
+int log_source_set_prefix_regex(log_source_t *ls, const char *regex);
 
-int log_source_set_timestamp_fmt(log_source_t *lf, const char *fmt);
+int log_source_set_ts_fmt(log_source_t *lf, const char *fmt);
 
 #endif

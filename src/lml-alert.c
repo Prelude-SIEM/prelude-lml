@@ -72,7 +72,6 @@ static int resolve_failed_fallback(const log_entry_t *log_entry, idmef_node_t *n
                  */
                 string = idmef_node_new_name(node);
                 prelude_string_set_ref(string, log_entry->target_hostname);
-
         } else {
                 address = idmef_node_new_address(node);
                 if ( ! address ) 
@@ -172,10 +171,8 @@ static int fill_analyzer(const log_entry_t *log_entry, idmef_analyzer_t *analyze
 static int generate_target(const log_entry_t *log_entry, idmef_alert_t *alert) 
 {
         int ret;
-        idmef_user_t *user;
         idmef_node_t *node;
         idmef_target_t *target;
-        idmef_user_id_t *userid;
         idmef_process_t *process;
         prelude_string_t *process_name;
 
@@ -186,18 +183,6 @@ static int generate_target(const log_entry_t *log_entry, idmef_alert_t *alert)
                         return -1;
         }
 
-        if ( log_entry->target_user && ! idmef_target_get_user(target) ) {
-                user = idmef_target_new_user(target);
-                if ( ! user )
-                        return -1;
-
-                userid = idmef_user_new_user_id(user);
-                if ( ! userid )
-                        return -1;
-                
-                prelude_string_set_ref(idmef_user_id_new_name(userid), log_entry->target_user);
-        }
-        
         if ( log_entry->target_program && ! idmef_target_get_process(target) ) {
                 process = idmef_target_new_process(target);
                 if ( ! process )

@@ -27,36 +27,43 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #
 # Files to monitor
 #
-# You should define the log format / log timestamp format before
-# you define a file to monitor. If not specified, syslog format is
-# used.
+# You should define the log message prefix regex and log timestamp format
+# before you define a file to monitor. If not specified, syslog format is used.
 #
-# In order to set log-fmt, you can use the token :
-# %p (process name)
-# %h (hostname).
+# The prefix regex should contain pcre named subpatterns to pick out the
+# information available in your syslog's prefix.
+#
+# The available field names are:
+#   hostname
+#   program
+#   pid
+#   timestamp
+#
+# Please see pcrepattern(3) manpage for help writing the prefix-regex
 #
 # In order to set time-fmt, please have a look at the strptime(3) manpage.
 #
 # Example configuration for syslog output:
 #
-time-format = "%b %d %H:%M:%S"
-log-format = "%ltime %thost %tprog "
+time-format = "%b %d %H:%M:%S" 
+prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<program>\S+)(\[(?P<pid>[0-9]+)\])?:)? "
 
 file = /var/log/messages
 file = /var/log/auth.log
 
+#
 # Example configuration for metalog output:
 #
-# time-format = "%b %d %H:%M:%S"
-# log-format = "%ltime [%tprog]"
+# prefix-regex = "^(?P<timestamp>.{15}) \[(?P<program>\S+)\] "
+# time-format = "%b %d %H:%M:%S" 
 #
 # file = /var/log/everything/current
 
 
 # Example configuration for apache output:
 #
-# time-format = "%d/%b/%Y:%H:%M:%S +0000"
-# log-format = "%thost - - [%ltime] "
+# prefix-regex = "^(?P<hostname>\S+) - - \[(?P<timestamp>.{20}) \+.{4}\] "
+# time-format = "%d/%b/%Y:%H:%M:%S"
 #
 # file = /var/log/apache2/access_log
 

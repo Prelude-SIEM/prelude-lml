@@ -36,6 +36,7 @@
  */
 #include <time.h>
 
+#include <pcre.h>
 
 #include <libprelude/prelude-log.h>
 #include "log-common.h"
@@ -45,24 +46,26 @@
  * default log fmt.
  */
 #define SYSLOG_TS_FMT "%b %d %H:%M:%S"
-#define SYSLOG_LOG_FMT "%ltime %thost %tprog:"
+#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:(?P<program>\\S+)(\\[(?P<pid>[0-9]+)\\])?:)?"
+
+
+
+struct log_source_s {
+        unsigned int id;
+        
+        char *name;
+        char *ts_fmt;
+        pcre *prefix_regex;
+        pcre_extra *prefix_regex_extra;
+};
 
 
 static unsigned int global_id = 0;
 
 
-struct log_source_s {
-        
-        unsigned int id;
-        
-        char *name;
-        char *ts_fmt;
-        char *log_fmt;
-};
 
 
-
-static int format_tstamp(log_source_t *ls, const char *log, char delim, void **out) 
+static int parse_ts(log_source_t *ls, const char *string, void **out) 
 {
         time_t now;
         struct tm *lt;
@@ -86,142 +89,77 @@ static int format_tstamp(log_source_t *ls, const char *log, char delim, void **o
          * strptime() return a pointer to the first non matched character.
          */
         
-        end = strptime(log, ls->ts_fmt, lt);
+        end = strptime(string, ls->ts_fmt, lt);
         if ( ! end ) 
                 goto err;
 
-        end = strchr(end, delim);
-        if ( ! end ) {
-                log(LOG_ERR, "couldn't find '%c' in %s\n", delim, end);
-                return -1;
-        }
-        
         /*
          * convert back to a timeval.
          */
         tv->tv_usec = 0;
         tv->tv_sec = mktime(lt);
         
-        return end - log;
+        return 0;
 
  err:
-        log(LOG_INFO, "couldn't format \"%s\" using \"%s\".\n", log, ls->ts_fmt);
+        log(LOG_INFO, "couldn't format \"%s\" using \"%s\".\n", string, ls->ts_fmt);
         return -1;
 }
 
 
 
-
-static int format_common(log_source_t *ls, const char *log, char delim, void **out) 
+static int parse_prefix(log_entry_t *log_entry)
 {
-        char *ptr, tmp;
-                
-        ptr = strchr(log, delim);        
-        if ( ! ptr ) {
-                log(LOG_ERR, "couldn't find '%c' in %s\n", delim, log);
+        const char *string;
+        int ovector[5 * 3];
+        int i, ret, matches = 0;
+        void *tv = &log_entry->tv;
+        struct {
+                const char *field;
+                int (*cb)(log_source_t *ls, const char *log, void **out);
+                void **ptr;
+        } tbl[] = {
+                { "program",   NULL,     (void **) &log_entry->target_program     },
+                { "pid",       NULL,     (void **) &log_entry->target_program_pid },
+                { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
+                { "timestamp", parse_ts, (void **) &tv                            },
+                { NULL, NULL, NULL                                                },
+        };
+
+        matches = pcre_exec(log_entry->source->prefix_regex, log_entry->source->prefix_regex_extra,
+                            log_entry->log, strlen(log_entry->log), 0, 0, ovector, sizeof(ovector) / sizeof(int));
+        
+        if ( matches < 0 ) {
+                log(LOG_ERR, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->log);
                 return -1;
         }
 
-        tmp = *ptr;
-        *ptr = '\0';
-                
-        if ( *out )
-                free(*out);
+        for ( i = 0; tbl[i].field != NULL; i++ ) {
+                ret = pcre_get_named_substring(log_entry->source->prefix_regex, log_entry->log,
+                                               ovector, matches, tbl[i].field, &string);
 
-        *out = strdup(log);
-        *ptr = tmp;
-        
-        return ptr - log;
-}
-
-
-
-
-static int handle_escaped(log_entry_t *log_entry, const char *fmt, const char **log)
-{
-        int i, ret, len;
-        void *tv = &log_entry->tv;
-        struct {
-                const char *name;
-                int (*cb)(log_source_t *ls, const char *log, char delim, void **out);
-                void **ptr;
-        } tbl[] = {
-                { "tprog", format_common, (void **) &log_entry->target_program  },
-                { "thost", format_common, (void **) &log_entry->target_hostname },
-                { "tuser", format_common, (void **) &log_entry->target_user     },
-                { "ltime", format_tstamp, (void **) &tv                  },
-                { NULL, NULL                                             },
-        };
-
-        for ( i = 0; tbl[i].name != NULL; i++ ) {
-                len = strlen(tbl[i].name);
-                
-                ret = strncmp(fmt, tbl[i].name, len);
-                if ( ret != 0 )
+                if ( ret == PCRE_ERROR_NOSUBSTRING )
                         continue;
 
-                ret = tbl[i].cb(log_entry->source, *log, fmt[len], tbl[i].ptr);
-                if ( ret < 0 )
+                else if ( ret < 0 ) {
+                        log(LOG_ERR, "could not get referenced string: %d.\n", ret);
                         return -1;
-                
-                *log += ret;
-                return len + 1;
-        }
-
-        log(LOG_ERR, "unknown tag: %%%s.\n", fmt);
-        
-        return -1;
-} 
-
-
-
-
-
-static int format_header(log_entry_t *log_entry, const char *log)
-{
-        int ret = 0;
-        const char *fmt = log_entry->source->log_fmt;
-        
-        while ( *fmt ) {
-                
-                if ( *fmt == '%' && ((*fmt + 1) != '%' || *(fmt + 1) != '\0') ) {
-                        ret = handle_escaped(log_entry, fmt + 1, &log);
-                        if ( ret < 0 )
-                                return -1;
-
-                        fmt += ret;
                 }
                 
-                else if ( *fmt != *log ) {
-                        log(LOG_ERR, "couldn't match %s != %s.\n", fmt, log);
-                        break;                
-                }
-
+                if ( ! tbl[i].cb )
+                        *tbl[i].ptr = strdup(string);
+                
                 else {
-                        fmt++;
-                        log++;
+                        ret = tbl[i].cb(log_entry->source, string, tbl[i].ptr);
+                        if ( ret < 0 ) {
+                                log(LOG_ERR, "failed to parse prefix field: %s.\n", tbl[i].field);
+                                return -1;
+                        }
                 }
         }
-        
-
-        return ret;
-}
-
-
-
-static int format_log(log_entry_t *log_entry)
-{
-        int ret;
-        char *entry = log_entry->log;
-
-        ret = format_header(log_entry, entry);
-        /*
-         * don't return on error, a syslog header might not have a tag.
-         */
 
         return 0;
 }
-
 
 
 
@@ -254,7 +192,7 @@ log_entry_t *log_entry_new(log_source_t *source)
         gettimeofday(&log_entry->tv, NULL);
 
         /*
-         * default hostname is our.
+         * default hostname is ours.
          */
         log_entry->target_hostname = get_hostname();
         
@@ -273,11 +211,12 @@ int log_entry_set_log(log_entry_t *log_entry, const char *entry)
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
-
-        ret = format_log(log_entry);
+        
+        ret = parse_prefix(log_entry);
         if ( ret < 0 ) {
+                log(LOG_ERR, "failed to parse log message prefix.\n");
                 gettimeofday(&log_entry->tv, NULL);
-                return 0;
+                return -1;
         }
                 
         return 0;
@@ -294,13 +233,13 @@ void log_entry_delete(log_entry_t *log_entry)
         if ( log_entry->target_program )
                 free(log_entry->target_program);
 
-        if ( log_entry->target_user )
-                free(log_entry->target_user);
+        if ( log_entry->target_program_pid )
+                free(log_entry->target_program_pid);
 
         if ( log_entry->log )
                 free(log_entry->log);
         
-	free(log_entry);
+        free(log_entry);
 }
 
 
@@ -334,9 +273,16 @@ log_source_t *log_source_new(void)
                 return NULL;
         }
 
-        new->ts_fmt = strdup(SYSLOG_TS_FMT);
-        new->log_fmt = strdup(SYSLOG_LOG_FMT);
-        
+        if ( log_source_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
+                log(LOG_ERR, "failed to set log timestamp format.\n");
+                return NULL;
+        }
+
+        if ( log_source_set_prefix_regex(new, SYSLOG_PREFIX_REGEX) < 0 ) {
+                log(LOG_ERR, "failed to set log message prefix.\n");
+                return NULL;
+        }
+
         return new;
 }
 
@@ -350,14 +296,23 @@ const char *log_source_get_name(log_source_t *ls)
 
 
 
-int log_source_set_log_fmt(log_source_t *ls, const char *fmt)
+int log_source_set_prefix_regex(log_source_t *ls, const char *regex)
 {       
-        if ( ls->log_fmt )
-                free(ls->log_fmt);
+        int erroffset;
+        const char *errptr;
+
+        if ( ls->prefix_regex )
+                free(ls->prefix_regex);
         
-        ls->log_fmt = strdup(fmt);
-        if ( ! ls->log_fmt ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        ls->prefix_regex = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
+        if ( ! ls->prefix_regex ) {
+                log(LOG_ERR, "Unable to compile regex: %s : %s.\n", regex, errptr);
+                return -1;
+        }
+
+        ls->prefix_regex_extra = pcre_study(ls->prefix_regex, 0, &errptr);
+        if ( ! ls->prefix_regex_extra && errptr ) {
+                log(LOG_ERR, "Unable to study regex: %s : %s.\n", regex, errptr);
                 return -1;
         }
 
@@ -367,7 +322,7 @@ int log_source_set_log_fmt(log_source_t *ls, const char *fmt)
 
 
 
-int log_source_set_timestamp_fmt(log_source_t *ls, const char *fmt)
+int log_source_set_ts_fmt(log_source_t *ls, const char *fmt)
 {        
         if ( ls->ts_fmt )
                 free(ls->ts_fmt);
@@ -391,8 +346,11 @@ void log_source_destroy(log_source_t *source)
         if ( source->ts_fmt )
                 free(source->ts_fmt);
         
-        if ( source->log_fmt )
-                free(source->log_fmt);
+        if ( source->prefix_regex)
+                free(source->prefix_regex);
+
+        if ( source->prefix_regex_extra)
+                free(source->prefix_regex_extra);
         
         free(source);
 }

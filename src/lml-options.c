@@ -150,12 +150,12 @@ static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, pr
 
 
 
-static int set_logfile_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_logfile_prefix_regex(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {        
-        if ( config.logfile_format )
-                free(config.logfile_format);
+        if ( config.logfile_prefix_regex )
+                free(config.logfile_prefix_regex);
         
-        config.logfile_format = strdup(arg);
+        config.logfile_prefix_regex = strdup(arg);
 
         return 0;
 }
@@ -221,14 +221,14 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg, prelu
         if ( ! ls )
                 return prelude_error_from_errno(errno);
 
-        if ( config.logfile_format ) {
-                ret = log_source_set_log_fmt(ls, config.logfile_format);
+        if ( config.logfile_prefix_regex ) {
+                ret = log_source_set_prefix_regex(ls, config.logfile_prefix_regex);
                 if ( ret < 0 )
                         return ret;
         }
 
         if ( config.logfile_ts_format ) {
-                ret = log_source_set_timestamp_fmt(ls, config.logfile_ts_format);
+                ret = log_source_set_ts_fmt(ls, config.logfile_ts_format);
                 if ( ret < 0 )
                         return ret;
         }
@@ -329,7 +329,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
         config.pidfile = NULL;
-        config.logfile_format = NULL;
+        config.logfile_prefix_regex = NULL;
         config.logfile_ts_format = NULL;
         config.lml_client = NULL;
         config.batch_mode = FALSE;
@@ -404,8 +404,8 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            set_logfile_ts_format, NULL);
         
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
-                           'l', "log-format", "Specify the input format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
-                           set_logfile_format, NULL);
+                           'p', "prefix-regex", "Specify the input prefix format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           set_logfile_prefix_regex, NULL);
         
         opt = prelude_option_add(ropt,  PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                                  'f', "file", "Specify a file to monitor (use \"-\" for standard input)",

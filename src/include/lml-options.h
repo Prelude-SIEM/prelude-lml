@@ -32,7 +32,7 @@ int lml_options_init(prelude_option_t *lml_optlist, int argc, char **argv);
 
 typedef struct {
         char *pidfile;
-        char *logfile_format;
+        char *logfile_prefix_regex;
         char *logfile_ts_format;
 
         prelude_client_t *lml_client;
