@@ -177,8 +177,8 @@ static int add_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr,
                 idmax = idmin;
                 
         for ( i = idmin; i <= idmax; i++ ) {
-                                
-                ret = add_goto_single(plugin, rule, atoi(idstr), optional);
+                
+                ret = add_goto_single(plugin, rule, i, optional);
                 if ( ret < 0 )
                         return -1;
         }
