@@ -32,4 +32,10 @@ int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls);
 
 void file_server_start_monitoring(void);
 
-void file_server_set_rotation_interval_max_difference(int val);
+unsigned int file_server_get_max_rotation_time_offset(void);
+
+void file_server_set_max_rotation_time_offset(unsigned int val);
+
+unsigned int file_server_get_max_rotation_size_offset(void);
+
+void file_server_set_max_rotation_size_offset(unsigned int val);

@@ -21,6 +21,10 @@
 *
 *****/
 
+#include "config.h"
+#undef HAVE_FAM
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,8 +37,6 @@
 #include <assert.h>
 #include <time.h>
 #include <sys/uio.h>
-
-#include "config.h"
 
 #ifdef HAVE_FAM 
  #include <fam.h>
@@ -63,11 +65,11 @@
 
 
 /*
- * If we get more than ROTATION_MAX_DIFFERENCE seconds
- * of difference between the time the logfile is rotated,
- * and a third rotation, issue an alert.
+ * If we get more than ROTATION_MAX_DIFFERENCE seconds/size
+ * of difference between different logfile rotation, issue an alert.
  */
-#define DEFAULT_ROTATION_INTERVAL_MAX_DIFFERENCE 1800
+#define DEFAULT_MAX_ROTATION_SIZE_OFFSET     1024
+#define DEFAULT_MAX_ROTATION_TIME_OFFSET     (5 * 60)
 
 
 /*
@@ -92,13 +94,16 @@
 
 
 typedef struct {
+        prelude_list_t list;
+        
         log_source_t *source;
         
         FILE *fd;
         FILE *metadata_fd;
 
-        time_t last_rotation;
-        time_t rotation_average;
+        off_t last_rotation_size;
+        time_t last_rotation_time;
+        time_t last_rotation_time_interval;
         
         int index;
         char buf[1024];
@@ -107,8 +112,7 @@ typedef struct {
         off_t last_size;
 
         time_t last_mtime;
-        prelude_list_t list;
-
+        
 #ifdef HAVE_FAM
         FAMRequest fam_request;
 #endif
@@ -132,7 +136,8 @@ static int batch_mode = 0;
 static int fam_initialized = 0;
 static PRELUDE_LIST_HEAD(active_fd_list);
 static PRELUDE_LIST_HEAD(inactive_fd_list);
-static int rotation_interval_max_difference = DEFAULT_ROTATION_INTERVAL_MAX_DIFFERENCE;
+static unsigned int max_rotation_size_offset = DEFAULT_MAX_ROTATION_SIZE_OFFSET;
+static unsigned int max_rotation_time_offset = DEFAULT_MAX_ROTATION_TIME_OFFSET;
 
 
 
@@ -496,7 +501,6 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
 
                 eventno++;
-                
                 lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf);
                 file_metadata_save(monitor, st->st_size - len);
                 
@@ -537,13 +541,19 @@ static monitor_fd_t *monitor_new(log_source_t *ls)
         }
 
         new->source = ls;
-        
+
         ret = file_metadata_open(new);
         if ( ret < 0 ) {
                 free(new);
                 return NULL;
         }
-        
+    
+#ifdef HAVE_FAM
+        ret = fam_setup_monitor(new);
+        if ( ret < 0 )
+                return NULL;
+#endif
+            
         prelude_list_add(&new->list, &inactive_fd_list);
 
         return new;
@@ -571,12 +581,6 @@ static int monitor_open(monitor_fd_t *monitor)
 {
         int ret;
         const char *filename;
-        
-#ifdef HAVE_FAM
-        ret = fam_setup_monitor(monitor);
-        if ( ret < 0 )
-                return -1;
-#endif
 
         filename = log_source_get_name(monitor->source);
         
@@ -584,10 +588,8 @@ static int monitor_open(monitor_fd_t *monitor)
                 monitor->fd = stdin;
         else {
                 monitor->fd = fopen(filename, "r");
-                if ( ! monitor->fd ) {
-                        log(LOG_ERR, "couldn't open %s.\n", filename);
+                if ( ! monitor->fd ) 
                         return -1;
-                }
 
                 ret = file_metadata_get_position(monitor);
                 if ( ret < 0 )
@@ -603,6 +605,15 @@ static int monitor_open(monitor_fd_t *monitor)
         return 0;
 }
 
+
+
+static void monitor_close(monitor_fd_t *monitor)
+{
+        fclose(monitor->fd);
+        monitor->fd = NULL;
+        prelude_list_del(&monitor->list);
+        prelude_list_add_tail(&monitor->list, &inactive_fd_list);
+}
 
 
 
@@ -636,33 +647,50 @@ static void check_modification_time(monitor_fd_t *monitor, struct stat *st)
 }
 
 
-
-
-static int is_normal_log_rotation(monitor_fd_t *monitor, struct stat *st)
+static int get_rotation_size_offset(monitor_fd_t *monitor, struct stat *st)
 {
-        int ret = 0;
-        time_t diff, now, rtt;
+        off_t diff;
+        int prev = 0;
+        
+        diff = MAX(monitor->last_rotation_size, st->st_size) - 
+               MIN(monitor->last_rotation_size, st->st_size);
+      
+        if ( monitor->last_rotation_size )
+                prev = 1;
+        
+        monitor->last_rotation_size = st->st_size;
+        
+        return prev ? diff : 0;
+}
+
+
+static int get_rotation_time_offset(monitor_fd_t *monitor, struct stat *st)
+{
+        int prev = 0;
+        time_t interval, now, offset;
               
         now = time(NULL);
-        diff = now - monitor->last_rotation;
+        interval = now - monitor->last_rotation_time;
         
-        rtt = MAX(monitor->rotation_average, diff) - MIN(monitor->rotation_average, diff);
-              
-        if ( monitor->rotation_average && rtt > rotation_interval_max_difference )
-                ret = -1;
+        offset = MAX(monitor->last_rotation_time_interval, interval) - 
+                 MIN(monitor->last_rotation_time_interval, interval);
 
-        if ( monitor->last_rotation )
-                monitor->rotation_average = diff;
+        if ( monitor->last_rotation_time ) {
+                prev = 1;
+                monitor->last_rotation_time_interval = interval;
+        }
         
-        monitor->last_rotation = now;
+        monitor->last_rotation_time = now;
         
-        return ret;
+        return prev ? offset : 0;
 }
 
 
 
 static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 {
+        char buf[1024];
+        int toff, soff;
 	struct stat st_new;
         const char *filename;
         idmef_impact_t *impact;
@@ -676,30 +704,25 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
          */
         if ( st->st_nlink > 0 ) {
 
-		if ( stat(filename, &st_new) < 0 ) {
-			log(LOG_ERR, "error stat %s\n", filename);
-			return -1;
-		}
-
-		/* test if the file has been renamed */
-
-		if ( st->st_ino == st_new.st_ino )
-			return 0;
-		
-		log(LOG_INFO, "logfile %s has been renamed.\n", filename);
-
-	} else
-		log(LOG_INFO, "logfile %s reached 0 hard link.\n", filename);	
-
-        /*
-         * This file doesn't exist on the file system anymore.
-         */
-        fclose(monitor->fd);
-        monitor->fd = NULL;
+                if ( stat(filename, &st_new) == 0 ) {
+                        /*
+                         * test if the file has been renamed
+                         */
+                        if ( st->st_ino == st_new.st_ino ) 
+                                return 0;
+                        else {
+                                fclose(monitor->fd);
+                                monitor_open(monitor);
+                        }
+                } else {
+                        monitor_close(monitor);
+                }
+		log(LOG_INFO, "- logfile %s has been renamed.\n", filename);
+	} else {
+		log(LOG_INFO, "- logfile %s reached 0 hard link.\n", filename);	
+                monitor_close(monitor);
+        }
         
-        prelude_list_del(&monitor->list);
-        prelude_list_add_tail(&monitor->list, &inactive_fd_list);
-
         classification = idmef_classification_new();
         if ( ! classification )
                 return -1;
@@ -717,14 +740,24 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
-        if ( is_normal_log_rotation(monitor, st) == 0 ) {
-                idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_MEDIUM);
+        soff = get_rotation_size_offset(monitor, st);
+        toff = get_rotation_time_offset(monitor, st);
+        
+        printf("%d <= %d || %d <= %d\n", toff, max_rotation_time_offset, soff, max_rotation_size_offset);
+        
+        if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
+                idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
                 impact_description = idmef_impact_new_description(impact);
                 idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
         } else {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
                 impact_description = idmef_impact_new_description(impact);
-                idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT_HIGH);
+                snprintf(buf, sizeof(buf), "An inconsistency has been observed in file rotation: "
+                        "The differences between the previously observed rotation time and size are higher "
+                        "than the allowed limits: size difference=%u bytes allowed=%u bytes, time "
+                        "difference=%u seconds allowed=%u seconds", soff, max_rotation_size_offset, 
+                        toff, max_rotation_time_offset);
+                idmef_string_set_ref(impact_description, buf);
         }
 
         logfile_alert(monitor, st, classification, impact);
@@ -750,7 +783,7 @@ static int get_expected_event(FAMConnection *fc, int eventno)
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
 
-	while ( ! FAMPending(fc) ) {
+        while ( ! FAMPending(fc) ) {
                 ret = select(fc->fd + 1, &fds, NULL, NULL, &tv);
 		if ( ret <= 0 )
 			return -1;
@@ -892,41 +925,30 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
 static int fam_process_event(FAMEvent *event) 
 {
         int ret = 0;
-        struct stat st;
+        struct stat st, st2;
         monitor_fd_t *monitor = event->userdata;
 
-        if ( ! monitor->fd ) {
-                if ( event->code == FAMCreated )  
-                        return monitor_open(monitor);
-                else
-                        /*
-                         * sometime it happen that FAM notify us
-                         * several time for FAMDeleted event. Which would
-                         * result in a crash without this check.
-                         */
-                        return -1;
-        }
-
-        ret = fstat(fileno(monitor->fd), &st);
-        if ( ret < 0 )
-                log(LOG_ERR, "fstat returned an error.\n");
-        
         switch (event->code) {
+        case FAMCreated:
+        case FAMChanged:
+                if ( ! monitor->fd && monitor_open(monitor) < 0 )
+                        return -1;
                 
-        case FAMChanged:                
+        case FAMDeleted:
+                ret = fstat(fileno(monitor->fd), &st);
+                if ( ret < 0 )
+                        log(LOG_ERR, "fstat returned an error.\n");
+
                 /*
                  * check mtime consistency.
-                 */ 
+                 */
                 check_modification_time(monitor, &st);
         
                 /*
                  * read and analyze available data. 
                  */
                 check_logfile_data(monitor, &st);
-                break;
-                
-        case FAMDeleted:
-	case FAMMoved:
+        
                 ret = is_file_already_used(monitor, &st);
                 break;
 
@@ -953,7 +975,6 @@ static int fam_process_queued_events(void)
         FAMEvent event;
         
         while ( FAMPending(&fc) ) {
-
                 ret = FAMNextEvent(&fc, &event);
                 if ( ret < 0 ) {
                         log(LOG_ERR, "error while getting FAM event: %s.\n", FamErrlist[FAMErrno]);
@@ -1000,6 +1021,7 @@ static int process_file_event(monitor_fd_t *monitor)
 
 int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls) 
 {
+        int ret;
         monitor_fd_t *new;
         
         /*
@@ -1012,6 +1034,13 @@ int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls)
         if ( ! new )
                 return -1;
 
+        ret = monitor_open(new);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't open %s for reading.\n", log_source_get_name(ls));
+                free(new);
+                return -1;
+        }
+        
         new->regex_list = rlist;
         
         return 0;
@@ -1064,12 +1093,30 @@ int file_server_get_event_fd(void)
 
 
 
-void file_server_set_rotation_interval_max_difference(int val) 
+void file_server_set_max_rotation_time_offset(unsigned int val) 
 {
-        rotation_interval_max_difference = val;
+        max_rotation_time_offset = val;
 }
 
 
+
+unsigned int file_server_get_max_rotation_time_offset(void)
+{
+        return max_rotation_time_offset;
+}
+
+
+
+void file_server_set_max_rotation_size_offset(unsigned int val)
+{
+        max_rotation_size_offset = val;
+}
+
+
+unsigned int file_server_get_max_rotation_size_offset(void)
+{
+        return max_rotation_size_offset;
+}
 
 
 void file_server_start_monitoring(void)
@@ -1087,8 +1134,3 @@ void file_server_set_batch_mode(void)
 {
         batch_mode = 1;
 }
-
-
-
-
-

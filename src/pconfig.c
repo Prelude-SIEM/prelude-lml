@@ -101,12 +101,34 @@ static int set_batch_mode(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-static int set_rotation_interval(void *context, prelude_option_t *opt, const char *arg) 
+static int set_rotation_time_offset(void *context, prelude_option_t *opt, const char *arg) 
 {
-        file_server_set_rotation_interval_max_difference(atoi(arg));
+        file_server_set_max_rotation_time_offset(atoi(arg));
         return prelude_option_success;
 }
 
+
+
+static int get_rotation_time_offset(void *context, prelude_option_t *opt, char *buf, size_t size)
+{
+        snprintf(buf, size, "%u", file_server_get_max_rotation_time_offset());
+        return 0;
+}
+
+
+static int set_rotation_size_offset(void *context, prelude_option_t *opt, const char *arg) 
+{
+        file_server_set_max_rotation_size_offset(atoi(arg));
+        return prelude_option_success;
+}
+
+
+
+static int get_rotation_size_offset(void *context, prelude_option_t *opt, char *buf, size_t size)
+{
+        snprintf(buf, size, "%u", file_server_get_max_rotation_size_offset());
+        return 0;
+}
 
 
 static int set_quiet_mode(void *context, prelude_option_t *opt, const char *arg)
@@ -355,11 +377,17 @@ int pconfig_set(int argc, char **argv)
         
         prelude_option_set_priority(opt, option_run_last);
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 'r', "rotation-interval",
-                           "Specifies the maximum difference, in seconds, between the interval " \
-                           "of two logfiles' rotation. If this difference is reached, a high "   \
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 't', "max-rotation-time-offset",
+                           "Specifies the maximum time difference, in seconds, between the time " \
+                           "of logfiles rotation. If this amount is reached, a high "   \
                            "severity alert will be emited", required_argument,
-                           set_rotation_interval, NULL);
+                           set_rotation_time_offset, get_rotation_time_offset);
+        
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 's', "max-rotation-size-offset",
+                           "Specifies the maximum difference, in bytes, between two logfile "
+                           "rotation. If this difference is reached, a high severity alert "
+                           "will be emited", required_argument, set_rotation_size_offset, 
+                           get_rotation_size_offset);
         
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'b', "batchmode",
                            "Tell LML to run in batch mode", no_argument,
