@@ -267,7 +267,7 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
 
 static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumline, size_t size)
 {
-        int line = 0;
+        int line = 0, ret;
         char *offptr, *buf;
 
         rewind(monitor->metadata_fd);
@@ -289,7 +289,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         *offptr++ = '\0';
 
         ret = sscanf(buf, "%" SCNu64, start);
-        if ( ret < 0 ) {
+        if ( ret != 1 ) {
                 log(LOG_ERR, "error reading metadata file offset.\n");
                 return -1;
         }
