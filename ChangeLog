@@ -1,5 +1,11 @@
 2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
 
+	* src/file-server.c (logfile_alert): 
+	* src/regex.c(regex_init):
+	replace strncpy by snprintf.
+
+2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
+
 	* src/file-server.c (logfile_alert): fix unterminated
 	string.
 	

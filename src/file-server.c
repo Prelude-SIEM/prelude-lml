@@ -194,8 +194,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
                 goto err;
 
         inode->number = st->st_ino;
-        strncpy(buf, fd->file, sizeof(buf));
-        buf[sizeof (buf) - 1] = 0;
+        snprintf(buf, sizeof(buf), "%s", fd->file);
 
         ptr = strrchr(buf, '/');
         if ( ptr ) {

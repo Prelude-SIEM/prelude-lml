@@ -165,24 +165,21 @@ regex_list_t *regex_init(char *filename)
                         line++;
                         continue;
                 }
-                strncpy(name, token, MAX_NAME_LEN);
-                name[MAX_NAME_LEN - 1] = 0;
+                snprintf(name, MAX_NAME_LEN, "%s", token);
                 
                 token = strtok_r(NULL, " \t", &tmp);
                 if (NULL == token) {
                         line++;
                         continue;
                 }
-                strncpy(options, token, MAX_OPTIONS_LEN);
-                option[MAX_OPTIONS_LEN - 1] = 0;
+                snprintf(options, MAX_OPTIONS_LEN, "%s", token);
                 
                 token = strtok_r(NULL, "", &tmp);
                 if (NULL == token) {
                         line++;
                         continue;
                 }
-                strncpy(regex, token, MAX_LINE_LEN);
-                regex[MAX_LINE_LEN - 1] = 0;
+                snprintf(regex, MAX_LINE_LEN, "%s", token);
         
                 ret = regex_create_entry(conf, filename, line, name, regex, options);
                 if ( ret < 0 )
