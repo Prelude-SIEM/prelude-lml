@@ -5,6 +5,7 @@ ruleset_DATA = \
 	cisco-vpn.rules		\
 	exim.rules		\
 	grsecurity.rules	\
+	honeyd.rules		\
 	ipchains.rules		\
 	ipfw.rules		\
 	ipso.rules		\
@@ -24,8 +25,8 @@ ruleset_DATA = \
 	wap11.rules		\
 	wu-ftp.rules		\
 	zywall.rules		\
-	zyxel.rules		\
-	honeyd.rules
+	zyxel.rules
+
 
 
 rulesetdir = $(configdir)/ruleset
