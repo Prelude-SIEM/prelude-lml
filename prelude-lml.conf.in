@@ -29,8 +29,7 @@
 #
 # Files to monitor
 #
-file = /var/log/messages
-file = /var/log/apache/access_log
+file = /var/log/auth.log
 
 
 
@@ -38,9 +37,10 @@ file = /var/log/apache/access_log
 # Here start plugins configuration #
 ####################################
 
-[Simple]
+[SimpleMod]
 
 ruleset=@configdir@/ruleset/simple.rules;
+
 
 # [Debug]
 #

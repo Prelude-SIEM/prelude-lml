@@ -4,6 +4,7 @@
 
 Paxmod			-			.* PAX: .*
 Debug			-			.*
+SimpleMod		-			.*
 
 #
 # plugin-name-list is a coma separated list of plugins

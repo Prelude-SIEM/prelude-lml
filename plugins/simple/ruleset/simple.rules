@@ -1,0 +1,2 @@
+regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
+regex=authentication failure; class.name=Authentication Failure; impact.completion = failed; impact.type = other; impact.severity = high;

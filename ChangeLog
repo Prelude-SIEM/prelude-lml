@@ -1,3 +1,11 @@
+2002-03-28  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/simple/simple.c: 
+
+	This is the start of the Simple plugin. This plugin
+	have a ruleset, composed of regex, and of information
+	to fill in the alert if the regex match.
+
 2002-03-28  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/debug/debug.c: revert to including <inttypes.h> instead of
