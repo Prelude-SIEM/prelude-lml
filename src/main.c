@@ -35,9 +35,12 @@
 extern int batch_mode;
 static char **global_argv;
 extern udp_server_t *udp_srvr;
+extern prelude_bool_t dry_run;
 prelude_option_t *lml_root_optlist;
 extern prelude_client_t *lml_client;
 static volatile sig_atomic_t got_sighup = 0;
+
+
 
 static void sig_handler(int signum)
 {
@@ -241,7 +244,8 @@ int main(int argc, char **argv)
                  * only call prelude_client_destroy in case we are running in batch
                  * mode, causing an heartbeat to be sent to notice of a normal exit.
                  */
-                prelude_client_destroy(lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
+                if ( ! dry_run )
+                        prelude_client_destroy(lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
         }
         
         return 0;
