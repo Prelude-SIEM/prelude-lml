@@ -1,5 +1,16 @@
 # Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>: FreeBSD IPFW support
-regex=ipfw: (\d+) Deny ([A-Z]+) ([0-9\.]+):(\d+) ([0-9\.]+):([0-9]+) in via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
-regex=ipfw: (\d+) Deny ([A-Z]+) ([0-9\.]+):(\d+) ([0-9\.]+):([0-9]+) out via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
-regex=ipfw: (\d+) Accept ([A-Z]+) ([0-9\.]+):(\d+) ([0-9\.]+):([0-9]+) in via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
-regex=ipfw: (\d+) Accept ([A-Z]+) ([0-9\.]+):(\d+) ([0-9\.]+):([0-9]+) out via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
+
+# 1. Deny rules
+regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
+regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
+
+regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;
+regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); class.name=Packet dropped by firewall; impact.completion=failed; impact.type=other; impact.severity=medium; impact.description=Denied outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;
+
+
+# 2. Accept rules
+regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted incoming packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
+regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted outgoing packet (rule #$1) $2 $3:$4 -> $5:$6 on interface $7;
+
+regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted incoming packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;
+regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); class.name=Packet accepted by firewall; impact.completion=succeeded; impact.type=other; impact.severity=medium; impact.description=Accepted outgoing packet (rule #$1) ICMP type $2.$3 $4 -> $5 on interface $6;
