@@ -147,7 +147,7 @@ static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, pre
                         return -1;
 
                 if ( ! optional )
-                        rule->required++;
+                        rule->required_goto++;
                 else
                         new->optional = TRUE;
                 
