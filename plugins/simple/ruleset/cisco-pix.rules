@@ -310,8 +310,49 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
  target(0).interface=$4; \
  last
 
+#Mar 15 20:55:18 gtsprodpix %PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for tcp src prod:10.100.17.27/1586 dst inside:10.100.16.255/445
+regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for (tcp|udp) src (\S+):([\d\.]+)/(\S+) dst (\S+):([\d\.]+)/(\S+); \
+ classification(0).name=Broadcast Address Translation Request; \
+ id=215; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The firewall has received a request to assign a static NAT translation for a broadcast address, which is illegal.  This is commonly an indicator of a network mapping attempt.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=$1; \
+ source(0).interface=$2; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$6; \
+ target(0).service.port=$7; \
+ target(0).interface=$5; \
+ last
+
+#Mar 24 09:19:42 gtsprodpix %PIX-4-313003: Invalid destination for ICMP error message: ICMP source 12.34.56.78 destination 90.12.34.56 (type 3, code 1) on outside interface.  Original IP payload: ICMP source 1.1.1.1 destination 1.1.1.1 (type 1, code 1).
+regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+) destination ([\d\.]+) \(type \d+, code \d+\) on (\S+) interface.; \
+ classification(0).name=ICMP Destination/Source Mismatch; \
+ id=216; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The destination for the ICMP error message is different than the source of the IP packet that induced the ICMP error message.  This could be an active network probe, an attempt to use the ICMP error message as a covert channel, or a misbehaving IP host.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=icmp; \
+ source(0).interface=$3; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).service.protocol=icmp; \
+ last
+
+
 # Events taken from the Cisco System Log Messages List that will need rules
-# (include 'attack' or 'intrusion' in description; no log samples):
+# (include 'attack' || 'intrusion' || 'probe' || 'covert' in description; no log samples):
 # %PIX-2-106017: Deny IP due to Land Attack from IP_address to IP_address 
 # %PIX-1-106021: Deny protocol reverse path check from source_address to dest_address on interface interface_name 
 # %PIX-1-106022: Deny protocol connection spoof from source_address to dest_address on interface interface_name 
@@ -324,10 +365,8 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
 # %PIX-4-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number
 # %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol 
 # %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host 
-# %PIX-6-605004: Login denied from {source_address/source_port | serial} to {interface_name:dest_address/service | console} for user "user"
 # %PIX-7-710005: {TCP|UDP} request discarded from source_address/source_port to interface_name:dest_address/service 
 # %PIX-7-710006: protocol request discarded from source_address to interface_name:dest_address
 # %PIX-2-106020: Deny IP teardrop fragment (size = number, offset = number) from IP_address to IP_address
 # %PIX-4-209004: Invalid IP fragment, size = bytes exceeds maximum size = bytes: src = IP_address, dest = IP_address, proto = protocol, id = number
 # %PIX-4-209005: Discard IP fragment set with more than number elements: src = IP_address, dest = IP_address, proto = protocol, id = number 
-
