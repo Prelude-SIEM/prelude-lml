@@ -232,7 +232,7 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg, prelu
                 if ( ret < 0 )
                         return ret;
         }
-        
+
         ret = access(arg, R_OK);
         if ( ret < 0 ) {
                 prelude_string_sprintf(err, "%s does not exist or have wrong permissions", arg);

@@ -70,7 +70,6 @@ regex=attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\
  last
 
 # no log sample, please submit
-#
 regex=not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Potential tmp race; \
  id=602; \
@@ -1739,7 +1738,7 @@ regex=mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
 
 # LOG:Dec 29 20:48:00 unix kernel: grsec: chdir to /root by /usr/sbin/crond[crond:19046] uid/euid:0/0 gid/egid:0/0, parent /usr/sbin/crond[crond:3401] uid/euid:0/0 gid/egid:0/0
 #
-regex=chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
+regex=chdir to \(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Directory changed; \
  id=681; \
  revision=1; \
