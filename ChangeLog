@@ -1,5 +1,8 @@
 2003-12-26  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* src/pconfig.c (pconfig_set): workaround prelude-getopt
+	flaw...
+
 	* src/file-server.c (file_server_wake_up): 
 	(initialize_fam): don't try to initialize fam on
 	each file monitored in case fam initialization fail once.

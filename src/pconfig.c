@@ -134,6 +134,8 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 
 static int set_logfile_format(prelude_option_t *opt, const char *arg)
 {
+        printf("set fmt\n");
+        
         if ( logfile_format )
                 free(logfile_format);
         
@@ -146,6 +148,8 @@ static int set_logfile_format(prelude_option_t *opt, const char *arg)
 
 static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
 {
+        printf("set ts\n");
+        
         if ( logfile_ts_format )
                 free(logfile_ts_format);
         
@@ -349,10 +353,6 @@ int pconfig_set(int argc, char **argv)
         prelude_option_set_priority(opt, option_run_first);
 #endif
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
-                           "Specify a file to monitor (you might specify \"stdin\")",
-                           required_argument, set_file, NULL);
-        
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 't', "time-format", 
                            "Specify the input timestamp format", required_argument,
                            set_logfile_ts_format, NULL);
@@ -360,6 +360,10 @@ int pconfig_set(int argc, char **argv)
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'l', "log-format", 
                            "Specify the input format", required_argument,
                            set_logfile_format, NULL);
+        
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
+                           "Specify a file to monitor (you might specify \"stdin\")",
+                           required_argument, set_file, NULL);
         
         ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
 	if ( ret == prelude_option_error || ret == prelude_option_end )
