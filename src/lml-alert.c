@@ -53,11 +53,11 @@ static idmef_analyzer_t *idmef_analyzer;
 
 
 
-static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *node) 
+static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *node)
 {
         int ret;
         idmef_address_t *address;
-	prelude_string_t *string;
+        prelude_string_t *string;
         
         /*
          * we want to know if it's an ip address or an hostname.
@@ -67,8 +67,8 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
                 /*
                  * hostname.
                  */
-		string = idmef_node_new_name(node);
-		prelude_string_set_ref(string, log->target_hostname);
+                string = idmef_node_new_name(node);
+                prelude_string_set_ref(string, log->target_hostname);
 
         } else {
                 address = idmef_node_new_address(node);
@@ -76,7 +76,7 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
                         return -1;
 
                 string = idmef_address_new_address(address);
-		prelude_string_set_ref(string, log->target_hostname);
+                prelude_string_set_ref(string, log->target_hostname);
         }
 
         return 0;
@@ -90,15 +90,15 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
         char str[128];
         void *in_addr;
         idmef_address_t *addr;
-	prelude_string_t *string;
+        prelude_string_t *string;
 
         while ( ai ) {
                 
                 if ( ai->ai_flags & AI_CANONNAME ) {
-			string = idmef_node_new_name(node);
-			if ( prelude_string_set_dup(string, ai->ai_canonname) < 0 )
-				return -1;
-		}
+                        string = idmef_node_new_name(node);
+                        if ( prelude_string_set_dup(string, ai->ai_canonname) < 0 )
+                                return -1;
+                }
                 
                 addr = idmef_node_new_address(node);
                 if ( ! addr )
@@ -107,7 +107,7 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
                 in_addr = prelude_inet_sockaddr_get_inaddr(ai->ai_addr);
                 assert(in_addr);
 
-		idmef_address_set_category(addr, (ai->ai_family == AF_INET) ?
+                idmef_address_set_category(addr, (ai->ai_family == AF_INET) ?
                                            IDMEF_ADDRESS_CATEGORY_IPV4_ADDR :
                                            IDMEF_ADDRESS_CATEGORY_IPV6_ADDR);
                 
@@ -116,9 +116,9 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
                         return -1;
                 }
 
-		string = idmef_address_new_address(addr);
-		if ( prelude_string_set_dup(string, str) < 0 )
-			return -1;
+                string = idmef_address_new_address(addr);
+                if ( prelude_string_set_dup(string, str) < 0 )
+                        return -1;
 
                 ai = ai->ai_next;
         }
@@ -136,7 +136,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         idmef_target_t *target;
         idmef_user_id_t *userid;
         idmef_process_t *process;
-	prelude_string_t *process_name;
+        prelude_string_t *process_name;
 
         target = idmef_alert_get_next_target(alert, NULL);
         if ( ! target ) {
@@ -162,8 +162,8 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                 if ( ! process )
                         return -1;
 
-		process_name = idmef_process_new_name(process);
-		prelude_string_set_ref(process_name, log->target_program);
+                process_name = idmef_process_new_name(process);
+                prelude_string_set_ref(process_name, log->target_program);
         }
         
         if ( log->target_hostname && ! idmef_target_get_node(target) ) {
@@ -196,17 +196,17 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 
 static int generate_additional_data(idmef_alert_t *alert, const char *meaning, const char *data)
 {
-	idmef_additional_data_t *adata;
-	prelude_string_t *adata_meaning;
+        idmef_additional_data_t *adata;
+        prelude_string_t *adata_meaning;
 
         adata = idmef_alert_new_additional_data(alert);
         if ( ! adata )
-		return -1;
+                return -1;
 
-	adata_meaning = idmef_additional_data_new_meaning(adata);
-	prelude_string_set_ref(adata_meaning, meaning);
+        adata_meaning = idmef_additional_data_new_meaning(adata);
+        prelude_string_set_ref(adata_meaning, meaning);
 
-	return idmef_additional_data_set_string_ref(adata, data);
+        return idmef_additional_data_set_string_ref(adata, data);
 }
 
 
@@ -215,38 +215,45 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 {
         const char *source;
         idmef_alert_t *alert;
-	idmef_time_t *create_time;
-	idmef_time_t *detect_time;
+        idmef_time_t *create_time;
+        idmef_time_t *detect_time;
+        idmef_analyzer_t *cur_analyzer;
         
-	alert = idmef_message_get_alert(message);
+        alert = idmef_message_get_alert(message);
 
-	create_time = idmef_time_new_from_gettimeofday();
-	if ( ! create_time )
-		goto error;
+        create_time = idmef_time_new_from_gettimeofday();
+        if ( ! create_time )
+                goto error;
 
-	idmef_alert_set_create_time(alert, create_time);
+        idmef_alert_set_create_time(alert, create_time);
         
         detect_time = idmef_alert_new_detect_time(alert);
-	if ( ! detect_time )
-		goto error;
+        if ( ! detect_time )
+                goto error;
 
-	idmef_time_set_from_time(detect_time, (const time_t *) &log->tv.tv_sec);
-	idmef_time_set_usec(detect_time, log->tv.tv_usec);
+        idmef_time_set_from_time(detect_time, (const time_t *) &log->tv.tv_sec);
+        idmef_time_set_usec(detect_time, log->tv.tv_usec);
 
         if ( log->target_hostname || log->target_program ) {
                 if ( generate_target(log, alert) < 0 )
-			goto error;
+                        goto error;
         }
 
-	idmef_alert_set_analyzer(alert, idmef_analyzer_ref(idmef_analyzer));
+        cur_analyzer = idmef_alert_get_analyzer(alert);
+        if ( cur_analyzer ) 
+                idmef_analyzer_set_analyzer(cur_analyzer, idmef_analyzer_ref(idmef_analyzer));
+        else
+                cur_analyzer = idmef_analyzer;
+
+        idmef_alert_set_analyzer(alert, idmef_analyzer_ref(cur_analyzer));
 
         source = log_source_get_name(log->source);
-	if ( generate_additional_data(alert, "Log received from", source) < 0 )
-		goto error;
+        if ( generate_additional_data(alert, "Log received from", source) < 0 )
+                goto error;
         
         if ( log->log ) {
-		if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
-			goto error;
+                if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
+                        goto error;
         }
 
         prelude_client_send_idmef(lml_client, message);
@@ -262,21 +269,21 @@ int lml_alert_init(prelude_client_t *lml_client)
 {
         prelude_string_t *string;
         
-	idmef_analyzer = prelude_client_get_analyzer(lml_client);
-	if ( ! idmef_analyzer )
-		return -1;
+        idmef_analyzer = prelude_client_get_analyzer(lml_client);
+        if ( ! idmef_analyzer )
+                return -1;
         
-	string = idmef_analyzer_new_model(idmef_analyzer);
-	prelude_string_set_constant(string, ANALYZER_MODEL);
+        string = idmef_analyzer_new_model(idmef_analyzer);
+        prelude_string_set_constant(string, ANALYZER_MODEL);
 
-	string = idmef_analyzer_new_class(idmef_analyzer);
-	prelude_string_set_constant(string, ANALYZER_CLASS);
+        string = idmef_analyzer_new_class(idmef_analyzer);
+        prelude_string_set_constant(string, ANALYZER_CLASS);
 
-	string = idmef_analyzer_new_manufacturer(idmef_analyzer);
-	prelude_string_set_constant(string, ANALYZER_MANUFACTURER);
+        string = idmef_analyzer_new_manufacturer(idmef_analyzer);
+        prelude_string_set_constant(string, ANALYZER_MANUFACTURER);
 
-	string = idmef_analyzer_new_version(idmef_analyzer);
-	prelude_string_set_constant(string, VERSION);
+        string = idmef_analyzer_new_version(idmef_analyzer);
+        prelude_string_set_constant(string, VERSION);
 
         return 0;
 }
