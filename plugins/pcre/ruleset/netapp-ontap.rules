@@ -88,8 +88,8 @@ regex=\[telnet_\d+:info\]: (\S+) logged in from host: ([\w\-\.]+); \
  assessment.impact.description=A user logged into the NetApp Filer using telnet.; \
  source(0).node.name=$1; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).type=target-user; \
- target(0).user.userid(0).name=$1; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$1; \
  last
 
 #Jul 15 11:20:49 cahco3 Thu Jul 15 11:17:01 PDT [raid.vol.disk.add.done:notice]: Addition of disk 8.64 (S/N 3HZ6YQHN00007433ARFV) to volume Callrec has completed successfully
