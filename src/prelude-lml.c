@@ -1,9 +1,9 @@
 /*****
 *
-* Copyright (C) 2004-2005 Yoann Vandoorselaere <yoann@prelude-ids.org>
-* All Rights Reserved
+* Copyright (C) 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
-* This file is part of the Prelude program.
+* This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by 
@@ -149,6 +149,8 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
 {
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
+        
+        prelude_log(PRELUDE_LOG_DEBUG, "[LOG] %s\n", str);
 
         log_entry = lml_log_entry_new();
         if ( ! log_entry )

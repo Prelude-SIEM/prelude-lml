@@ -1,3 +1,8 @@
+
+***
+* Use of this file is deprecated, use svn log.
+***
+
 2004-02-10  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* src/lml-alert.c (generate_target): 

@@ -1,9 +1,9 @@
 /*****
 *
-* Copyright (C) 2002 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
-* All Rights Reserved
+* Copyright (C) 2002, 2003, 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
-* This file is part of the Prelude program.
+* This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by 
@@ -54,7 +54,7 @@ static idmef_analyzer_t *idmef_analyzer;
 
 #define ANALYZER_CLASS "HIDS"
 #define ANALYZER_MODEL "Prelude LML"
-#define ANALYZER_MANUFACTURER "The Prelude Team http://www.prelude-ids.org"
+#define ANALYZER_MANUFACTURER "http://www.prelude-ids.com"
 
 
 

@@ -1,9 +1,9 @@
 /*****
 *
-* Copyright (C) 1998 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
-* All Rights Reserved
+* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
-* This file is part of the Prelude program.
+* This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by 
@@ -726,7 +726,7 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_opt
         
         prelude_plugin_set_name(&pcre_plugin, "pcre");
         prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");
-        prelude_plugin_set_contact(&pcre_plugin, "yoann@prelude-ids.org");
+        prelude_plugin_set_contact(&pcre_plugin, "yoann.v@prelude-ids.com");
         prelude_plugin_set_destroy_func(&pcre_plugin, pcre_destroy);
         
         pcre_plugin.run = pcre_run;
