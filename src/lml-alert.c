@@ -1,3 +1,6 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <inttypes.h>
 #include <sys/utsname.h>
 
@@ -19,34 +22,74 @@ static idmef_string_t ostype, osversion;
 #define ANALYZER_MANUFACTURER "The Prelude Team http://www.prelude-ids.org"
 
 
-void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t priority)
+
+static int generate_target(const log_container_t *log, idmef_alert_t *alert) 
 {
+        int ret;
         idmef_node_t *node;
         idmef_target_t *target;
+        idmef_process_t *process;
         idmef_address_t *address;
+        
+        target = idmef_alert_target_new(alert);
+        if ( ! target ) 
+                return -1;
+
+        if ( log->target_program ) {
+                process = idmef_target_process_new(target);
+                if ( ! process )
+                        return -1;
+                
+                idmef_string_set(&process->name, log->target_program);
+        }
+
+        if ( log->target_hostname ) {
+                
+                node = idmef_target_node_new(target);
+                if ( ! node ) 
+                        return -1;
+
+                /*
+                 * we want to know if it's an Ip address or an hostname.
+                 */
+                ret = inet_addr(log->target_hostname);
+                if ( ret < 0 ) {
+                        /*
+                         * hostname.
+                         */
+
+                        idmef_string_set(&node->name, log->target_hostname);
+                } else {
+                        address = idmef_node_address_new(node);
+                        if ( ! address ) 
+                                return -1;
+
+                        idmef_string_set(&address->address, log->target_hostname);
+                }
+        }
+
+        return 0;
+}
+
+
+
+
+
+void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t priority)
+{
+        int ret;
         idmef_additional_data_t *data;
         idmef_alert_t *alert = msg->message.alert;
         idmef_analyzer_t *analyzer = &alert->analyzer;
 
-        target = idmef_alert_target_new(alert);
-        if ( ! target ) {
-                idmef_message_free(msg);
-                return;
-        }
-
-        node = idmef_target_node_new(target);
-        if ( ! node ) {
-                idmef_message_free(msg);
-                return;
-        }
-
-        address = idmef_node_address_new(node);
-        if ( ! address ) {
-                idmef_message_free(msg);
-                return;
-        }
-
-        idmef_string_set(&address->address, log->source);
+        
+        if ( log->target_hostname || log->target_program ) {
+                ret = generate_target(log, alert);
+                if ( ret < 0 ) {
+                      idmef_message_free(msg);
+                      return;  
+                }
+        }        
         
         idmef_string_copy(&analyzer->ostype, &ostype);
         idmef_string_copy(&analyzer->osversion, &osversion);
@@ -54,6 +97,22 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
         idmef_string_set_constant(&analyzer->class, ANALYZER_CLASS);
         idmef_string_set_constant(&analyzer->manufacturer, ANALYZER_MANUFACTURER);
 
+        /*
+         *
+         */
+        data = idmef_alert_additional_data_new(alert);
+        if ( ! data ) {
+                idmef_message_free(msg);
+                return;
+        }
+        
+        data->type = string;
+        idmef_string_set_constant(&data->meaning, "Log received from");
+        idmef_string_set(&data->data, log->source);
+
+        /*
+         *
+         */
         data = idmef_alert_additional_data_new(alert);
         if ( ! data ) {
                 idmef_message_free(msg);
@@ -61,9 +120,13 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
         }
 
         data->type = string;
-        idmef_string_set_constant(&data->meaning, "Source Log");
+        idmef_string_set_constant(&data->meaning, "Original Log");
         idmef_string_set(&data->data, log->log);
-
+        
+        /*
+         *
+         */
+        
         idmef_msg_send(msgbuf, msg, priority);
         idmef_message_free(msg);
 }

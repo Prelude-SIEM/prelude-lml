@@ -107,7 +107,7 @@ static int set_pidfile(const char *arg)
 static int set_file(const char *arg) 
 {
         int fd, ret;
-
+           
         fd = open(arg, O_RDONLY);
         if ( fd < 0 ) {
                 log(LOG_ERR, "couldn't open %s for reading.\n", arg);

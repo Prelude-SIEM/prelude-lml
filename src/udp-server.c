@@ -51,9 +51,9 @@ static void udp_server_standalone(udp_server_t *server)
         fd_set fds;
         int len, ret;
         struct sockaddr_in addr;
-        char buf[SYSLOG_MSG_MAX_SIZE];
         struct timeval now, last, timeout;
-
+        char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
+        
         FD_ZERO(&fds);
         FD_SET(server->sockfd, &fds);
 
@@ -89,9 +89,17 @@ static void udp_server_standalone(udp_server_t *server)
                 
 		dprint("[UDP  ] on fd %d got packet from %s:%d - packet is %d bytes long\n",
                        server->sockfd, inet_ntoa(addr.sin_addr), addr.sin_port, ret);
-
+                
                 buf[ret] = '\0';
-                lml_dispatch_log(server->list, server->queue, buf, inet_ntoa(addr.sin_addr));
+
+                /*
+                 * we don't care about syslog priority / facility.
+                 */
+                ptr = strchr(buf, '>');
+                if ( ! ptr )
+                        ptr = buf;
+                
+                lml_dispatch_log(server->list, server->queue, ptr, inet_ntoa(addr.sin_addr));
 	}
 }
 

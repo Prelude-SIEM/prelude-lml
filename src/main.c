@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
@@ -80,7 +81,6 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
 
 
 
-
 /**
  * lml_dispatch_log:
  * @list: List of regex.
@@ -93,20 +93,14 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
  */
 void lml_dispatch_log(regex_list_t *list, queue_t *queue, const char *str, const char *from)
 {
-	time_t t;
-	log_container_t *log;
+        log_container_t *log;
 
-        log = malloc(sizeof(*log));
-	if ( ! log ) {
-                log(LOG_ERR, "memory exhausted.\n");
+        log = log_container_new(str, from);
+        if ( ! log )
                 return;
-        }
-
-	log->log = strdup(str);
-	log->source = strdup(from);
-	t = time(NULL), localtime_r(&t, &log->time_received);
-        
+                
         dprint("[MSGRD] received <%s> from %s\n", str, from);
+
         if ( queue ) 
                 queue_push(queue, log);
         else {

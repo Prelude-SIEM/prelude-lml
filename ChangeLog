@@ -1,5 +1,16 @@
 2002-04-02  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/log-common.c (format_syslog_header): 
+	new function, parse the syslog header. 
+
+	* src/lml-alert.c (generate_target): 
+	new function, take care of including target_program and
+	target_hostname in the IDMEF alert.
+	(lml_emit_alert): call generate_target().
+
+	* src/file-server.c (file_server_wake_up): 
+	set backslash 0 at the end of the buffer.
+
 	* src/pconfig.c (set_file): now that we do not
 	rely on server logic to add file monitor, we can add
 	monitor from the option callback.

@@ -46,7 +46,7 @@ static int read_file(int fd, char *buf, size_t size)
                 size -= ret;
                                 
         } while ( ret != 0 );
-
+        
         return 0;
 }
 
@@ -79,6 +79,8 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
                 ret = read_file(monitor->fd, buf, sizeof(buf));
                 if ( ret < 0 )
                         continue;
+
+                buf[strlen(buf)] = '\0';
                 
                 lml_dispatch_log(list, queue, buf, monitor->file);
         }
@@ -124,6 +126,7 @@ int file_server_monitor_file(const char *file, int fd)
         
         return 0;
 }
+
 
 
 
