@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2002, 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -161,7 +161,7 @@ static int set_file(prelude_option_t *opt, const char *arg)
 {
         int ret;
         log_file_t *lf;
-
+        
         lf = log_file_new();
         if ( ! lf )
                 return prelude_option_error;

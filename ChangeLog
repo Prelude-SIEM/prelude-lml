@@ -1,3 +1,18 @@
+2004-01-10  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/log-common.c 
+	(format_header, handle_escaped, format_common): 
+	(format_tstamp): Re-worked, cleaned-up, with the 
+	ability to tell where exactly in the log is the
+	timestamp. Make it much more easy to add new hook
+	for IDMEF field within the log.
+
+	(SYSLOG_LOG_FMT): 
+	(SYSLOG_TS_FMT): update to the newer format.
+
+	* prelude-lml.conf.in: remove invalid section,
+	use new log message configuration format.
+
 2004-01-09  Gene Gomez  <gene@gomezbrothers.com>
 
         * plugins/simple/ruleset:

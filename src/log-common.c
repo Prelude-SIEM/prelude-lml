@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 2003, 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -44,8 +44,8 @@
 /*
  * default log fmt.
  */
-#define SYSLOG_TS_FMT    "%b %d %H:%M:%S "
-#define SYSLOG_LOG_FMT   "%h %p:"
+#define SYSLOG_TS_FMT "%b %d %H:%M:%S"
+#define SYSLOG_LOG_FMT "%ltime %thost %tprog:"
 
 
 static unsigned int global_id = 0;
@@ -55,34 +55,68 @@ struct log_file_s {
         
         unsigned int id;
         const char *filename;
-
+        
+        char *ts_fmt;
         char *log_fmt;
-        char *time_fmt;
 };
 
 
 
-static int format_time(struct tm *lt, const char *fmt, char **log) 
-{        
+static int format_tstamp(log_file_t *lf, const char *log, char delim, void **out) 
+{
+        time_t now;
+        struct tm *lt;
+        const char *end;
+        struct timeval *tv = *out;
+        
         /*
-         * Now, let's format the timestamp provided in the syslog message.
+         * We first get the localtime from this system,
+         * so that all the struct tm member are filled.
+         *
+         * As syslog header doesn't contain a complete timestamp, this
+         * avoid us some computation error.
+         */
+        now = time(NULL);
+        
+        lt = localtime(&now);
+        if ( ! lt )
+                goto err;
+
+        /*
          * strptime() return a pointer to the first non matched character.
          */
-        *log = strptime(*log, fmt, lt);
-        if ( ! *log ) 
-                return -1;
+        
+        end = strptime(log, lf->ts_fmt, lt);
+        if ( ! end ) 
+                goto err;
 
-        return 0;
+        end = strchr(end, delim);
+        if ( ! end ) {
+                log(LOG_ERR, "couldn't find '%c' in %s\n", delim, end);
+                return -1;
+        }
+        
+        /*
+         * convert back to a timeval.
+         */
+        tv->tv_usec = 0;
+        tv->tv_sec = mktime(lt);
+        
+        return end - log;
+
+ err:
+        log(LOG_ERR, "couldn't format \"%s\" using \"%s\".\n", log, lf->ts_fmt);
+        return -1;
 }
 
 
 
 
-static int handle_escaped(log_container_t *lc, const char *log, char escaped, char delim) 
+static int format_common(log_file_t *lf, const char *log, char delim, void **out) 
 {
         char *ptr, tmp;
-
-        ptr = strchr(log, delim);
+                
+        ptr = strchr(log, delim);        
         if ( ! ptr ) {
                 log(LOG_ERR, "couldn't find '%c' in %s\n", delim, log);
                 return -1;
@@ -90,49 +124,72 @@ static int handle_escaped(log_container_t *lc, const char *log, char escaped, ch
 
         tmp = *ptr;
         *ptr = '\0';
-
-        if ( escaped == 'p' ) {
-                if ( lc->target_program ) 
-                        free(lc->target_program);
-                        
-                lc->target_program = strdup(log);
-        }
-        
-        else if ( escaped == 'h' ) {
-                if ( lc->target_hostname )
-                        free(lc->target_hostname);
                 
-                lc->target_hostname = strdup(log);
-        }
+        if ( *out )
+                free(*out);
 
-        else if ( escaped == 'u' ) {
-                if ( lc->target_user )
-                        free(lc->target_user);
-
-                lc->target_user = strdup(log);
-        }
-        
+        *out = strdup(log);
         *ptr = tmp;
         
         return ptr - log;
+}
+
+
+
+
+static int handle_escaped(log_file_t *lf, log_container_t *lc, const char *fmt, const char **log)
+{
+        int i, ret, len;
+        void *tv = &lc->tv;
+        struct {
+                const char *name;
+                int (*cb)(log_file_t *lf, const char *log, char delim, void **out);
+                void **ptr;
+        } tbl[] = {
+                { "tprog", format_common, (void **) &lc->target_program  },
+                { "thost", format_common, (void **) &lc->target_hostname },
+                { "tuser", format_common, (void **) &lc->target_user     },
+                { "ltime", format_tstamp, (void **) &tv                  },
+                { NULL, NULL                                             },
+        };
+
+        for ( i = 0; tbl[i].name != NULL; i++ ) {
+                len = strlen(tbl[i].name);
+                
+                ret = strncmp(fmt, tbl[i].name, len);
+                if ( ret != 0 )
+                        continue;
+
+                ret = tbl[i].cb(lf, *log, fmt[len], tbl[i].ptr);
+                if ( ret < 0 )
+                        return -1;
+                
+                *log += ret;
+                return len + 1;
+        }
+
+        log(LOG_ERR, "unknown tag: %%%s.\n", fmt);
+        
+        return -1;
 } 
 
 
 
 
 
-static int format_header(log_container_t *lc, const char *fmt, const char *log)
+static int format_header(log_file_t *lf, log_container_t *lc, const char *log)
 {
-        int ret = 0;        
+        int ret = 0;
+        const char *fmt = lf->log_fmt;
         
         while ( *fmt ) {
-                if ( *fmt == '%' && *(fmt + 1) != '\0' ) {
-                        ret = handle_escaped(lc, log, *(fmt + 1), *(fmt + 2));
+                
+                if ( *fmt == '%' && ((*fmt + 1) != '%' || *(fmt + 1) != '\0') ) {
+                        ret = handle_escaped(lf, lc, fmt + 1, &log);
                         if ( ret < 0 )
                                 return -1;
 
-                        fmt += 2;
-                        log += ret;
+                        fmt += ret;
                 }
                 
                 else if ( *fmt != *log ) {
@@ -155,41 +212,12 @@ static int format_header(log_container_t *lc, const char *fmt, const char *log)
 static int format_log(log_file_t *lf, log_container_t *lc)
 {
         int ret;
-        time_t now;
-        struct tm *lt;
         char *log = lc->log;
-        
-        /*
-         * We first get the localtime from this system,
-         * so that all the struct tm member are filled.
-         *
-         * As syslog header doesn't contain a complete timestamp, this
-         * avoid us some computation error.
-         */
-        now = time(NULL);
-        
-        lt = localtime(&now);
-        if ( ! lt ) {
-                log(LOG_ERR, "error getting local time.\n");
-                return -1;
-        }
 
-        ret = format_time(lt, lf->time_fmt, &log);        
-        if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't format \"%s\" using \"%s\".\n", lc->log, lf->time_fmt);
-                return -1;
-        }
-        
-        ret = format_header(lc, lf->log_fmt, log);
+        ret = format_header(lf, lc, log);
         /*
          * don't return on error, a syslog header might not have a tag.
          */
-        
-        /*
-         * convert back to a timeval.
-         */
-        lc->tv.tv_usec = 0;
-        lc->tv.tv_sec = mktime(lt);
 
         return 0;
 }
@@ -329,7 +357,6 @@ log_file_t *log_file_new(void)
         }
 
         lf->log_fmt = SYSLOG_LOG_FMT;
-        lf->time_fmt = SYSLOG_TS_FMT;
 
         return lf;
 }
@@ -344,10 +371,10 @@ const char *log_file_get_filename(log_file_t *lf)
 
 
 
-int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt)
+int log_file_set_log_fmt(log_file_t *lf, const char *fmt)
 {        
-        lf->time_fmt = strdup(fmt);
-        if ( ! lf->time_fmt ) {
+        lf->log_fmt = strdup(fmt);
+        if ( ! lf->log_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
@@ -357,10 +384,11 @@ int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt)
 
 
 
-int log_file_set_log_fmt(log_file_t *lf, const char *fmt)
+
+int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt)
 {        
-        lf->log_fmt = strdup(fmt);
-        if ( ! lf->log_fmt ) {
+        lf->ts_fmt = strdup(fmt);
+        if ( ! lf->ts_fmt ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
