@@ -66,18 +66,18 @@ extern prelude_option_t *lml_root_optlist;
 
 static pcre_rule_container_t *create_rule_container(pcre_rule_t *rule)
 {
-	pcre_rule_container_t *rc;
+        pcre_rule_container_t *rc;
 
-	rc = calloc(1, sizeof(*rc));
-	if ( ! rc ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		return NULL;
-	}
+        rc = calloc(1, sizeof(*rc));
+        if ( ! rc ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
         
         rc->rule = rule;
         rule->refcount++;
         
-	return rc;
+        return rc;
 }
 
 
@@ -182,6 +182,7 @@ static int parse_rule_optgoto(pcre_plugin_t *plugin, pcre_rule_t *rule, const ch
 static int parse_rule_min_optgoto_match(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
         rule->min_optgoto_match = atoi(arg);
+
         return 0;
 }
 
@@ -190,6 +191,7 @@ static int parse_rule_min_optgoto_match(pcre_plugin_t *plugin, pcre_rule_t *rule
 static int parse_rule_min_optregex_match(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
         rule->min_optregex_match = atoi(arg);
+
         return 0;
 }
 
@@ -234,7 +236,7 @@ static int parse_include(pcre_plugin_t *plugin, const char *value)
 
         fclose(fd);
 
-	return ret;
+        return ret;
 }
 
 
@@ -306,7 +308,6 @@ static char *cut_line(char *buf, char **sptr)
         *sptr = NULL;
 
         while ( *ptr ) {
-                
                 if ( *ptr == '\\' ) 
                         escaped = 1;
 
@@ -332,61 +333,61 @@ static char *cut_line(char *buf, char **sptr)
 
 
 static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
-			      const char *filename, int line,
-			      const char *keyword, const char *value)
+                                const char *filename, int line,
+                                const char *keyword, const char *value)
 {
-	int i;
-	struct {
+        int i;
+        struct {
                 const char *keyword;
                 int (*func)(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *value);
         } keywords[] = {
-                { "chained"           , parse_rule_chained            },
-                { "goto"              , parse_rule_goto               },
-                { "id",			parse_rule_id                 },
-                { "last",		parse_rule_last		      },
-                { "min-optgoto-match" , parse_rule_min_optgoto_match  },
-                { "min-optregex-match", parse_rule_min_optregex_match },
-                { "optgoto"           , parse_rule_optgoto            },
-                { "optregex"          , parse_rule_optregex           },
-                { "regex",		parse_rule_regex	      },
-                { "revision",		parse_rule_revision	      },
+                { "chained"             , parse_rule_chained            },
+                { "goto"                , parse_rule_goto               },
+                { "id"                  , parse_rule_id                 },
+                { "last"                , parse_rule_last               },
+                { "min-optgoto-match"   , parse_rule_min_optgoto_match  },
+                { "min-optregex-match"  , parse_rule_min_optregex_match },
+                { "optgoto"             , parse_rule_optgoto            },
+                { "optregex"            , parse_rule_optregex           },
+                { "regex"               , parse_rule_regex              },
+                { "revision"            , parse_rule_revision           },
         };
 
-	for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
-		if ( strcmp(keyword, keywords[i].keyword) != 0 )
-			continue;
+        for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
+                if ( strcmp(keyword, keywords[i].keyword) != 0 )
+                        continue;
 
-		if ( keywords[i].func(plugin, rule, value) < 0 ) {
-			log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, keyword);
-			return -1;
-		}
+                if ( keywords[i].func(plugin, rule, value) < 0 ) {
+                        log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, keyword);
+                        return -1;
+                }
 
-		return 1;
-	}
+                return 1;
+        }
 
-	return 0;
+        return 0;
 }
 
 
 
 
 static int parse_rule_entry(pcre_plugin_t *plugin, pcre_rule_t *rule,
-			    const char *filename, int line,
-			    const char *key, const char *value)
+                            const char *filename, int line,
+                            const char *key, const char *value)
 {
-	int ret;
+        int ret;
 
-	/*
-	 * Do we have a keyword...
-	 */
-	ret = parse_rule_keyword(plugin, rule, filename, line, key, value);
-	if ( ret == -1 || ret == 1 )
-		return ret;
+        /*
+         * Do we have a keyword...
+         */
+        ret = parse_rule_keyword(plugin, rule, filename, line, key, value);
+        if ( ret == -1 || ret == 1 )
+                return ret;
 
-	/*
-	 * ... or an idmef object
-	 */
-	return rule_object_add(rule->object_list, filename, line, key, value);	
+        /*
+         * ... or an idmef object
+         */
+        return rule_object_add(rule->object_list, filename, line, key, value);        
 }
 
 
@@ -410,7 +411,7 @@ static pcre_rule_t *create_rule(void)
         PRELUDE_INIT_LIST_HEAD(&rule->rule_list);
         PRELUDE_INIT_LIST_HEAD(&rule->regex_list);
 
-	return rule;
+        return rule;
 }
 
 
@@ -432,7 +433,7 @@ static void free_rule(pcre_rule_t *rule)
         }
 
         rule_object_list_destroy(rule->object_list);
-                        	        
+                                        
         free(rule);
 }
 
@@ -451,16 +452,16 @@ static void free_rule_container(pcre_rule_container_t *rc)
 
 static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, int line, char *buf) 
 {
-	char *in;
-	char *key;
-	char *value;
-	char *ptr = NULL;
+        char *in;
+        char *key;
+        char *value;
+        char *ptr = NULL;
         int first_directive = 1;
         pcre_rule_t *rule = NULL;
-	pcre_rule_container_t *rc = NULL;
+        pcre_rule_container_t *rc = NULL;
         
         while ( (in = cut_line(buf, &ptr)) ) {
-		buf = NULL;
+                buf = NULL;
                 
                 /*
                  * filter space at the begining of the line.
@@ -480,29 +481,29 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                 }
                 
                 if ( first_directive ) {
-			if ( strcmp(key, "include") == 0 ) {
+                        if ( strcmp(key, "include") == 0 ) {
                                 parse_include(plugin, value);
                                 return 0;
                         }
                         
-			rule = create_rule();
-			if ( ! rule )
-				return -1;
-			
-			first_directive = 0;
-		}
+                        rule = create_rule();
+                        if ( ! rule )
+                                return -1;
+                        
+                        first_directive = 0;
+                }
                 
-		if ( parse_rule_entry(plugin, rule, filename, line, key, value) < 0 ) {
-			free_rule(rule);
-			return -1;
-		}
+                if ( parse_rule_entry(plugin, rule, filename, line, key, value) < 0 ) {
+                        free_rule(rule);
+                        return -1;
+                }
         }
 
-	if ( prelude_list_empty(&rule->regex_list) ) {
-		log(LOG_ERR, "%s:%d: rule does not provide a regex.\n", filename, line);
-		free_rule(rule);
-		return -1;
-	}
+        if ( prelude_list_empty(&rule->regex_list) ) {
+                log(LOG_ERR, "%s:%d: rule does not provide a regex.\n", filename, line);
+                free_rule(rule);
+                return -1;
+        }
 
         rc = create_rule_container(rule);
         if ( ! rc ) {
@@ -515,7 +516,7 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
         else
                 prelude_list_add_tail(&rc->list, &plugin->rule_list);
         
-	plugin->rulesnum++;
+        plugin->rulesnum++;
 
         return 0;
 }
@@ -544,7 +545,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd)
                 if ( *ptr == '\0' || *ptr == '#' )
                         continue;
 
-		parse_ruleset_directive(plugin, filename, line, ptr);
+                parse_ruleset_directive(plugin, filename, line, ptr);
         }
 
         return 0;
@@ -677,22 +678,22 @@ prelude_plugin_generic_t *pcre_LTX_prelude_plugin_init(void)
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
         opt = prelude_option_add(lml_root_optlist, hook, 0, "pcre", "Pcre plugin option",
-                                 PRELUDE_OPTION_ARGUMENT_OPTIONAL, pcre_activate, NULL);
+                                PRELUDE_OPTION_ARGUMENT_OPTIONAL, pcre_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &pcre_plugin, opt, NULL);
         
         prelude_option_add(opt, hook, 'r', "ruleset", "Ruleset to use",
-                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pcre_ruleset, NULL);
+                                PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pcre_ruleset, NULL);
 
         prelude_option_add(opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'p',
-                           "pass-first", "Process rules with the \"last\" attribute first",
-                           PRELUDE_OPTION_ARGUMENT_NONE, set_last_first, NULL);
+                                "pass-first", "Process rules with the \"last\" attribute first",
+                                PRELUDE_OPTION_ARGUMENT_NONE, set_last_first, NULL);
         
-	prelude_plugin_set_name(&pcre_plugin, "pcre");
-	prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");
-	prelude_plugin_set_contact(&pcre_plugin, "yoann@prelude-ids.org");
-	prelude_plugin_set_running_func(&pcre_plugin, pcre_run);
+        prelude_plugin_set_name(&pcre_plugin, "pcre");
+        prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");
+        prelude_plugin_set_contact(&pcre_plugin, "yoann@prelude-ids.org");
+        prelude_plugin_set_running_func(&pcre_plugin, pcre_run);
         prelude_plugin_set_destroy_func(&pcre_plugin, pcre_destroy);
         
-	return (void *) &pcre_plugin;
+        return (void *) &pcre_plugin;
 }

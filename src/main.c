@@ -41,14 +41,14 @@ static volatile sig_atomic_t got_sighup = 0;
 
 static void sig_handler(int signum)
 {
-	log(LOG_INFO, "\n\nCaught signal %d.\n", signum);
+        log(LOG_INFO, "\n\nCaught signal %d.\n", signum);
         
         signal(signum, SIG_DFL);
 
         if ( udp_srvr )
                 udp_server_close(udp_srvr);
         
-	exit(2);
+        exit(2);
 }
 
 
@@ -195,22 +195,22 @@ int main(int argc, char **argv)
         global_argv = argv;
         lml_root_optlist = prelude_option_new_root();
         
-	PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
+        PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
         
-	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
-	if (ret < 0) {
-		log(LOG_INFO, "error initializing logs plugins.\n");
-		return -1;
-	}
-	log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
+        ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
+        if (ret < 0) {
+                log(LOG_INFO, "error initializing logs plugins.\n");
+                return -1;
+        }
+        log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
         
         ret = pconfig_set(lml_root_optlist, argc, argv);
         if ( ret < 0 )
                 exit(1);
         
         signal(SIGTERM, sig_handler);
-	signal(SIGINT, sig_handler);
-	signal(SIGQUIT, sig_handler);
+        signal(SIGINT, sig_handler);
+        signal(SIGQUIT, sig_handler);
         signal(SIGABRT, sig_handler);
         signal(SIGHUP, sighup_handler);
 
@@ -242,5 +242,5 @@ int main(int argc, char **argv)
                 prelude_client_destroy(lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
         }
         
-	return 0;
+        return 0;
 }

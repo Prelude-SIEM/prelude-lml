@@ -34,7 +34,6 @@ static char *trim(char *str)
         wptr = rptr = str;
         
         while ( *rptr != '\0' ) {
-
                 if ( isspace((int) *rptr) ) {
                         do {
                                 rptr++;
@@ -162,7 +161,6 @@ regex_list_t *regex_init(const char *source)
         }
 
         while ( fgets(buf, sizeof(buf), fd) ) {
-                
                 trim(buf);
 
                 if ( buf[0] == '#' || buf[0] == '\0' )

@@ -75,7 +75,7 @@ static int get_version(void *context, prelude_option_t *opt, char *buf, size_t s
 
 static int print_version(void *context, prelude_option_t *opt, const char *arg)
 {
-	printf("prelude-lml %s.\n", VERSION);
+        printf("prelude-lml %s.\n", VERSION);
         return prelude_error(PRELUDE_ERROR_EOF);
 }
 
@@ -84,7 +84,7 @@ static int print_version(void *context, prelude_option_t *opt, const char *arg)
 static int print_help(void *context, prelude_option_t *opt, const char *arg)
 {
         prelude_option_print(NULL, PRELUDE_OPTION_TYPE_CLI, 25);
-	return prelude_error(PRELUDE_ERROR_EOF);
+        return prelude_error(PRELUDE_ERROR_EOF);
 }
 
 
@@ -130,8 +130,8 @@ static int get_rotation_size_offset(void *context, prelude_option_t *opt, char *
 
 static int set_quiet_mode(void *context, prelude_option_t *opt, const char *arg)
 {
-	prelude_log_use_syslog();
-	return 0;
+        prelude_log_use_syslog();
+        return 0;
 }
 
 
@@ -339,15 +339,15 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_t *opt;
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
-	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
-			   "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
+                           "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
 
-	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
-			   "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
-			   print_version, get_version);
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+                           "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
+                           print_version, get_version);
 
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
-			   "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
+                           "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
         
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'u', "user",
                            "Run as the specified user", PRELUDE_OPTION_ARGUMENT_REQUIRED,
@@ -357,11 +357,11 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                            "Run in the specified group", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_lml_group, NULL);
         
-	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
-			   "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
-			   set_daemon_mode, NULL);
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
+                           "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
+                           set_daemon_mode, NULL);
         
-	opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
+        opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
                                  "Write Prelude LML PID to specified pidfile",
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
         
@@ -446,5 +446,5 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
         
-	return 0;
+        return 0;
 }

@@ -169,7 +169,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         if ( ! target )
                 goto err;
 
-        file = idmef_target_new_file(target);	
+        file = idmef_target_new_file(target);        
         if ( ! file ) 
                 goto err;
 
@@ -435,7 +435,6 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen)
         len = fd->index;
         
         while ( 1 ) {
-
                 /*
                  * check if our buffer isn't big enough,
                  * and truncate if it is.
@@ -498,7 +497,6 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         monitor->last_size = st->st_size;
         
         while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
-
                 eventno++;
                 lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf);
                 file_metadata_save(monitor, st->st_size - len);
@@ -690,7 +688,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 {
         char buf[1024];
         int toff, soff;
-	struct stat st_new;
+        struct stat st_new;
         const char *filename;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
@@ -698,11 +696,10 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
         filename = log_source_get_name(monitor->source);
         
-	/*
+        /*
          * test if the file has been removed
          */
         if ( st->st_nlink > 0 ) {
-
                 if ( stat(filename, &st_new) == 0 ) {
                         /*
                          * test if the file has been renamed
@@ -713,11 +710,10 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                         fclose(monitor->fd);
                         monitor_open(monitor);
                 } 
-                
                 else monitor_close(monitor);
                 log(LOG_INFO, "- logfile %s has been renamed.\n", filename);
-	} else {
-		log(LOG_INFO, "- logfile %s reached 0 hard link.\n", filename);	
+        } else {
+                log(LOG_INFO, "- logfile %s reached 0 hard link.\n", filename);
                 monitor_close(monitor);
         }
         
@@ -767,41 +763,41 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
 static int get_expected_event(FAMConnection *fc, int eventno)
 {
-	int ret;
-	fd_set fds;
-	FAMEvent event;
-	struct timeval tv;
+        int ret;
+        fd_set fds;
+        FAMEvent event;
+        struct timeval tv;
 
-	FD_ZERO(&fds);
-	FD_SET(fc->fd, &fds);
+        FD_ZERO(&fds);
+        FD_SET(fc->fd, &fds);
 
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
 
         while ( ! FAMPending(fc) ) {
                 ret = select(fc->fd + 1, &fds, NULL, NULL, &tv);
-		if ( ret <= 0 )
-			return -1;
-	}
+                if ( ret <= 0 )
+                        return -1;
+        }
 
-	/*
-	 * Wait for the notification started event.
-	 */
-	ret = FAMNextEvent(fc, &event);
+        /*
+         * Wait for the notification started event.
+         */
+        ret = FAMNextEvent(fc, &event);
         if ( ret < 0 || event.code != eventno ) 
                 return -1;
 
-	return 0;
+        return 0;
 }
 
 
 
 static int check_fam_writev_bug(FAMConnection *fc)
 {
-	int ret, fd;
-	FAMRequest fr;
+        int ret, fd;
+        FAMRequest fr;
         char buf[1024];
-	struct iovec iov[1];
+        struct iovec iov[1];
         char teststring[] = "testfam";
 
         snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
@@ -812,38 +808,38 @@ static int check_fam_writev_bug(FAMConnection *fc)
                 return -1;
         }
         
-	fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
-	if ( fd < 0 ) {
-		log(LOG_ERR, "error opening %s for writing.\n", buf);
-		return -1;
-	}
+        fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
+        if ( fd < 0 ) {
+                log(LOG_ERR, "error opening %s for writing.\n", buf);
+                return -1;
+        }
         
-	ret = FAMMonitorFile(fc, buf, &fr, NULL);
-	if ( ret < 0 ) {
+        ret = FAMMonitorFile(fc, buf, &fr, NULL);
+        if ( ret < 0 ) {
                 log(LOG_ERR, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[FAMErrno]);
                 close(fd);
                 return -1;
-	}
+        }
 
-	ret = get_expected_event(fc, FAMExists);
-	if ( ret < 0 )
-		goto err;
-
-	ret = get_expected_event(fc, FAMEndExist);
-	if ( ret < 0 )
+        ret = get_expected_event(fc, FAMExists);
+        if ( ret < 0 )
                 goto err;
 
-	iov[0].iov_len = sizeof(teststring);
-	iov[0].iov_base = teststring;
+        ret = get_expected_event(fc, FAMEndExist);
+        if ( ret < 0 )
+                goto err;
+
+        iov[0].iov_len = sizeof(teststring);
+        iov[0].iov_base = teststring;
         
-	ret = writev(fd, iov, 1);
-	if ( ret != sizeof(teststring) ) {
-		log(LOG_ERR, "error writing test string to %s: %s.\n", buf);
-		goto err;
-	}
-	
-	ret = get_expected_event(fc, FAMChanged);
-	if ( ret < 0 )
+        ret = writev(fd, iov, 1);
+        if ( ret != sizeof(teststring) ) {
+                log(LOG_ERR, "error writing test string to %s: %s.\n", buf);
+                goto err;
+        }
+        
+        ret = get_expected_event(fc, FAMChanged);
+        if ( ret < 0 )
                 goto err;
         
  err:

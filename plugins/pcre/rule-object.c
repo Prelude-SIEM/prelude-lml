@@ -56,8 +56,8 @@ struct rule_object_list {
 typedef struct {
         prelude_list_t list;
         
-	idmef_object_t *object;
-	prelude_list_t rule_object_value_list;
+        idmef_object_t *object;
+        prelude_list_t rule_object_value_list;
 } rule_object_t;
 
 
@@ -67,33 +67,33 @@ typedef struct {
  * List of fixed and dynamic value for a given IDMEF object.
  */
 typedef struct rule_object_value {
-	prelude_list_t list;      
-	char *value;
+        prelude_list_t list;      
+        char *value;
 } rule_object_value_t;
 
 
 
 typedef struct {
-	prelude_list_t list;
+        prelude_list_t list;
 
         int refno;
-	char **value;
+        char **value;
 } rule_referenced_value_t;
 
 
 
 static int strrncmp(const char *s1, const char *s2)
 {
-	size_t s1_len;
-	size_t s2_len;
+        size_t s1_len;
+        size_t s2_len;
 
-	s1_len = strlen(s1);
-	s2_len = strlen(s2);
+        s1_len = strlen(s1);
+        s2_len = strlen(s2);
 
-	if ( s1_len < s2_len )
-		return 1;
+        if ( s1_len < s2_len )
+                return 1;
 
-	return strncmp(s1 + s1_len - s2_len, s2, s2_len);
+        return strncmp(s1 + s1_len - s2_len, s2, s2_len);
 }
 
 
@@ -101,66 +101,66 @@ static int strrncmp(const char *s1, const char *s2)
 
 static int referenced_value_add(rule_object_list_t *olist, unsigned int reference, char **value)
 {
-	rule_referenced_value_t *reference_value;
+        rule_referenced_value_t *reference_value;
 
-	if ( reference >= MAX_REFERENCE_PER_RULE ) {
-		log(LOG_ERR, "reference number %d is too high.\n", reference);
-		return -1;
-	}
+        if ( reference >= MAX_REFERENCE_PER_RULE ) {
+                log(LOG_ERR, "reference number %d is too high.\n", reference);
+                return -1;
+        }
 
-	reference_value = malloc(sizeof(*reference_value));
-	if ( ! reference_value ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		return -1;
-	}
+        reference_value = malloc(sizeof(*reference_value));
+        if ( ! reference_value ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
 
-	reference_value->value = value;
+        reference_value->value = value;
         reference_value->refno = reference;
         
-	prelude_list_add_tail(&reference_value->list, &olist->referenced_value_list);
+        prelude_list_add_tail(&reference_value->list, &olist->referenced_value_list);
 
-	return 0;
+        return 0;
 }
 
 
 
 static int add_dynamic_object_value(rule_object_list_t *olist, rule_object_t *rule_object, unsigned int reference)
 {
-	rule_object_value_t *rovalue;
+        rule_object_value_t *rovalue;
 
-	rovalue = calloc(1, sizeof(*rovalue));
-	if ( ! rovalue ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		return -1;
-	}
+        rovalue = calloc(1, sizeof(*rovalue));
+        if ( ! rovalue ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
 
-	if ( referenced_value_add(olist, reference, &rovalue->value) < 0 ) {
-		free(rovalue);
-		return -1;
-	}
+        if ( referenced_value_add(olist, reference, &rovalue->value) < 0 ) {
+                free(rovalue);
+                return -1;
+        }
 
-	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
+        prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 
-	return 0;		
+        return 0;                
 }
 
 
 
 static int add_fixed_object_value(rule_object_t *rule_object, prelude_string_t *strbuf)
 {
-	rule_object_value_t *rovalue;
+        rule_object_value_t *rovalue;
 
-	rovalue = calloc(1, sizeof(*rovalue));
-	if ( ! rovalue ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		return -1;
-	}
+        rovalue = calloc(1, sizeof(*rovalue));
+        if ( ! rovalue ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
 
-	rovalue->value = prelude_string_get_string_released(strbuf);
+        rovalue->value = prelude_string_get_string_released(strbuf);
 
-	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
+        prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 
-	return 0;
+        return 0;
 }
 
 
@@ -169,56 +169,55 @@ static int parse_rule_object_value(rule_object_list_t *olist, rule_object_t *rul
 {
         int i;
         char num[10];
-	const char *str;
-	prelude_string_t *strbuf;
+        const char *str;
+        prelude_string_t *strbuf;
 
-	str = line;
+        str = line;
 
-	while ( *str ) {
-
+        while ( *str ) {
                 if ( *str == '$' && *(str + 1) != '$' ) {
 
                         i = 0;
-			str++;
+                        str++;
                         
-			while ( isdigit((int) *str) && i < sizeof(num) )
-				num[i++] = *str++;
+                        while ( isdigit((int) *str) && i < sizeof(num) )
+                                num[i++] = *str++;
 
-			if ( ! i )
-				return -1;
+                        if ( ! i )
+                                return -1;
 
-			num[i] = 0;
+                        num[i] = 0;
 
-			if ( add_dynamic_object_value(olist, rule_object, atoi(num)) < 0 )
-				return -1;
+                        if ( add_dynamic_object_value(olist, rule_object, atoi(num)) < 0 )
+                                return -1;
 
-			continue;
-		}
+                        continue;
+                }
 
-		strbuf = prelude_string_new();
-		if ( ! strbuf )
-			return -1;
+                strbuf = prelude_string_new();
+                if ( ! strbuf )
+                        return -1;
 
-		while ( *str ) {
-			if ( *str == '$' ) {
-				if ( *(str + 1) == '$' )
-					str++;
-				else
-					break;
-			}
+                while ( *str ) {
+                        if ( *str == '$' ) {
+                                if ( *(str + 1) == '$' )
+                                        str++;
+                                else
+                                        break;
+                        }
 
-			if ( prelude_string_ncat(strbuf, str, 1) < 0 )
-				return -1;
-			str++;
-		}
+                        if ( prelude_string_ncat(strbuf, str, 1) < 0 )
+                                return -1;
+                        str++;
+                }
 
-		if ( add_fixed_object_value(rule_object, strbuf) < 0 )
-			return -1;
+                if ( add_fixed_object_value(rule_object, strbuf) < 0 )
+                        return -1;
 
-		prelude_string_destroy(strbuf);
-	}
+                prelude_string_destroy(strbuf);
+        }
 
-	return 0;
+        return 0;
 }
 
 
@@ -240,53 +239,52 @@ static void free_rule_object_value_list(rule_object_t *object)
 
 static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 {
-	const char *str;
+        const char *str;
         prelude_list_t *tmp;
         idmef_value_t *value;
         struct servent *service;
-	prelude_string_t *strbuf;
-	rule_object_value_t *rovalue;
+        prelude_string_t *strbuf;
+        rule_object_value_t *rovalue;
                  
-	strbuf = prelude_string_new();
-	if ( ! strbuf )
-		return NULL;
+        strbuf = prelude_string_new();
+        if ( ! strbuf )
+                return NULL;
 
-	prelude_list_for_each(tmp, &rule_object->rule_object_value_list) {
-		rovalue = prelude_list_entry(tmp, rule_object_value_t, list);
+        prelude_list_for_each(tmp, &rule_object->rule_object_value_list) {
+                rovalue = prelude_list_entry(tmp, rule_object_value_t, list);
 
                 if ( ! rovalue->value )
                         continue;
 
                 if ( prelude_string_cat(strbuf, rovalue->value) < 0 ) {
-			prelude_string_destroy(strbuf);
-			return NULL;
-		}
-	}
+                        prelude_string_destroy(strbuf);
+                        return NULL;
+                }
+        }
 
         if ( prelude_string_is_empty(strbuf) ) {
                 prelude_string_destroy(strbuf);
                 return NULL;
         }
         
-	str = prelude_string_get_string(strbuf);
+        str = prelude_string_get_string(strbuf);
 
-	if ( strrncmp(idmef_object_get_name(rule_object->object), ".port") == 0 && ! isdigit((int) *str) ) {
+        if ( strrncmp(idmef_object_get_name(rule_object->object), ".port") == 0 && ! isdigit((int) *str) ) {
+                service = getservbyname(str, NULL);
+                if ( ! service ) {
+                        log(LOG_ERR, "Service name '%s' could not be found in /etc/services.\n", str);
+                        return NULL;
+                }
 
-		service = getservbyname(str, NULL);
-		if ( ! service ) {
-			log(LOG_ERR, "Service name '%s' could not be found in /etc/services.\n", str);
-			return NULL;
-		}
+                value = idmef_value_new_uint16(ntohs(service->s_port));
 
-		value = idmef_value_new_uint16(ntohs(service->s_port));
+        }
+        else
+            value = idmef_value_new_for_object(rule_object->object, str);
 
-	} else {
-		value = idmef_value_new_for_object(rule_object->object, str);
-	}
-
-	prelude_string_destroy(strbuf);
-	
-	return value;
+        prelude_string_destroy(strbuf);
+        
+        return value;
 }
 
 
@@ -295,10 +293,10 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 static void resolve_referenced_value(rule_object_list_t *olist,
                                      const log_container_t *log, int *ovector, size_t osize) 
 {
-	 int ret;
+         int ret;
          prelude_list_t *tmp;
-	 char buf[1024] = { 0 };
-	 rule_referenced_value_t *rval;
+         char buf[1024] = { 0 };
+         rule_referenced_value_t *rval;
          
          prelude_list_for_each(tmp, &olist->referenced_value_list) {
                  
@@ -350,7 +348,7 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
         int ret;
         prelude_list_t *tmp;
         idmef_value_t *value;
-	rule_object_t *rule_object;
+        rule_object_t *rule_object;
         
         if ( ! *message ) {
                 *message = idmef_message_new();
@@ -360,28 +358,28 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
         
         resolve_referenced_value(olist, log, ovector, osize);
         
-	prelude_list_for_each(tmp, &olist->rule_object_list) {
-		rule_object = prelude_list_entry(tmp, rule_object_t, list);
+        prelude_list_for_each(tmp, &olist->rule_object_list) {
+                rule_object = prelude_list_entry(tmp, rule_object_t, list);
 
                 value = build_message_object_value(rule_object);
-		if ( ! value )
+                if ( ! value )
                         continue;
                 
-		ret = idmef_object_set(*message, rule_object->object, value);
-		idmef_value_destroy(value);
+                ret = idmef_object_set(*message, rule_object->object, value);
+                idmef_value_destroy(value);
 
-		if ( ret < 0 ) {
-			log(LOG_ERR, "idmef_object_set failed for %s: %d.\n",
+                if ( ret < 0 ) {
+                        log(LOG_ERR, "idmef_object_set failed for %s: %d.\n",
                             idmef_object_get_name(rule_object->object), ret);
-			idmef_message_destroy(*message);
+                        idmef_message_destroy(*message);
                         referenced_value_destroy_content(olist);
                         return -1;
-		}
-	}
+                }
+        }
 
         referenced_value_destroy_content(olist);
         
-	return 0;
+        return 0;
 }
 
 
@@ -390,8 +388,8 @@ int rule_object_add(rule_object_list_t *olist,
                     const char *filename, int line,
                     const char *object_name, const char *value)
 {
-	idmef_object_t *object;
-	rule_object_t *rule_object;
+        idmef_object_t *object;
+        rule_object_t *rule_object;
 
         object = idmef_object_new("alert.%s", object_name);
         if ( ! object ) {
@@ -399,32 +397,32 @@ int rule_object_add(rule_object_list_t *olist,
                 return -1;
         }
 
-	if ( idmef_object_is_ambiguous(object) == 0 ) {
-		log(LOG_ERR, "%s:%d: invalid object '%s', some list index are missing.\n",
-		    filename, line, idmef_object_get_name(object));
-		idmef_object_destroy(object);
-		return -1;
-	}
+        if ( idmef_object_is_ambiguous(object) == 0 ) {
+                log(LOG_ERR, "%s:%d: invalid object '%s', some list index are missing.\n",
+                    filename, line, idmef_object_get_name(object));
+                idmef_object_destroy(object);
+                return -1;
+        }
 
-	rule_object = malloc(sizeof(*rule_object));
-	if ( ! rule_object ) {
-		log(LOG_ERR, "memory exhausted.\n");
-		idmef_object_destroy(object);
-		return -1;
-	}
+        rule_object = malloc(sizeof(*rule_object));
+        if ( ! rule_object ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                idmef_object_destroy(object);
+                return -1;
+        }
 
-	PRELUDE_INIT_LIST_HEAD(&rule_object->rule_object_value_list);
-	rule_object->object = object;
+        PRELUDE_INIT_LIST_HEAD(&rule_object->rule_object_value_list);
+        rule_object->object = object;
 
-	if ( parse_rule_object_value(olist, rule_object, value) < 0 ) {
-		idmef_object_destroy(object);
-		free(rule_object);
-		return -1;
-	}
+        if ( parse_rule_object_value(olist, rule_object, value) < 0 ) {
+                idmef_object_destroy(object);
+                free(rule_object);
+                return -1;
+        }
 
-	prelude_list_add_tail(&rule_object->list, &olist->rule_object_list);
+        prelude_list_add_tail(&rule_object->list, &olist->rule_object_list);
 
-	return 0;
+        return 0;
 }
 
 

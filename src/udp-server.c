@@ -35,10 +35,10 @@
 
 
 struct udp_server {
-	int sockfd;
+        int sockfd;
         log_source_t *ls;
         regex_list_t *rlist;
-	struct sockaddr_in saddr;
+        struct sockaddr_in saddr;
 };
 
 
@@ -81,8 +81,8 @@ void udp_server_process_event(udp_server_t *server)
 void udp_server_close(udp_server_t *server)
 {
         log_source_destroy(server->ls);
-	close(server->sockfd);
-	free(server);
+        close(server->sockfd);
+        free(server);
 }
 
 
@@ -100,7 +100,7 @@ int udp_server_get_event_fd(udp_server_t *server)
 udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t port)
 {
         int ret;
-	udp_server_t *server;
+        udp_server_t *server;
 
         server = malloc(sizeof(*server));
         if ( ! server ) {
@@ -114,12 +114,12 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
         if ( ! server->ls )
                 return NULL;
         
-	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if ( server->sockfd < 0 ) {
-		log(LOG_ERR, "couldn't create socket.\n");
+        server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+        if ( server->sockfd < 0 ) {
+                log(LOG_ERR, "couldn't create socket.\n");
                 free(server);
                 return NULL;
-	}
+        }
 
         
         ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
@@ -135,10 +135,10 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
 
         ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
         if ( ret < 0 ) {
-		log(LOG_ERR, "couldn't bind to socket.\n");
+                log(LOG_ERR, "couldn't bind to socket.\n");
                 udp_server_close(server);
                 return NULL;
-	}
+        }
                 
-	return server;
+        return server;
 }

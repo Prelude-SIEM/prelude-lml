@@ -110,7 +110,6 @@ static int exec_regex(pcre_rule_t *rule, const log_container_t *log, int *ovecto
         dprint("\nInput = %s\n", log->log);
         
         prelude_list_for_each(tmp, &rule->regex_list) {
-                
                 item = prelude_linked_object_get_object(tmp, rule_regex_t);
                                 
                 ret = do_pcre_exec(item, &real_ret, log->log, strlen(log->log),
@@ -248,10 +247,10 @@ rule_regex_t *rule_regex_new(const char *regex, int optionnal)
         }
 
         new->regex_string = strdup(regex);
-	    if ( ! new->regex_string ) {
-		    log(LOG_ERR, "memory exhausted.\n");
-		    return NULL;
-	    }
+        if ( ! new->regex_string ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
 
         new->optreg = optionnal;
         new->extra = pcre_study(new->regex, 0, &err_ptr);

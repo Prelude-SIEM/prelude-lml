@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <limits.h>		/* for NAME_MAX */
+#include <limits.h>                /* for NAME_MAX */
 #include <sys/time.h>
 #include <time.h>
 
@@ -24,7 +24,7 @@ static int subscribe(prelude_plugin_instance_t *pi)
 {
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-	log(LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        log(LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
         prelude_linked_object_add((prelude_linked_object_t *) pi, &log_plugins_instance);
 
         return 0;
@@ -36,7 +36,7 @@ static void unsubscribe(prelude_plugin_instance_t *pi)
 {
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-	log(LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        log(LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
         prelude_linked_object_del((prelude_linked_object_t *) pi);
 }
 
@@ -69,28 +69,24 @@ prelude_plugin_instance_t *log_plugin_register(const char *plugin)
  */
 int log_plugins_init(const char *dirname, int argc, char **argv)
 {
-	int ret;
+        int ret;
         
-	ret = access(dirname, F_OK);
-	if ( ret < 0 ) {
-		if ( errno == ENOENT )
-			return 0;
+        ret = access(dirname, F_OK);
+        if ( ret < 0 ) {
+                if ( errno == ENOENT )
+                        return 0;
 
                 log(LOG_ERR, "can't access %s.\n", dirname);
 
                 return -1;
-	}
+        }
 
-	ret = prelude_plugin_load_from_dir(dirname, subscribe, unsubscribe);
-	if ( ret < 0 ) {
-		log(LOG_ERR, "couldn't load plugin subsystem.\n");
-		return -1;
-	}
+        ret = prelude_plugin_load_from_dir(dirname, subscribe, unsubscribe);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't load plugin subsystem.\n");
+                return -1;
+        }
         
-	return ret;
+        return ret;
 }
-
-
-
-
 

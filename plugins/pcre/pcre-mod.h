@@ -29,10 +29,10 @@
 
 
 typedef struct {
-	uint16_t id;
-	uint16_t revision;
+        uint16_t id;
+        uint16_t revision;
 
-	int last;
+        int last;
         int chained;
         int required;
         int refcount;
