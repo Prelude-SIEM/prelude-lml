@@ -91,3 +91,15 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
  target(0).service.protocol=udp; \
  target(0).process.pid=$1; \
  last
+
+#Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
+regex='\S+' contains a virus \(Infection: (\S+)\); \
+ classification(0).name=Virus found: $1; \
+ id=404; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=A virus has been identified by P3Scan; \
+ last
