@@ -1,3 +1,18 @@
+2002-04-27  Laurent Oudot  <oudot.laurent@wanadoo.fr>
+
+	* plugins/simple/ruleset/simple.rules:
+	Added include directive for specific rules in cisco.rules and
+	zyxel.rules.
+	The include directive is very cool because it will help at maintaining
+	the rules (if you don't need for example zyxel rules, you can put a
+	simple # character before the include directive). 
+	
+	* plugins/simple/ruleset/cisco.rules:
+	New file dedicated to cisco rules.
+	
+	* plugins/simple/ruleset/zyxel.rules:
+	New file dedicated to zyxel rules.
+
 2002-04-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/file-server.c (file_server_monitor_file): 
