@@ -1,3 +1,10 @@
+2002-04-27  Laurent Oudot  <oudot.laurent@wanadoo.fr>
+
+	* plugins/simple/ruleset/simple.rules :
+	Added ZyXEL routers and firewalls support.
+	It will help at dealing with ZyXEL network equipments used with 
+	security filtering features.
+
 2002-04-26  Laurent Oudot  <oudot.laurent@wanadoo.fr>
 
 	* plugins/simple/ruleset/simple.rules :
