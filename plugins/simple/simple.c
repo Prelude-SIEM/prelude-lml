@@ -1880,6 +1880,12 @@ static int parse_ruleset(const char *filename, FILE *fd)
                         continue;
                 }
 
+                if ( ! rule->regex ) {
+                        log(LOG_ERR, "error parsing %s:%d: rule does not provide a regex.\n", filename, line);
+                        free_rule(rule);
+                        return -1;
+                }
+                
                 list_add_tail(&rule->list, &rules_list);
                 rulesnum++;
         }

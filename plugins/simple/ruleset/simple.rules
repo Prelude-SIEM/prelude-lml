@@ -35,7 +35,7 @@
 # - impact.completion:
 #   An indication of whether the analyzer believes the attempt that
 #   the event describes was successful or not.
-#   The permitted values are: faile, succeeded.
+#   The permitted values are: failed, succeeded.
 #
 # - impact.type:
 #   The type of attempt represented by this event, in relatively broad categories.

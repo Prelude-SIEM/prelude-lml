@@ -1,3 +1,18 @@
+2002-10-13  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/simple/ruleset/grsecurity.rules: 
+	new grsecurity ruleset, contributed by 
+	Brad Spengler <spender@grsecurity.net>, and handling
+	grsecurity up to 1.9.7.
+
+	* plugins/simple/ruleset/simple.rules: fix a typo.
+
+	* plugins/simple/simple.c (parse_ruleset): 
+	check if rule->regex is NULL (which is possible
+	in case a rule doesn't provide a regex). Dump an
+	error, and drop the rule. This fix a possible SIGSEGV
+	on possible malformed rules.
+
 2002-09-20  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/simple/ruleset/simple.rules:
