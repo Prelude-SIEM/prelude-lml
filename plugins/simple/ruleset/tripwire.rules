@@ -28,46 +28,46 @@
 #Jan 22 11:32:26 host tripwire[5265]: Integrity Check Complete: /usr/local/tripwire/tfs/report/host-.twr TWReport host 20040122113203 V:91 S:100 A:51 R:0 C:40 L:0 M:8 H:83
 
 regex=TWReport \S+ \d+ V:0; \
-  classification(0).name=Integrity Check OK; \
-  id=3400; \
-  revision=1; \
-  classification(0).origin=vendor-specific; \
-  assessment.impact.severity=low; \
-  assessment.impact.type=file; \
-  assessment.impact.completion=succeeded; \
-  assessment.impact.description=Integrity check ran successfully without warnings; \
-  target(0).decoy=no; \
-  last
+ classification(0).name=Integrity Check OK; \
+ id=3400; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Integrity check ran successfully without warnings; \
+ target(0).decoy=no; \
+ last
 
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:(?!0)(\d+); \
-  classification(0).name=Integrity Check Warning: file(s) added; \
-  id=3401; \
-  revision=1; \
-  classification(0).origin=vendor-specific; \
-  assessment.impact.severity=low; \
-  assessment.impact.type=file; \
-  assessment.impact.completion=succeeded; \
-  assessment.impact.description=Integrity check ran successfully, warning: $1 file(s) added; \
-  target(0).decoy=no
+ classification(0).name=Integrity Check Warning: file(s) added; \
+ id=3401; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Integrity check ran successfully, warning: $1 file(s) added; \
+ target(0).decoy=no
 
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
-  classification(0).name=Integrity Check Warning: file(s) removed; \
-  id=3402; \
-  revision=1; \
-  classification(0).origin=vendor-specific; \
-  assessment.impact.severity=high; \
-  assessment.impact.type=file; \
-  assessment.impact.completion=succeeded; \
-  assessment.impact.description=Integrity check ran successfully, warning: $1 files removed; \
-  target(0).decoy=no
+ classification(0).name=Integrity Check Warning: file(s) removed; \
+ id=3402; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Integrity check ran successfully, warning: $1 files removed; \
+ target(0).decoy=no
 
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:\d+ C:(?!0)(\d+); \
-  classification(0).name=Integrity Check Warning: file(s) modified; \
-  id=3403; \
-  revision=1; \
-  classification(0).origin=vendor-specific; \
-  assessment.impact.severity=medium; \
-  assessment.impact.type=file; \
-  assessment.impact.completion=succeeded; \
-  assessment.impact.description=Integrity check ran, warning: $1 files modified; \
-  target(0).decoy=no
+ classification(0).name=Integrity Check Warning: file(s) modified; \
+ id=3403; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Integrity check ran, warning: $1 files modified; \
+ target(0).decoy=no

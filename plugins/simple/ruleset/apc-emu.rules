@@ -69,7 +69,7 @@ regex=EMU: Input Contact \d+ (\'.+\') opened, abnormal condition; \
 #Mar 22 16:28:51 enviro1 10.100.17.252 EMU: Input Contact 4 'Rack 4 Front Door' closed, abnormal condition cleared. 0x1014
 regex=EMU: Input Contact \d+ (\'.+\') closed, abnormal condition cleared; \
  classification(0).name=Device Contact Closed; \
- id=2802; \
+ id=2803; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \

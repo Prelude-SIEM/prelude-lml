@@ -67,7 +67,7 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
  last
 
 # 1.c 538
-# No log sample; please submit
+# Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
 regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+)  Logon ID:\((.*)\)  Logon Type:(\d+); \
  classification(0).name=Windows Event ID [538]: User logoff; \
  id=1402; \

@@ -107,7 +107,7 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) 
  assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3.  No reactive action taken.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- target(0).node.name=$4
+ target(0).node.name=$4; \
  target(0).service.name=http; \
  last
 
@@ -122,7 +122,7 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- target(0).node.name=$5
+ target(0).node.name=$5; \
  target(0).service.name=http; \
  last
 
@@ -137,7 +137,7 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to \[(\S+)\
  assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- target(0).node.name=$5
+ target(0).node.name=$5; \
  target(0).service.name=http; \
  last
 
