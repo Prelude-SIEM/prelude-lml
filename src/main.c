@@ -186,7 +186,7 @@ static void wait_for_event(void)
                 if ( udp_event_fd > 0 && FD_ISSET(udp_event_fd, &fds) ) 
                         udp_server_process_event(udp_srvr);
                 
-                if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) ) 
+                if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) )
                         file_server_wake_up();
         }
 }
@@ -241,16 +241,3 @@ int main(int argc, char **argv)
         
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
