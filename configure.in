@@ -98,31 +98,26 @@ dnl **************************************************
 dnl * Check for FAM.                                 *
 dnl **************************************************
 
-enable_fam=no
-                                                                                                
-AC_ARG_ENABLE(fam, [  --enable-fam      Use FAM for file change notification [default=auto]], enable_fam="$enableval", enable_fam=yes)
+AC_ARG_WITH(fam, [  --with-fam=DIR          use DIR where fam is installed.],
+            [FAM_CFLAGS="-I$withval/include"; FAM_LIBS="-L$withval/lib"])
 
-for dir in /usr /usr/local /usr/pkg; do
-	AC_CHECK_FILE($dir/lib/libfam.so, fam_lib_dir=$dir)
-	AC_CHECK_FILE($dir/include/fam.h, fam_include_dir=$dir)
-done
+old_LDFLAGS=$LDFLAGS
+old_CPPFLAGS=$CPPFLAGS
+LDFLAGS="$LDFLAGS $FAM_LIBS"
+CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
 
-if test -z "$fam_lib_dir" || test -z "$fam_include_dir"; then
-	enable_fam=no
-fi
+AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
+AC_CHECK_LIB(fam, main, , fam_lib_ok="no")
 
-if test x$fam_include_dir = x/usr; then
-	fam_include_dir=""
+if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then 
+   	enable_fam=no;
 else
-	fam_include="-I$fam_include_dir/include"
+	enable_fam=yes;
+	AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
 fi
 
-if test x$enable_fam = xyes; then
-	LIBPRELUDE_LIBS="$LIBPRELUDE_LIBS -lfam"
-	LIBPRELUDE_CFLAGS="$LIBPRELUDE_CFLAGS $fam_include"
-        AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
-fi
-                                                                                      
+AC_SUBST(FAM_LIBS)
+AC_SUBST(FAM_CFLAGS)
 AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
 
 
