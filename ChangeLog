@@ -1,3 +1,10 @@
+2002-03-29  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* prelude-lml.conf.in (file): 
+	now that we are able to have the same entry with different
+	value several time in config file (libprelude), add new file
+	to monitor.
+
 2002-03-28  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/simple/simple.c: include <inttypes.h> and <sys/types.h>
