@@ -32,7 +32,7 @@
 
 #Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
 regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
- classification(0).name=Load Balancer $1 Audit; \
+ classification(0).name=Load balancer $1 audit; \
  id=3600; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -49,7 +49,7 @@ regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
 
 #Jun 10 18:05:43 12.4.18.135 bigconf.cgi: AUDIT -- Delete POOL SMDEMO User: admin
 regex=bigconf.cgi: AUDIT -- (\w+) (\w+) (\w+)  User: (\S+); \
- classification(0).name=Load Balancer $1 Audit; \
+ classification(0).name=Load balancer $1 audit; \
  id=3601; \
  revision=1; \
  classification(0).origin=vendor-specific; \

@@ -37,6 +37,7 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
  assessment.impact.description=Messages 400000 through 400051 - Cisco Intrusion Detection System signature messages; \
  source(0).interface=$4; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -47,7 +48,7 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+
 
 #Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification(0).name=Successful firewall user login; \
+ classification(0).name=Firewall user login successful; \
  id=201; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -70,7 +71,7 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
- classification(0).name=Successful firewall admin login; \
+ classification(0).name=Firewall admin login successful; \
  id=202; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -115,7 +116,7 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification(0).name=Failed firewall user login; \
+ classification(0).name=Firewall user login failed; \
  id=205; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -138,7 +139,7 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
- classification(0).name=Failed firewall admin login; \
+ classification(0).name=Firewall admin login failed; \
  id=206; \
  revision=1; \
  classification(0).origin=vendor-specific; \

@@ -32,7 +32,7 @@
 
 #Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'probe'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
- classification(0).name=MS-SQL user login failure; \
+ classification(0).name=Database user login failure; \
  id=1000; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -47,7 +47,7 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
 
 #Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'sa'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
- classification(0).name=MS-SQL sa login failure; \
+ classification(0).name=Database admin login failure; \
  id=1001; \
  revision=1; \
  classification(0).origin=vendor-specific; \

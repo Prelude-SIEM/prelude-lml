@@ -43,7 +43,7 @@ regex=entered promiscuous mode; \
 
 # No sample log; please submit
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
- classification(0).name=Exim request rejected; \
+ classification(0).name=Mail server request rejected; \
  classification(0).origin=vendor-specific; \
  id=401; \
  revision=1; \
@@ -60,7 +60,7 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
 
 #Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
 regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMINAL: (\S+); \
- classification(0).name=Oracle DBA Audit Trail; \
+ classification(0).name=Database audit; \
  id=402; \
  revision=1; \
  classification(0).origin=vendor-specific; \

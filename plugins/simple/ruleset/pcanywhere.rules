@@ -32,7 +32,7 @@
 
 #Apr 13 10:31:03 12.34.56.78 pcanywhere[info] 127 NT AUTHORITY\SYSTEM  Host In Session  Host Name: DB3  Host Licensee: MAXIMUS  Remote Name: JM15575  Remote User: NUT&BOLT  Device Type: TCP/IP
 regex=Host In Session  Host Name: (\S+)  Host Licensee: \S+  Remote Name: (\S+)  Remote User: (\S+); \ 
-classification(0).name=pcAnywhere User Connected; \
+classification(0).name=Remote control user connected; \
  id=3000; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -49,7 +49,7 @@ classification(0).name=pcAnywhere User Connected; \
 
 #Apr 14 06:29:55 db3 pcanywhere[info] 123 NT AUTHORITY\SYSTEM  Host End Session  Device Type: TCP/IP  Description: Remote logged off
 regex=Host End Session  Device Type: \S+  Description: (.+); \
- classification(0).name=pcAnywhere User Disconnected; \
+ classification(0).name=Remote control user disconnected; \
  id=3001; \
  revision=1; \
  classification(0).origin=vendor-specific; \

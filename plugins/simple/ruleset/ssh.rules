@@ -37,7 +37,7 @@
 
 #Dec  8 14:45:17 itguxweb1 sshd[32112]: Accepted publickey for root from 12.34.56.78 port 56634 ssh2
 regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- classification(0).name=SSH Remote root login; \
+ classification(0).name=Admin login successful; \
  id=1900; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -58,7 +58,7 @@ regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
 regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- classification(0).name=SSH Remote user login; \
+ classification(0).name=User login successful; \
  id=1901; \
  revision=1; \
  classification(0).origin=vendor-specific; \

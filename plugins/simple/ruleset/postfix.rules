@@ -37,7 +37,7 @@
 #May  3 17:41:05 exademo postfix/smtpd[6161]: 7F70283BF6: reject: RCPT from unknown[212.180.111.248]: 554 <dmaciejak@exaprobe.com>: Relay access denied; from=<DIEU> to=<dmaciejak@exaprobe.com> proto=SMTP helo=<koma>
 
 regex=reject: RCPT from [\w\-\.]+\[([\d\.]+)\]: .* Relay access denied. from=<(\S+)> to=<(\S+)> proto=SMTP; \
- classification(0).name=Postfix: Relay access denied; \
+ classification(0).name=Mail server: Relay access denied; \
  id=3500; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -57,7 +57,7 @@ regex=reject: RCPT from [\w\-\.]+\[([\d\.]+)\]: .* Relay access denied. from=<(\
 
 #May  3 12:22:14 exademo postfix/postfix-script: starting the Postfix mail system
 regex=starting the Postfix mail system; \
- classification(0).name=Postfix started ; \
+ classification(0).name=Mail server started ; \
  id=3501; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -69,7 +69,7 @@ regex=starting the Postfix mail system; \
 
 #May  4 11:43:10 exademo postfix/postfix-script: stopping the Postfix mail system
 regex=stopping the Postfix mail system; \
- classification(0).name=Postfix stopped; \
+ classification(0).name=Mail server stopped; \
  id=3502; \
  revision=1; \
  classification(0).origin=vendor-specific; \
@@ -81,7 +81,7 @@ regex=stopping the Postfix mail system; \
 
 #May  4 09:26:15 exademo postfix/smtpd[8472]: lost connection after CONNECT from localhost[127.0.0.1]
 regex=lost connection after (\S+) from [\w\-\.]+\[([\d\.]+)\]; \
- classification(0).name=Postfix suspicious access; \
+ classification(0).name=Mail server suspicious access; \
  id=3503; \
  revision=1; \
  classification(0).origin=vendor-specific; \
