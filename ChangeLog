@@ -1,3 +1,9 @@
+2002-12-18  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/debug/debug.c (debug_run): stop using our own
+	msgbuf. Use lml-alert provided function. Also, debug message
+	are _low_ priority.
+
 2002-12-09  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* configure.in: bump version number to 0.8.2.
