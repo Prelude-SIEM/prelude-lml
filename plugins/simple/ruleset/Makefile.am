@@ -5,7 +5,7 @@ ruleset_DATA = \
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
-	dellom.rules		\
+	dell-om.rules		\
 	grsecurity.rules	\
 	honeyd.rules		\
 	ipchains.rules		\
