@@ -1,4 +1,8 @@
+
+#define _XOPEN_SOURCE 600
 #include <stdio.h>
+#undef _XOPEN_SOURCE
+
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -9,9 +13,8 @@
  * glibc2 won't define strptime()
  * unless _XOPEN_SOURCE is defined.
  */
-#define _XOPEN_SOURCE 600
  #include <time.h>
-#undef _XOPEN_SOURCE
+
 
 #include <libprelude/prelude-log.h>
 #include "log-common.h"

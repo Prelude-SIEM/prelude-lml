@@ -6,7 +6,6 @@ noinst_HEADERS =    				\
                     log-common.h		\
                     log.h 			\
                     plugin-log.h 		\
-                    queue.h 			\
                     regex.h	 		\
                     udp-server.h		\
 		    pconfig.h			\

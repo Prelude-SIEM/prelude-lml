@@ -30,6 +30,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/utsname.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include <libprelude/list.h>
 #include <libprelude/prelude-log.h>
@@ -146,7 +148,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
         struct timeval tv;
         idmef_additional_data_t *data;
         idmef_alert_t *alert = msg->message.alert;
-
+        
         gettimeofday(&tv, NULL);
         alert->create_time.sec = tv.tv_sec;
         alert->create_time.usec = tv.tv_usec;

@@ -32,6 +32,11 @@
 #include <errno.h>
 #include <assert.h>
 
+#ifdef HAVE_FAM
+ #include <fam.h>
+ static FAMConnection fc;
+#endif
+
 #include <libprelude/timer.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
@@ -39,12 +44,12 @@
 #include <libprelude/idmef-tree-func.h>
 #include <libprelude/prelude-message.h>
 
-#include "queue.h"
 #include "regex.h"
 #include "common.h"
 #include "log-common.h"
 #include "file-server.h"
 #include "lml-alert.h"
+
 
 #define LOGFILE_DELETION_CLASS "Logfile deletion"
 #define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"              \
@@ -65,11 +70,116 @@ typedef struct {
         off_t last_size;
         time_t last_mtime;
         struct list_head list;
+
+#ifdef HAVE_FAM
+        FAMRequest fam_request;
+#endif
+        
 } monitor_fd_t;
 
 
+#ifdef HAVE_FAM
+        static int fam_setup_monitor(monitor_fd_t *monitor);
+#endif
+
+
+static int fam_initialized = 0;
 static LIST_HEAD(active_fd_list);
 static LIST_HEAD(inactive_fd_list);
+
+
+
+
+static void logfile_alert(monitor_fd_t *fd, struct stat *st,
+                          idmef_classification_t *cl, idmef_impact_t *impact)
+{
+        char buf[256], *ptr;
+        idmef_file_t *f;
+        idmef_time_t *time;
+        idmef_inode_t *inode;
+        log_container_t *log;
+        idmef_alert_t *alert;
+        idmef_target_t *target;
+        idmef_message_t *message;
+        idmef_classification_t *class;
+        idmef_assessment_t *assessment;
+                
+        log = log_container_new(NULL, fd->file);
+        if ( ! log )
+                return;
+        
+        message = idmef_message_new();
+        if ( ! message )
+                return;
+
+        /*
+         * Initialize the idmef structures
+         */
+        idmef_alert_new(message);
+        alert = message->message.alert;
+
+        target = idmef_alert_target_new(alert);
+        if ( ! target )
+                goto err;
+
+        f = idmef_target_file_new(target);
+        if ( ! f ) 
+                goto err;
+
+        f->data_size = st->st_size;
+
+        inode = idmef_file_inode_new(f);
+        if ( ! inode )
+                goto err;
+
+        inode->number = st->st_ino;
+        snprintf(buf, sizeof(buf), "%s", fd->file);
+
+        ptr = strrchr(buf, '/');
+        if ( ptr ) {
+                *ptr = '\0';
+                idmef_string_set(&f->name, ptr + 1);
+        }
+        
+        idmef_string_set(&f->path, buf);
+
+        time = idmef_file_access_time_new(f);
+        if ( ! time )
+                goto err;
+        
+        time->sec = st->st_atime;
+        
+        time = idmef_file_modify_time_new(f);
+        if ( ! time )
+                goto err;
+
+        time->sec = st->st_mtime;
+        
+        idmef_alert_assessment_new(alert);
+        assessment = alert->assessment;
+
+        idmef_assessment_impact_new(assessment);
+        memcpy(assessment->impact, impact, sizeof(*assessment->impact));
+        
+        class = idmef_alert_classification_new(alert);
+        if ( ! class )
+                goto err;
+        
+        class->origin = cl->origin;
+        idmef_string_copy(&class->url, &cl->url);
+        idmef_string_copy(&class->name, &cl->name);
+               
+        lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_HIGH);
+
+        log_container_delete(log);
+        
+        return;
+        
+ err:
+        log_container_delete(log);
+        idmef_message_free(message);
+}
+
 
 
 
@@ -116,130 +226,126 @@ static int read_logfile(monitor_fd_t *fd)
 
 
 
-static void try_reopening_inactive_fd(void) 
+static void check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct stat *st) 
+{
+        int len, ret;
+        
+        if ( ! monitor->need_more_read && st->st_size == monitor->last_size ) 
+                return;
+        
+        len = (st->st_size - monitor->last_size) + monitor->need_more_read;
+        monitor->last_size = st->st_size;
+
+        while ( (ret = read_logfile(monitor)) != -1 ) {
+                len -= ret;
+                lml_dispatch_log(list, monitor->buf, monitor->file);
+        }
+
+        /*
+         * if len isn't 0, it mean we got EOF before reading every new byte,
+         * we want to retry reading even if st_size isn't modified then.
+         */
+        monitor->need_more_read = len;
+}
+
+
+
+
+static monitor_fd_t *monitor_new(const char *file) 
+{
+        monitor_fd_t *new;
+        
+        new = calloc(1, sizeof(*new));
+        if ( ! new ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+
+        new->file = strdup(file);
+        if ( ! new->file ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                free(new);
+                return NULL;
+        }
+
+        list_add(&new->list, &inactive_fd_list);
+
+        return new;
+}
+
+
+
+
+static void monitor_destroy(monitor_fd_t *monitor) 
+{
+        if ( monitor->fd )
+                fclose(monitor->fd);
+        
+        list_del(&monitor->list);
+
+        free(monitor->file);
+        
+        free(monitor);
+}
+
+
+
+
+static int monitor_open(monitor_fd_t *monitor, int start_from_zero) 
 {
         int ret;
         struct stat st;
-        monitor_fd_t *monitor;
+        
+#ifdef HAVE_FAM
+        ret = fam_setup_monitor(monitor);
+        if ( ret < 0 )
+                return -1;
+#endif
+        
+        monitor->fd = fopen(monitor->file, "r");
+        if ( ! monitor->fd )
+                return -1;
+        
+        monitor->index = 0;
+        monitor->need_more_read = 0;
+        
+        if ( start_from_zero )                 
+                monitor->last_size = 0;
+        else {
+                ret = fseek(monitor->fd, 0, SEEK_END);
+                if ( ret < 0 ) {
+                        log(LOG_ERR, "couldn't seek to the end of the file.\n");
+                        monitor_destroy(monitor);
+                        return -1;
+                }
+        }
+        
+        list_del(&monitor->list);
+        list_add_tail(&monitor->list, &active_fd_list);
+        
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "stat: error on file %s.\n", monitor->file);
+                return -1;
+        }
+                
+        monitor->last_size = (start_from_zero) ? 0 : st.st_size;
+        monitor->last_mtime = st.st_mtime;
+
+        return 0;
+}
+
+
+
+
+static void try_reopening_inactive_monitor(void) 
+{
         struct list_head *tmp, *bkp;
 
-        list_for_each_safe(tmp, bkp, &inactive_fd_list) {
-
-                monitor = list_entry(tmp, monitor_fd_t, list);
-                
-                monitor->fd = fopen(monitor->file, "r");
-                if ( ! monitor->fd )
-                        continue;
-                
-                ret = fstat(fileno(monitor->fd), &st);
-                if ( ret < 0 ) {
-                        log(LOG_ERR, "stat: error on file %s.\n", monitor->file);
-                        continue;
-                }
-                
-                monitor->index = 0;
-                monitor->last_size = 0; /* re-read every file entry */
-                monitor->last_mtime = st.st_mtime;
-                monitor->need_more_read = 0;
-                
-                list_del(&monitor->list);
-                list_add_tail(&monitor->list, &active_fd_list);
-                
-                log(LOG_INFO, "Re-opened monitor for '%s'.\n", monitor->file);
-        }
+        list_for_each_safe(tmp, bkp, &inactive_fd_list) 
+                monitor_open(list_entry(tmp, monitor_fd_t, list), 1);
 }
 
-
-
-static void logfile_alert(monitor_fd_t *fd, struct stat *st,
-                          idmef_classification_t *cl, idmef_impact_t *impact)
-{
-        char buf[256], *ptr;
-        idmef_file_t *f;
-        idmef_time_t *time;
-        idmef_inode_t *inode;
-        log_container_t *log;
-        idmef_alert_t *alert;
-        idmef_target_t *target;
-        idmef_message_t *message;
-        idmef_classification_t *class;
-        idmef_assessment_t *assessment;
-        
-        log = log_container_new(NULL, fd->file);
-        if ( ! log )
-                return;
-        
-        message = idmef_message_new();
-        if ( ! message )
-                return;
-
-        /*
-         * Initialize the idmef structures
-         */
-        idmef_alert_new(message);
-        alert = message->message.alert;
-
-        target = idmef_alert_target_new(alert);
-        if ( ! target )
-                goto err;
-
-        f = idmef_target_file_new(target);
-        if ( ! f ) 
-                goto err;
-
-        f->data_size = st->st_size;
-
-        inode = idmef_file_inode_new(f);
-        if ( ! inode )
-                goto err;
-
-        inode->number = st->st_ino;
-        snprintf(buf, sizeof(buf), "%s", fd->file);
-
-        ptr = strrchr(buf, '/');
-        if ( ptr ) {
-                *ptr = '\0';
-                idmef_string_set(&f->name, ptr + 1);
-        }
-        
-        idmef_string_set(&f->path, buf);
-
-        time = idmef_file_access_time_new(f);
-        if ( ! time )
-                goto err;
-        
-        time->sec = st->st_atime;
-
-        time = idmef_file_modify_time_new(f);
-        if ( ! time )
-                goto err;
-
-        time->sec = st->st_mtime;
-        
-        idmef_alert_assessment_new(alert);
-        assessment = alert->assessment;
-
-        idmef_assessment_impact_new(assessment);
-        memcpy(assessment->impact, impact, sizeof(*assessment->impact));
-        
-        class = idmef_alert_classification_new(alert);
-        if ( ! class )
-                goto err;
-        
-        class->origin = cl->origin;
-        idmef_string_copy(&class->url, &cl->url);
-        idmef_string_copy(&class->name, &cl->name);
-               
-        lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_HIGH);
-
-        log_container_delete(log);
-        
-        return;
-        
- err:
-        log_container_delete(log);
-        idmef_message_free(message);
-}
 
 
 
@@ -273,6 +379,8 @@ static void check_modification_time(monitor_fd_t *fd, struct stat *st)
         
         logfile_alert(fd, st, &class, &impact);
 }
+
+
 
 
 
@@ -312,78 +420,153 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
 
 
-
-
-static void process_logfile(regex_list_t *list, lml_queue_t *queue, monitor_fd_t *monitor, struct stat *st) 
+static int process_file_event(regex_list_t *list, monitor_fd_t *monitor) 
 {
-        int len, ret;
+        int ret;
+        struct stat st;
         
-        if ( ! monitor->need_more_read && st->st_size == monitor->last_size ) 
-                return;
-        
-        len = (st->st_size - monitor->last_size) + monitor->need_more_read;
-        monitor->last_size = st->st_size;
-
-        while ( (ret = read_logfile(monitor)) != -1 ) {
-                len -= ret;
-                lml_dispatch_log(list, queue, monitor->buf, monitor->file);
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
+                return -1;
         }
-
+        
+        ret = is_file_already_used(monitor, &st);
+        if ( ret < 0 )
+                return -1;
+        
         /*
-         * if len isn't 0, it mean we got EOF before reading every new byte,
-         * we want to retry reading even if st_size isn't modified then.
+         * check mtime consistency.
+         */ 
+        check_modification_time(monitor, &st);
+        
+        /*
+         * read and analyze available data. 
          */
-        monitor->need_more_read = len;
+        check_logfile_data(list, monitor, &st);
+
+        return 0;
 }
 
 
 
-int file_server_wake_up(regex_list_t *list, lml_queue_t *queue) 
+#ifdef HAVE_FAM
+
+static int fam_setup_monitor(monitor_fd_t *monitor)
 {
         int ret;
-        struct stat st;
-        monitor_fd_t *monitor;
-        struct list_head *tmp, *bkp;
-        
-        /*
-         * this function is called every second,
-         * as we're not using prelude-async, we have to wake possibly
-         * existing timer manually.
-         */
-        prelude_wake_up_timer();
+        static int initialized = 0;
 
-        /*
-         * try to open inactive fd (file was not existing previously).
-         */
-        try_reopening_inactive_fd();
+        if ( ! initialized ) {
+                initialized = 1;
 
-        list_for_each_safe(tmp, bkp, &active_fd_list) {
-                               
-                monitor = list_entry(tmp, monitor_fd_t, list);
-
-                ret = fstat(fileno(monitor->fd), &st);
+                ret = FAMOpen(&fc);
                 if ( ret < 0 ) {
-                        log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
-                        continue;
+                        log(LOG_ERR, "error initializing FAM: %s.\n", FamErrlist[FAMErrno]);
+                        return -1;
                 }
                 
-                ret = is_file_already_used(monitor, &st);
-                if ( ret < 0 )
-                        continue;
+                fam_initialized = 1;
+        }
+        
+        ret = FAMMonitorFile(&fc, monitor->file, &monitor->fam_request, monitor);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "error creating FAM monitor for %s: %s.\n", monitor->file, FamErrlist[FAMErrno]);
+                return -1;
+        }
+        
+        return 0;
+}
 
+
+
+static int fam_process_event(regex_list_t *list, FAMEvent *event) 
+{
+        int ret = 0;
+        struct stat st;
+        monitor_fd_t *monitor = event->userdata;
+
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 )
+                log(LOG_ERR, "fstat returned an error.\n");
+        
+        switch (event->code) {
+
+        case FAMCreated:
+                monitor_open(monitor, 1);
+                break;
+                
+        case FAMChanged:                
                 /*
                  * check mtime consistency.
                  */ 
                 check_modification_time(monitor, &st);
-
+        
                 /*
                  * read and analyze available data. 
                  */
-                process_logfile(list, queue, monitor, &st);
+                check_logfile_data(list, monitor, &st);
+                break;
+                
+        case FAMDeleted:
+                ret = is_file_already_used(monitor, &st);
+                break;
+
+        case FAMExists:
+        case FAMEndExist:
+                /*
+                 * This happen when a monitor is created.
+                 */
+                return 0;
+                
+        default:
+                return -1;
+        }
+
+        return ret;
+}
+
+
+
+
+static int fam_wait_for_event(regex_list_t *list) 
+{
+        int ret;
+        FAMEvent event;
+        
+        while ( (ret = FAMNextEvent(&fc, &event)) >= 0 )
+                fam_process_event(list, &event);
+        
+        if ( ret < 0 ) {
+                log(LOG_ERR, "error while waiting for FAM event: %s.\n", FamErrlist[FAMErrno]);
+                return -1;
         }
 
         return 0;
 }
+
+
+
+static int fam_process_queued_events(regex_list_t *list) 
+{
+        int ret;
+        FAMEvent event;
+        
+        while ( FAMPending(&fc) ) {
+
+                ret = FAMNextEvent(&fc, &event);
+                if ( ret < 0 ) {
+                        log(LOG_ERR, "error while getting FAM event: %s.\n", FamErrlist[FAMErrno]);
+                        return -1;
+                }
+
+                fam_process_event(list, &event);
+        }
+
+        return 0;
+}
+
+#endif
 
 
 
@@ -391,51 +574,18 @@ int file_server_wake_up(regex_list_t *list, lml_queue_t *queue)
 int file_server_monitor_file(const char *file) 
 {
         int ret;
-        struct stat st;
         monitor_fd_t *new;
-        
-        new = calloc(1, sizeof(*new));
-        if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                return -1;
-        }
 
-        new->file = strdup(file);
-        if ( ! new->file ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                free(new);
+        new = monitor_new(file);
+        if ( ! new )
                 return -1;
-        }
+
+        ret = monitor_open(new, 0);
+        if ( ret < 0 )
+                return -1;
         
-        new->fd = fopen(file, "r");
-        if ( ! new->fd ) {
-                log(LOG_INFO, "%s doesn't exist, will try to re-open periodically.\n", file);
-                list_add_tail(&new->list, &inactive_fd_list);
+        if ( ! new->fd )
                 return 0;
-        }
-        
-        ret = fseek(new->fd, 0, SEEK_END);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't seek to the end of the file.\n");
-                fclose(new->fd);
-                free(new->file);
-                free(new);
-                return -1;
-        }
-        
-        ret = fstat(fileno(new->fd), &st);
-        if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't stat '%s'.\n", file);
-                fclose(new->fd);
-                free(new->file);
-                free(new);
-                return -1;
-        }
-        
-        new->last_size = st.st_size;
-        new->last_mtime = st.st_mtime;
-
-        list_add_tail(&new->list, &active_fd_list);
         
         return 0;
 }
@@ -443,19 +593,67 @@ int file_server_monitor_file(const char *file)
 
 
 
-
-int file_server_standalone(regex_list_t *list, lml_queue_t *queue) 
+int file_server_standalone(regex_list_t *list)
 {
-        /*
-         * there is no way for select / read to block on EOF
-         * for regular file, so we end up doing a sleep and
-         * comparing modification time (as tail does).
-         */
-        while ( 1 ) {
-                file_server_wake_up(list, queue);
-                sleep(1);
+        if ( ! fam_initialized ) {
+                while ( 1 ) {
+                        file_server_wake_up(list);
+                        sleep(1);
+                }
         }
+
+#ifdef HAVE_FAM
+        else 
+                return fam_wait_for_event(list);
+#endif
+        
+        return 0;
 }
+
+
+
+
+int file_server_wake_up(regex_list_t *list) 
+{
+        monitor_fd_t *monitor;
+        struct list_head *tmp, *bkp;
+
+        if ( ! fam_initialized ) {
+                /*
+                 * try to open inactive fd (file was not existing previously).
+                 */
+                try_reopening_inactive_monitor();
+                
+                list_for_each_safe(tmp, bkp, &active_fd_list) {
+                        monitor = list_entry(tmp, monitor_fd_t, list);
+                        process_file_event(list, monitor);
+                }
+        }
+        
+#ifdef HAVE_FAM
+        else 
+                return fam_process_queued_events(list);
+#endif
+        
+        return 0;
+}
+
+
+
+
+int file_server_get_event_fd(void) 
+{
+#ifdef HAVE_FAM
+        return FAMCONNECTION_GETFD(&fc);
+#else
+        return -1;
+#endif
+}
+
+
+
+
+
 
 
 

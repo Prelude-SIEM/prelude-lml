@@ -1,9 +1,6 @@
 #ifndef LOG_COMMON_H
 #define LOG_COMMON_H
 
-#include <time.h>
-#include <sys/time.h>
-
 typedef struct {
         char *log;
 	char *source;

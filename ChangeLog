@@ -1,5 +1,48 @@
 2002-09-18  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/udp-server.c (udp_server_process_event): 
+	new function, read one syslog message.
+	(udp_server_get_event_fd): new function.
+	(udp_server_new): fix call to memset().
+
+	The udp-server implementation doesn't depend on pthread
+	anymore.
+	
+	* src/main.c (lml_dispatch_log): 
+	doesn't take an lml_queue_t argument anymore.
+	(main): call file_server_standalone if no udp server
+	is configured. Otherwise call wait_for_event.
+
+	(wait_for_event): select on the UDP server socket,
+	and on the file-server socket if FAM is activated. 
+	Otherwise, the file-server function are called every
+	seconds.
+	
+	* src/log-common.c (_XOPEN_SOURCE): 
+	move this definition arround stdio.h inclusion. This
+	solve the Solaris compilation problem.
+
+	* src/file-server.c: massive reorganisation.
+	(monitor_open): call fam_setup_monitor if HAVE_FAM is set.
+
+	(fam_setup_monitor): 
+	(fam_process_event): 
+	(fam_wait_for_event): 
+	(fam_process_queued_events): new function handling FAM monitor.
+
+	(file_server_standalone): use FAM if possible.
+	(file_server_wake_up): ditto.
+
+	file-server is now able to monitor file change throught FAM,
+	insteaf of polling every file descriptor every second. This
+	code is not yet enabled on architecture that support it 
+	because the current Linux Kernel version with Dnotify support
+	(user by FAM) doesn't seem to notice some of the data written
+	to a file throught writev().
+	
+	* src/Makefile.am (prelude_lml_SOURCES): 
+	remove queue.c dependencie.
+
 	* plugins/simple/ruleset/simple.rules: 
 	document User/UserID field usage.
 

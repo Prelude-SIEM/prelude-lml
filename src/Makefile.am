@@ -12,7 +12,6 @@ prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@
 prelude_lml_SOURCES = 			\
 	main.c				\
 	udp-server.c			\
-	queue.c				\
 	regex.c				\
 	log-common.c			\
 	log-plugins.c			\
