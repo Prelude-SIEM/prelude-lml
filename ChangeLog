@@ -1,5 +1,7 @@
 2002-06-10  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* configure.in: only enable gtkdoc if requested.
+
 	* plugins/simple/ruleset/simple.rules (include): 
 	include grsecurity.rules.
 
