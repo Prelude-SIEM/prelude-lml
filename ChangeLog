@@ -1,5 +1,11 @@
 2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
 
+	* src/file-server.c (check_modification_time):
+	fixed assert problem when two modifications are
+	done in the log file at the same second.
+
+2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
+
 	* src/file-server.c (logfile_alert): 
 	* src/regex.c(regex_init):
 	replace strncpy by snprintf.

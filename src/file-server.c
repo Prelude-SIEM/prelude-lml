@@ -254,17 +254,12 @@ static void check_modification_time(monitor_fd_t *fd, struct stat *st)
         idmef_impact_t impact;
         idmef_classification_t class;
         time_t old_mtime = fd->last_mtime;
-        
+
         fd->last_mtime = st->st_mtime;
         
-        if ( st->st_mtime == old_mtime ) {
-                assert(st->st_size == fd->last_size);
+        if ( st->st_mtime >= old_mtime && st->st_size >= fd->last_size ) 
                 return; /* everythings sound okay */
-        }
-        
-        if ( st->st_size > fd->last_size ) 
-                return;
-                
+
         memset(&class, 0, sizeof(class));
         memset(&impact, 0, sizeof(impact));
         
