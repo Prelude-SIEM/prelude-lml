@@ -199,7 +199,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
         if ( state->optmatch < rule->min_optgoto_match ) 
                 return -1;
         
-        if ( ! rule->chained && state->idmef ) {
+        if ( ! rule->silent && state->idmef ) {
                 lml_emit_alert(log_entry, state->idmef, PRELUDE_MSG_PRIORITY_MID);
                 state->idmef = NULL;
         }

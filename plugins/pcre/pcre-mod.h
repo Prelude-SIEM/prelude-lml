@@ -34,6 +34,7 @@ typedef struct {
 
         prelude_bool_t last;
         prelude_bool_t chained;
+        prelude_bool_t silent;
         unsigned int required_goto;
         unsigned int refcount;
 

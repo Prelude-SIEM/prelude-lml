@@ -227,6 +227,15 @@ static int parse_rule_last(pcre_plugin_t *plugin, pcre_rule_t *rule, const char 
 
 
 
+
+static int parse_rule_silent(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        rule->silent = TRUE;
+
+        return 0;
+}
+
+
 static int parse_rule_chained(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
         rule->chained = TRUE;
@@ -372,6 +381,7 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                 { "optregex"            , parse_rule_optregex           },
                 { "regex"               , parse_rule_regex              },
                 { "revision"            , parse_rule_revision           },
+                { "silent"              , parse_rule_silent             },
         };
 
         for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
