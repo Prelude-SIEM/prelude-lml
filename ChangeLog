@@ -1,3 +1,13 @@
+2003-03-18  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* plugins/simple/ruleset/Makefile.am:
+	add missing entries to ruleset_DATA.
+
+	* plugins/simple/ruleset/proftpd.rules:
+	* plugins/simple/ruleset/ssh.rules:
+	* plugins/simple/ruleset/vpopmail.rules:
+	English grammar fixes.
+
 2003-02-27  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/simple/ruleset/exim.rules (regex): 

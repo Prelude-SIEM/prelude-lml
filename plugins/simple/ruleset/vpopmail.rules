@@ -30,7 +30,7 @@ regex=.*vpopmail\[(\d+)\]: vchkpw: vpopmail user not found (\S+):(\S+).*; \
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \
- impact.description= Someone tried to login to your POP3 server as non-existant user '$2' but failed; \
+ impact.description= Someone tried to log in to your POP3 server as a non-existant user '$2' but failed; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$3; \
@@ -45,7 +45,7 @@ regex=.*vpopmail\[(\d+)\]: vchkpw: password fail (\S+):(\S+).*; \
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \
- impact.description= Someone tried to login to your POP3 server as user '$2' but failed; \
+ impact.description= Someone tried to log in to your POP3 server as user '$2' but failed; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$3; \

@@ -43,7 +43,7 @@ regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - no such user '(\S+)'
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \
- impact.description= Someone tried to login to your FTP server as non-existant user '$5' but failed; \
+ impact.description= Someone tried to login to your FTP server as a non-existant user '$5' but failed; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$4; \
@@ -58,7 +58,7 @@ regex=.*proftpd\[(\d+)\]:.*[\(\[]([\d\.]+)[\)\]].* - USER (\S+): no such user fo
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \
- impact.description= Someone tried to login to your FTP server as non-existant user '$3' but failed; \
+ impact.description= Someone tried to login to your FTP server as a non-existant user '$3' but failed; \
  source.node.address; \
  source.node.address.category=ipv4-addr; \
  source.node.address.address=$2; \
