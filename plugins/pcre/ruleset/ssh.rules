@@ -121,7 +121,9 @@ regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 ##############################################
 
 #LOG:Dec  9 18:48:29 itguxweb2 sshd[29536]: Failed password for illegal user ROOT from 12.34.56.78 port 2886
-regex=Illegal user (\S+) from (\S+); \
+#LOG:Jan 20 14:10:02 blah sshd[25443]: Invalid user admin from 213.201.222.134
+
+regex=(Illegal|Invalid) user (\S+) from (\S+); \
  classification.text=SSH Remote login failed with an invalid user; \
  id=1904; \
  revision=1; \
