@@ -29,41 +29,33 @@
 #
 #####
 
-#LOG:Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
-regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
+regex=-- (\w+) (?!VIPPORT)(\w+) ([\d\.]+) User: (\S+)$; id=3600; revision=1; \
  classification.text=Load balancer $1 audit; \
- id=3600; \
- revision=1; \
- analyzer.name=Big-IP; \
- analyzer.manufacturer=F5; \
- analyzer.class=Load Balancer; \
- assessment.impact.severity=low; \
- assessment.impact.type=other; \
- assessment.impact.completion=succeeded; \
- assessment.impact.description=Bigconf performed a $1 on $3, of object type $2.; \
- source(0).user.category=os-device; \
- source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).name=$4; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$3; \
- last
+ target(0).node.address(0).address=$3; \ 
+ assessment.impact.description=Bigconf performed a $1 on $3, of object type $2.; \
+ chained;
 
-#LOG:Jun 10 18:05:43 12.4.18.135 bigconf.cgi: AUDIT -- Delete POOL SMDEMO User: admin
-regex=bigconf.cgi: AUDIT -- (\w+) (\w+) (\w+)  User: (\S+); \
+regex=-- (\w+) (\w+) (\w+) User: (\S+)$; id=3601; revision=1; \
  classification.text=Load balancer $1 audit; \
- id=3601; \
- revision=1; \
+ assessment.impact.description=Bigconf performed a $1 on $3, of object type $2.; \
+ chained;
+
+#
+# LOG:Jun 10 18:05:43 12.4.18.135 bigconf.cgi: AUDIT -- Delete POOL SMDEMO User: admin
+# LOG:Jun 10 14:03:08 12.4.18.135 bigconf.cgi: AUDIT -- Create MEMBER 10.5.253.52:0 (Parent: POOL SMDEMO) User: admin
+#
+regex=AUDIT; optgoto=3600-3601; min-optgoto-match=1; \
  analyzer.name=Big-IP; \
  analyzer.manufacturer=F5; \
  analyzer.class=Load Balancer; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=Bigconf performed a $1 on $3, of object type $2.; \
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).name=$4; \
- last
+ source(0).user.user_id(0).name = $1; \
+ last;
 
 #LOG:Jun 14 07:06:05 12.34.56.78 kernel: security: UDP port denial 90.12.34.56:20031 -> 78.90.12.34:20031
 #regex=security: (\S+) .*port denial ([\d\.]+):(\d+) -> ([\d\.]+):(\d+); \ 
