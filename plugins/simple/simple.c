@@ -29,6 +29,7 @@
 #include <pcre.h>
 
 #include <libprelude/list.h>
+#include <libprelude/common.h>
 #include <libprelude/idmef-tree.h>
 #include <libprelude/idmef-tree-func.h>
 #include <libprelude/prelude-io.h>
@@ -1514,34 +1515,13 @@ static void free_rule(simple_rule_t *rule)
 
 
 
-static int read_multiline(const char *filename, int *line, FILE *fd, char *buf, size_t size) 
-{
-        int i;
-
-        if ( ! fgets(buf, size, fd) )
-                return -1;
-
-        (*line)++;
-        i = strlen(buf);
-        
-        while ( --i > 0 && (buf[i] == ' ' || buf[i] == '\n') );
-        
-        if ( buf[i] == '\\' ) 
-                return read_multiline(filename, line, fd, buf + i, size - i);
-                
-        return 0;
-}
-
-
-
-
 static int parse_ruleset(const char *filename, FILE *fd) 
 {
         int ret, line = 0;
         simple_rule_t *rule;
         char buf[8192], *ptr;
 
-        while ( read_multiline(filename, &line, fd, buf, sizeof(buf)) == 0  ) {
+        while ( prelude_read_multiline(fd, &line, buf, sizeof(buf)) == 0 ) {
                 
                 ptr = buf;
                 buf[strlen(buf) - 1] = '\0'; /* strip \n */
@@ -1941,7 +1921,7 @@ static void simple_run(const log_container_t *log)
 
 
 
-static int set_simple_state(const char *optarg)
+static int set_simple_state(prelude_option_t *opt, const char *optarg)
 {
         int ret;
         
@@ -1965,7 +1945,7 @@ static int set_simple_state(const char *optarg)
 
 
 
-static int set_simple_ruleset(const char *arg) 
+static int set_simple_ruleset(prelude_option_t *opt, const char *arg) 
 {
         int ret;
         FILE *fd;

@@ -61,7 +61,7 @@ static char *pidfile = NULL;
 static uid_t prelude_lml_user = 0;
 
 
-static int print_version(const char *arg)
+static int print_version(prelude_option_t *opt, const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
 	return prelude_option_end;
@@ -69,7 +69,7 @@ static int print_version(const char *arg)
 
 
 
-static int print_help(const char *arg)
+static int print_help(prelude_option_t *opt, const char *arg)
 {
 	prelude_option_print(CLI_HOOK, 25);
 	return prelude_option_end;
@@ -77,7 +77,7 @@ static int print_help(const char *arg)
 
 
 
-static int set_quiet_mode(const char *arg)
+static int set_quiet_mode(prelude_option_t *opt, const char *arg)
 {
 	prelude_log_use_syslog();
 	return prelude_option_success;
@@ -85,7 +85,7 @@ static int set_quiet_mode(const char *arg)
 
 
 
-static int set_daemon_mode(const char *arg)
+static int set_daemon_mode(prelude_option_t *opt, const char *arg)
 {
         prelude_daemonize(pidfile);
         if ( pidfile )
@@ -97,7 +97,7 @@ static int set_daemon_mode(const char *arg)
 }
 
 
-static int set_pidfile(const char *arg)
+static int set_pidfile(prelude_option_t *opt, const char *arg)
 {
         pidfile = strdup(arg);
 	return prelude_option_success;
@@ -105,7 +105,7 @@ static int set_pidfile(const char *arg)
 
 
 
-static int set_file(const char *arg) 
+static int set_file(prelude_option_t *opt, const char *arg) 
 {
         int ret;
                 
@@ -120,7 +120,7 @@ static int set_file(const char *arg)
 
 
 
-static int enable_udp_server(const char *arg) 
+static int enable_udp_server(prelude_option_t *opt, const char *arg) 
 {
         udp_srvr = udp_server_new(udp_srvr_addr, udp_srvr_port);
         free(udp_srvr_addr);
@@ -133,14 +133,14 @@ static int enable_udp_server(const char *arg)
 
 
 
-static int set_udp_server_addr(const char *arg) 
+static int set_udp_server_addr(prelude_option_t *opt, const char *arg) 
 {
         udp_srvr_addr = strdup(arg);
         return prelude_option_success;
 }
 
 
-static int set_udp_server_port(const char *arg) 
+static int set_udp_server_port(prelude_option_t *opt, const char *arg) 
 {
         udp_srvr_port = atoi(arg);
         return prelude_option_success;
@@ -148,7 +148,7 @@ static int set_udp_server_port(const char *arg)
 
 
 
-static int set_lml_user(const char *arg) 
+static int set_lml_user(prelude_option_t *opt, const char *arg) 
 {
         struct passwd *p;
         

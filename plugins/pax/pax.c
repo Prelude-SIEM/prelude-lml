@@ -556,7 +556,7 @@ static void pax_log_processing(const log_container_t * log)
 	return;
 }
 
-static int set_pax_state(const char *optarg)
+static int set_pax_state(prelude_option_t *opt, const char *optarg)
 {
 	int ret;
 
