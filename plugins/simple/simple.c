@@ -87,7 +87,7 @@ typedef struct {
 	uint16_t id;
 	uint16_t revision;
 
-	int last, pass;
+	int last;
 	char *regex_string;
 
 	struct list_head rule_object_list;
@@ -103,7 +103,7 @@ static int is_enabled = 0;
 static plugin_log_t plugin;
 static LIST_HEAD(rule_list);
 static char *rulesetdir = NULL;
-static int pass_rules_first = 0;
+static int last_rules_first = 0;
 
 
 
@@ -176,14 +176,6 @@ static void resolve_rule_reference_value_list(const log_container_t *log,
         }
 }
 
-
-
-static int parse_rule_pass(simple_rule_t *rule, const char *pass)
-{
-        rule->pass = 1;
-
-        return 0;
-}
 
 
 
@@ -369,7 +361,6 @@ static int parse_rule_keyword(simple_rule_t *rule,
                 { "id",			parse_rule_id		},
                 { "revision",		parse_rule_revision	},
 		{ "last",		parse_rule_last		},
-                { "pass",               parse_rule_pass         },
         };
 
 	for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
@@ -643,7 +634,7 @@ static int parse_ruleset_directive(const char *filename, int line, char *buf)
 		return -1;
 	}
 
-        if ( pass_rules_first && rule->pass )
+        if ( last_rules_first && rule->last )
                 list_add(&rule->list, &rule_list);
         else
                 list_add_tail(&rule->list, &rule_list);
@@ -788,7 +779,6 @@ static void simple_run(const log_container_t *log)
         int ret;
         simple_rule_t *rule;
         struct list_head *tmp;
-	idmef_message_t *message;
         int ovector[MAX_REFERENCE_PER_RULE * 3];
         
         list_for_each(tmp, &rule_list) {
@@ -799,21 +789,15 @@ static void simple_run(const log_container_t *log)
 		if ( ret < 0 )
                         continue;
 
-                if ( rule->pass )
-                        return;
-                
                 resolve_rule_reference_value_list(log, rule, ovector, ret);
 
-		message = build_message(rule);
-		if ( ! message )
-			continue;
-
-		lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_MID);
-
+                if ( ! list_empty(&rule->rule_object_list) ) 
+                        lml_emit_alert(log, build_message(rule), PRELUDE_MSG_PRIORITY_MID);
+                
                 free_rule_reference_value_list_content(rule);
 
                 if ( rule->last )
-                        return;
+                        break;
         }
 }
 
@@ -845,9 +829,9 @@ static int set_simple_state(prelude_option_t *opt, const char *optarg)
 
 
 
-static int set_pass_first(prelude_option_t *opt, const char *arg)
+static int set_last_first(prelude_option_t *opt, const char *arg)
 {
-        pass_rules_first = 1;
+        last_rules_first = 1;
         
         return prelude_option_success;
 }
@@ -905,9 +889,10 @@ plugin_generic_t *plugin_init(int argc, char **argv)
                            "Ruleset to use", required_argument,
                            set_simple_ruleset, NULL);
 
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
-                           "Process \"Pass rules\" first", no_argument,
-                           set_pass_first, NULL);
+        opt = prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
+                                 "Process rules with the \"last\" attribute first", no_argument,
+                                 set_last_first, NULL);
+        prelude_option_set_priority(opt, option_run_first);
         
 	plugin_set_name(&plugin, "SimpleMod");
 	plugin_set_author(&plugin, "Yoann Vandoorselaere");

@@ -1,13 +1,21 @@
 2004-01-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
-	* plugins/simple/simple.c: 
+	* plugins/simple/simple.c:	
+	(simple_run): remove latest "pass" addition, cleanup the
+	code and allow use of the "last" attribute with regex 
+	that doesn't generate an alert. Keep the pass_rules_first
+	option throught.
+
+2004-01-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
 	(set_pass_first): 
 	(parse_rule_pass): implemented.
 	(parse_rule_keyword): hook pass keyword.
 	(simple_run): stop walking rule in case we meet a "pass" rule.
 
 	(plugin_init): new option to process pas rule first, 
-	if the user want to.
+	if the user want to. Make this option get higher priority than
+	the ruleset specification option.
 	
 	(parse_ruleset_directive): if the "pass rules" first option was
 	specified, add pass rules at the begining of the list.
