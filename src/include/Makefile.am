@@ -9,4 +9,12 @@ noinst_HEADERS =    				\
                     queue.h 			\
                     regex.h	 		\
                     udp-server.h		\
-		    pconfig.h
+		    pconfig.h			\
+		    file-server.h		\
+		    plugin-log-prv.h
+
+include_HEADERS =                               \
+		    lml-alert.h			\
+		    log-common.h		\
+		    plugin-log.h
+

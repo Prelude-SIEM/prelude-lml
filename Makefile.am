@@ -1,7 +1,7 @@
 SUBDIRS = src plugins
 
 preludeconfdir = $(configdir)
-preludeconf_DATA = plugins.rules
+preludeconf_DATA = plugins.rules prelude-lml.conf
 
 EXTRA_DIST = $(preludeconf_DATA) config.h \
              AUTHORS COPYING CREDITS INSTALL NEWS README \
