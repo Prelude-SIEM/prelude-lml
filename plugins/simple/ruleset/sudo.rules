@@ -44,8 +44,8 @@ regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
  source(0).user.userid(0).type=original-user; \
  source(0).user.userid(0).name=$1;  \
  target(0).user.category = os-device; \
- target(0).user.userid(0).name=$2; \
  target(0).user.userid(0).type=current-user; \
+ target(0).user.userid(0).name=$2; \
  last
 
 #Jan 15 09:53:11 12.34.56.78 sudo:   ekwong : user NOT in sudoers ; TTY=pts/2 ; PWD=/ ; USER=root ; COMMAND=/bin/ls
@@ -62,6 +62,6 @@ regex=(\S+) : user NOT in sudoers . TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+)
  source(0).user.userid(0).type=original-user; \
  source(0).user.userid(0).name=$1;  \
  target(0).user.category = os-device; \
- target(0).user.userid(0).name=$2; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$2; \
  last

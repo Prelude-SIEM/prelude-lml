@@ -40,8 +40,8 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.description=An attempt was made to login to MS-SQL instance $1 using account $2; \
- target(0).user.userid(0).name=$2; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$2; \
  target(0).process.name=$1; \
  last
 
@@ -55,7 +55,7 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.description=An attempt was made to login to MS-SQL instance $1 as sa; \
- target(0).user.userid(0).name=sa; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=sa; \
  target(0).process.name=$1; \
  last

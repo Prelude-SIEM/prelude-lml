@@ -64,8 +64,8 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
  target(0).node.address(0).address=$4; \
  target(0).service.port=$5; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$6; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$6; \
  last
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
@@ -79,11 +79,11 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 succesfully enabled; \
  source(0).user.category=os-device; \
- source(0).user.userid(0).name=$1; \
  source(0).user.userid(0).type=current-user; \
+ source(0).user.userid(0).name=$1; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=enable_15; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=enable_15; \
  last
 
 #Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
@@ -109,8 +109,8 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 logged out; \
  source(0).user.category=os-device; \
- source(0).user.userid(0).name=$1; \
  source(0).user.userid(0).type=current-user; \
+ source(0).user.userid(0).name=$1; \
  last
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
@@ -132,8 +132,8 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  target(0).node.address(0).address=$4; \
  target(0).service.port=$5; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$6; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$6; \
  last
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
@@ -147,8 +147,8 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  assessment.impact.completion=failed; \
  assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=enable_15; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=enable_15; \
  last
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)

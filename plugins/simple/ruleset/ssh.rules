@@ -52,8 +52,8 @@ regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=root; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=root; \
  last;
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
@@ -73,8 +73,8 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$2; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$2; \
  last
 
 ################
@@ -98,8 +98,8 @@ regex=Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=root; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=root; \
  last
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
@@ -119,8 +119,8 @@ regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$2; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$2; \
  last
 
 ##############################################
@@ -142,8 +142,8 @@ regex=Illegal user (\S+) from (\S+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$1; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$1; \
  last
 
 ##################################################################################
@@ -163,8 +163,8 @@ regex=User (\S+) not allowed because .*listed in (\w+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=$1; \
  target(0).user.userid(0).type=target-user; \
+ target(0).user.userid(0).name=$1; \
  last
 
 ##################################################################
@@ -211,6 +211,6 @@ regex=ROOT LOGIN REFUSED FROM (\w+); \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
  target(0).user.category=os-device; \
- target(0).user.userid(0).name=root; \
  target(0).user.userid(0).type=target.user; \
+ target(0).user.userid(0).name=root; \
  last

@@ -43,8 +43,8 @@ classification(0).name=pcAnywhere User Connected; \
  source(0).node.name=$2; \
  target(0).node.name=$3; \
  source(0).user.category=application; \
- source(0).user.userid(0).name=$3; \
  source(0).user.userid(0).type=original-user; \
+ source(0).user.userid(0).name=$3; \
  last
 
 #Apr 14 06:29:55 db3 pcanywhere[info] 123 NT AUTHORITY\SYSTEM  Host End Session  Device Type: TCP/IP  Description: Remote logged off

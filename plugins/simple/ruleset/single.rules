@@ -69,8 +69,8 @@ regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMIN
  assessment.impact.type=admin; \
  assessment.impact.description=The command $1 was executed; \
  source(0).user.category=application; \
- source(0).user.userid(0).name=$2; \
  source(0).user.userid(0).type=original-user; \
+ source(0).user.userid(0).name=$2; \
  source(0).node.name=$3; \
  last
 

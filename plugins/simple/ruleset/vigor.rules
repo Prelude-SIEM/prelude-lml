@@ -35,9 +35,11 @@ regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR (tcp|ud
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Vigor dropped a $5 packet $1:$2 -> $3:$4; \
+ source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.port=$2; \
  source(0).service.protocol=TCP; \
+ target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  target(0).service.port=$4; \
  target(0).service.protocol=TCP; \
@@ -57,8 +59,10 @@ regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([\d\.]+)    PR icmp len \d+ \d+ ic
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Vigor dropped an ICMP packet $1 -> $2 ($3/$4); \
+ source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=ICMP; \
+ target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
  target(0).service.protocol=ICMP; \
  last;

@@ -36,8 +36,8 @@ regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
  source(0).user.userid(0).name = $2;  \
  source(0).user.userid(0).number = $3; \
  target(0).user.category = os-device; \
- target(0).user.userid(0).name=$1; \
  target(0).user.userid(0).type = target-user; \
+ target(0).user.userid(0).name=$1; \
  last
 
 # authentication failure; logname=xxxx uid=xxxx euid=xxxx tty=xxxx ruser=xxxx rhost=xxxx  user=xxxx
