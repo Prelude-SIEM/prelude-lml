@@ -142,91 +142,33 @@
 #   target().process.pid:
 #   A process number
 
-include = ms-sql.rules;
-include = nagios.rules;
-include = wu-ftp.rules;
+include = checkpoint.rules;
 include = cisco.rules;
 include = cisco-vpn.rules;
 include = cisco-pix.rules;
-include = navce.rules;
 include = exim.rules;
-include = zyxel.rules;
-include = ipfw.rules;
-include = netfilter.rules;
 include = grsecurity.rules;
-include = ssh.rules;
-include = zywall.rules;
+include = honeyd.rules;
+include = ipchains.rules;
+include = ipfw.rules;
+include = ipso.rules;
+include = ms-sql.rules;
+include = nagios.rules;
+include = navce.rules;
+include = netfilter.rules;
+include = ntsyslog.rules;
+include = pam.rules;
+include = portsentry.rules;
 include = proftpd.rules;
 include = qpopper.rules;
-include = vpopmail.rules;
-include = checkpoint.rules;
-include = ntsyslog.rules;
-include = ipso.rules;
+include = single.rules;
 include = squid.rules;
-include = portsentry.rules;
+include = ssh.rules;
+include = sudo.rules;
 include = vigor.rules;
-include = ipchains.rules;
+include = vpopmail.rules;
 include = wap11.rules;
+include = wu-ftp.rules;
+include = zywall.rules;
+include = zyxel.rules;
 include = honeyd.rules;
-
-#Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
-regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
- classification(0).name=User authentication; \
- id=1; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.completion = succeeded; \
- assessment.impact.type = user; \
- assessment.impact.severity = low; \
- assessment.impact.description = User $2 authenticated to $1 successfuly; \
- source(0).user.category = os-device; \
- source(0).user.userid(0).type = current-user; \
- source(0).user.userid(0).name = $2;  \
- source(0).user.userid(0).number = $3; \
- target(0).user.category = os-device; \
- target(0).user.userid(0).name=$1; \
- target(0).user.userid(0).type = target-user; \
- last
-                                                                                                                         
-# authentication failure; logname=xxxx uid=xxxx euid=xxxx tty=xxxx ruser=xxxx rhost=xxxx  user=xxxx
-regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.*) rhost=(.*) user=(.*); \
- classification(0).name = User authentication; \
- id=2; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.completion = failed; \
- assessment.impact.type = user; \
- assessment.impact.severity = high; \
- assessment.impact.description=User $1 tried to authenticate as $7 and failed; \
- source(0).user.category = os-device; \
- source(0).user.userid(0).type = current-user; \
- source(0).user.userid(0).name = $1;           \
- source(0).user.userid(0).number=$2; \
- target(0).user.category = os-device; \
- target(0).user.userid(0).type = target-user; \
- target(0).user.userid(0).name = $7; \
- last
-
-# No log sample; please submit
-regex=entered promiscuous mode; \
- classification(0).name=Promiscuous mode detected; \
- id=3; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.completion = succeeded; \
- assessment.impact.type = other; \
- assessment.impact.severity = medium; \
- assessment.impact.description=A sniffer is probably running on this machine; \
- last
-
-# No log sample; please submit
-regex=no such user; \
- classification(0).name=Invalid User; \
- id=4; \
- revision=1; \
- classification(0).origin=vendor-specific; \
- assessment.impact.completion = failed; \
- assessment.impact.type = other; \
- assessment.impact.severity = medium; \
- assessment.impact.description = Someone tried to log in using a non existing user; \
- last

@@ -1,12 +1,9 @@
 #####
 #
-# Copyright (C) 2003 Laurent Oudot <oudot.laurent@wanadoo.fr>
-# This ruleset is currently unmaintained.  Contact the Prelude
-# development team if you would like to maintain it.
-# All Rights Reserved
+# This file is part of the Prelude program.
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by 
+# it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
 #
@@ -21,11 +18,34 @@
 #
 #####
 
+#
+# All of these rules are single, standalone rules that don't match up
+# with any particular ruleset.  Comment out as needed.
+#
+
+# Copyright (C) 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
+# All Rights Reserved
+
+# No log sample; please submit
+regex=entered promiscuous mode; \
+ classification(0).name=Promiscuous mode detected; \
+ id=400; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion = succeeded; \
+ assessment.impact.type = other; \
+ assessment.impact.severity = medium; \
+ assessment.impact.description=A sniffer is probably running on this machine; \
+ last
+
+# Copyright (C) 2003 Laurent Oudot <oudot.laurent@wanadoo.fr>
+# All Rights Reserved
+
 # No sample log; please submit
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  classification(0).name=Exim request rejected; \
  classification(0).origin=vendor-specific; \
- id=400; \
+ id=401; \
  revision=1; \
  assessment.impact.severity = low; \
  assessment.impact.completion=failed; \

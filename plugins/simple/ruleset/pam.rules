@@ -1,0 +1,72 @@
+#####
+#
+# Copyright (C) 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+#Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
+regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
+ classification(0).name=User authentication; \
+ id=1; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion = succeeded; \
+ assessment.impact.type = user; \
+ assessment.impact.severity = low; \
+ assessment.impact.description = User $2 authenticated to $1 successfuly; \
+ source(0).user.category = os-device; \
+ source(0).user.userid(0).type = current-user; \
+ source(0).user.userid(0).name = $2;  \
+ source(0).user.userid(0).number = $3; \
+ target(0).user.category = os-device; \
+ target(0).user.userid(0).name=$1; \
+ target(0).user.userid(0).type = target-user; \
+ last
+
+# authentication failure; logname=xxxx uid=xxxx euid=xxxx tty=xxxx ruser=xxxx rhost=xxxx  user=xxxx
+regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.*) rhost=(.*) user=(.*); \
+ classification(0).name = User authentication; \
+ id=2; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion = failed; \
+ assessment.impact.type = user; \
+ assessment.impact.severity = high; \
+ assessment.impact.description=User $1 tried to authenticate as $7 and failed; \
+ source(0).user.category = os-device; \
+ source(0).user.userid(0).type = current-user; \
+ source(0).user.userid(0).name = $1;           \
+ source(0).user.userid(0).number=$2; \
+ target(0).user.category = os-device; \
+ target(0).user.userid(0).type = target-user; \
+ target(0).user.userid(0).name = $7; \
+ last
+
+# No log sample; please submit
+regex=no such user; \
+ classification(0).name=Invalid User; \
+ id=3; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.completion = failed; \
+ assessment.impact.type = other; \
+ assessment.impact.severity = medium; \
+ assessment.impact.description = Someone tried to log in using a non existing user; \
+ last
