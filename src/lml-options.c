@@ -366,7 +366,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
 
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'D', "debug",
-                           "Debug mode", PRELUDE_OPTION_ARGUMENT_NONE, set_debug_mode, NULL);
+                           "Debug mode", PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_debug_mode, NULL);
         
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
