@@ -306,7 +306,7 @@ static int parse_key_and_value(char *input, char **key, char **value)
         /*
          * strip whitespace at the tail of the key.
          */
-        while ( tmp && (*tmp == '=' || isspace(*tmp)) )
+        while ( tmp && (*tmp == '=' || isspace((int) *tmp)) )
                 *tmp-- = '\0';
 
         if ( ! ptr )
@@ -317,7 +317,7 @@ static int parse_key_and_value(char *input, char **key, char **value)
          * strip whitespace at the begining of the value.
          */
         ptr++;
-        while ( *ptr != '\0' && isspace(*ptr) )
+        while ( *ptr != '\0' && isspace((int) *ptr) )
                 ptr++;
 
         *value = ptr;
@@ -326,7 +326,7 @@ static int parse_key_and_value(char *input, char **key, char **value)
          * strip whitespace at the end of the value.
          */
         ptr = ptr + strlen(ptr) - 1;
-        while ( isspace(*ptr) )
+        while ( isspace((int) *ptr) )
                 *ptr-- = '\0';
         
         return 0;
@@ -463,7 +463,7 @@ static int parse_rule_object_value(simple_rule_t *rule, rule_object_t *rule_obje
                         i = 0;
 			str++;
                         
-			while ( isdigit(*str) && i < sizeof(num) )
+			while ( isdigit((int) *str) && i < sizeof(num) )
 				num[i++] = *str++;
 
 			if ( ! i )
@@ -742,7 +742,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 	str = prelude_strbuf_get_string(strbuf);
 
-	if ( strrncmp(idmef_object_get_name(rule_object->object), ".port") == 0 && ! isdigit(*str) ) {
+	if ( strrncmp(idmef_object_get_name(rule_object->object), ".port") == 0 && ! isdigit((int) *str) ) {
 		struct servent *service;
 
 		service = getservbyname(str, NULL);
