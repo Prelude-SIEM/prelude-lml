@@ -171,4 +171,3 @@ include = wap11.rules;
 include = wu-ftp.rules;
 include = zywall.rules;
 include = zyxel.rules;
-include = honeyd.rules;
