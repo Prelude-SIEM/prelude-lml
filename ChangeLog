@@ -1,3 +1,14 @@
+2003-02-04  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/simple.c: handling of IDMEF
+	source and destination address.
+
+	* src/file-server.c: (fam_wait_for_event):
+	remove unused.
+
+	* src/lml-alert.c (generate_analyzer): 
+	make LML alert carry LML version.
+
 2003-01-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* src/main.c (sighup_handler): implemented. Set the

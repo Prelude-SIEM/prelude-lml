@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2002 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@mandrakesoft.com>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -47,6 +47,7 @@
 
 #include "log-common.h"
 #include "lml-alert.h"
+#include "config.h"
 
 
 static prelude_msgbuf_t *msgbuf;
@@ -64,6 +65,7 @@ static void generate_analyzer(idmef_analyzer_t *analyzer)
         idmef_string_set_constant(&analyzer->model, ANALYZER_MODEL);
         idmef_string_set_constant(&analyzer->class, ANALYZER_CLASS);
         idmef_string_set_constant(&analyzer->manufacturer, ANALYZER_MANUFACTURER);
+        idmef_string_set_constant(&analyzer->version, VERSION);
 }
 
 

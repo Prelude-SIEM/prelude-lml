@@ -617,24 +617,6 @@ static int fam_process_event(regex_list_t *list, FAMEvent *event)
 
 
 
-static int fam_wait_for_event(regex_list_t *list) 
-{
-        int ret;
-        FAMEvent event;
-        
-        while ( (ret = FAMNextEvent(&fc, &event)) >= 0 )
-                fam_process_event(list, &event);
-        
-        if ( ret < 0 ) {
-                log(LOG_ERR, "error while waiting for FAM event: %s.\n", FamErrlist[FAMErrno]);
-                return -1;
-        }
-
-        return 0;
-}
-
-
-
 static int fam_process_queued_events(regex_list_t *list) 
 {
         int ret;

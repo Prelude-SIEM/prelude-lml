@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2002 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@mandrakesoft.com>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -77,10 +77,12 @@ typedef struct {
         pcre *regex;
         pcre_extra *extra;
         char *regex_string;
+     
         idmef_impact_t *impact;  
         idmef_classification_t *class;
         idmef_source_t *source;
         idmef_target_t *target;
+
         struct list_head variable_list;
         struct list_head list;
 } simple_rule_t;
@@ -175,24 +177,59 @@ static int create_source_node(idmef_source_t *source)
 #define create_target_node(target) create_source_node((idmef_source_t *) target)
 
 
-static int create_node_address_address(idmef_node_t *node, const char *address, int *var_type, void **var_ptr) 
-{
-        idmef_address_t *address_tmp;
 
-        if ( ! (address_tmp = idmef_node_address_new(node)) ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                return -1;
-        }
-
- 
+static int create_address_address(idmef_address_t *addr, const char *address, int *var_type, void **var_ptr) 
+{ 
         *var_type = VARIABLE_TYPE_STRING;
-        *var_ptr  = &address_tmp->address;
+        *var_ptr  = &addr->address;
 
-        idmef_string_set(&address_tmp->address, strdup(address));
+        idmef_string_set(&addr->address, strdup(address));
  
         return 0;
 }
 
+
+
+
+
+static int create_address_category(idmef_address_t *addr, const char *category, int *var_type, void **var_ptr) 
+{
+        int i;
+
+        struct {
+                const char *name;
+                idmef_address_category_t category;
+        } tbl[] = {
+                { "unknown",       addr_unknown  },
+                { "atm",           atm           },
+                { "e-mail",        e_mail        },
+                { "lotus-notes",   lotus_notes   },
+                { "mac",           mac           },
+                { "sna",           sna           },
+                { "vm",            vm            },
+                { "ipv4-addr",     ipv4_addr     },
+                { "ipv4-addr-hex", ipv4_addr_hex },
+                { "ipv6-addr",     ipv6_addr     },
+                { "ipv6-addr-hex", ipv6_addr_hex },
+                { "ipv6-net",      ipv6_net      },
+                { "ipv6-net-mask", ipv6_net_mask },
+                { NULL,            0             },
+        };
+
+        for ( i = 0; tbl[i].name != NULL; i++ ) {
+
+                if ( strcmp(category, tbl[i].name) != 0 )
+                        continue;
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &addr->category;
+                addr->category = tbl[i].category;
+
+                return 0;
+        }
+
+        return -1;
+}
 
 
 
@@ -204,7 +241,7 @@ static int create_node_category(idmef_node_t *node, const char *category, int *v
                 const char *name;
                 idmef_node_category_t category;
         } tbl[] = {
-                { "node_unknown", node_unknown },
+                { "unknown",      node_unknown },
                 { "ads",          ads          },
                 { "afs",          afs          },
                 { "coda",         coda         },
@@ -448,6 +485,17 @@ static idmef_userid_t *retrieve_latest_userid(idmef_user_t *user)
 
         return NULL;
 }
+
+
+
+static idmef_address_t *retrieve_latest_address(idmef_node_t *node) 
+{
+        if ( ! list_empty(&node->address_list) )
+                return list_entry(node->address_list.prev, idmef_address_t, list);
+
+        return NULL;
+}
+
 
 
 
@@ -821,18 +869,64 @@ static int parse_regex(simple_rule_t *rule, const char *regex, int *var_type, vo
 
 
 
-static int parse_source_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+
+static int parse_source_node_address_category(simple_rule_t *rule, const char *category, int *var_type, void **var_ptr) 
 {
+        idmef_address_t *addr;
+        
         if ( create_source(rule) < 0 )
                 return -1;
 
         if ( create_source_node(rule->source) < 0 )
                 return -1;
 
-        if ( create_node_address_address(rule->source->node, address, var_type, var_ptr) < 0 )
+        addr = retrieve_latest_address(rule->source->node);
+        if ( ! addr )
+                return -1;
+        
+        return create_address_category(addr, category, var_type, var_ptr);
+}
+
+
+
+
+
+static int parse_target_node_address_category(simple_rule_t *rule, const char *category, int *var_type, void **var_ptr) 
+{
+        idmef_address_t *addr;
+        
+        if ( create_target(rule) < 0 )
                 return -1;
 
-        return 0;
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+
+        addr = retrieve_latest_address(rule->target->node);
+        if ( ! addr )
+                return -1;
+        
+        return create_address_category(addr, category, var_type, var_ptr);
+}
+
+
+
+
+
+static int parse_source_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+{
+        idmef_address_t *addr;
+        
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_node(rule->source) < 0 )
+                return -1;
+
+        addr = retrieve_latest_address(rule->source->node);
+        if ( ! addr )
+                return -1;
+
+        return create_address_address(addr, address, var_type, var_ptr);
 }
 
 
@@ -840,16 +934,47 @@ static int parse_source_node_address_address(simple_rule_t *rule, const char *ad
 
 static int parse_target_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
 {
+        idmef_address_t *addr;
+        
+        if ( create_target(rule) < 0 )
+                return -1;
+
+        if ( create_target_node(rule->target) < 0 )
+                return -1;
+        
+        addr = retrieve_latest_address(rule->target->node);
+        if ( ! addr )
+                return -1;
+        
+        return create_address_address(addr, address, var_type, var_ptr);
+}
+
+
+
+
+static int parse_source_node_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+{
+        if ( create_source(rule) < 0 )
+                return -1;
+
+        if ( create_source_node(rule->source) < 0 )
+                return -1;
+
+        return (idmef_node_address_new(rule->source->node)) ? 0 : -1;
+}
+
+
+
+
+static int parse_target_node_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+{
         if ( create_target(rule) < 0 )
                 return -1;
 
         if ( create_target_node(rule->target) < 0 )
                 return -1;
 
-        if ( create_node_address_address(rule->target->node, address, var_type, var_ptr) < 0 )
-                return -1;
-
-        return 0;
+        return (idmef_node_address_new(rule->target->node)) ? 0 : -1;
 }
 
 
@@ -1657,57 +1782,61 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 const char *key;
                 int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
-                { "include",                     parse_include                      },
-                { "regex",                       parse_regex                        },
-                { "class.origin",                parse_class_origin                 },
-                { "class.name",                  parse_class_name                   },
-                { "class.url",                   parse_class_url                    },
-                { "impact.completion",           parse_impact_completion            },
-                { "impact.type",                 parse_impact_type                  },
-                { "impact.severity",             parse_impact_severity              },
-                { "impact.description",          parse_impact_desc                  },
-                { "source.node.address.address", parse_source_node_address_address  },
-                { "source.node.category",        parse_source_node_category         },
-                { "source.node.location",        parse_source_node_location         },
-                { "source.node.name",            parse_source_node_name             },
-                { "source.spoofed",              parse_source_spoofed               },
-                { "source.interface",            parse_source_interface             },
-                { "source.service.port",         parse_source_service_port          },
-                { "source.service.protocol",     parse_source_service_protocol      },
-                { "source.service.name",         parse_source_service_name          },
-                { "source.service.portlist",     parse_source_service_portlist      },
-                { "source.process.name",         parse_source_process_name          },
-                { "source.process.path",         parse_source_process_path          },
-                { "source.process.pid",          parse_source_process_pid           },
-                { "source.process.arg",          parse_source_process_arg           },
-                { "source.process.env",          parse_source_process_env           },
-                { "source.user.category",        parse_source_user_category         },
-                { "source.user.userid.type",     parse_source_user_userid_type      },
-                { "source.user.userid.name",     parse_source_user_userid_name      },
-                { "source.user.userid.number",   parse_source_user_userid_number    },
-                { "source.user.userid",          parse_source_user_userid           },
-                { "target.node.address.address", parse_target_node_address_address  },
-                { "target.node.category",        parse_target_node_category         },
-                { "target.node.location",        parse_target_node_location         },
-                { "target.node.name",            parse_target_node_name             },
-                { "target.decoy",                parse_target_decoy                 },
-                { "target.interface",            parse_target_interface             },
-                { "target.service.port",         parse_target_service_port          },
-                { "target.service.protocol",     parse_target_service_protocol      },
-                { "target.service.name",         parse_target_service_name          },
-                { "target.service.portlist",     parse_target_service_portlist      },
-                { "target.process.name",         parse_target_process_name          },
-                { "target.process.path",         parse_target_process_path          },
-                { "target.process.pid",          parse_target_process_pid           },
-                { "target.process.arg",          parse_target_process_arg           },
-                { "target.process.env",          parse_target_process_env           },
-                { "target.file.name",            parse_target_file_name             },
-                { "target.user.category",        parse_target_user_category         },
-                { "target.user.userid.type",     parse_target_user_userid_type      },
-                { "target.user.userid.name",     parse_target_user_userid_name      },
-                { "target.user.userid.number",   parse_target_user_userid_number    },
-                { "target.user.userid",          parse_target_user_userid           },
-                { NULL,                          NULL                               },
+                { "include",                      parse_include                      },
+                { "regex",                        parse_regex                        },
+                { "class.origin",                 parse_class_origin                 },
+                { "class.name",                   parse_class_name                   },
+                { "class.url",                    parse_class_url                    },
+                { "impact.completion",            parse_impact_completion            },
+                { "impact.type",                  parse_impact_type                  },
+                { "impact.severity",              parse_impact_severity              },
+                { "impact.description",           parse_impact_desc                  },
+                { "source.node.address.category", parse_source_node_address_category },
+                { "source.node.address.address",  parse_source_node_address_address  },
+                { "source.node.address",          parse_source_node_address          },
+                { "source.node.category",         parse_source_node_category         },
+                { "source.node.location",         parse_source_node_location         },
+                { "source.node.name",             parse_source_node_name             },
+                { "source.spoofed",               parse_source_spoofed               },
+                { "source.interface",             parse_source_interface             },
+                { "source.service.port",          parse_source_service_port          },
+                { "source.service.protocol",      parse_source_service_protocol      },
+                { "source.service.name",          parse_source_service_name          },
+                { "source.service.portlist",      parse_source_service_portlist      },
+                { "source.process.name",          parse_source_process_name          },
+                { "source.process.path",          parse_source_process_path          },
+                { "source.process.pid",           parse_source_process_pid           },
+                { "source.process.arg",           parse_source_process_arg           },
+                { "source.process.env",           parse_source_process_env           },
+                { "source.user.category",         parse_source_user_category         },
+                { "source.user.userid.type",      parse_source_user_userid_type      },
+                { "source.user.userid.name",      parse_source_user_userid_name      },
+                { "source.user.userid.number",    parse_source_user_userid_number    },
+                { "source.user.userid",           parse_source_user_userid           },
+                { "target.node.address.category", parse_target_node_address_category },
+                { "target.node.address.address",  parse_target_node_address_address  },
+                { "target.node.address",          parse_target_node_address          },
+                { "target.node.category",         parse_target_node_category         },
+                { "target.node.location",         parse_target_node_location         },
+                { "target.node.name",             parse_target_node_name             },
+                { "target.decoy",                 parse_target_decoy                 },
+                { "target.interface",             parse_target_interface             },
+                { "target.service.port",          parse_target_service_port          },
+                { "target.service.protocol",      parse_target_service_protocol      },
+                { "target.service.name",          parse_target_service_name          },
+                { "target.service.portlist",      parse_target_service_portlist      },
+                { "target.process.name",          parse_target_process_name          },
+                { "target.process.path",          parse_target_process_path          },
+                { "target.process.pid",           parse_target_process_pid           },
+                { "target.process.arg",           parse_target_process_arg           },
+                { "target.process.env",           parse_target_process_env           },
+                { "target.file.name",             parse_target_file_name             },
+                { "target.user.category",         parse_target_user_category         },
+                { "target.user.userid.type",      parse_target_user_userid_type      },
+                { "target.user.userid.name",      parse_target_user_userid_name      },
+                { "target.user.userid.number",    parse_target_user_userid_number    },
+                { "target.user.userid",           parse_target_user_userid           },
+                { NULL,                           NULL                               },
         };
 
         ptr = buf;
@@ -1896,12 +2025,35 @@ static int parse_ruleset(const char *filename, FILE *fd)
 
 
 
+static int record_address(idmef_node_t *node, idmef_node_t *alert_node) 
+{
+        struct list_head *tmp;
+        idmef_address_t *addr, *new;
+
+        list_for_each(tmp, &node->address_list) {
+                addr = list_entry(tmp, idmef_address_t, list);
+
+                new = idmef_node_address_new(alert_node);
+                if ( ! new )
+                        return -1;
+
+                new->category = addr->category;
+                new->vlan_num = addr->vlan_num;
+                idmef_string_copy(&new->address, &addr->address);
+                idmef_string_copy(&new->netmask, &addr->netmask);
+                idmef_string_copy(&new->vlan_name, &addr->vlan_name);
+        }
+
+        return 0;
+}
+
+
+
+
 static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_source)
 {
         idmef_user_t *user;
         idmef_node_t *node;
-        idmef_address_t *address;
-        idmef_address_t *address_tmp;
         idmef_service_t *service;
         idmef_process_t *process;
         idmef_process_arg_t *arg;
@@ -1923,16 +2075,8 @@ static int record_source_fields(idmef_source_t *source, idmef_source_t *alert_so
                 node->category = source->node->category;
                 idmef_string_copy(&node->location, &source->node->location);
                 idmef_string_copy(&node->name, &source->node->name);
-                
-                list_for_each(tmp, &source->node->address_list) {
-                        address = idmef_node_address_new(node);
 
-                        if ( ! address )
-                                return -1;
-                
-                        address_tmp = list_entry(tmp, idmef_address_t, list);
-                        idmef_string_copy(&address->address, &address_tmp->address);
-                }
+                record_address(source->node, node);
         }
 
         if ( source->service ) {
