@@ -45,7 +45,7 @@ struct udp_server {
 
 void udp_server_process_event(udp_server_t *server)
 {
-        int ret;
+        ssize_t ret;
         socklen_t len;
         char src[512];
         struct sockaddr_in addr;
@@ -53,7 +53,7 @@ void udp_server_process_event(udp_server_t *server)
         
         len = sizeof(struct sockaddr);
 
-        ret = recvfrom(server->sockfd, buf, sizeof(buf), 0, (struct sockaddr *) &addr, &len);
+        ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr *) &addr, &len);
         if ( ret < 0 ) {
                 log(LOG_ERR, "error receiving syslog message.\n");
                 return;
@@ -68,12 +68,14 @@ void udp_server_process_event(udp_server_t *server)
          * we don't care about syslog priority / facility.
          */
         ptr = strchr(buf, '>');
-        if ( ptr )
-                ptr++;
-        else 
+        if ( ! ptr )
                 ptr = buf;
+        else {
+                ret--;
+                ptr++;
+        }
         
-        lml_dispatch_log(server->rlist, server->ls, ptr);
+        lml_dispatch_log(server->rlist, server->ls, ptr, ret);
 }
 
 

@@ -112,7 +112,7 @@ static void regex_match_cb(void *plugin, void *log)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str)
+void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str, size_t size)
 {
         log_entry_t *log_entry;
 
@@ -120,9 +120,9 @@ void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str)
         if ( ! log_entry )
                 return;
         
-        log_entry_set_log(log_entry, str);
+        log_entry_set_log(log_entry, str, size);
 
-        regex_exec(list, log_entry->log, &regex_match_cb, log_entry);
+        regex_exec(list, &regex_match_cb, log_entry, log_entry->log, log_entry->log_len);
         log_entry_delete(log_entry);
 }
 

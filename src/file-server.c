@@ -511,7 +511,7 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         
         while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
                 eventno++;
-                lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf);
+                lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf, ret);
                 file_metadata_save(monitor, st->st_size - len);
                 
                 len -= rlen;

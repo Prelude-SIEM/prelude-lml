@@ -7,7 +7,9 @@ typedef struct log_source_s log_source_t;
 
 
 typedef struct {
-        char *log;        
+        char *log;
+        size_t log_len;
+        
         struct timeval tv;
 
         char *target_hostname;
@@ -21,7 +23,7 @@ typedef struct {
 
 log_entry_t *log_entry_new(log_source_t *source);
 
-int log_entry_set_log(log_entry_t *lc, const char *entry);
+int log_entry_set_log(log_entry_t *lc, const char *entry, size_t size);
 
 void log_entry_delete(log_entry_t *lc);
 

@@ -235,8 +235,9 @@ void regex_destroy(regex_list_t *list)
 
 
 
-int regex_exec(regex_list_t *list, const char *str,
-               void (*cb)(void *plugin, void *data), void *data)
+int regex_exec(regex_list_t *list,
+               void (*cb)(void *plugin, void *data), void *data,
+               const char *str, size_t len)
 {
         prelude_list_t *tmp;
         regex_entry_t *entry;
@@ -246,7 +247,7 @@ int regex_exec(regex_list_t *list, const char *str,
                 entry = prelude_list_entry(tmp, regex_entry_t, list);
 
                 count = pcre_exec(entry->regex_compiled, entry->regex_extra,
-                                  str, strlen(str), 0, 0, ovector, 20 * 3);
+                                  str, len, 0, 0, ovector, 20 * 3);
                 if ( count <= 0 )
                         continue;
                 

@@ -110,7 +110,7 @@ static int parse_ts(log_source_t *ls, const char *string, void **out)
 
 static int parse_prefix(log_entry_t *log_entry)
 {
-        const char *string;
+        char *string;
         int ovector[5 * 3];
         int i, ret, matches = 0;
         void *tv = &log_entry->tv;
@@ -127,7 +127,7 @@ static int parse_prefix(log_entry_t *log_entry)
         };
 
         matches = pcre_exec(log_entry->source->prefix_regex, log_entry->source->prefix_regex_extra,
-                            log_entry->log, strlen(log_entry->log), 0, 0, ovector, sizeof(ovector) / sizeof(int));
+                            log_entry->log, log_entry->log_len, 0, 0, ovector, sizeof(ovector) / sizeof(int));
         
         if ( matches < 0 ) {
                 log(LOG_ERR, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->log);
@@ -136,8 +136,8 @@ static int parse_prefix(log_entry_t *log_entry)
 
         for ( i = 0; tbl[i].field != NULL; i++ ) {
                 ret = pcre_get_named_substring(log_entry->source->prefix_regex, log_entry->log,
-                                               ovector, matches, tbl[i].field, &string);
-
+                                               ovector, matches, tbl[i].field, (const char **) &string);
+                
                 if ( ret == PCRE_ERROR_NOSUBSTRING )
                         continue;
 
@@ -147,10 +147,12 @@ static int parse_prefix(log_entry_t *log_entry)
                 }
                 
                 if ( ! tbl[i].cb )
-                        *tbl[i].ptr = strdup(string);
+                        *tbl[i].ptr = string;
                 
                 else {
                         ret = tbl[i].cb(log_entry->source, string, tbl[i].ptr);
+                        free(string);
+                        
                         if ( ret < 0 ) {
                                 log(LOG_ERR, "failed to parse prefix field: %s.\n", tbl[i].field);
                                 return -1;
@@ -190,11 +192,6 @@ log_entry_t *log_entry_new(log_source_t *source)
 
         log_entry->source = source;
         gettimeofday(&log_entry->tv, NULL);
-
-        /*
-         * default hostname is ours.
-         */
-        log_entry->target_hostname = get_hostname();
         
         return log_entry;
 }
@@ -202,9 +199,11 @@ log_entry_t *log_entry_new(log_source_t *source)
 
 
 
-int log_entry_set_log(log_entry_t *log_entry, const char *entry) 
+int log_entry_set_log(log_entry_t *log_entry, const char *entry, size_t size) 
 {
         int ret;
+        
+        log_entry->log_len = size;
         
         log_entry->log = strdup(entry);
         if ( ! log_entry->log ) {
@@ -213,12 +212,16 @@ int log_entry_set_log(log_entry_t *log_entry, const char *entry)
         }
         
         ret = parse_prefix(log_entry);
+        
+        if ( ! log_entry->target_hostname )
+                log_entry->target_hostname = get_hostname();
+        
         if ( ret < 0 ) {
                 log(LOG_ERR, "failed to parse log message prefix.\n");
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }
-                
+        
         return 0;
 }
 
