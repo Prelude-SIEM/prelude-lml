@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,6 +34,9 @@ regex=\[monitor.globalStatus.nonCritical:warning\]: (\S+) is full \(using or res
  classification(0).name=Storage capacity warning; \
  id=3900; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
@@ -47,6 +49,9 @@ regex=Directory (\S+) is getting close to the maxdirsize limit; \
  classification(0).name=Storage capacity warning; \
  id=3901; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
@@ -60,6 +65,9 @@ regex=\[httpd_slowproc:warning\]: HTTP Authentication from ([\d\.]+) to realm \w
  classification(0).name=Web administration admin login failed; \
  id=3902; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
@@ -74,6 +82,9 @@ regex=\[telnet_\d+:info\]: (\S+) logged in from host: ([\w\-\.]+); \
  classification(0).name=Remote control admin login succeeded; \
  id=3903; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
@@ -90,6 +101,9 @@ regex=\[raid.vol.disk.add.done:notice\]: Addition of disk ([\d\.]+) \(S\/N (\S+)
  classification(0).name=Storage disk added to RAID; \
  id=3904; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
@@ -102,6 +116,9 @@ regex=\[raid.disk.zero.done:notice]: ([\d\.]+) \(S\/N (\S+)\): disk zeroing comp
  classification(0).name=Storage disk zeroed; \
  id=3905; \
  revision=1; \
+ analyzer.name=ONTAP; \
+ analyzer.manufacturer=NetApp; \
+ analyzer.class=Storage; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \

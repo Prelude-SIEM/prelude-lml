@@ -31,6 +31,8 @@ regex=entered promiscuous mode; \
  classification.text=Promiscuous mode detected; \
  id=400; \
  revision=1; \
+ analyzer.name=kernel; \
+ analyzer.class=OS; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = other; \
  assessment.impact.severity = medium; \
@@ -45,6 +47,7 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  classification.text=Mail server request rejected; \
  id=401; \
  revision=1; \
+ analyzer.class=Service; \
  assessment.impact.severity = low; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
@@ -53,7 +56,6 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  last
 
 # Copyright (C) 2004 Gene Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 
 #Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
@@ -61,6 +63,9 @@ regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMIN
  classification.text=Database audit; \
  id=402; \
  revision=1; \
+ analyzer.name=Database; \
+ analyzer.manufacturer=Oracle; \
+ analyzer.class=Database; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
@@ -76,6 +81,8 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
  classification.text=TFTP Session; \
  id=403; \
  revision=1; \
+ analyzer.name=xinetd; \
+ analyzer.class=Service; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
@@ -93,6 +100,9 @@ regex='\S+' contains a virus \(Infection: (\S+)\); \
  classification.text=Virus found: $1; \
  id=404; \
  revision=1; \
+ analyzer.name=P3Scan; \
+ analyzer.manufacturer=p3scan.sourceforge.net; \
+ analyzer.class=Antivirus; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -105,6 +115,8 @@ regex=syslogd (startup|shutdown) succeeded; \
  classification.text=Syslog $1; \
  id=405; \
  revision=1; \
+ analyzer.name=syslog; \
+ analyzer.class=OS; \
  assessment.impact.severity=low; \
  assessment.impact.type=dos; \
  assessment.impact.completion=succeeded; \

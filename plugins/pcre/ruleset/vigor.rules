@@ -30,6 +30,7 @@ regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR (tcp|ud
  classification.text=$5 Packet dropped; \
  id=2000; \
  revision=1; \
+ analyzer.class=Firewall; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
@@ -53,6 +54,7 @@ regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([\d\.]+)    PR icmp len \d+ \d+ ic
  classification.text=ICMP Packet dropped; \
  id=2001; \
  revision=1; \
+ analyzer.class=Firewall; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \

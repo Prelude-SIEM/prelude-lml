@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,6 +34,9 @@ regex=\S+: (\S+) FOUND; \
  classification.text=Virus found: $1; \
  id=3200; \
  revision=1; \
+ analyzer.name=Clam Antivirus; \
+ analyzer.manufacturer=www.clamav.net; \
+ analyzer.class=Antivirus; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -46,6 +48,9 @@ regex=Database correctly reloaded \(\d+ viruses\); \
  classification.text=Virus definitions updated; \
  id=3201; \
  revision=1; \
+ analyzer.name=Clam Antivirus; \
+ analyzer.manufacturer=www.clamav.net; \
+ analyzer.class=Antivirus; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \

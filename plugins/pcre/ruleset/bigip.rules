@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,6 +34,9 @@ regex=bigconf.cgi: AUDIT -- (\w+) (?!VIPPORT)(\w+) ([\d\.]+).+User: (\S+); \
  classification.text=Load balancer $1 audit; \
  id=3600; \
  revision=1; \
+ analyzer.name=Big-IP; \
+ analyzer.manufacturer=F5; \
+ analyzer.class=Load Balancer; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \
@@ -51,6 +53,9 @@ regex=bigconf.cgi: AUDIT -- (\w+) (\w+) (\w+)  User: (\S+); \
  classification.text=Load balancer $1 audit; \
  id=3601; \
  revision=1; \
+ analyzer.name=Big-IP; \
+ analyzer.manufacturer=F5; \
+ analyzer.class=Load Balancer; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
  assessment.impact.completion=succeeded; \

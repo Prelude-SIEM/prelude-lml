@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # Based on rules originally submitted by David Maciejak on behalf of
@@ -31,6 +30,9 @@ regex=TWReport \S+ \d+ V:0; \
  classification.text=Integrity Check OK; \
  id=3400; \
  revision=1; \
+ analyzer.name=Tripwire; \
+ analyzer.manufacturer=Tripwire, Inc.; \
+ analyzer.class=Integrity Checker; \
  assessment.impact.severity=low; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -42,6 +44,9 @@ regex=TWReport \S+ \d+ V:\d+ S:\d+ A:(?!0)(\d+); \
  classification.text=Integrity Check Warning: file(s) added; \
  id=3401; \
  revision=1; \
+ analyzer.name=Tripwire; \
+ analyzer.manufacturer=Tripwire, Inc.; \
+ analyzer.class=Integrity Checker; \
  assessment.impact.severity=low; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -52,6 +57,9 @@ regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
  classification.text=Integrity Check Warning: file(s) removed; \
  id=3402; \
  revision=1; \
+ analyzer.name=Tripwire; \
+ analyzer.manufacturer=Tripwire, Inc.; \
+ analyzer.class=Integrity Checker; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
@@ -62,6 +70,9 @@ regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:\d+ C:(?!0)(\d+); \
  classification.text=Integrity Check Warning: file(s) modified; \
  id=3403; \
  revision=1; \
+ analyzer.name=Tripwire; \
+ analyzer.manufacturer=Tripwire, Inc.; \
+ analyzer.class=Integrity Checker; \
  assessment.impact.severity=medium; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \

@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,6 +34,9 @@ regex=Host In Session  Host Name: (\S+)  Host Licensee: \S+  Remote Name: (\S+) 
 classification.text=Remote control user connected; \
  id=3000; \
  revision=1; \
+ analyzer.name=pcAnywhere; \
+ analyzer.manufacturer=Symantec; \
+ analyzer.class=Remote Control; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=low; \
@@ -51,6 +53,9 @@ regex=Host End Session  Device Type: \S+  Description: (.+); \
  classification.text=Remote control user disconnected; \
  id=3001; \
  revision=1; \
+ analyzer.name=pcAnywhere; \
+ analyzer.manufacturer=Symantec; \
+ analyzer.class=Remote Control; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=low; \

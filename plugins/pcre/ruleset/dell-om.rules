@@ -1,7 +1,6 @@
 #####
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
-# MAXIMUS (www.maximus.com)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,6 +34,9 @@ regex=1306  Redundancy lost Redundancy unit: (.+) Chassis location:; \
  classification.text=Power supply redundancy failure; \
  id=3800; \
  revision=1; \
+ analyzer.name=OpenManage; \
+ analyzer.manufacturer=Dell; \
+ analyzer.class=Monitoring; \
  assessment.impact.severity=high; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -46,6 +48,9 @@ regex=1352  Power supply returned to normal Sensor location: (.+) Chassis locati
  classification.text=Power supply normal; \
  id=3801; \
  revision=1; \
+ analyzer.name=OpenManage; \
+ analyzer.manufacturer=Dell; \
+ analyzer.class=Monitoring; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -57,6 +62,9 @@ regex=1353  Power supply detected a warning Sensor location: (.+) Chassis locati
  classification.text=Power supply warning; \
  id=3802; \
  revision=1; \
+ analyzer.name=OpenManage; \
+ analyzer.manufacturer=Dell; \
+ analyzer.class=Monitoring; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
@@ -68,6 +76,9 @@ regex=1354  Power supply detected a failure Sensor location: (.+) Chassis locati
  classification.text=Power supply failure; \
  id=3803; \
  revision=1; \
+ analyzer.name=OpenManage; \
+ analyzer.manufacturer=Dell; \
+ analyzer.class=Monitoring; \
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \

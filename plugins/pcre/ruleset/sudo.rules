@@ -35,6 +35,8 @@ regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
  classification.text=SUDO Command Executed; \
  id=2700; \
  revision=1; \
+ analyzer.name=sudo; \
+ analyzer.class=OS; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.severity=low; \
@@ -52,6 +54,8 @@ regex=(\S+) : user NOT in sudoers . TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+)
  classification.text=SUDO from Unauthorized User; \
  id=2701; \
  revision=1; \
+ analyzer.name=sudo; \
+ analyzer.class=OS; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
