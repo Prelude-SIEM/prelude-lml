@@ -18,8 +18,7 @@
 # - Avoid capturing variables which you don't use.  This causes unneccessary
 #   memory consumption.
 # - At a minimum, include regex, classification().name, 
-#   classification().origin, assessement.impact.severity, 
-#   assessment.impact.type, impact.description.
+#   assessement.impact.severity, assessment.impact.type, impact.description.
 # - If it's correct for this application, include last.
 # - Put only a single field on each line of your rules.
 # - Include a sample log entry with each rule.
@@ -41,15 +40,10 @@
 # - regex:
 #   A PCRE regex that should be matched to trigger the alert.
 #
-# - classification().name: 
+# - classification.text: 
 #   The name of the alert, from one of the origins listed below.
 #
-# - classification().origin:
-#   The source from which the name of the alert originates. 
-#   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is 
-#   unknown.
-#
-# - classification().url:
+# - classification.url:
 #   A URL at which the manager (or the human
 #   operator of the manager) can find additional information about the
 #   alert.  The document pointed to by the URL may include an in-depth
