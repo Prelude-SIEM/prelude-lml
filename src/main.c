@@ -21,10 +21,11 @@
 #include "common.h"
 #include "queue.h"
 #include "regex.h"
+#include "pconfig.h"
 #include "udp-server.h"
 #include "log-common.h"
 #include "plugin-log.h"
-#include "pconfig.h"
+#include "plugin-log-prv.h"
 #include "file-server.h"
 #include "lml-alert.h"
 
@@ -46,9 +47,9 @@ static void sig_handler(int signum)
 
 
 
-static void regex_match_cb(const char *plugin, void *log) 
+static void regex_match_cb(void *plugin, void *log) 
 {
-        log_plugins_run(plugin, (log_container_t *) log);
+        log_plugin_run(plugin, (log_container_t *) log);
 }
 
 

@@ -1,5 +1,30 @@
 2002-04-08  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* plugins/simple/simple.c: try to do time consuming stuff
+	at initialisation time.
+
+	* src/regex.c: 
+	instead of searching at runtime for the plugin to use
+	(using string compareason), resolve plugin dependency
+	at initialisation time, and store a pointer to the plugin
+	that need to be ran for a given regex.
+
+	(regex_exec): the callback now take the plugin as argument.
+
+	(regex_init): call regex_create_entry instead of doing
+	everything ourselve.
+	
+	(regex_create_entry): new function.
+	
+
+	* src/log-plugins.c: 
+	we do not use hashkey anymore.
+
+	(log_plugin_run): take the plugin to run as argument.
+	It's now up to the caller to know which plugin to run.
+
+	* src/hashkey.c: removed.
+
 	* Makefile.am (install-data-local): 
         Only install default configuration file if it does not
         exit... If a configuration file is already present, warn

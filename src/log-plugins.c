@@ -16,42 +16,16 @@
 #include "hashkey.h"
 #include "log-common.h"
 #include "plugin-log.h"
-
-static hash_table plugins;
-
-/* Derived from /usr/CVSroot/XEmacs/xemacs/src/symbols.c 2001/04/30 09:02:41 */
-
-static int hash_string(const void *k)
-{
-        int len;
-	unsigned int hash = 0;
-        const char *ptr = (const char *) k;
-
-        len = strlen(ptr);
-        
-	for (hash = 0; len; len--, ptr++)
-		hash = 31 * hash + *ptr;
-
-	return hash;
-}
+#include "plugin-log-prv.h"
 
 
-
-static int equal_string(const void *k1, const void *k2)
-{
-	if ( ! strcmp((const char *) k1, (const char *) k2))
-		return 1;
-	return 0;
-}
-
+static LIST_HEAD(plugins_list);
 
 
 static int subscribe(plugin_container_t *pc)
 {
 	dprint("- Subscribing plugin %s\n", pc->plugin->name);
-	hash_position(plugins, pc->plugin->name);
-	hash_insert(plugins, pc->plugin->name, pc);
-	return 0;
+        return plugin_add(pc, &plugins_list, NULL);
 }
 
 
@@ -59,24 +33,59 @@ static int subscribe(plugin_container_t *pc)
 static void unsubscribe(plugin_container_t *pc)
 {
 	dprint("- Unsubscribing plugin %s\n", pc->plugin->name);
-	hash_position(plugins, pc->plugin->name);
-	hash_delete(plugins);
+        plugin_del(pc);
+}
+
+
+
+static plugin_container_t *log_plugin_search(plugin_generic_t *plugin) 
+{
+        struct list_head *tmp;
+        plugin_container_t *pc;
+        
+        list_for_each(tmp, &plugins_list) {
+
+                pc = list_entry(tmp, plugin_container_t, ext_list);
+
+                if ( pc->plugin == plugin )
+                        return pc;
+        }
+
+        return NULL;
+}
+
+
+
+void log_plugin_run(plugin_container_t *pc, log_container_t *log)
+{
+        plugin_run(pc, plugin_log_t, run, log);
 }
 
 
 
 
-void log_plugins_run(const char *plugin_name, log_container_t *log)
+plugin_container_t *log_plugin_register(const char *pname) 
 {
-	plugin_container_t *pc;
+        plugin_container_t *pc;
+        plugin_generic_t *plugin;
+        
+        /*
+         * search in the whole plugin list a plugin
+         * with pname as it's name.
+         */
+        plugin = plugin_search_by_name(pname);
+        if ( ! plugin ) 
+                return NULL;
 
-	if ( hash_position(plugins, plugin_name) ) {
-		pc = (plugin_container_t *) hash_get(plugins);
-                if ( ! pc )
-                        return;
-                
-                plugin_run(pc, plugin_log_t, run, log);
-	}
+        /*
+         * register the plugin.
+         */
+        plugin_subscribe(plugin);
+
+        pc = log_plugin_search(plugin);
+        assert(pc);
+
+        return pc;
 }
 
 
@@ -89,9 +98,7 @@ void log_plugins_run(const char *plugin_name, log_container_t *log)
 int log_plugins_init(const char *dirname, int argc, char **argv)
 {
 	int ret;
-
-	plugins = hash_create(hash_string, equal_string);
-
+        
 	ret = plugin_load_from_dir(dirname, argc, argv, subscribe,
                                    unsubscribe);
 	if (ret < 0) {
@@ -101,3 +108,8 @@ int log_plugins_init(const char *dirname, int argc, char **argv)
         
 	return ret;
 }
+
+
+
+
+

@@ -24,11 +24,11 @@
 
 
 typedef struct {
-        char *unexpanded;
-        
         void *ptr;
         int type;
         int reference;
+        char *reference_str;
+        idmef_string_t unexpanded;
         struct list_head list;
 } variable_t;
 
@@ -64,7 +64,7 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_
                 { "vendor-specific", vendor_specific },
                 { NULL, 0 },
         };
-
+        
         for ( i = 0; tbl[i].name != NULL; i++ ) {
 
                 if ( strcmp(origin, tbl[i].name) != 0 )
@@ -75,9 +75,9 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_
                         return -1;
                 }
 
-                 *var_type = VARIABLE_TYPE_INT;
-                 *var_ptr = &rule->class->origin;
-                 
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &rule->class->origin;
+                
                 rule->class->origin = tbl[i].origin;
 
                 return 0;
@@ -346,13 +346,20 @@ static int store_runtime_variable(simple_rule_t *rule, const char *line, int var
 
                 else if ( c == '$' && ! escaped ) {
                         is_variable = 1;
+                        outvar[i++] = c;
                         continue;
                 }
 
                 if ( ! is_variable )
                         continue;
+
+                if ( i >= sizeof(outvar) ) {
+                        log(LOG_ERR, "variable name exceed buffer size.\n");
+                        is_variable = 0;
+                        continue;
+                }
                 
-                if ( isdigit(c) )
+                if ( isdigit(c) ) 
                         outvar[i++] = c;
                         
                 if ( ! isdigit(c) || *str == '\0' ) {
@@ -365,14 +372,13 @@ static int store_runtime_variable(simple_rule_t *rule, const char *line, int var
                                 log(LOG_ERR, "memory exhausted.\n");
                                 return -1;
                         }
-                        
-                        printf("Add new variable with ref=%d outptr=%p type=%d\n", atoi(outvar), var_ptr, var_type);
-                        
+                                                
                         new->ptr = var_ptr;
                         new->type = var_type;
-                        new->reference = atoi(outvar);
-                        new->unexpanded = strdup(line);
-                        
+                        new->reference = atoi(outvar + 1);
+                        new->reference_str = strdup(outvar);
+                        idmef_string_set(&new->unexpanded, strdup(line));
+                                                
                         list_add_tail(&new->list, &rule->variable_list);
                         continue;
                 }
@@ -517,7 +523,7 @@ static int parse_ruleset(const char *filename, FILE *fd)
                 rulenum++;
         }
 
-        log(LOG_INFO, "- Simple plugin added %d rules.\n", rulenum);
+        log(LOG_INFO, "- SimpleMod plugin added %d rules.\n", rulenum);
         
         return 0;
 }
@@ -612,9 +618,9 @@ static void resolve_variable(const log_container_t *log,
                              simple_rule_t *rule, int *ovector, size_t osize) 
 {
         int ret;
+        char buf[1024];
         variable_t *var;
         struct list_head *tmp;
-        char ref[10], buf[1024];
         
         list_for_each(tmp, &rule->variable_list){
                 var = list_entry(tmp, variable_t, list);
@@ -635,12 +641,10 @@ static void resolve_variable(const log_container_t *log,
                 
                 
                 if ( var->type == VARIABLE_TYPE_INT ) 
-                        *(int *) var->ptr =  atoi(buf);
+                        *(int *) var->ptr = atoi(buf);
                 
-                else if ( var->type == VARIABLE_TYPE_STRING ) {
-                        snprintf(ref, sizeof(ref), "$%d", var->reference);
-                        replace_str(var->ptr, ref, buf);
-                }
+                else if ( var->type == VARIABLE_TYPE_STRING ) 
+                        replace_str(var->ptr, var->reference_str, buf);
         }
 }
 
@@ -649,19 +653,19 @@ static void resolve_variable(const log_container_t *log,
 
 static void free_variable_allocated_data(simple_rule_t *rule) 
 {
+        variable_t *var;
         idmef_string_t *str;
         struct list_head *tmp;
-        variable_t *var;
 
         list_for_each(tmp, &rule->variable_list) {
 
                 var = list_entry(tmp, variable_t, list);
 
-                if ( var->unexpanded && var->type == VARIABLE_TYPE_STRING ) {
+                if ( var->type == VARIABLE_TYPE_STRING ) {
                         str = var->ptr;
                         free(str->string);
-                        str->string = strdup(var->unexpanded);
-                        str->len = strlen(var->unexpanded);
+                        str->len = idmef_string_len(&var->unexpanded);
+                        str->string = strdup(idmef_string(&var->unexpanded));
                 }
         }
 }

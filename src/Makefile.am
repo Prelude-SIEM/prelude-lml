@@ -14,7 +14,6 @@ prelude_lml_SOURCES = 			\
 	udp-server.c			\
 	queue.c				\
 	regex.c				\
-	hashkey.c			\
 	log-common.c			\
 	log-plugins.c			\
 	pconfig.c			\

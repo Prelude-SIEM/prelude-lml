@@ -11,13 +11,16 @@
 
 #include "common.h"
 #include "regex.h"
+#include "log-common.h"
+#include "plugin-log-prv.h"
+
 
 struct regex_entry {
 	pcre *regex_compiled;
 	pcre_extra *regex_extra;
 	int options;
-	char *name;
-	struct list_head int_list;
+        plugin_container_t *plugin;
+	struct list_head list;
 };
 
 
@@ -60,9 +63,8 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
 	new->regex_compiled = NULL;
 	new->regex_extra = NULL;
 	new->options = 0;
-	new->name = NULL;
 
-	list_add_tail(&new->int_list, list);
+	list_add_tail(&new->list, list);
 
 	return new;
 }
@@ -72,14 +74,58 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
 
 static void regex_entry_delete(regex_entry_t *entry)
 {
-	list_del(&entry->int_list);
-        
-	pcre_free(entry->regex_compiled);
-	pcre_free(entry->regex_extra);
+	list_del(&entry->list);
 
-        free(entry->name);
+        if ( entry->regex_compiled )
+                pcre_free(entry->regex_compiled);
+
+        if ( entry->regex_extra )
+                pcre_free(entry->regex_extra);
+        
 	free(entry);
 }
+
+
+
+
+static int regex_create_entry(regex_list_t *list, const char *filename,
+                              int line, const char *pname, const char *regex, const char *options) 
+{
+        int erroffset;
+        pcre *compiled;
+        const char *errptr;
+        regex_entry_t *entry;
+        
+        compiled = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
+        if ( ! compiled ) {
+                log(LOG_INFO, "%s:%d : unable to compile: %s.\n", filename, line, errptr);
+                return -1;
+        }
+        
+        entry = regex_entry_new(list);
+        if ( ! entry ) {
+                pcre_free(compiled);
+                return -1;
+        }
+        
+        entry->regex_compiled = compiled;
+        entry->regex_extra = pcre_study(entry->regex_compiled, 0, &errptr);
+
+        entry->plugin = log_plugin_register(pname);
+        if ( ! entry->plugin ) {
+                regex_entry_delete(entry);
+                log(LOG_INFO, "%s:%d : couldn't find plugin: %s.\n", filename, line, pname);
+        }
+        
+        /*
+         * TBD: take care of options field
+         */
+        
+        dprint("[REGEX] rule found: plugin: %s - pattern: %s - options: %s\n", pname, regex, options);
+
+        return 0;
+}
+
 
 
 
@@ -87,7 +133,12 @@ static void regex_entry_delete(regex_entry_t *entry)
 regex_list_t *regex_init(char *filename)
 {
 	FILE *f;
-	int line = 1;
+	int line = 1, ret;
+        char *token, *tmp = NULL;
+        char buf[MAX_LINE_LEN];
+        char name[MAX_NAME_LEN];
+        char regex[MAX_LINE_LEN];
+        char options[MAX_OPTIONS_LEN];
 
 	regex_list_t *conf = malloc(sizeof(*conf));
 	assert(conf);
@@ -99,27 +150,23 @@ regex_list_t *regex_init(char *filename)
 		return NULL;
 	}
 
-	while (!feof(f)) {
-		char *token;
-		char buf[MAX_LINE_LEN];
-		char name[MAX_NAME_LEN];
-		char regex[MAX_LINE_LEN];
-		char options[MAX_OPTIONS_LEN];
-		char *tmp = NULL;
-
-		if (fgets(buf, MAX_LINE_LEN, f) == NULL)
-			break;
-
+	while ( fgets(buf, MAX_LINE_LEN, f) ) {
+                
 		trim(buf);
-		//sscanf( buf, "%s %s %*s\n", name, options, regex );
 
+                if ( buf[0] == '#' || buf[0] == '\0' )
+                        /*
+                         * ignore comments and empty lines
+                         */
+                        continue;
+                
 		token = strtok_r(buf, " \t", &tmp);
 		if (NULL == token) {
 			line++;
 			continue;
 		}
 		strncpy(name, token, MAX_NAME_LEN);
-
+                
 		token = strtok_r(NULL, " \t", &tmp);
 		if (NULL == token) {
 			line++;
@@ -134,32 +181,10 @@ regex_list_t *regex_init(char *filename)
 		}
 		strncpy(regex, token, MAX_LINE_LEN);
 
-		/* ignore comments and empty lines */
-		if (buf[0] != '#' && buf[0] != '\0') {
-			const char *errptr;
-			int erroffset;
-			regex_entry_t *entry;
-			pcre *compiled;
-
-			compiled =  pcre_compile(regex, 0, &errptr, &erroffset, NULL);
-			if (NULL == compiled) {
-				log(LOG_WARNING, "%s:%d : unable to compile: %s\n",
-				    filename, line, errptr);
-				continue;
-			}
-                        
-			entry = regex_entry_new(conf);
-			entry->name = strdup(name);
-			entry->regex_compiled = compiled;
-			entry->regex_extra = pcre_study(entry->regex_compiled, 0, &errptr);
-
-			/*
-			 * TBD: take care of options field
-			 */
-
-			dprint("[REGEX] rule found: plugin: %s - pattern: %s - options: %s\n",
-                               name, regex, options);
-		}
+                ret = regex_create_entry(conf, filename, line, name, regex, options);
+                if ( ret < 0 )
+                        continue;
+                
 		line++;
 	}
 
@@ -175,7 +200,7 @@ void regex_destroy(regex_list_t *list)
 	struct list_head *tmp, *bkp;
 
 	list_for_each_safe(tmp, bkp, list) {
-		entry = list_entry(tmp, regex_entry_t, int_list);
+		entry = list_entry(tmp, regex_entry_t, list);
 		regex_entry_delete(entry);
 	}
         
@@ -186,24 +211,22 @@ void regex_destroy(regex_list_t *list)
 
 
 int regex_exec(regex_list_t *list, const char *str,
-               void (*cb)(const char *name, void *data), void *data)
+               void (*cb)(void *plugin, void *data), void *data)
 {
         regex_entry_t *entry;
 	struct list_head *tmp;
         int count, ovector[20 * 3];
         
 	list_for_each(tmp, list) {
-                entry = list_entry(tmp, regex_entry_t, int_list);
+                entry = list_entry(tmp, regex_entry_t, list);
 
 		count = pcre_exec(entry->regex_compiled, entry->regex_extra,
                                   str, strlen(str), 0, 0, ovector, 20 * 3);
                 if ( count <= 0 )
                         continue;
                 
-                dprint("[REGEX] string <%s> matched - count = %d - plugin: %s\n",
-                       str, count, entry->name);
-
-                cb(entry->name, data);
+                dprint("[REGEX] string <%s> matched - count = %d\n", str, count);
+                cb(entry->plugin, data);
 	}
         
 	return 0;
