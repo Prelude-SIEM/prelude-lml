@@ -20,6 +20,9 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
         time_t now;
         struct tm localtime;
 
+        if ( ! buf )
+                return -1;
+        
         /*
          * We first get the localtime from this system,
          * so that all the struct tm member are filled.
@@ -79,18 +82,18 @@ log_container_t *log_container_new(const char *log, const char *from)
                 return NULL;
         }
         
-        lc->log = strdup(log);
+        lc->target_program = NULL;
+        lc->target_hostname = NULL;
+        lc->log = (log) ? strdup(log) : NULL;
+        
 	lc->source = strdup(from);
         
         ret = format_syslog_header(log, &lc->tv, host, tag);
         if ( ret == 0 ) {
                 lc->target_program = strdup(tag);
                 lc->target_hostname = strdup(host);
-        } else {
-                lc->target_program = NULL;
-                lc->target_hostname = NULL;
+        } else 
                 gettimeofday(&lc->tv, NULL);
-        }
 
 	return lc;
 }
@@ -107,7 +110,9 @@ void log_container_delete(log_container_t *lc)
 
         if ( lc->source )
                 free(lc->source);
+
+        if ( lc->log )
+                free(lc->log);
         
-        free(lc->log);
 	free(lc);
 }

@@ -1735,12 +1735,11 @@ static int record_target(idmef_alert_t *alert, idmef_target_t *target)
 
 static void emit_alert(simple_rule_t *rule, const log_container_t *log) 
 {
+        int ret;
         idmef_alert_t *alert;
         idmef_message_t *message;
         idmef_classification_t *class;
         idmef_assessment_t *assessment;
-
-        int ret;
 
         message = idmef_message_new();
         if ( ! message )

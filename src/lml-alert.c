@@ -140,7 +140,6 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 
 
 
-
 void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t priority)
 {
         int ret;
@@ -181,14 +180,16 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t pr
         /*
          *
          */
-        data = idmef_alert_additional_data_new(alert);
-        if ( ! data ) {
-                idmef_message_free(msg);
-                return;
+        if ( log->log ) {
+                data = idmef_alert_additional_data_new(alert);
+                if ( ! data ) {
+                        idmef_message_free(msg);
+                        return;
+                }
+                
+                idmef_string_set_constant(&data->meaning, "Original Log");
+                idmef_additional_data_set_data(data, string, log->log, strlen(log->log) + 1);
         }
-
-        idmef_string_set_constant(&data->meaning, "Original Log");
-        idmef_additional_data_set_data(data, string, log->log, strlen(log->log) + 1);
         
         /*
          *
