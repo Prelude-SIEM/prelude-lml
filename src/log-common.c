@@ -46,7 +46,7 @@
  * default log fmt.
  */
 #define SYSLOG_TS_FMT "%b %d %H:%M:%S"
-#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:((?P<program>\\S+)(\\[(?P<pid>[0-9]+)\\])?)?: )?"
+#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:((?P<process>\\S+)(\\[(?P<pid>[0-9]+)\\])?)?: )?"
 
 
 
@@ -119,8 +119,8 @@ static int parse_prefix(log_entry_t *log_entry)
                 int (*cb)(log_source_t *ls, const char *log, void **out);
                 void **ptr;
         } tbl[] = {
-                { "program",   NULL,     (void **) &log_entry->target_program     },
-                { "pid",       NULL,     (void **) &log_entry->target_program_pid },
+                { "process",   NULL,     (void **) &log_entry->target_process     },
+                { "pid",       NULL,     (void **) &log_entry->target_process_pid },
                 { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
                 { "timestamp", parse_ts, (void **) &tv                            },
                 { NULL, NULL, NULL                                                },
@@ -230,11 +230,11 @@ void log_entry_delete(log_entry_t *log_entry)
         if ( log_entry->target_hostname )
                 free(log_entry->target_hostname);
 
-        if ( log_entry->target_program )
-                free(log_entry->target_program);
+        if ( log_entry->target_process )
+                free(log_entry->target_process);
 
-        if ( log_entry->target_program_pid )
-                free(log_entry->target_program_pid);
+        if ( log_entry->target_process_pid )
+                free(log_entry->target_process_pid);
 
         if ( log_entry->log )
                 free(log_entry->log);

@@ -135,16 +135,16 @@ static int fill_analyzer(const log_entry_t *log_entry, idmef_analyzer_t *analyze
         idmef_process_t *process;
         prelude_string_t *process_name;
 
-        if ( log_entry->target_program && ! idmef_analyzer_get_process(analyzer) ) {
+        if ( log_entry->target_process && ! idmef_analyzer_get_process(analyzer) ) {
                 process = idmef_analyzer_new_process(analyzer);
                 if ( ! process )
                         return -1;
 
                 process_name = idmef_process_new_name(process);
-                prelude_string_set_ref(process_name, log_entry->target_program);
+                prelude_string_set_ref(process_name, log_entry->target_process);
 
-                if ( log_entry->target_program_pid )
-                        idmef_process_set_pid(process, atoi(log_entry->target_program_pid));
+                if ( log_entry->target_process_pid )
+                        idmef_process_set_pid(process, atoi(log_entry->target_process_pid));
         }
 
         if ( log_entry->target_hostname && ! idmef_analyzer_get_node(analyzer) ) {
@@ -187,16 +187,16 @@ static int generate_target(const log_entry_t *log_entry, idmef_alert_t *alert)
                         return -1;
         }
 
-        if ( log_entry->target_program && ! idmef_target_get_process(target) ) {
+        if ( log_entry->target_process && ! idmef_target_get_process(target) ) {
                 process = idmef_target_new_process(target);
                 if ( ! process )
                         return -1;
 
                 process_name = idmef_process_new_name(process);
-                prelude_string_set_ref(process_name, log_entry->target_program);
+                prelude_string_set_ref(process_name, log_entry->target_process);
 
-                if ( log_entry->target_program_pid )
-                        idmef_process_set_pid(process, atoi(log_entry->target_program_pid));
+                if ( log_entry->target_process_pid )
+                        idmef_process_set_pid(process, atoi(log_entry->target_process_pid));
         }
         
         if ( log_entry->target_hostname && ! idmef_target_get_node(target) ) {
@@ -282,7 +282,7 @@ void lml_emit_alert(const log_entry_t *log_entry, idmef_message_t *message, uint
 
         cur_analyzer = idmef_alert_get_analyzer(alert);
         
-        if ( log_entry->target_hostname || log_entry->target_program ) {
+        if ( log_entry->target_hostname || log_entry->target_process ) {
                 if ( generate_target(log_entry, alert) < 0 )
                         goto error;
 

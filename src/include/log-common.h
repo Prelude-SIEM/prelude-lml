@@ -11,8 +11,8 @@ typedef struct {
         struct timeval tv;
 
         char *target_hostname;
-        char *target_program;
-        char *target_program_pid;
+        char *target_process;
+        char *target_process_pid;
 
         log_source_t *source;
 } log_entry_t;
