@@ -32,10 +32,10 @@
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|B; \
- classification.name=$5 packet blocked; \
+ classification(0).name=$5 packet blocked; \
  id=2400; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \
@@ -54,10 +54,10 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|F; \
- classification.name=$5 packet forwarded; \
+ classification(0).name=$5 packet forwarded; \
  id=2401; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \
@@ -76,10 +76,10 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|N; \
- classification.name=$5 packet matched; \
+ classification(0).name=$5 packet matched; \
  id=2402; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \

@@ -32,10 +32,10 @@
 
 #Oct 28 20:38:47 www.tyco-training.stag ftpd[12781]: ANONYMOUS FTP LOGIN FROM p508ee95a.dip.t-dialin.net [80.142.233.90], Igpuser@home.com
 regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
- classification.name=Anonymous FTP logon; \
+ classification(0).name=Anonymous FTP logon; \
  id=2300; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=user; \
  impact.severity=low; \
@@ -54,10 +54,10 @@ regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\]
 
 #Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
 regex=([\w\-\.]+) ftpd\[\d+\]: FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
- classification.name=FTP logon failed; \
+ classification(0).name=FTP logon failed; \
  id=2301; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \

@@ -41,10 +41,10 @@
 # Jul 19 14:44:09 192.168.1.1 ZyXEL Communications Corp.: IP[Src=202.132.154.1 Dst=192.168.1.33 UDP spo=0035  dpo=05d4]}S03>R01mF
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9A-Fa-f]+)  dpo=([0-9A-Fa-f]+).*S(\d{2})>R(\d{2})(.)(.); \
- classification.name=ZyXEL ip access; \
+ classification(0).name=ZyXEL ip access; \
  id=2500; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = medium; \
@@ -64,10 +64,10 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo
 # Jul 19 14:44:13 192.168.1.1 ZyXEL Communications Corp.: IP[Src=192.168.1.33 Dst=202.132.154.1 ICMP]}S03>R01mF
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*S(\d{2})>R(\d{2})(.)(.); \
- classification.name=ZyXEL ip access; \
+ classification(0).name=ZyXEL ip access; \
  id=2501; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other;\
  impact.severity = medium; \
@@ -90,10 +90,10 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*
 # Jul 19 11:44:14 192.168.1.1 ZyXEL Communications Corp.: ppp:BACP Closing
 
 regex=ZyXEL Communications Corp.: ppp:(LCP|IPCP|CCP|BACP) (Starting|Opening|Closing); \
- classification.name=ZyXEL PPP $2; \
+ classification(0).name=ZyXEL PPP $2; \
  id=2502; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.type = other;\
  impact.severity = low; \
  impact.description=$2 $1 connection; \

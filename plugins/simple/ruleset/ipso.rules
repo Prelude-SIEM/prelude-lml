@@ -36,10 +36,10 @@
 # 1. PAM alerts: often an authentification issue; high severity to comply with simple.rules
 # No log sample; please submit
 regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
- classification.name=Nokia: PAM alert; \
+ classification(0).name=Nokia: PAM alert; \
  id=900; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=high; \
  impact.type=user; \
  impact.description=PAM: $3; \
@@ -50,10 +50,10 @@ regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
 # 2. Misc ALERT logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_ALERT\]; \
- classification.name=Nokia: Misc. ALERT logs; \
+ classification(0).name=Nokia: Misc. ALERT logs; \
  id=901; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=ALERT log from $1; \
@@ -69,10 +69,10 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
 # 1. Rebooting or halting the system: severity should depend on the machine ?
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
- classification.name=Nokia: Reboot; \
+ classification(0).name=Nokia: Reboot; \
  id=902; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.completion=succeeded; \
  impact.type=dos; \
@@ -83,10 +83,10 @@ regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
- classification.name=Nokia: Reboot attempt; \
+ classification(0).name=Nokia: Reboot attempt; \
  id=903; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.completion=succeeded; \
  impact.type=dos; \
@@ -97,10 +97,10 @@ regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
- classification.name=Nokia: Stopping system; \
+ classification(0).name=Nokia: Stopping system; \
  id=904; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=dos; \
@@ -111,10 +111,10 @@ regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
 
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
- classification.name=Nokia: Reboot announce; \
+ classification(0).name=Nokia: Reboot announce; \
  id=905; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=low; \
  impact.completion=succeeded; \
  impact.type=dos; \
@@ -125,10 +125,10 @@ regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
 # 2. Installation failure
 # No log sample; please submit
 regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
- classification.name=Nokia: Install/upgrade failure; \
+ classification(0).name=Nokia: Install/upgrade failure; \
  id=906; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -139,10 +139,10 @@ regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
 # 3. Misc CRIT logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_CRIT\]; \
- classification.name=Nokia: Misc. CRIT logs; \
+ classification(0).name=Nokia: Misc. CRIT logs; \
  id=907; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=CRIT log from $1; \
@@ -158,10 +158,10 @@ regex=regex= (\w+) \[LOG_CRIT\]; \
 # 1. SMTP: mail rejection
 # No log sample; please submit
 regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
- classification.name=Nokia: Unauthorized SMTP use; \
+ classification(0).name=Nokia: Unauthorized SMTP use; \
  id=908; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=other; \
@@ -175,10 +175,10 @@ regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
 # 2. SMTP: can't open port 25
 # No log sample; please submit
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\) on ([\d\.]+); \
- classification.name=Nokia: SMTP port failure; \
+ classification(0).name=Nokia: SMTP port failure; \
  id=909; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.type=dos; \
  impact.severity=low; \
  impact.description=SMTP port #$3 could not be opened on $1; \
@@ -191,10 +191,10 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\)
 # 3. SMTP: can't connect service SMTP
 # no log sample; please submit
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" port (\d+); \
- classification.name=Nokia: SMTP unreachable; \
+ classification(0).name=Nokia: SMTP unreachable; \
  id=910; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.type=dos; \
  impact.severity=low; \
  impact.description=$1 could not connect to the SMTP server $3:$4; \
@@ -208,10 +208,10 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" p
 # 4. Misc ERR logs
 # No log sample; please submit
 regex=regex= (\w+) \[LOG_ERR\]; \
- classification.name=Nokia: Misc. ERR logs; \
+ classification(0).name=Nokia: Misc. ERR logs; \
  id=911; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=ERR log from $1; \

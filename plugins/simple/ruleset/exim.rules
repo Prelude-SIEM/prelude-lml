@@ -21,8 +21,8 @@
 
 # No sample log; please submit
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected.*; \
- classification.name=Exim request rejected; \
- classification.origin=vendor-specific; \
+ classification(0).name=Exim request rejected; \
+ classification(0).origin=vendor-specific; \
  id=400; \
  revision=1; \
  impact.severity = low; \

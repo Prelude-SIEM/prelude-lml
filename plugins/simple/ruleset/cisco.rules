@@ -24,10 +24,10 @@
 # Cisco router support for Prelude-LML
 # No log sample; please submit
 regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; \
- classification.name=Cisco ip access; \
+ classification(0).name=Cisco ip access; \
  id=500; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = medium; \
@@ -46,10 +46,10 @@ regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9
 
 # No log sample; please submit
 regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; \
- classification.name=RSH attempt; \
+ classification(0).name=RSH attempt; \
  id=501; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = medium; \

@@ -14,14 +14,14 @@
 # - regex:
 #   A PCRE regex that should be matched to trigger the alert.
 #
-# - classification.name: 
+# - classification(0).name: 
 #   The name of the alert, from one of the origins listed below.
 #
-# - classification.origin:
+# - classification(0).origin:
 #   The source from which the name of the alert originates. 
 #   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is unknown.
 #
-# - classification.url:
+# - classification(0).url:
 #   A URL at which the manager (or the human
 #   operator of the manager) can find additional information about the
 #   alert.  The document pointed to by the URL may include an in-depth
@@ -144,10 +144,10 @@ include = wap11.rules;
 
 #Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user root by (uid=0)
 regex=session opened for user root; \
- classification.name=Root login; \
+ classification(0).name=Root login; \
  id=1; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = succeeded; \
  impact.type = admin; \
  impact.severity = medium; \
@@ -157,10 +157,10 @@ regex=session opened for user root; \
 
 # No log sample; please submit
 regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
- classification.name=Authentication Failure; \
+ classification(0).name=Authentication Failure; \
  id=2; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = high; \
@@ -173,10 +173,10 @@ regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
 
 # No log sample; please submit
 regex=entered promiscuous mode; \
- classification.name=Promiscuous mode detected; \
+ classification(0).name=Promiscuous mode detected; \
  id=3; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = succeeded; \
  impact.type = other; \
  impact.severity = medium; \
@@ -185,10 +185,10 @@ regex=entered promiscuous mode; \
 
 # No log sample; please submit
 regex=no such user; \
- classification.name=Invalid User; \
+ classification(0).name=Invalid User; \
  id=4; \
  revision=1; \
- classification.origin=vendor-specific; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = medium; \
