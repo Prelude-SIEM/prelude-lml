@@ -31,7 +31,7 @@
 #####
 
 #Mar 28 04:22:18 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation, '40%RH'. 0x101C
-regex=EMU: Probe \d+ i(\'.+\') high  humidity violation, \'(\d+%); \
+regex=EMU: Probe \d+ (\'.+\') high  humidity violation, \'(\d+%); \
  classification(0).name=High Environmental Humidity; \
  id=2800; \
  revision=1; \
