@@ -31,6 +31,7 @@
 #include <inttypes.h>
 #include <errno.h>
 
+#include <libprelude/timer.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
 
@@ -48,7 +49,7 @@ typedef struct {
         int index;
         char buf[1024];
         int need_more_read;
-        time_t last_modified;
+        time_t last_size;
 } monitor_fd_t;
 
 
@@ -130,10 +131,10 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
                         continue;
                 }
                 
-                if ( ! monitor->need_more_read && st.st_mtime == monitor->last_modified ) 
+                if ( ! monitor->need_more_read && st.st_size == monitor->last_size ) 
                         continue;
 
-                monitor->last_modified = st.st_mtime;
+                monitor->last_size = st.st_size;
 
                 while ( read_logfile(monitor) != -1 ) 
                         lml_dispatch_log(list, queue, monitor->buf, monitor->file);
@@ -174,7 +175,7 @@ int file_server_monitor_file(const char *file, int fd)
         }
         
         new->fd = fdopen(fd, "r");
-        new->last_modified = st.st_mtime;
+        new->last_size = st.st_size;
         new->file = strdup(file);
         fd_tbl[fd_index++] = new;
         

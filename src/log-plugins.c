@@ -24,7 +24,7 @@ static LIST_HEAD(plugins_list);
 
 static int subscribe(plugin_container_t *pc)
 {
-	dprint("- Subscribing plugin %s\n", pc->plugin->name);
+	log(LOG_INFO, "- Subscribing plugin %s\n", pc->plugin->name);
         return plugin_add(pc, &plugins_list, NULL);
 }
 
@@ -32,7 +32,7 @@ static int subscribe(plugin_container_t *pc)
 
 static void unsubscribe(plugin_container_t *pc)
 {
-	dprint("- Unsubscribing plugin %s\n", pc->plugin->name);
+	log(LOG_INFO, "- Unsubscribing plugin %s\n", pc->plugin->name);
         plugin_del(pc);
 }
 

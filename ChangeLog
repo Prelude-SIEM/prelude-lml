@@ -1,3 +1,13 @@
+2002-04-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/log-plugins.c (subscribe): 
+	(unsubscribe): be more verbose - not only debug.
+
+	* src/file-server.c (file_server_monitor_file): 
+	(file_server_wake_up): use st_size, not st_mtime.
+
+	also include libprelude/timer.h
+
 2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* file-server.c: (read_logfile): 
