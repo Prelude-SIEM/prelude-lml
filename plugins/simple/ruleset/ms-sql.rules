@@ -42,8 +42,8 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
  assessment.impact.description=An attempt was made to login to MS-SQL instance $1 using account $2; \
   \
  source(0).node.address(0).category=ipv4-addr; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 #Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'sa'.
@@ -58,6 +58,6 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
  assessment.impact.description=An attempt was made to login to MS-SQL instance $1 as sa; \
   \
  source(0).node.address(0).category=ipv4-addr; \
- target(0).user.userid; \
- target(0).user.userid.name=sa; \
+  \
+ target(0).user.userid(0).name=sa; \
  last

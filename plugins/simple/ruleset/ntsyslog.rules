@@ -60,8 +60,8 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.description=$2 successfully logged on on $7 ($3 domain) via $6; \
- source(0).user.userid; \
- source(0).user.userid.name=$1; \
+  \
+ source(0).user.userid(0).name=$1; \
  last
 
 # 1.c 538
@@ -75,8 +75,8 @@ regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.description=$2 logged off; \
- source(0).user.userid; \
- source(0).user.userid.name=$2; \
+  \
+ source(0).user.userid(0).name=$2; \
  last
 
 # 1.d 560
@@ -90,8 +90,8 @@ regex= security\[success\] 560 (.*)  Object Open:  Object Server:([\w\s]+)  Obje
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=$11 opened an object $4 on $2; \
- source(0).user.userid; \
- source(0).user.userid.name=$11; \
+  \
+ source(0).user.userid(0).name=$11; \
  target(0).process.pid=$7; \
  last
 
@@ -120,8 +120,8 @@ regex= security\[success\] 576 (.*)  Special privileges assigned to new logon:  
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.description=$2 got following privileges: $5; \
- source(0).user.userid; \
- source(0).user.userid.name=$2; \
+  \
+ source(0).user.userid(0).name=$2; \
  last
 
 # 1.g 577
@@ -135,8 +135,8 @@ regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:(.+)  Se
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Service $3 called with the following privileges: $10; \
- source(0).user.userid; \
- source(0).user.userid.name=$7; \
+  \
+ source(0).user.userid(0).name=$7; \
  last
 
 # 1.h
@@ -150,8 +150,8 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=User $4 modified the password policy for the $2 domain; \
- source(0).user.userid; \
- source(0).user.userid.name=$4; \
+  \
+ source(0).user.userid(0).name=$4; \
  last
 
 # 1.i 680
@@ -181,8 +181,8 @@ regex= security\[success\] 682 (.*)  Session reconnected to winstation:  User Na
   \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$7; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 # 1.k 683
@@ -199,8 +199,8 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
   \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$7; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 # 1.l other
@@ -229,8 +229,8 @@ regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\
  assessment.impact.type=user; \
  assessment.impact.description=Logon as $4 failed: $3; \
  target(0).node.name=$9; \
- target(0).user.userid; \
- target(0).user.userid.name=$4; \
+  \
+ target(0).user.userid(0).name=$4; \
  last
 
 # 2.b 578
@@ -243,8 +243,8 @@ regex= security\[failure\] 578 (.+) Privileged object operation:  Object Server:
  assessment.impact.severity=medium; \
  assessment.impact.type=user; \
  target(0).process.pid=$3; \
- source(0).user.userid; \
- source(0).user.userid.name=$7; \
+  \
+ source(0).user.userid(0).name=$7; \
  last
 
 # 2.c 627
@@ -257,10 +257,10 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
  assessment.impact.severity=medium; \
  assessment.impact.type=user; \
  assessment.impact.description=$5 attempted to change the password for $2 on the $3 domain; \
- source(0).user.userid; \
- source(0).user.userid.name=$5; \
- target(0).user.userid; \
- target(0).user.userid.name=$2
+  \
+ source(0).user.userid(0).name=$5; \
+  \
+ target(0).user.userid(0).name=$2
 
 # 2.d 681
 #Dec 10 08:20:07 mrfreeze.itg.sac.tfs security[failure] 681 NT AUTHORITY\SYSTEM  The logon to account: tfslegalask@itg.sac.tfs  by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  from workstation: MRFREEZE  failed. The error code was: 3221225572
@@ -274,8 +274,8 @@ regex= security\[failure\] 681 (.+)  The logon to account: (\w+)  by:(.+)  from 
  assessment.impact.type=user; \
  assessment.impact.description=Logon as $2 from $3 failed; \
  target(0).node.name=$3; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 # 2.e other

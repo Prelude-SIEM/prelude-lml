@@ -39,8 +39,8 @@ regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last;
 
 # Jan 13 20:42:31 (none) popper[6752]: tamere at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "tamere" is incorrect.
@@ -63,6 +63,6 @@ regex=popper\[\d+\]: (\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password su
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last;

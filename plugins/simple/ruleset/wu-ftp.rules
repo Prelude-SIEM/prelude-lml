@@ -46,10 +46,10 @@ regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\]
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=anonymous; \
- source(0).user.userid; \
- source(0).user.userid.name=$3; \
+  \
+ target(0).user.userid(0).name=anonymous; \
+  \
+ source(0).user.userid(0).name=$3; \
  last
 
 #Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
@@ -68,6 +68,6 @@ regex=([\w\-\.]+) ftpd\[\d+\]: FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \
- source(0).user.userid; \
- source(0).user.userid.name=$3; \
+  \
+ source(0).user.userid(0).name=$3; \
  last

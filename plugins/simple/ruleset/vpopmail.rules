@@ -40,8 +40,8 @@ regex=vpopmail\[\d+\]: vchkpw: vpopmail user not found (\S+):([\d\.]+); \
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last;
 
 # Jan 14 17:24:54 spotk vpopmail[28359]: vchkpw: password fail xxx@spotk.net:127.0.0.1
@@ -61,6 +61,6 @@ regex=vpopmail\[\d+\]: vchkpw: password fail (\S+):([\d\.]+); \
  source(0).service.protocol=tcp; \
  target(0).service.port=110; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last;

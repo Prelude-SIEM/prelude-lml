@@ -1,11 +1,16 @@
 ruleset_DATA = \
 	checkpoint.rules	\
 	cisco.rules		\
+	cisco-pix.rules		\
+	cisco-vpn.rules		\
 	exim.rules		\
 	grsecurity.rules	\
 	ipchains.rules		\
 	ipfw.rules		\
 	ipso.rules		\
+	ms-sql.rules		\
+	nagios.rules		\
+	navce.rules		\
 	netfilter.rules		\
 	ntsyslog.rules		\
 	portsentry.rules	\
@@ -17,6 +22,7 @@ ruleset_DATA = \
 	vigor.rules		\
 	vpopmail.rules		\
 	wap11.rules		\
+	wu-ftp.rules		\
 	zywall.rules		\
 	zyxel.rules
 

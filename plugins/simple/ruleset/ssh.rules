@@ -52,8 +52,8 @@ regex=sshd\[\d+\]: Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; 
 # target(0).node.address(0).category=ipv46-addr; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=root; \
+  \
+ target(0).user.userid(0).name=root; \
  last;
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
@@ -74,8 +74,8 @@ regex=sshd\[\d+\]: Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*
 # target(0).node.address(0).category=ipv46-addr; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 ################
@@ -100,8 +100,8 @@ regex=sshd\[\d+\]: Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 # target(0).node.address(0).category=ipv4-addr; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=root; \
+  \
+ target(0).user.userid(0).name=root; \
  last
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
@@ -122,8 +122,8 @@ regex=sshd\[\d+\]: Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(s
 # target(0).node.address(0).category=ipv4-addr; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$2; \
+  \
+ target(0).user.userid(0).name=$2; \
  last
 
 ##############################################
@@ -145,8 +145,8 @@ regex=sshd\[\d+\]: Illegal user (\S+) from (\S+); \
  source(0).node.address(0).address=$2; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last
 
 ##################################################################################
@@ -165,8 +165,8 @@ regex=sshd\[\d+\]: User (\S+) not allowed because .*listed in (\w+); \
  assessment.impact.description=User $1 failed to login because he is listed in $2; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=$1; \
+  \
+ target(0).user.userid(0).name=$1; \
  last
 
 ##################################################################
@@ -214,7 +214,7 @@ regex=sshd\[\d+\]: ROOT LOGIN REFUSED FROM (\w+); \
  source(0).service.protocol=tcp; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
- target(0).user.userid; \
- target(0).user.userid.name=root; \
+  \
+ target(0).user.userid(0).name=root; \
  last
 

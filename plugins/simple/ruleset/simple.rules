@@ -99,21 +99,21 @@
 #   target(0).user.category:
 #   The type of user represented (unknown, application, os-device).
 #
-# - source(0).user.userid,
-#   target(0).user.userid:
+# - source(0).user.userid(0).
+#   target(0).user.userid(0).
 #   Create a new UserId inside an User object (that may contain several UserId).
 #
-# - source(0).user.userid.type,
-#   target(0).user.userid.type:
+# - source(0).user.userid(0).type,
+#   target(0).user.userid(0).type:
 #   The type of user information represented (current-user, original-user, target-user,
 #   user-privs, current-group, group-privs, other-privs).
 #
-# - source(0).user.userid.name,
-#   target(0).user.userid.name:
+# - source(0).user.userid(0).name,
+#   target(0).user.userid(0).name:
 #   A user or group name.
 #
-# - source(0).user.userid.number,
-#   target(0).user.userid.number:
+# - source(0).user.userid(0).number,
+#   target(0).user.userid(0).number:
 #   A user or group number.
 
 include = ms-sql.rules;
@@ -151,8 +151,8 @@ regex=session opened for user root; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = admin; \
  assessment.impact.severity = medium; \
- target(0).user.userid; \
- target(0).user.userid.name=root; \
+  \
+ target(0).user.userid(0).name=root; \
  last
 
 # No log sample; please submit
@@ -165,10 +165,10 @@ regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
  assessment.impact.type = other; \
  assessment.impact.severity = high; \
  assessment.impact.description=Process $1 attempted to change UID from $2 to $3; \
- source(0).user.userid; \
- source(0).user.userid.number=$2; \
- target(0).user.userid; \
- target(0).user.userid.number=$3; \
+  \
+ source(0).user.userid(0).number=$2; \
+  \
+ target(0).user.userid(0).number=$3; \
  last
 
 # No log sample; please submit
