@@ -46,6 +46,7 @@
 # 1. Dropped packets; several cases depending on the service format.
 # 1.a Both ports are numbers
 # No sample log entry; please submit
+
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
  class.name=Packet dropped and logged; \
  id=100; \
