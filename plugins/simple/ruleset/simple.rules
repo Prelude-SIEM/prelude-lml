@@ -15,9 +15,12 @@
 # these guidelines:
 # - Avoid using .+ or .* in regex entries unless actually neccessary.  Doing so
 #   will make your rule CPU-costly to implement.
+# - Avoid capturing variables which you don't use.  This causes unneccessary
+#   memory consumption.
 # - At a minimum, include regex, classification().name, 
 #   classification().origin, assessement.impact.severity, 
-#   assessment.impact.type, impact.description, and last.
+#   assessment.impact.type, impact.description.
+# - If it's correct for this application, include last.
 # - Put only a single field on each line of your rules.
 # - Include a sample log entry with each rule.
 # - Gather as many pieces of data, and fill as many IDMEF fields as possible
@@ -171,6 +174,7 @@ include = ntsyslog.rules;
 include = pam.rules;
 include = pcanywhere.rules;
 include = portsentry.rules;
+include = postfix.rules;
 include = proftpd.rules;
 include = qpopper.rules;
 include = shadow-utils.rules;

@@ -17,6 +17,7 @@ ruleset_DATA = \
 	pam.rules		\
 	pcanywhere.rules	\
 	portsentry.rules	\
+	postfix.rules		\
 	proftpd.rules		\
 	qpopper.rules		\
 	shadow-utils.rules	\
