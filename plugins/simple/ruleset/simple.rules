@@ -157,6 +157,7 @@
 #   A process number
 
 include = apc-emu.rules;
+include = bigip.rules;
 include = cisco-pix.rules;
 include = cisco-router.rules;
 include = cisco-vpn.rules;

@@ -1,5 +1,6 @@
 ruleset_DATA = \
 	apc-emu.rules		\
+	bigip.rules		\
 	cisco-pix.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
