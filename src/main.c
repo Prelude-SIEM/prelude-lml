@@ -211,10 +211,6 @@ int main(int argc, char **argv)
         if ( ret < 0 )
                 exit(1);
         
-        ret = lml_alert_init(lml_client);
-        if ( ret < 0 )
-                return -1;
-        
         signal(SIGTERM, sig_handler);
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);

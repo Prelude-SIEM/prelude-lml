@@ -339,11 +339,15 @@ int pconfig_set(int argc, char **argv)
         lml_client = prelude_client_new(PRELUDE_CLIENT_CAPABILITY_SEND_IDMEF);
         if ( ! lml_client )
                 return -1;
-
+        
+        ret = lml_alert_init(lml_client);
+        if ( ret < 0 )
+                return -1;
+        
         ret = prelude_client_init(lml_client, "prelude-lml", PRELUDE_CONF, argc, argv);
         if ( ret < 0 )
                 exit(1);
-
+        
         if ( batch_mode && udp_srvr ) {
                 log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
                 return -1;
