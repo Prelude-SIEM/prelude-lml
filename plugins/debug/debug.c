@@ -59,7 +59,7 @@ static void debug_run(const log_container_t * log)
 
 
 
-static int set_debug_state(const char *optarg)
+static int set_debug_state(prelude_option_t *opt, const char *optarg)
 {
 	int ret;
 
@@ -94,7 +94,7 @@ static int get_output(char *buf, size_t size)
 }
 
 
-static int set_output(const char *optarg)
+static int set_output(prelude_option_t *opt, const char *optarg)
 {
 	/*
 	 * enable or disable depending on the current value.
@@ -107,10 +107,9 @@ plugin_generic_t *plugin_init(int argc, char **argv)
 {
 	prelude_option_t *opt;
 
-	opt =
-	    prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 0, "debug",
-			       "Debug plugin option", no_argument,
-			       set_debug_state, get_debug_state);
+	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 0, "debug",
+				 "Debug plugin option", no_argument,
+				 set_debug_state, get_debug_state);
 
 	prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'p', "print",
 			   "Output to stderr when plugin is called",

@@ -1,3 +1,9 @@
+2002-07-11  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/debug/debug.c (set_debug_state): 
+	(set_output): fix the latest prelude getopt API
+	change.
+
 2002-06-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* fit latest prelude-getopt API change.
