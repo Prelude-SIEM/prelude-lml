@@ -60,7 +60,7 @@ static void udp_server_standalone(udp_server_t *server)
         gettimeofday(&last, NULL);
         
 	while ( 1 ) {
-
+                
                 rfds = fds;
                 timeout.tv_sec = 1;
                 timeout.tv_usec = 0;

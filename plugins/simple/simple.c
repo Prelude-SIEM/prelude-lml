@@ -19,6 +19,19 @@
 #include "lml-alert.h"
 #include "log.h"
 
+#define VARIABLE_TYPE_INT    0
+#define VARIABLE_TYPE_STRING 1
+
+
+typedef struct {
+        char *unexpanded;
+        
+        void *ptr;
+        int type;
+        int reference;
+        struct list_head list;
+} variable_t;
+
 
 
 typedef struct {
@@ -27,6 +40,7 @@ typedef struct {
         char *regex_string;
         idmef_impact_t *impact;  
         idmef_classification_t *class;
+        struct list_head variable_list;
         struct list_head list;
 } simple_rule_t;
 
@@ -37,7 +51,7 @@ static plugin_log_t plugin;
 static LIST_HEAD(rules_list);
 
 
-static int parse_class_origin(simple_rule_t *rule, const char *origin) 
+static int parse_class_origin(simple_rule_t *rule, const char *origin, int *var_type, void **var_ptr) 
 {
         int i;
         struct {
@@ -60,7 +74,10 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin)
                         log(LOG_ERR, "memory exhausted.\n");
                         return -1;
                 }
-                
+
+                 *var_type = VARIABLE_TYPE_INT;
+                 *var_ptr = &rule->class->origin;
+                 
                 rule->class->origin = tbl[i].origin;
 
                 return 0;
@@ -72,12 +89,15 @@ static int parse_class_origin(simple_rule_t *rule, const char *origin)
 
 
 
-static int parse_class_name(simple_rule_t *rule, const char *name) 
+static int parse_class_name(simple_rule_t *rule, const char *name, int *var_type, void **var_ptr) 
 {
         if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
+
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr = &rule->class->name;
         
         idmef_string_set(&rule->class->name, strdup(name));
 
@@ -87,12 +107,15 @@ static int parse_class_name(simple_rule_t *rule, const char *name)
 
 
 
-static int parse_class_url(simple_rule_t *rule, const char *url) 
+static int parse_class_url(simple_rule_t *rule, const char *url, int *var_type, void **var_ptr) 
 {
         if ( ! rule->class && ! (rule->class = calloc(1, sizeof(*rule->class))) ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
+
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr = &rule->class->url;
         
         idmef_string_set(&rule->class->url, strdup(url));
 
@@ -102,7 +125,7 @@ static int parse_class_url(simple_rule_t *rule, const char *url)
 
 
 
-static int parse_impact_completion(simple_rule_t *rule, const char *completion) 
+static int parse_impact_completion(simple_rule_t *rule, const char *completion, int *var_type, void **var_ptr) 
 {
         int i;
         struct {
@@ -123,6 +146,9 @@ static int parse_impact_completion(simple_rule_t *rule, const char *completion)
                         log(LOG_ERR, "memory exhausted.\n");
                         return -1;
                 }
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &rule->impact->completion;
                 
                 rule->impact->completion = tbl[i].completion;
 
@@ -135,7 +161,7 @@ static int parse_impact_completion(simple_rule_t *rule, const char *completion)
 
 
 
-static int parse_impact_type(simple_rule_t *rule, const char *type) 
+static int parse_impact_type(simple_rule_t *rule, const char *type, int *var_type, void **var_ptr) 
 {
         int i;
         struct {
@@ -160,6 +186,9 @@ static int parse_impact_type(simple_rule_t *rule, const char *type)
                         log(LOG_ERR, "memory exhausted.\n");
                         return -1;
                 }
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &rule->impact->type;
                 
                 rule->impact->type = tbl[i].type;
 
@@ -172,7 +201,7 @@ static int parse_impact_type(simple_rule_t *rule, const char *type)
 
 
 
-static int parse_impact_severity(simple_rule_t *rule, const char *severity) 
+static int parse_impact_severity(simple_rule_t *rule, const char *severity, int *var_type, void **var_ptr) 
 {
         int i;
         struct {
@@ -194,7 +223,9 @@ static int parse_impact_severity(simple_rule_t *rule, const char *severity)
                         log(LOG_ERR, "memory exhausted.\n");
                         return -1;
                 }
-                
+
+                *var_type = VARIABLE_TYPE_INT;
+                *var_ptr = &rule->impact->severity;
                 rule->impact->severity = tbl[i].severity;
 
                 return 0;
@@ -205,12 +236,15 @@ static int parse_impact_severity(simple_rule_t *rule, const char *severity)
 
 
 
-static int parse_impact_desc(simple_rule_t *rule, const char *desc) 
+static int parse_impact_desc(simple_rule_t *rule, const char *desc, int *var_type, void **var_ptr) 
 {
         if ( ! rule->impact && ! (rule->impact = calloc(1, sizeof(*rule->impact))) ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
+
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &rule->impact->description;
         
         idmef_string_set(&rule->impact->description, strdup(desc));
         
@@ -219,7 +253,7 @@ static int parse_impact_desc(simple_rule_t *rule, const char *desc)
 
 
 
-static int parse_regex(simple_rule_t *rule, const char *regex) 
+static int parse_regex(simple_rule_t *rule, const char *regex, int *var_type, void **var_ptr) 
 {
         int erroffset;
         const char *errptr;
@@ -229,10 +263,9 @@ static int parse_regex(simple_rule_t *rule, const char *regex)
                 log(LOG_INFO, "unable to compile regex: %s.\n", errptr);
                 return -1;
         }
-
-        rule->extra = pcre_study(rule->regex, 0, &errptr);
-
+        
         rule->regex_string = strdup(regex);
+        rule->extra = pcre_study(rule->regex, 0, &errptr);
         
         return 0;
 }
@@ -259,7 +292,7 @@ static int filter_string(char *input, char **key, char **value)
          * search last '=' in the input,
          * corresponding to the key = value separator.
          */
-        tmp = ptr = strrchr(input, '=');
+        tmp = ptr = strchr(input, '=');
         if ( ! ptr ) 
                 return -1;
 
@@ -284,8 +317,66 @@ static int filter_string(char *input, char **key, char **value)
         ptr = ptr + strlen(ptr);
         while ( isspace(*ptr) )
                 *ptr-- = '\0';
+        
+        return 0;
+}
 
-        /* printf("key=\"%s\" val=\"%s\"\n", *key, *value); */
+
+
+
+static int store_runtime_variable(simple_rule_t *rule, const char *line, int var_type, void *var_ptr) 
+{
+        char c;
+        const char *str;
+        char outvar[10];
+        variable_t *new;
+        int escaped = 0, is_variable = 0, i = 0;
+
+        str = line;
+        
+        while ( (c = *str++) != '\0' ) {
+
+                if ( escaped ) {
+                        escaped = 0;
+                        continue;
+                }
+                
+                if ( c == '\\' )
+                        escaped = 1;
+
+                else if ( c == '$' && ! escaped ) {
+                        is_variable = 1;
+                        continue;
+                }
+
+                if ( ! is_variable )
+                        continue;
+                
+                if ( isdigit(c) )
+                        outvar[i++] = c;
+                        
+                if ( ! isdigit(c) || *str == '\0' ) {
+                        is_variable = 0;
+                        outvar[i] = '\0';
+                        i = 0;
+                        
+                        new = malloc(sizeof(*new));
+                        if ( ! new ) {
+                                log(LOG_ERR, "memory exhausted.\n");
+                                return -1;
+                        }
+                        
+                        printf("Add new variable with ref=%d outptr=%p type=%d\n", atoi(outvar), var_ptr, var_type);
+                        
+                        new->ptr = var_ptr;
+                        new->type = var_type;
+                        new->reference = atoi(outvar);
+                        new->unexpanded = strdup(line);
+                        
+                        list_add_tail(&new->list, &rule->variable_list);
+                        continue;
+                }
+        }
 
         return 0;
 }
@@ -295,11 +386,12 @@ static int filter_string(char *input, char **key, char **value)
 
 static int parse_rule(const char *filename, int line, simple_rule_t *rule, char *buf) 
 {
-        int i, ret;
+        void *var_ptr;
+        int i, ret, var_type;
         char *in, *ptr, *key, *val;
         struct {
                 const char *key;
-                int (*func)(simple_rule_t *rule, const char *value);
+                int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
                 { "regex", parse_regex                         },
                 { "class.origin", parse_class_origin           },
@@ -335,17 +427,18 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 }
                 
                 for ( i = 0; tbl[i].key != NULL; i++ ) {
+                        if ( strcmp(key, tbl[i].key) != 0 )
+                                continue;
                         
-                        if ( strcmp(key, tbl[i].key) == 0 ) {
-                                
-                                ret = tbl[i].func(rule, val);
-                                if ( ret < 0 ) {
-                                        log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, key);
-                                        return -1;
-                                }
-                                
-                                break;
+                        ret = tbl[i].func(rule, val, &var_type, &var_ptr);
+                        if ( ret < 0 ) {
+                                log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, key);
+                                return -1;
                         }
+
+                        ret = store_runtime_variable(rule, val, var_type, var_ptr);
+                                
+                        break;
                 }
                 
                 if ( tbl[i].key == NULL ) {
@@ -412,6 +505,8 @@ static int parse_ruleset(const char *filename, FILE *fd)
                         return -1;
                 }
 
+                INIT_LIST_HEAD(&rule->variable_list);
+                
                 ret = parse_rule(filename, line, rule, ptr);
                 if ( ret < 0 ) {
                         free_rule(rule);
@@ -472,22 +567,129 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
 
 
 
+static int replace_str(idmef_string_t *str, const char *needle, const char *replacement) 
+{
+        char *ptr, *out;
+        int off, new_len, replacement_len, needle_len;
+        
+        ptr = strstr(str->string, needle);
+        if ( ! ptr ) {
+                log(LOG_ERR, "couldn't find %s!\n", needle);
+                return -1;
+        }
+
+        needle_len = strlen(needle);
+        replacement_len = strlen(replacement);
+
+        /*
+         * compute the offset where needle start.
+         * (idmef string count \0 in len, that's the reason of the + 1).
+         */
+        off = str->len - (strlen(ptr) + 1);
+        new_len = str->len + replacement_len - needle_len;
+        
+        out = malloc(new_len);
+        if ( ! out ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+        
+        memcpy(out, str->string, off);
+        memcpy(out + off, replacement, replacement_len);
+        strcpy(out + off + replacement_len, ptr + needle_len);
+
+        free(str->string);
+        str->string = out;
+        str->len = new_len;
+
+        return 0;
+}
+
+
+
+
+static void resolve_variable(const log_container_t *log,
+                             simple_rule_t *rule, int *ovector, size_t osize) 
+{
+        int ret;
+        variable_t *var;
+        struct list_head *tmp;
+        char ref[10], buf[1024];
+        
+        list_for_each(tmp, &rule->variable_list){
+                var = list_entry(tmp, variable_t, list);
+                
+                ret = pcre_copy_substring(log->log, ovector, osize, var->reference, buf, sizeof(buf));
+                if ( ret < 0 ) {
+                        if ( ret == PCRE_ERROR_NOMEMORY ) 
+                                log(LOG_ERR, "not enough memory to get backward reference %d.\n", var->reference);
+
+                        else if ( ret == PCRE_ERROR_NOSUBSTRING )
+                                log(LOG_ERR, "backward reference %d doesn exist.\n", var->reference);
+
+                        else
+                                log(LOG_ERR, "unknown PCRE error while getting backward reference %d.\n", var->reference);
+
+                        continue;
+                }
+                
+                
+                if ( var->type == VARIABLE_TYPE_INT ) 
+                        *(int *) var->ptr =  atoi(buf);
+                
+                else if ( var->type == VARIABLE_TYPE_STRING ) {
+                        snprintf(ref, sizeof(ref), "$%d", var->reference);
+                        replace_str(var->ptr, ref, buf);
+                }
+        }
+}
+
+
+
+
+static void free_variable_allocated_data(simple_rule_t *rule) 
+{
+        idmef_string_t *str;
+        struct list_head *tmp;
+        variable_t *var;
+
+        list_for_each(tmp, &rule->variable_list) {
+
+                var = list_entry(tmp, variable_t, list);
+
+                if ( var->unexpanded && var->type == VARIABLE_TYPE_STRING ) {
+                        str = var->ptr;
+                        free(str->string);
+                        str->string = strdup(var->unexpanded);
+                        str->len = strlen(var->unexpanded);
+                }
+        }
+}
+
+
+
+
+
 static void simple_run(const log_container_t *log)
 {
         int ret;
+        int ovector[100];
         simple_rule_t *rule;
         struct list_head *tmp;
-
+        
         list_for_each(tmp, &rules_list) {
                 rule = list_entry(tmp, simple_rule_t, list);
                                 
                 ret = pcre_exec(rule->regex, rule->extra, log->log,
-                                strlen(log->log), 0, 0, NULL, 0);
+                                strlen(log->log), 0, 0, ovector, 100);
                 if ( ret < 0 )
                         continue;
-
+                
                 printf("[%s]: matched %s\n", log->source, rule->regex_string);
+                                
+                resolve_variable(log, rule, ovector, ret);
                 emit_alert(rule, log);
+                free_variable_allocated_data(rule);
         }
 }
 

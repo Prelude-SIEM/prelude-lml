@@ -1,4 +1,30 @@
+2002-04-04  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/file-server.c (file_server_wake_up): 
+	use buffered IO.
+
+	* plugins/simple/simple.c: 
+	(store_runtime_variable): new function, keep pointer
+	to string that use backward reference.
+
+	(simple_run): call resolve_variable and free_variable_allocated_data().
+
+	(free_variable_allocated_data): 
+	new function.
+	
+	(resolve_variable): new function. Use backward reference
+	associated with the matched regex to resolve variable.
+
+	(replace_str): replace a given variable in a string.
+
+	The Simple plugin now support backward reference in IDMEF field setting. 
+	This mean you can have dynamic text in IDMEF field. 
+
 2002-04-03  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/simple/simple.c (filter_string): 
+	use strchr, not strchrr, to search key - value
+	delimiter. 
 
 	* src/udp-server.c (udp_server_standalone): 
 	save the set and restore it when select() return.
