@@ -1,3 +1,9 @@
+2002-04-25  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/log-common.c (format_syslog_header): 
+	revert 2002-04-24, which was not needed (sscanf don't need
+	precision).
+
 2002-04-24  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/log-common.c (format_syslog_header): 
