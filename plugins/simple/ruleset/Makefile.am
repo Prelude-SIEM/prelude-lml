@@ -15,6 +15,7 @@ ruleset_DATA = \
 	ms-sql.rules		\
 	nagios.rules		\
 	navce.rules		\
+	netfilter.rules		\
 	ntsyslog.rules		\
 	pam.rules		\
 	pcanywhere.rules	\
