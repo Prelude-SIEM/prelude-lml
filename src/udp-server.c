@@ -130,9 +130,9 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 udp_server_close(server);
                 return NULL;
 	}
-        
-	dprint("[UDP ] Server created on %s:%d, fd %d\n", addr, port, server->sockfd);
-        
+
+        log(LOG_INFO, "- syslog server created on %s:%d.\n", addr, port);
+                
 	return server;
 }
 

@@ -1,3 +1,8 @@
+2004-02-01  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/udp-server.c (udp_server_new): verbose message
+	when the syslog server is enabled.
+
 2004-01-31  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/simple/ruleset/simple.rules (regex): 
