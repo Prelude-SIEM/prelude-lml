@@ -8,16 +8,16 @@ EXTRA_DIST = $(preludeconf_DATA) config.h \
              prelude.spec ChangeLog
 
 install-data-local:        
-	@if test -f $(configdir)/prelude-lml.conf; then                                                  \
-		echo "********************************************************************************"; \
-                echo;                                                                                    \
-                echo "$(configdir)/prelude-lml.conf already exist...";                                   \
-                echo "Installing default configuration in $(configdir)/prelude-lml.conf-dist";           \
-                echo;                                                                                    \
-                echo "********************************************************************************"; \
-		$(INSTALL) $(top_srcdir)/prelude-lml.conf $(configdir)/prelude-lml.conf-dist;            \
-        else                                                                                             \
-                $(INSTALL) -m 600 $(top_srcdir)/prelude-lml.conf $(configdir)/;                          \
+	@if test -f $(DESTDIR)/$(configdir)/prelude-lml.conf; then         					\
+		echo "********************************************************************************"; 	\
+                echo;                                                                                    	\
+                echo "$(DESTDIR)/$(configdir)/prelude-lml.conf already exist...";				\
+                echo "Installing default configuration in $(DESTDIR)/$(configdir)/prelude-lml.conf-dist";       \
+                echo;                                                                                    	\
+                echo "********************************************************************************"; 	\
+		$(INSTALL) $(top_srcdir)/prelude-lml.conf $(DESTDIR)/$(configdir)/prelude-lml.conf-dist;        \
+        else                                                                                             	\
+                $(INSTALL) -m 600 $(top_srcdir)/prelude-lml.conf $(DESTDIR)/$(configdir)/;                      \
         fi
 
 
