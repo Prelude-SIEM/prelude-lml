@@ -9,7 +9,7 @@
 # filename	plugin-name-list      pcre-options	regex
 #
 # *		Debug		      -			.*
-  * 		SimpleMod	      -			.*
+  * 		Pcre		      -			.*
 
 #
 # plugin-name-list is a coma separated list of plugins

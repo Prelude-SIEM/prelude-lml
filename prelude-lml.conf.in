@@ -67,14 +67,15 @@ file = /var/log/auth.log
 # the interval of two logfiles' rotation. If this difference 
 # is reached, a high severity alert will be emited
 #
-rotation-interval = 3600
+#max-rotation-size-offset = 1024
+#max-rotation-time-offset = 300
 
 
 ####################################
 # Here start plugins configuration #
 ####################################
 
-[SimpleMod]
+[Pcre]
 
 ruleset=@configdir@/ruleset/simple.rules
 

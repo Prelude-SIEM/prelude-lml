@@ -1,1 +1,1 @@
-SUBDIRS = debug simple
+SUBDIRS = debug pcre
