@@ -53,14 +53,14 @@ lml_config_t config;
 static const char *config_file = PRELUDE_LML_CONF;
 
 
-static int set_conf_file(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int set_conf_file(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         config_file = strdup(optarg);
         return 0;
 }
 
 
-static int print_version(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int print_version(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         printf("prelude-lml %s.\n", VERSION);
         return prelude_error(PRELUDE_ERROR_EOF);
@@ -68,7 +68,7 @@ static int print_version(void *context, prelude_option_t *opt, const char *optar
 
 
 
-static int print_help(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int print_help(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         prelude_option_print(NULL, PRELUDE_OPTION_TYPE_CLI, 25);
         return prelude_error(PRELUDE_ERROR_EOF);
@@ -76,7 +76,7 @@ static int print_help(void *context, prelude_option_t *opt, const char *optarg, 
 
 
 
-static int set_batch_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int set_batch_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         config.batch_mode = TRUE;
         file_server_set_batch_mode();
@@ -85,14 +85,14 @@ static int set_batch_mode(void *context, prelude_option_t *opt, const char *opta
 
 
 
-static int set_ignore_metadata(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int set_ignore_metadata(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         config.ignore_metadata = TRUE;
         file_server_set_ignore_metadata();
         return 0;
 }
 
-static int set_rotation_time_offset(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err) 
+static int set_rotation_time_offset(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context) 
 {
         file_server_set_max_rotation_time_offset(atoi(optarg));
         return 0;
@@ -100,13 +100,13 @@ static int set_rotation_time_offset(void *context, prelude_option_t *opt, const 
 
 
 
-static int get_rotation_time_offset(void *context, prelude_option_t *opt, prelude_string_t *out)
+static int get_rotation_time_offset(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
         return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_time_offset());
 }
 
 
-static int set_rotation_size_offset(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
+static int set_rotation_size_offset(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
         file_server_set_max_rotation_size_offset(atoi(arg));
         return 0;
@@ -114,20 +114,20 @@ static int set_rotation_size_offset(void *context, prelude_option_t *opt, const 
 
 
 
-static int get_rotation_size_offset(void *context, prelude_option_t *opt, prelude_string_t *out)
+static int get_rotation_size_offset(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
         return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_size_offset());
 }
 
 
-static int set_quiet_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int set_quiet_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         prelude_log_set_flags(prelude_log_get_flags() | PRELUDE_LOG_FLAGS_QUIET);
         return 0;
 }
 
 
-static int set_daemon_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int set_daemon_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         prelude_daemonize(config.pidfile);
         if ( config.pidfile )
@@ -139,7 +139,7 @@ static int set_daemon_mode(void *context, prelude_option_t *opt, const char *opt
 }
 
 
-static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_pidfile(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         config.pidfile = strdup(arg);
         if ( ! config.pidfile )
@@ -150,7 +150,7 @@ static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, pr
 
 
 
-static int set_logfile_prefix_regex(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_logfile_prefix_regex(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {        
         if ( config.logfile_prefix_regex )
                 free(config.logfile_prefix_regex);
@@ -162,7 +162,7 @@ static int set_logfile_prefix_regex(void *context, prelude_option_t *opt, const 
 
 
 
-static int set_logfile_ts_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_logfile_ts_format(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {        
         if ( config.logfile_ts_format )
                 free(config.logfile_ts_format);
@@ -174,7 +174,7 @@ static int set_logfile_ts_format(void *context, prelude_option_t *opt, const cha
 
 
 
-static int set_dry_run(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_dry_run(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         config.dry_run = TRUE;
 
@@ -183,7 +183,7 @@ static int set_dry_run(void *context, prelude_option_t *opt, const char *arg, pr
 
 
 
-static int set_text_output(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+static int set_text_output(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         int ret;
         FILE *fd;
@@ -216,7 +216,7 @@ static int set_text_output(void *context, prelude_option_t *opt, const char *arg
 
 
 
-static int set_file(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
+static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
         int ret;
         log_source_t *ls;
@@ -261,7 +261,7 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg, prelu
 
 
 
-static int destroy_udp_server(void *context, prelude_option_t *opt, prelude_string_t *err)
+static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void *context)
 {
         if ( ! config.udp_srvr )
                 return 0;
@@ -277,7 +277,7 @@ static int destroy_udp_server(void *context, prelude_option_t *opt, prelude_stri
 
 
 
-static int get_udp_server(void *context, prelude_option_t *opt, prelude_string_t *out)
+static int get_udp_server(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
         if ( ! config.udp_srvr )
                 return 0;
@@ -286,12 +286,12 @@ static int get_udp_server(void *context, prelude_option_t *opt, prelude_string_t
 }
 
 
-static int set_udp_server(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err) 
+static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
         char *ptr = NULL;
         regex_list_t *rlist;
         
-        destroy_udp_server(context, opt, err);
+        destroy_udp_server(opt, err, context);
 
         if ( ! arg )
                 return 0;
@@ -346,81 +346,81 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
         config.text_output_fd = NULL;
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
                            "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
                            print_version, NULL);
 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
                 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_daemon_mode, NULL);
 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
                            "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_text_output, NULL);
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 0, "dry-run",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "dry-run",
                            "No alert emission / Prelude connection", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_dry_run, NULL);
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'c', "config",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 'c', "config",
                            "Configuration file to use", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_conf_file, NULL);
         
-        opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
-                                 "Write Prelude LML PID to specified pidfile",
-                                 PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
+                           "Write Prelude LML PID to specified pidfile",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
         
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_FIRST);
         
-        opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
-                                 PRELUDE_OPTION_TYPE_WIDE, 's', "udp-srvr",
-                                 "address:port pair to listen to syslog to UDP messages (default port 514)", 
-                                 PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
+                           PRELUDE_OPTION_TYPE_WIDE, 's', "udp-srvr",
+                           "address:port pair to listen to syslog to UDP messages (default port 514)", 
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
 
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
                 
-        prelude_option_add(ropt, all_hook, 't', "max-rotation-time-offset",
+        prelude_option_add(ropt, NULL, all_hook, 't', "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
                            "severity alert will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_rotation_time_offset, get_rotation_time_offset);
         
-        prelude_option_add(ropt, all_hook, 's', "max-rotation-size-offset",
+        prelude_option_add(ropt, NULL, all_hook, 's', "max-rotation-size-offset",
                            "Specifies the maximum difference, in bytes, between two logfile "
                            "rotation. If this difference is reached, a high severity alert "
                            "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset, 
                            get_rotation_size_offset);
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batchmode",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batchmode",
                            "Tell LML to run in batch mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_batch_mode, NULL);
 
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "ignore-metadata",
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "ignore-metadata",
                            "Tell LML not to read/write metadata", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_ignore_metadata, NULL);
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                            't', "time-format", "Specify the input timestamp format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_ts_format, NULL);
         
-        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                            'p', "prefix-regex", "Specify the input prefix format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_prefix_regex, NULL);
         
-        opt = prelude_option_add(ropt,  PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
-                                 'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
-                                 PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+                           'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
         
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
         
         
-        ret = prelude_option_parse_arguments(NULL, ropt, &config_file, &argc, argv, &err);
+        ret = prelude_option_parse_arguments(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {
                 if ( err )
                         prelude_log(PRELUDE_LOG_WARN, "%s.\n", prelude_string_get_string(err));

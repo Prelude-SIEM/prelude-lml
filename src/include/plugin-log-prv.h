@@ -23,4 +23,4 @@
 
 prelude_plugin_instance_t *log_plugin_register(const char *pname);
 void log_plugin_run(prelude_plugin_instance_t *pc, log_entry_t *log);
-int log_plugins_init(const char *dirname, int argc, char **argv);
+int log_plugins_init(const char *dirname, void *data);

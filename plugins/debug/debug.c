@@ -36,7 +36,7 @@
 #include "lml-alert.h"
 
 
-prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void);
+int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *data);
 
 
 typedef struct {
@@ -120,7 +120,7 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entr
 
 
 
-static int debug_activate(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int debug_activate(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         debug_plugin_t *new;
                 
@@ -144,7 +144,7 @@ static void debug_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 
 
 
-static int debug_get_output_stderr(void *context, prelude_option_t *opt, prelude_string_t *out)
+static int debug_get_output_stderr(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
         debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         return prelude_string_sprintf(out, "%s", plugin->out_stderr ? "true" : "false");
@@ -152,7 +152,7 @@ static int debug_get_output_stderr(void *context, prelude_option_t *opt, prelude
 
 
 
-static int debug_set_output_stderr(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+static int debug_set_output_stderr(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
         
@@ -163,17 +163,20 @@ static int debug_set_output_stderr(void *context, prelude_option_t *opt, const c
 
 
 
-prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
+int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_optlist)
 {
+        int ret;
         prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
+
+        *pret = (void *) &plugin;
         
-        opt = prelude_option_add(lml_root_optlist, hook, 0, "debug", "Debug plugin option",
+        ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
         
-        prelude_option_add(opt, hook, 's', "stderr",
+        prelude_option_add(opt, NULL, hook, 's', "stderr",
                            "Output to stderr when plugin is called", PRELUDE_OPTION_ARGUMENT_NONE,
                            debug_set_output_stderr, debug_get_output_stderr);
         
@@ -183,5 +186,5 @@ prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
         prelude_plugin_set_running_func(&plugin, debug_run);
         prelude_plugin_set_destroy_func(&plugin, debug_destroy);
         
-        return (void *) &plugin;
+        return 0;
 }

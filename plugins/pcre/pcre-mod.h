@@ -44,7 +44,7 @@ typedef struct {
         prelude_list_t rule_list;
         prelude_list_t regex_list;
         
-        rule_object_list_t *object_list;
+        struct rule_object_list *object_list;
 } pcre_rule_t;
 
 

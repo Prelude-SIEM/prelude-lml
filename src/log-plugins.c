@@ -39,6 +39,8 @@
 #include "plugin-log.h"
 #include "plugin-log-prv.h"
 
+#define LML_PLUGIN_SYMBOL "lml_plugin_init"
+
 
 static PRELUDE_LIST(log_plugins_instance);
 
@@ -90,7 +92,7 @@ prelude_plugin_instance_t *log_plugin_register(const char *plugin)
  * Open the plugin directory (dirname),
  * and try to load all plugins located int it.
  */
-int log_plugins_init(const char *dirname, int argc, char **argv)
+int log_plugins_init(const char *dirname, void *data)
 {
         int ret;
         
@@ -104,7 +106,7 @@ int log_plugins_init(const char *dirname, int argc, char **argv)
                 return -1;
         }
 
-        ret = prelude_plugin_load_from_dir(dirname, subscribe, unsubscribe);
+        ret = prelude_plugin_load_from_dir(dirname, LML_PLUGIN_SYMBOL, data, subscribe, unsubscribe);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "couldn't load plugin subsystem.\n");
                 return -1;

@@ -216,13 +216,15 @@ int main(int argc, char **argv)
         int ret;
         
         prelude_init(&argc, argv);
-        
         global_argv = argv;
-        lml_root_optlist = prelude_option_new_root();
         
         PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
         
-        ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
+        ret = prelude_option_new_root(&lml_root_optlist);
+        if ( ret < 0 )
+                return ret;
+        
+        ret = log_plugins_init(LOG_PLUGIN_DIR, lml_root_optlist);
         if (ret < 0) {
                 prelude_log(PRELUDE_LOG_WARN, "error initializing logs plugins.\n");
                 return -1;
