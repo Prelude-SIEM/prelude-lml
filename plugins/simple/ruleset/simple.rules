@@ -11,28 +11,29 @@
 # parsing function to the simple.c plugin distributed with Prelude LML.
 #
 # CREATING AND CONTRIBUTING RULES:
-# Rulesets that you contribute to the Prelude-LML maintainer should follow these
-# guidelines:
-# - Avoid using .+ or .* in regex entries unless actually neccessary.  Doing so will
-#   make your rule CPU-costly to implement.
-# - At a minimum, include regex, classification().name, classification().origin,
-#   assessement.impact.severity, assessment.impact.type, impact.description, and last.
+# Rulesets that you contribute to the Prelude-LML maintainer should follow 
+# these guidelines:
+# - Avoid using .+ or .* in regex entries unless actually neccessary.  Doing so
+#   will make your rule CPU-costly to implement.
+# - At a minimum, include regex, classification().name, 
+#   classification().origin, assessement.impact.severity, 
+#   assessment.impact.type, impact.description, and last.
 # - Put only a single field on each line of your rules.
 # - Include a sample log entry with each rule.
-# - Gather as many pieces of data, and fill as many IDMEF fields as possible from the
-#   log entry.
-# - If a similar rule exists in another ruleset (same function, different software),
-#   use the classification().name from the other rule.
+# - Gather as many pieces of data, and fill as many IDMEF fields as possible
+#   from the log entry.
+# - If a similar rule exists in another ruleset (same function, different 
+#   software), use the classification().name from the other rule.
 # - Use only the actual log message, none of the syslog headers (this generally
 #   includes timestamp, originating node, originating process, and pid).
 # - Submit new rulesets to the prelude-devel mailing list for consideration.
 #
 #
-# Below you will find a listing of most of the IDMEF fields Prelude-LML accepts.  Where
-# you see an item listed with (), it means that item is indexed.  Indexing starts at 0,
-# so, for example, an event with multiple targets would have the first target listed as
-# target(0), followed by whatever IDMEF fields you use.  See the existing rulesets for
-# examples.
+# Below you will find a listing of most of the IDMEF fields Prelude-LML 
+# accepts.  Where you see an item listed with (), it means that item is 
+# indexed.  Indexing starts at 0, so, for example, an event with multiple 
+# targets would have the first target listed as target(0), followed by whatever
+# IDMEF fields you use.  See the existing rulesets for examples.
 #
 # - regex:
 #   A PCRE regex that should be matched to trigger the alert.
@@ -42,7 +43,8 @@
 #
 # - classification().origin:
 #   The source from which the name of the alert originates. 
-#   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is unknown.
+#   Possible values are: unknown, bugtraqid, cve, vendor-specific. Default is 
+#   unknown.
 #
 # - classification().url:
 #   A URL at which the manager (or the human
@@ -61,7 +63,8 @@
 #   The permitted values are: failed, succeeded.
 #
 # - assessment.impact.type:
-#   The type of attempt represented by this event, in relatively broad categories.
+#   The type of attempt represented by this event, in relatively broad
+#   categories.
 #   The permitted values are: admin, dos, file, recon, user, other.
 #
 # - assessment.impact.description:
@@ -72,6 +75,12 @@
 #   target().node.address().address:
 #   Address that has been attacked/Address that issued the attack.
 #   There can be more than one.
+#
+# - source().node.address().category
+#   source().node.address().category
+#   The type of address provided.
+#   Possible values: unknown, atm, e-mail, lotus-notes, mac, sna, vm, 
+#   ipv4-addr, ipv4-addr-hex, ipv6-addr, ipv6-addr-hex, ipv6-net, ipv6-net-mask
 # 
 # - source().node.name,
 #   target().node.name:
@@ -81,7 +90,7 @@
 # - source().node.category,
 #   target().node.category:
 #   The domain from which the name information was obtained.
-#   Possible values are: unknow, ads, afs, coda, dfs, dns, hosts, kerberos,
+#   Possible values are: unknown, ads, afs, coda, dfs, dns, hosts, kerberos,
 #   nds, nis, nisplus, nt, wfw
 #
 # - source().node.location,
@@ -125,8 +134,8 @@
 #
 # - source().user.userid().type,
 #   target().user.userid().type:
-#   The type of user information represented (current-user, original-user, target-user,
-#   user-privs, current-group, group-privs, other-privs).
+#   The type of user information represented (current-user, original-user, 
+#   target-user, user-privs, current-group, group-privs, other-privs).
 #
 # - source().user.userid().name,
 #   target().user.userid().name:
