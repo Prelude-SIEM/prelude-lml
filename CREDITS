@@ -3,7 +3,29 @@
 (D) Description
 (S) snail-mail address
 
+N: Arnaud Guignard
+E: arnaud.guignard@free.fr
+D: Simple plugin IDMEF object support
+S: France
+
+N: Laurent Oudot
+E: oudot.laurent@wanadoo.fr
+D: Simple Netfilter, ZyXel, Cisco rulesets.
+S: France
+
 N: Pierre-Jean Turpeau
 E: Pierre-Jean.Turpeau@ENSEIRB.fr
-D: Commited the first prelude-lml implementation
+D: Original prelude-lml implementation
 S: France
+
+N: Yoann Vandoorselaere
+E: yoann@mandrakesoft.com
+D: Maintainer
+S: France
+
+N: Krzysztof Zaraska
+E: kzaraska@student.uci.agh.edu.pl
+D: FreeBSD port
+D: random bugfix
+S: Poland
+
