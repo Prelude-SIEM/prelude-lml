@@ -1,5 +1,8 @@
 2002-03-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/hashkey.c (hash_position): 
+	cast to unsigned int, lot of cleanup.
+
 	* src/file-server.c (file_server_monitor_file): 
 	take an already open FD as argument (so that we don't 
 	require root access here).

@@ -18,14 +18,17 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "hashkey.h"
 #include <stdlib.h>
+#include <libprelude/prelude-log.h>
 
-typedef struct hash_binding *hash_binding;
+#include "hashkey.h"
+
+
+typedef struct hash_binding * hash_binding;
 
 struct hash_table {
 	int hash_table_size;
-	int number_of_bindings;
+        int number_of_bindings;
 	hash_binding *hash_table;
 	hash_binding *cursor;
 	int (*equal) (const void *k1, const void *k2);
@@ -45,84 +48,122 @@ struct hash_binding {
 #define MAX_FILL_DEGREE 5
 #define MIN_FILL_DEGREE 1
 
-hash_table
-hash_create(int (*hash) (const void *key), int (*equal) (const void *k1, const void *k2))
+
+hash_table hash_create(int (*hash) (const void *key),
+                       int (*equal) (const void *k1, const void *k2))
 {
+        int i;
 	hash_table temp;
-	int i;
+        
 	temp = malloc(sizeof(struct hash_table));
-	temp->hash_table_size = MIN_HASH_TABLE_SIZE;
-	temp->number_of_bindings = 0;
-	temp->hash_table =
-	    malloc(MIN_HASH_TABLE_SIZE * sizeof(hash_binding));
-	for (i = 0; i < MIN_HASH_TABLE_SIZE; i++)
+        if ( ! temp ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+
+        temp->number_of_bindings = 0;
+        temp->hash_table_size = MIN_HASH_TABLE_SIZE;
+        
+        temp->hash_table = malloc(MIN_HASH_TABLE_SIZE * sizeof(hash_binding));
+        if ( ! temp->hash_table ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+        
+        for ( i = 0; i < MIN_HASH_TABLE_SIZE; i++ )
 		temp->hash_table[i] = NULL;
+        
 	temp->cursor = NULL;
 	temp->equal = equal;
 	temp->hash = hash;
-	return temp;
+
+        return temp;
 }
+
+
 
 void hash_destroy(hash_table ht)
 {
-	hash_binding bind, temp;
-	int i;
-	for (i = 0; i < ht->hash_table_size; i++) {
-		for (bind = ht->hash_table[i]; bind;) {
-			temp = bind->next;
+        int i;
+	hash_binding bind, tmp;
+	
+	for ( i = 0; i < ht->hash_table_size; i++ ) {
+		for ( bind = ht->hash_table[i]; bind != NULL; bind = tmp ) {
+			tmp = bind->next;
 			free(bind);
-			bind = temp;
 		}
 	}
+        
 	free(ht->hash_table);
 }
 
+
+
+
 int hash_position(hash_table ht, const void *key)
 {
-	int index = (*(ht->hash)) (key) % ht->hash_table_size;
-	hash_binding *bind = &(ht->hash_table[index]);
-	for (; *bind; bind = &((*bind)->next)) {
-		if ((*(ht->equal)) ((*bind)->key, key)) {
+        hash_binding *bind;
+	unsigned int index;
+
+        index = ((unsigned int) ht->hash(key)) % ht->hash_table_size;
+
+	for ( bind = &(ht->hash_table[index]); *bind; bind = &((*bind)->next) ) {
+                if ( ht->equal((*bind)->key, key) ) {
 			ht->cursor = bind;
 			return 1;
 		}
 	}
+        
 	ht->cursor = bind;
-	return 0;
+
+        return 0;
 }
+
+
+
 
 static void possibly_increase_size(hash_table ht)
 {
-	if ((ht->number_of_bindings)
-	    > (ht->hash_table_size) * MAX_FILL_DEGREE) {
-		int i;
-		int new_hash_table_size = (ht->hash_table_size) * 2 + 1;
-		hash_binding *new_hash_table =
-		    malloc(new_hash_table_size * sizeof(hash_binding));
-		for (i = 0; i < new_hash_table_size; i++)
-			new_hash_table[i] = NULL;
-		for (i = 0; i < ht->hash_table_size; i++) {
-			hash_binding bind, temp;
-			for (bind = ht->hash_table[i]; bind;) {
-				int index =
-				    bind->hashval % new_hash_table_size;
-				temp = bind->next;
-				bind->next = new_hash_table[index];
-				new_hash_table[index] = bind;
-				bind = temp;
-			}
-		}
-		free(ht->hash_table);
-		ht->hash_table = new_hash_table;
-		ht->hash_table_size = new_hash_table_size;
-	}
+        int i;
+        hash_binding *new_hash_table;
+        int new_hash_table_size = ht->hash_table_size * 2 + 1;
+        
+        if ( ht->number_of_bindings <= ht->hash_table_size * MAX_FILL_DEGREE )
+                return;
+        
+        new_hash_table = malloc(new_hash_table_size * sizeof(hash_binding));
+        if ( ! new_hash_table ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return;
+        }
+        
+        for ( i = 0; i < new_hash_table_size; i++ )
+                new_hash_table[i] = NULL;
+        
+        for ( i = 0; i < ht->hash_table_size; i++ ) {
+                hash_binding bind, temp;
+
+                for ( bind = ht->hash_table[i]; bind; ) {
+                        int index = bind->hashval % new_hash_table_size;
+                        temp = bind->next;
+                        bind->next = new_hash_table[index];
+                        new_hash_table[index] = bind;
+                        bind = temp;
+                }
+        }
+
+        free(ht->hash_table);
+        ht->hash_table = new_hash_table;
+        ht->hash_table_size = new_hash_table_size;
 }
+
+
+
 
 static void possibly_decrease_size(hash_table ht)
 {
-	if ((ht->number_of_bindings)
-	    < (ht->hash_table_size) * MIN_FILL_DEGREE
-	    && ht->hash_table_size > MIN_HASH_TABLE_SIZE) {
+	if ( ht->number_of_bindings < (ht->hash_table_size) * MIN_FILL_DEGREE
+             && ht->hash_table_size > MIN_HASH_TABLE_SIZE) {
 		int i;
 		int new_hash_table_size = ((ht->hash_table_size) - 1) / 2;
 		hash_binding *new_hash_table =
@@ -146,6 +187,9 @@ static void possibly_decrease_size(hash_table ht)
 	}
 }
 
+
+
+
 void hash_insert(hash_table ht, void *key, void *obj)
 {
 	hash_binding old = *(ht->cursor);
@@ -158,6 +202,8 @@ void hash_insert(hash_table ht, void *key, void *obj)
 	possibly_increase_size(ht);
 }
 
+
+
 void hash_delete(hash_table ht)
 {
 	hash_binding old = *(ht->cursor);
@@ -166,6 +212,9 @@ void hash_delete(hash_table ht)
 	(ht->number_of_bindings)--;
 	possibly_decrease_size(ht);
 }
+
+
+
 
 void hash_map(hash_table ht, void (*fun) (void *object))
 {
@@ -177,10 +226,14 @@ void hash_map(hash_table ht, void (*fun) (void *object))
 	}
 }
 
+
+
 void *hash_get(hash_table ht)
 {
 	return (*(ht->cursor))->obj;
 }
+
+
 
 int hash_size(hash_table ht)
 {
