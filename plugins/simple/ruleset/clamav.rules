@@ -38,6 +38,7 @@ regex=\S+: (\S+) FOUND; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
  assessment.impact.description=A virus has been identified by ClamAV; \
  last
 
@@ -49,5 +50,6 @@ regex=Database correctly reloaded \(\d+ viruses\); \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
+ assessment.impact.completion=succeeded; \
  assessment.impact.description=Clam AV definitions have been updated; \
  last

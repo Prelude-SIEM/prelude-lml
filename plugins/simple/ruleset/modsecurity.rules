@@ -32,28 +32,84 @@
 #####
 
 #May 10 08:35:36 somehost httpd[24775]: [error] [client 12.34.56.78] mod_security: Warning. Pattern match "/test\.php" at THE_REQUEST.
-regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)"; \
- classification(0).name=mod_security Log Event; \
+regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\.; \
+ classification(0).name=HTTP $3 "$2"; \
  id=3100; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=mod_security found pattern match "$2".  No reactive action taken.; \
+ assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3.  No reactive action taken.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  target(0).service.name=http; \
  last
 
-#May 10 08:36:43 somehost httpd[24776]: [error] [client 10.1.74.181] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
-regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+). Pattern match "(.+)"; \
- classification(0).name=mod_security Block Event; \
+#May 10 08:36:43 somehost httpd[24776]: [error] [client 12.34.56.78] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
+regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+)\.; \
+ classification(0).name=HTTP $4 "$3" Blocked; \
  id=3101; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security found pattern match "$3".  Access was blocked with HTTP response code $2; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).service.name=http; \
+ last
+
+#No log sample; please submit
+regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. Pattern match "(\S+)" at (\S+)\.; \
+ classification(0).name=HTTP $4 "$3" Redirected; \
+ id=3102; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=failed; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).service.name=http; \
+ last
+
+#May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
+regex=\[client ([\d\.]+)\] mod_security: Invalid URL encoding (#\d) detected\.; \
+ classification(0).name=HTTP Invalid URL encoding $2; \
+ id=3103; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=mod_security found invalid URL encoding $2; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).service.name=http; \
+ last
+
+#No log sample; please submit
+regex=\[client ([\d\.]+)\] mod_security: Invalid character detected (\S+); \
+ classification(0).name=HTTP Invalid character "$2"; \
+ id=3104; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=mod_security found invalid character $2; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).service.name=http; \
+ last
+
+#No log sample; please submit
+regex=\[client ([\d\.]+)\] mod_security: Invalid Unicode encoding: (not enough bytes|invalid byte value|overlong character); \
+ classification(0).name=HTTP Invalid Unicode encoding "$2"; \
+ id=3105; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=mod_security found invalid Unicode encoding $2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  target(0).service.name=http; \

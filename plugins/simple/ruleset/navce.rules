@@ -39,6 +39,7 @@ regex=norton antivirus\[\w+\] 5  Virus Found!Virus name: (\S+) in File; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
  assessment.impact.type=file; \
+ assessment.impact.completion=succeeded; \
  assessment.impact.description=A virus has been identified by Norton Antivirus; \
  last
 
@@ -50,5 +51,6 @@ regex=norton antivirus\[\w+\] \d+  Download of virus definition file from LiveUp
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.type=other; \
+ assessment.impact.completion=succeeded; \
  assessment.impact.description=Norton Antivirus Virus definitions have been updated; \
  last
