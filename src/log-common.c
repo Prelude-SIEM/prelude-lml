@@ -28,7 +28,7 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
          */
         now = time(NULL);
         if ( ! localtime_r(&now, &localtime) ) {
-                log(LOG_ERR, "couldn't get local time.\n");
+                log(LOG_ERR, "error getting local time.\n");
                 return -1;
         }
 
@@ -37,16 +37,12 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
          * strptime() return a pointer to the first non matched character.
          */
         log = strptime(buf, "%b %d %H:%M:%S", &localtime);
-        if ( ! log ) {
-                log(LOG_ERR, "there was an error trying to parse syslog date.\n");
+        if ( ! log ) 
                 return -1;
-        }
         
         ret = sscanf(log, "%255s %32s", host, tag);
-        if ( ret != 2 ) {
-                log(LOG_ERR, "unknown format : \"%s\".\n", log);
+        if ( ret != 2 ) 
                 return -1;
-        }
 
         /*
          * the tag end as soon as we meet a non alpha numeric character.
