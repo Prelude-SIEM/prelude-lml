@@ -49,7 +49,7 @@
 #define DEFAULT_UDP_SERVER_PORT 514
 
 
-struct lml_config config;
+lml_config_t config;
 static const char *config_file = PRELUDE_CONF;
 
 

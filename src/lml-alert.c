@@ -46,7 +46,7 @@
 #include "config.h"
 
 
-extern struct lml_config config;
+extern lml_config_t config;
 static idmef_analyzer_t *idmef_analyzer;
 
 

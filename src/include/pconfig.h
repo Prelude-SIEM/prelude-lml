@@ -30,7 +30,7 @@
 
 int pconfig_init(prelude_option_t *lml_optlist, int argc, char **argv);
 
-struct lml_config {
+typedef struct {
         char *pidfile;
         char *logfile_format;
         char *logfile_ts_format;
@@ -46,6 +46,6 @@ struct lml_config {
         uint16_t udp_srvr_port;
 
         prelude_io_t *text_output_fd;
-};
+} lml_config_t;
 
 #endif /* _LML_PCONFIG_H */

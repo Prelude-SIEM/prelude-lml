@@ -32,7 +32,7 @@
  #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 
-extern struct lml_config config;
+extern lml_config_t config;
 static char **global_argv;
 prelude_option_t *lml_root_optlist;
 static volatile sig_atomic_t got_sighup = 0;
