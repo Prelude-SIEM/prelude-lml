@@ -130,22 +130,25 @@ void lml_dispatch_log(regex_list_t *list, const char *str, const char *from)
 
 
 
+static void add_fd_to_set(fd_set *fds, int fd) 
+{
+        if ( fd > 0 )
+                FD_SET(fd, fds);
+}
+
+
+
 static void wait_for_event(regex_list_t *list) 
 {
         int ret;
         fd_set fds;
         struct timeval tv, start, end;
         int file_event_fd, udp_event_fd;
-
+        
         udp_event_fd = udp_server_get_event_fd(udp_srvr);
         file_event_fd = file_server_get_event_fd();
-        
-        FD_ZERO(&fds);
-        FD_SET(udp_event_fd, &fds);
-        
-        if ( file_event_fd > 0 )
-                FD_SET(file_event_fd, &fds);
-        
+
+        FD_ZERO(&fds);                
         gettimeofday(&start, NULL);
         
         while ( 1 ) {
@@ -154,6 +157,9 @@ static void wait_for_event(regex_list_t *list)
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
                 
+                add_fd_to_set(&fds, udp_event_fd);
+                add_fd_to_set(&fds, file_event_fd);
+
                 ret = select(MAX(file_event_fd, udp_event_fd) + 1, &fds, NULL, NULL, &tv);
                 if ( ret < 0 ) {
                         if ( errno == EINTR )
@@ -173,16 +179,11 @@ static void wait_for_event(regex_list_t *list)
                                 file_server_wake_up(list);
                 }
                 
-                if ( FD_ISSET(udp_event_fd, &fds) ) 
+                if ( udp_event_fd > 0 && FD_ISSET(udp_event_fd, &fds) ) 
                         udp_server_process_event(udp_srvr, list);
                 
                 if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) ) 
                         file_server_wake_up(list);
-
-                FD_SET(udp_event_fd, &fds);
-
-                if ( file_event_fd > 0 )
-                        FD_SET(file_event_fd, &fds);
         }
 }
 

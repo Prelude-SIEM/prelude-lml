@@ -1,3 +1,14 @@
+2003-02-27  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/ruleset/exim.rules (regex): 
+	add \ to end of line.
+
+	* src/udp-server.c (udp_server_get_event_fd):
+        Avoid a NULL pointer dereference.
+
+	* src/main.c (add_fd_to_set):
+        (wait_for_event): don't add the FD if it's value is -1.
+
 2003-02-04  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/simple/ruleset/simple.rules (include): 

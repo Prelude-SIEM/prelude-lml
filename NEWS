@@ -1,3 +1,31 @@
+* 2003-02-27, prelude-lml 0.8.3:
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Implemented runtime detection and workaround of the FAM (Dnotify)
+	  writev() bug. We go back to simple file polling if the bug is 
+	  present.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Restart LML on SIGHUP, so that log rotation program might
+	  restart it.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Implemented handling of the source and destination address,
+	  by the Simple (signature) plugin.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  LML alert now carry LML version.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Modified the Debug plugin so that it use the shared LML API
+	  for sending alert. Also, Debug alert are now low priority.
+
+	- Laurent Oudot <oudot.laurent@wanadoo.fr>:
+	  Exim ruleset.
+
+	- Stéphane Loeuillet <LeRoutier@wanadoo.fr>:
+	  ProFTPD, vpopmail, qpopper rulesets.
+
 * 2002-12-06, prelude-lml-0.8.2:
 
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 

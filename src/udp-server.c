@@ -80,6 +80,9 @@ void udp_server_close(udp_server_t *server)
 
 int udp_server_get_event_fd(udp_server_t *server) 
 {
+        if ( ! server )
+                return -1;
+        
         return server->sockfd;
 }
 
