@@ -53,3 +53,18 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  assessment.impact.description=Exim refused a request : $1 rejected; \
  target(0).service.protocol=smtp; \
  last
+
+# Copyright (C) 2004 David Maciejak <dmaciejak@exaprobe.com>
+# All Rights Reserved
+
+#Feb 26 16:40:34 icare kernel: BIOS-provided physical RAM map:
+regex=BIOS-provided physical RAM map; \
+ classification(0).name=Host was restarted; \
+ classification(0).origin=vendor-specific; \
+ id=402; \
+ revision=1; \
+ assessment.impact.completion = succeeded; \
+ assessment.impact.type = other; \
+ assessment.impact.severity = medium; \
+ assessment.impact.description=Host was restarted; \
+ last
