@@ -1649,7 +1649,7 @@ regex=exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \(([^:]+
  assessment.impact.description=The binary $1 was executed within a chroot jail.; \
  last
 
-# LOG: Oct  5 23:32:51 serpens kernel: grsec: CAP_FSETID not raised for (nfsd:16764) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
+# LOG:Oct  5 23:32:51 serpens kernel: grsec: CAP_FSETID not raised for (nfsd:16764) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
 #
 regex=([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Filesystem remounted; \
@@ -1894,7 +1894,7 @@ regex=shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
  assessment.impact.description=Shared memory of size $1 was created.; \
  last
 
-# LOG::Oct 13 20:56:41 emma kernel: grsec: shared memory of uid:48 euid:0 removed by (httpd:29404) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
+# LOG:Oct 13 20:56:41 emma kernel: grsec: shared memory of uid:48 euid:0 removed by (httpd:29404) UID(0) EUID(0), parent (init:1) UID(0) EUID(0)
 #
 regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Shared memory removed; \
