@@ -15,7 +15,7 @@ typedef struct {
 #define plugin_set_running_func(p, func) plugin_run_func(p) = (func)
 
 int log_plugins_init(const char *dirname, int argc, char **argv);
-void log_plugins_run(char *plugin_name, log_container_t * log);
+void log_plugins_run(const char *plugin_name, log_container_t * log);
 
 /*
  * Plugin initialisation function.

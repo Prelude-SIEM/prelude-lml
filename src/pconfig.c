@@ -39,6 +39,8 @@
 
 #include "config.h"
 #include "pconfig.h"
+#include "queue.h"
+#include "file-server.h"
 
 extern Pconfig_t config;
 

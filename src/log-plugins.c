@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>		/* for NAME_MAX */
 #include <sys/time.h>
 #include <time.h>
 
-//#include <libprelude/list.h> 
+
 #include <libprelude/prelude-log.h>
 #include <libprelude/plugin-common.h>
 #include <libprelude/plugin-common-prv.h>
@@ -20,12 +21,14 @@ static hash_table plugins;
 
 /* Derived from /usr/CVSroot/XEmacs/xemacs/src/symbols.c 2001/04/30 09:02:41 */
 
-static int hash_string(void *k)
+static int hash_string(const void *k)
 {
+        int len;
 	unsigned int hash = 0;
-	char *ptr = (char *) k;
-	int len = strlen(ptr);
+        const char *ptr = (const char *) k;
 
+        len = strlen(ptr);
+        
 	for (hash = 0; len; len--, ptr++)
 		hash = 31 * hash + *ptr;
 
@@ -34,9 +37,9 @@ static int hash_string(void *k)
 
 
 
-static int equal_string(void *k1, void *k2)
+static int equal_string(const void *k1, const void *k2)
 {
-	if ( ! strcmp((char *) k1, (char *) k2))
+	if ( ! strcmp((const char *) k1, (const char *) k2))
 		return 1;
 	return 0;
 }
@@ -63,7 +66,7 @@ static void unsubscribe(plugin_container_t *pc)
 
 
 
-void log_plugins_run(char *plugin_name, log_container_t *log)
+void log_plugins_run(const char *plugin_name, log_container_t *log)
 {
 	plugin_container_t *pc;
 

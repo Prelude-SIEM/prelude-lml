@@ -358,7 +358,7 @@ static void pax_log_processing(const log_container_t * log)
 	char *tmp_save = tmp;
 
 	if (!message)
-		return -1;
+		return;
 
 	msgbuf = prelude_msgbuf_new(0);
 	if (!msgbuf)

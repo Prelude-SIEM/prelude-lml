@@ -1,5 +1,12 @@
 2002-03-26  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/regex.c: 
+	* src/main.c:
+	more cleanup, performance fix.
+
+	* src/regex.c (regex_destroy): 
+	use list_for_each_safe
+
 	* src/file-server.c: 
 	monitor local files.
 

@@ -29,7 +29,7 @@ typedef struct hash_table *hash_table;
    are considered equal, 0 otherwise. */
 
 extern hash_table
-hash_create(int (*hash) (void *key), int (*equal) (void *k1, void *k2));
+hash_create(int (*hash) (const void *key), int (*equal) (const void *k1, const void *k2));
 
 /* destroy a hash table. */
 
@@ -49,7 +49,7 @@ extern void hash_destroy(hash_table ht);
    positioned where it should be inserted, thus you can immediately insert
    it. */
 
-extern int hash_position(hash_table ht, void *key);
+extern int hash_position(hash_table ht, const void *key);
 
 /* Insert an object into a hash table.  Before insertion,
    hash_position() must have been called and must have returned

@@ -27,16 +27,18 @@
 #include "log-common.h"
 #include "plugin-log.h"
 #include "pconfig.h"
+#include "file-server.h"
+
 
 Pconfig_t config;
-#define MAXPLUG 1024
-
+static udp_server_t *myudp;
 
 
 static void sig_handler(int signum)
 {
 	fprintf(stderr, "\n\nCaught signal %d.\n", signum);
-	signal(signum, SIG_DFL);
+        signal(signum, SIG_DFL);
+        udp_server_close(myudp);
 	exit(2);
 }
 
@@ -65,10 +67,9 @@ static void message_reader(queue_t *queue, const char *str, const char *from)
 
 
 
-static void object_dump(void *object)
+static void regex_match_cb(const char *plugin, log_container_t *log) 
 {
-	char *s = object;
-	printf("[%s]\n", s);
+        log_plugins_run(plugin, log);
 }
 
 
@@ -76,9 +77,8 @@ static void object_dump(void *object)
 
 static void dispatcher(regex_list_t *list, queue_t *myqueue)
 {
-        int ret, i;
+        int ret;
         log_container_t *log;
-        char *plugins[MAXPLUG];
         
 	while ( 1 ) {
 
@@ -94,11 +94,8 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
                        log->time_received.tm_year + 1900,
                        log->time_received.tm_mon + 1,
                        log->time_received.tm_mday);
-
-                ret = regex_exec(list, log->log, plugins, MAXPLUG);
-                for (i = 0; i < ret; i++)
-                        log_plugins_run(plugins[i], log);
-
+                
+                ret = regex_exec(list, log->log, &regex_match_cb, log);
                 log_container_delete(log);
 	}
 }
@@ -108,10 +105,9 @@ static void dispatcher(regex_list_t *list, queue_t *myqueue)
 
 int main(int argc, char **argv)
 {
-	udp_server_t *myudp;
+        int ret;
 	queue_t *myqueue;
 	regex_list_t *regex_list;
-	int ret;
 
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {

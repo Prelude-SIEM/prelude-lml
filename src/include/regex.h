@@ -13,7 +13,7 @@ typedef struct list_head regex_list_t;
 
 regex_list_t *regex_init(char *filename);
 void regex_destroy(regex_list_t * conf);
-int regex_exec(regex_list_t * conf, char *str, char **plugins,
-	       int maxcount);
+int regex_exec(regex_list_t *list, const char *str,
+               void (*cb)(const char *name, void *data), void *data);
 
 #endif				/* REGEX_H */

@@ -14,6 +14,7 @@
 #include "common.h"
 #include "log-common.h"
 #include "server-logic.h"
+#include "file-server.h"
 
 
 typedef struct {
@@ -55,6 +56,9 @@ static int read_file(void *sdata, server_logic_client_t *client)
         monitor_fd_t *fd = (monitor_fd_t *) client;
         
         ret = prelude_io_read(fd->fd, buf, sizeof(buf));
+
+        printf("read ret %d\n", ret);
+        
         if ( ret == 0 ) {
                 sleep(1);
                 return 0;
@@ -90,12 +94,12 @@ int file_server_monitor_file(const char *file)
         int fd, ret;
         monitor_fd_t *new;
 
-        fd = open(file, O_RDONLY);
+        fd = open(file, O_RDONLY|O_NONBLOCK);
         if ( fd < 0 ) {
                 log(LOG_ERR, "couln't open %s for reading.\n", file);
                 return -1;
         }
-
+        
         ret = lseek(fd, 0, SEEK_END);
         if ( ret < 0 ) {
                 log(LOG_ERR, "couldn't seek to the end of the file.\n");
@@ -137,9 +141,6 @@ int file_server_monitor_file(const char *file)
 
 int file_server_new(queue_t *queue) 
 {
-        int ret;
-        const char *list;
-
         fserver = server_logic_new(queue, read_file, close_file);
         if ( ! fserver )
                 return -1;

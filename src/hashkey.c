@@ -28,14 +28,14 @@ struct hash_table {
 	int number_of_bindings;
 	hash_binding *hash_table;
 	hash_binding *cursor;
-	int (*equal) (void *k1, void *k2);
-	int (*hash) (void *key);
+	int (*equal) (const void *k1, const void *k2);
+	int (*hash) (const void *key);
 };
 
 struct hash_binding {
 	int hashval;
 	void *obj;
-	void *key;
+        const void *key;
 	hash_binding next;
 };
 
@@ -46,7 +46,7 @@ struct hash_binding {
 #define MIN_FILL_DEGREE 1
 
 hash_table
-hash_create(int (*hash) (void *key), int (*equal) (void *k1, void *k2))
+hash_create(int (*hash) (const void *key), int (*equal) (const void *k1, const void *k2))
 {
 	hash_table temp;
 	int i;
@@ -77,7 +77,7 @@ void hash_destroy(hash_table ht)
 	free(ht->hash_table);
 }
 
-int hash_position(hash_table ht, void *key)
+int hash_position(hash_table ht, const void *key)
 {
 	int index = (*(ht->hash)) (key) % ht->hash_table_size;
 	hash_binding *bind = &(ht->hash_table[index]);
