@@ -1,3 +1,36 @@
+2002-09-18  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/simple/ruleset/simple.rules: 
+	document User/UserID field usage.
+
+	* plugins/simple/simple.c (create_userid_type): 
+	(create_userid_name): 
+	(create_userid_number): 
+	(retrieve_latest_userid): 
+	(create_source_user): 
+	(create_target_user): 
+	(create_user_category): 
+	(parse_target_user_category): 
+	(parse_source_user_category): 
+	(parse_target_user_userid_type): 
+	(parse_source_user_userid_type): 
+	(parse_target_user_userid_name): 
+	(parse_source_user_userid_name): 
+	(parse_target_user_userid_number): 
+	(parse_source_user_userid_number): 
+	(parse_target_user_userid): 
+	(free_user): 
+	implemented.
+	(record_source_fields): handle User/UserID fields.
+	(parse_rule): only call store_runtime_variable if value is not NULL.
+
+	(free_rule): call free_user().
+
+	(parse_rule): update to handle User/UserID IDMEF object.
+
+	(filter_string): allow key without value (so that
+	they can be used as delimiter).
+
 2002-09-13  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/log-common.c: fix a solaris compilation problem

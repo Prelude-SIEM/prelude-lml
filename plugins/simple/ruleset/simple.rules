@@ -94,6 +94,27 @@
 # - source.service.portlist,
 #   target.service.portlist:
 #   A list of port numbers beeing used.
+#
+# - source.user.category,
+#   target.user.category:
+#   The type of user represented (unknown, application, os-device).
+#
+# - source.user.userid,
+#   target.user.userid:
+#   Create a new UserId inside an User object (that may contain several UserId).
+#
+# - source.user.userid.type,
+#   target.user.userid.type:
+#   The type of user information represented (current-user, original-user, target-user,
+#   user-privs, current-group, group-privs, other-privs).
+#
+# - source.user.userid.name,
+#   target.user.userid.name:
+#   A user or group name.
+#
+# - source.user.userid.number,
+#   target.user.userid.number:
+#   A user or group number.
 
 
 include = cisco.rules;
@@ -109,4 +130,3 @@ regex=PAM_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); class.name=Authentic
 regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.completion = succeeded; impact.type = other; impact.severity = medium; impact.description=A sniffer is probably running on this machine;
 
 regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tryed to log in using a non existing user;
-
