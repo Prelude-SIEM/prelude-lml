@@ -40,15 +40,15 @@
 #include "plugin-log-prv.h"
 
 
-static PRELUDE_LIST_HEAD(log_plugins_instance);
+static PRELUDE_LIST(log_plugins_instance);
 
 
 static int subscribe(prelude_plugin_instance_t *pi)
 {
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-        log(LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
-        prelude_linked_object_add((prelude_linked_object_t *) pi, &log_plugins_instance);
+        prelude_log(PRELUDE_LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        prelude_linked_object_add(&log_plugins_instance, (prelude_linked_object_t *) pi);
 
         return 0;
 }
@@ -59,7 +59,7 @@ static void unsubscribe(prelude_plugin_instance_t *pi)
 {
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-        log(LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        prelude_log(PRELUDE_LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
         prelude_linked_object_del((prelude_linked_object_t *) pi);
 }
 
@@ -99,14 +99,14 @@ int log_plugins_init(const char *dirname, int argc, char **argv)
                 if ( errno == ENOENT )
                         return 0;
 
-                log(LOG_ERR, "can't access %s.\n", dirname);
+                prelude_log(PRELUDE_LOG_ERR, "can't access %s.\n", dirname);
 
                 return -1;
         }
 
         ret = prelude_plugin_load_from_dir(dirname, subscribe, unsubscribe);
         if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't load plugin subsystem.\n");
+                prelude_log(PRELUDE_LOG_WARN, "couldn't load plugin subsystem.\n");
                 return -1;
         }
         

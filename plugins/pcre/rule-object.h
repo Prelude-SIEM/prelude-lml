@@ -32,7 +32,7 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
 
 rule_object_list_t *rule_object_list_new(void);
 
-int rule_object_list_empty(rule_object_list_t *olist);
+prelude_bool_t rule_object_list_is_empty(rule_object_list_t *olist);
 
 void rule_object_list_destroy(rule_object_list_t *olist);
 

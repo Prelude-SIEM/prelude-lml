@@ -64,7 +64,7 @@ static volatile sig_atomic_t got_sighup = 0;
 
 static void sig_handler(int signum)
 {
-        log(LOG_INFO, "\n\nCaught signal %d.\n", signum);
+        prelude_log(PRELUDE_LOG_WARN, "\n\nCaught signal %d.\n", signum);
         
         signal(signum, SIG_DFL);
 
@@ -97,7 +97,7 @@ static void handle_sighup_if_needed(void)
         if ( ! got_sighup )
                 return;
         
-        log(LOG_INFO, "- Restarting Prelude LML (%s).\n", global_argv[0]);
+        prelude_log(PRELUDE_LOG_WARN, "- Restarting Prelude LML (%s).\n", global_argv[0]);
 
         if ( config.udp_srvr )
                 /*
@@ -110,7 +110,7 @@ static void handle_sighup_if_needed(void)
          */
         ret = execvp(global_argv[0], global_argv);
         if ( ret < 0 ) {
-                log(LOG_ERR, "error re-executing lml\n");
+                prelude_log(PRELUDE_LOG_ERR, "error re-executing lml\n");
                 return;
         }
 }
@@ -186,7 +186,7 @@ static void wait_for_event(void)
                         if ( errno == EINTR )
                                 continue;
                         
-                        log(LOG_ERR, "select returned an error.\n");
+                        prelude_log(PRELUDE_LOG_ERR, "select returned an error.\n");
                         return;
                 }
                 
@@ -224,10 +224,10 @@ int main(int argc, char **argv)
         
         ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
         if (ret < 0) {
-                log(LOG_INFO, "error initializing logs plugins.\n");
+                prelude_log(PRELUDE_LOG_WARN, "error initializing logs plugins.\n");
                 return -1;
         }
-        log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
+        prelude_log(PRELUDE_LOG_INFO, "- Initialized %d logs plugins.\n", ret);
         
         ret = lml_options_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )

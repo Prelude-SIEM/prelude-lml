@@ -52,45 +52,70 @@ extern prelude_option_t *lml_root_optlist;
 
 static void debug_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry)
 {
+        int ret;
+        debug_plugin_t *plugin;
         idmef_alert_t *alert;
+        prelude_string_t *str;
         idmef_message_t *message;
         idmef_analyzer_t *analyzer;
-        prelude_string_t *analyzer_model, *analyzer_class;
         idmef_additional_data_t *adata;
-        prelude_string_t *adata_meaning;
-        debug_plugin_t *plugin;
 
         plugin = prelude_plugin_instance_get_data(pi);
 
-        message = idmef_message_new();
-        assert(message);
+        ret = idmef_message_new(&message);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating idmef message");
+                return;
+        }
 
-        alert = idmef_message_new_alert(message);
-        assert(alert);
+        ret = idmef_message_new_alert(message, &alert);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating idmef alert");
+                goto err;
+        }
 
-        analyzer = idmef_alert_new_analyzer(alert);
-        assert(analyzer);
+        ret = idmef_alert_new_analyzer(alert, &analyzer);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating idmef analyzer");
+                goto err;
+        }
 
-        analyzer_model = idmef_analyzer_new_model(analyzer);
-        prelude_string_set_constant(analyzer_model, "Prelude-LML Debug Plugin");
+        ret = idmef_analyzer_new_model(analyzer, &str);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating model string");
+                goto err;
+        }
+        prelude_string_set_constant(str, "Prelude-LML Debug Plugin");
 
-        analyzer_class = idmef_analyzer_new_class(analyzer);
-        prelude_string_set_constant(analyzer_class, "An alert for any log received");
+        ret = idmef_analyzer_new_class(analyzer, &str);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating class string");
+                goto err;
+        }
+        prelude_string_set_constant(str, "An alert for any log received");
 
-        adata = idmef_alert_new_additional_data(alert);
-        assert(adata);
-
+        ret = idmef_alert_new_additional_data(alert, &adata);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating idmef additional data");
+                goto err;
+        }
         idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
 
-        adata_meaning = idmef_additional_data_new_meaning(adata);
-        prelude_string_set_constant(adata_meaning, "log message");
-
+        ret = idmef_additional_data_new_meaning(adata, &str);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error creating meaning string");
+                goto err;
+        }
+        prelude_string_set_constant(str, "log message");
         idmef_additional_data_set_string_ref(adata, log_entry->original_log);
-
+        
         lml_emit_alert(log_entry, message, PRELUDE_MSG_PRIORITY_LOW);
 
         if ( plugin->out_stderr )
                 fprintf(stderr, "Debug: log received, log=%s\n", log_entry->original_log);
+
+ err:
+        idmef_message_destroy(message);
 }
 
 

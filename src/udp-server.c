@@ -55,7 +55,7 @@ void udp_server_process_event(udp_server_t *server)
 
         ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr *) &addr, &len);
         if ( ret < 0 ) {
-                log(LOG_ERR, "error receiving syslog message.\n");
+                prelude_log(PRELUDE_LOG_ERR, "error receiving syslog message.\n");
                 return;
         }
 
@@ -106,7 +106,7 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
 
         server = malloc(sizeof(*server));
         if ( ! server ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
@@ -118,7 +118,7 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
         
         server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if ( server->sockfd < 0 ) {
-                log(LOG_ERR, "couldn't create socket.\n");
+                prelude_log(PRELUDE_LOG_ERR, "couldn't create socket.\n");
                 free(server);
                 return NULL;
         }
@@ -126,7 +126,7 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
         
         ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
         if ( ret < 0 ) {
-                log(LOG_INFO, "couldn't resolve %s.\n", addr);
+                prelude_log(PRELUDE_LOG_WARN, "couldn't resolve %s.\n", addr);
                 udp_server_close(server);
                 return NULL;
         }
@@ -137,7 +137,7 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
 
         ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
         if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't bind to socket.\n");
+                prelude_log(PRELUDE_LOG_ERR, "couldn't bind to socket.\n");
                 udp_server_close(server);
                 return NULL;
         }

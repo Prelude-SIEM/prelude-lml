@@ -109,8 +109,8 @@ static int exec_regex(pcre_rule_t *rule, const log_entry_t *log_entry, int *ovec
 
         dprint("\nInput = %s\n", log_entry->message);
         
-        prelude_list_for_each(tmp, &rule->regex_list) {
-                item = prelude_linked_object_get_object(tmp, rule_regex_t);
+        prelude_list_for_each(&rule->regex_list, tmp) {
+                item = prelude_linked_object_get_object(tmp);
                                 
                 ret = do_pcre_exec(item, &real_ret, log_entry->message, log_entry->message_len,
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
@@ -185,7 +185,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
         else
                 state->reqmatch++;
 
-        prelude_list_for_each(tmp, &rule->rule_list) {
+        prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
                 ret = match_rule_list(child, state, log_entry);
@@ -236,19 +236,22 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
         new->regex = pcre_compile(regex, 0, &err_ptr, &err_offset, NULL);
         if ( ! new->regex ) {
-                log(LOG_INFO, "unable to compile regex: %s.\n", err_ptr);
+                prelude_log(PRELUDE_LOG_WARN, "unable to compile regex: %s.\n", err_ptr);
+                free(new);
                 return NULL;
         }
 
         new->regex_string = strdup(regex);
         if ( ! new->regex_string ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
+                free(new->regex);
+                free(new);
                 return NULL;
         }
 

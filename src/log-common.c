@@ -102,7 +102,7 @@ static int parse_ts(log_source_t *ls, const char *string, void **out)
         return 0;
 
  err:
-        log(LOG_INFO, "couldn't format \"%s\" using \"%s\".\n", string, ls->ts_fmt);
+        prelude_log(PRELUDE_LOG_WARN, "couldn't format \"%s\" using \"%s\".\n", string, ls->ts_fmt);
         return -1;
 }
 
@@ -130,7 +130,7 @@ static int parse_prefix(log_entry_t *log_entry)
                             log_entry->original_log, log_entry->original_log_len, 0, 0, ovector, sizeof(ovector) / sizeof(int));
         
         if ( matches < 0 ) {
-                log(LOG_ERR, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->original_log);
+                prelude_log(PRELUDE_LOG_WARN, "couldn't match log_prefix_regex against log entry: %s.\n", log_entry->original_log);
                 return -1;
         }
 
@@ -142,7 +142,7 @@ static int parse_prefix(log_entry_t *log_entry)
                         continue;
 
                 else if ( ret < 0 ) {
-                        log(LOG_ERR, "could not get referenced string: %d.\n", ret);
+                        prelude_log(PRELUDE_LOG_WARN, "could not get referenced string: %d.\n", ret);
                         return -1;
                 }
                 
@@ -154,7 +154,7 @@ static int parse_prefix(log_entry_t *log_entry)
                         free(string);
                         
                         if ( ret < 0 ) {
-                                log(LOG_ERR, "failed to parse prefix field: %s.\n", tbl[i].field);
+                                prelude_log(PRELUDE_LOG_WARN, "failed to parse prefix field: %s.\n", tbl[i].field);
                                 return -1;
                         }
                 }
@@ -186,7 +186,7 @@ log_entry_t *log_entry_new(log_source_t *source)
 
         log_entry = calloc(1, sizeof(*log_entry));
         if ( ! log_entry ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
@@ -207,7 +207,7 @@ int log_entry_set_log(log_entry_t *log_entry, const char *entry, size_t size)
         
         log_entry->original_log = strdup(entry);
         if ( ! log_entry->original_log ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
 
@@ -220,7 +220,7 @@ int log_entry_set_log(log_entry_t *log_entry, const char *entry, size_t size)
                 log_entry->target_hostname = get_hostname();
         
         if ( ret < 0 ) {
-                log(LOG_ERR, "failed to parse log message prefix.\n");
+                prelude_log(PRELUDE_LOG_WARN, "failed to parse log message prefix.\n");
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }
@@ -258,7 +258,7 @@ int log_source_set_name(log_source_t *ls, const char *name)
         
         ls->name = strdup(name);
         if ( ! ls->name ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
 
@@ -275,17 +275,17 @@ log_source_t *log_source_new(void)
         
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
         if ( log_source_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
-                log(LOG_ERR, "failed to set log timestamp format.\n");
+                prelude_log(PRELUDE_LOG_WARN, "failed to set log timestamp format.\n");
                 return NULL;
         }
 
         if ( log_source_set_prefix_regex(new, SYSLOG_PREFIX_REGEX) < 0 ) {
-                log(LOG_ERR, "failed to set log message prefix.\n");
+                prelude_log(PRELUDE_LOG_WARN, "failed to set log message prefix.\n");
                 return NULL;
         }
 
@@ -312,13 +312,13 @@ int log_source_set_prefix_regex(log_source_t *ls, const char *regex)
         
         ls->prefix_regex = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! ls->prefix_regex ) {
-                log(LOG_ERR, "Unable to compile regex: %s : %s.\n", regex, errptr);
+                prelude_log(PRELUDE_LOG_WARN, "Unable to compile regex: %s : %s.\n", regex, errptr);
                 return -1;
         }
 
         ls->prefix_regex_extra = pcre_study(ls->prefix_regex, 0, &errptr);
         if ( ! ls->prefix_regex_extra && errptr ) {
-                log(LOG_ERR, "Unable to study regex: %s : %s.\n", regex, errptr);
+                prelude_log(PRELUDE_LOG_WARN, "Unable to study regex: %s : %s.\n", regex, errptr);
                 return -1;
         }
 
@@ -335,7 +335,7 @@ int log_source_set_ts_fmt(log_source_t *ls, const char *fmt)
         
         ls->ts_fmt = strdup(fmt);
         if ( ! ls->ts_fmt ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
 

@@ -58,7 +58,7 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
 
         new = malloc(sizeof(*new));
         if ( ! new ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
@@ -66,7 +66,7 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
         new->regex_extra = NULL;
         new->options = 0;
 
-        prelude_list_add_tail(&new->list, list);
+        prelude_list_add_tail(list, &new->list);
 
         return new;
 }
@@ -101,7 +101,7 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
         
         compiled = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! compiled ) {
-                log(LOG_INFO, "%s:%d : unable to compile: %s.\n", REGEX_CONF, line, errptr);
+                prelude_log(PRELUDE_LOG_WARN, "%s:%d : unable to compile: %s.\n", REGEX_CONF, line, errptr);
                 return -1;
         }
         
@@ -117,13 +117,13 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
         entry->plugin = log_plugin_register(pname);
         if ( ! entry->plugin ) {
                 regex_entry_delete(entry);
-                log(LOG_INFO, "%s:%d : couldn't find plugin: %s.\n", REGEX_CONF, line, pname);
+                prelude_log(PRELUDE_LOG_WARN, "%s:%d : couldn't find plugin: %s.\n", REGEX_CONF, line, pname);
                 return -1;
         }
 
         plugin = prelude_plugin_instance_get_plugin(entry->plugin);
-        log(LOG_INFO, "- Monitoring %s through %s[%s]\n",
-            source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
+        prelude_log(PRELUDE_LOG_INFO, "- Monitoring %s through %s[%s]\n",
+                    source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
         
         /*
          * TBD: take care of options field
@@ -148,15 +148,15 @@ regex_list_t *regex_init(const char *source)
 
         conf = malloc(sizeof(*conf));
         if ( ! conf ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
         
-        PRELUDE_INIT_LIST_HEAD(conf);
+        prelude_list_init(conf);
 
         fd = fopen(REGEX_CONF, "r");
         if ( ! fd ) {
-                log(LOG_ERR, "couldn't open config file %s.\n", REGEX_CONF);
+                prelude_log(PRELUDE_LOG_ERR, "couldn't open config file %s.\n", REGEX_CONF);
                 return NULL;
         }
 
@@ -207,8 +207,8 @@ regex_list_t *regex_init(const char *source)
         
         fclose(fd);
 
-        if ( prelude_list_empty(conf) ) {
-                log(LOG_ERR, "No plugin configured to receive %s data.\n", source);
+        if ( prelude_list_is_empty(conf) ) {
+                prelude_log(PRELUDE_LOG_WARN, "No plugin configured to receive %s data.\n", source);
                 free(conf);
                 return NULL;
         }
@@ -224,7 +224,7 @@ void regex_destroy(regex_list_t *list)
         regex_entry_t *entry;
         prelude_list_t *tmp, *bkp;
 
-        prelude_list_for_each_safe(tmp, bkp, list) {
+        prelude_list_for_each_safe(list, tmp, bkp) {
                 entry = prelude_list_entry(tmp, regex_entry_t, list);
                 regex_entry_delete(entry);
         }
@@ -243,7 +243,7 @@ int regex_exec(regex_list_t *list,
         regex_entry_t *entry;
         int count, ovector[20 * 3];
         
-        prelude_list_for_each(tmp, list) {
+        prelude_list_for_each(list, tmp) {
                 entry = prelude_list_entry(tmp, regex_entry_t, list);
 
                 count = pcre_exec(entry->regex_compiled, entry->regex_extra,

@@ -70,7 +70,7 @@ static pcre_rule_container_t *create_rule_container(pcre_rule_t *rule)
 
         rc = calloc(1, sizeof(*rc));
         if ( ! rc ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
         
@@ -108,7 +108,7 @@ static int parse_rule_regex(pcre_plugin_t *plugin, pcre_rule_t *rule, const char
         if ( ! new )
                 return -1;
         
-        prelude_linked_object_add_tail((prelude_linked_object_t *) new, &rule->regex_list);
+        prelude_linked_object_add_tail(&rule->regex_list, (prelude_linked_object_t *) new);
         
         return 0;
 }
@@ -123,7 +123,7 @@ static int parse_rule_optregex(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
         if ( ! new )
                 return -1;
 
-        prelude_linked_object_add_tail((prelude_linked_object_t *) new, &rule->regex_list);
+        prelude_linked_object_add_tail(&rule->regex_list, (prelude_linked_object_t *) new);
         
         return 0;
 }
@@ -136,7 +136,7 @@ static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, pre
         prelude_list_t *tmp;
         pcre_rule_container_t *new, *cur;
         
-        prelude_list_for_each(tmp, &plugin->rule_list) {
+        prelude_list_for_each(&plugin->rule_list, tmp) {
                 cur = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
                 if ( cur->rule->id != id )
@@ -151,12 +151,12 @@ static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, pre
                 else
                         new->optional = TRUE;
                 
-                prelude_list_add_tail(&new->list, &rule->rule_list);
+                prelude_list_add_tail(&rule->rule_list, &new->list);
                 
                 return 0;
         }
         
-        log(LOG_ERR, "couldn't find a rule with ID %d.\n", id);
+        prelude_log(PRELUDE_LOG_WARN, "couldn't find a rule with ID %d.\n", id);
         
         return -1;
 }
@@ -168,7 +168,7 @@ static int add_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr,
         
         ret = sscanf(idstr, "%d-%d", &idmin, &idmax);
         if ( ret < 1 ) {
-                log(LOG_ERR, "could not parse goto value '%s'.\n", idstr);
+                prelude_log(PRELUDE_LOG_WARN, "could not parse goto value '%s'.\n", idstr);
                 return -1;
         }
 
@@ -258,7 +258,7 @@ static int parse_include(pcre_plugin_t *plugin, const char *value)
 
         fd = fopen(filename, "r");
         if ( ! fd ) {
-                log(LOG_ERR, "couldn't open %s for reading.\n", filename);
+                prelude_log(PRELUDE_LOG_ERR, "couldn't open %s for reading.\n", filename);
                 return -1;
         }
 
@@ -389,7 +389,7 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                         continue;
 
                 if ( keywords[i].func(plugin, rule, value) < 0 ) {
-                        log(LOG_INFO, "%s:%d: error parsing value for '%s'.\n", filename, line, keyword);
+                        prelude_log(PRELUDE_LOG_WARN, "%s:%d: error parsing value for '%s'.\n", filename, line, keyword);
                         return -1;
                 }
 
@@ -429,7 +429,7 @@ static pcre_rule_t *create_rule(void)
 
         rule = calloc(1, sizeof(*rule));
         if ( ! rule ) {
-                log(LOG_ERR, "memory exhausted.\n");
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
@@ -439,8 +439,8 @@ static pcre_rule_t *create_rule(void)
                 return NULL;
         }
         
-        PRELUDE_INIT_LIST_HEAD(&rule->rule_list);
-        PRELUDE_INIT_LIST_HEAD(&rule->regex_list);
+        prelude_list_init(&rule->rule_list);
+        prelude_list_init(&rule->regex_list);
 
         return rule;
 }
@@ -453,13 +453,13 @@ static void free_rule(pcre_rule_t *rule)
         prelude_list_t *tmp, *bkp;
         pcre_rule_container_t *rc;
         
-        prelude_list_for_each_safe(tmp, bkp, &rule->rule_list) {
+        prelude_list_for_each_safe(&rule->rule_list, tmp, bkp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 free_rule_container(rc);
         }
         
-        prelude_list_for_each_safe(tmp, bkp, &rule->regex_list) {
-                item = prelude_linked_object_get_object(tmp, rule_regex_t);
+        prelude_list_for_each_safe(&rule->regex_list, tmp, bkp) {
+                item = prelude_linked_object_get_object(tmp);
                 rule_regex_destroy(item);
         }
 
@@ -507,7 +507,7 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                         continue;
 
                 if ( parse_key_and_value(in, &key, &value) < 0 ) {
-                        log(LOG_INFO, "%s:%d: no string delimiter.\n", filename, line);
+                        prelude_log(PRELUDE_LOG_WARN, "%s:%d: no string delimiter.\n", filename, line);
                         return -1;
                 }
                 
@@ -530,8 +530,8 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                 }
         }
 
-        if ( prelude_list_empty(&rule->regex_list) ) {
-                log(LOG_ERR, "%s:%d: rule does not provide a regex.\n", filename, line);
+        if ( prelude_list_is_empty(&rule->regex_list) ) {
+                prelude_log(PRELUDE_LOG_WARN, "%s:%d: rule does not provide a regex.\n", filename, line);
                 free_rule(rule);
                 return -1;
         }
@@ -543,9 +543,9 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
         }
         
         if ( plugin->last_rules_first && rule->last )
-                prelude_list_add(&rc->list, &plugin->rule_list);
+                prelude_list_add(&plugin->rule_list, &rc->list);
         else
-                prelude_list_add_tail(&rc->list, &plugin->rule_list);
+                prelude_list_add_tail(&plugin->rule_list, &rc->list);
         
         plugin->rulesnum++;
 
@@ -594,7 +594,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const log_entry_t *log_entry
         
         plugin = prelude_plugin_instance_get_data(pi);
 
-        prelude_list_for_each(tmp, &plugin->rule_list) {
+        prelude_list_for_each(&plugin->rule_list, tmp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
                 ret = rule_regex_match(rc, log_entry);
@@ -653,9 +653,9 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *op
         if ( ret < 0 )
                 return -1;
 
-        log(LOG_INFO, "- pcre plugin added %d rules.\n", plugin->rulesnum);
+        prelude_log(PRELUDE_LOG_INFO, "- pcre plugin added %d rules.\n", plugin->rulesnum);
         
-        prelude_list_for_each_safe(tmp, bkp, &plugin->rule_list) {
+        prelude_list_for_each_safe(&plugin->rule_list, tmp, bkp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
 
                 if ( rc->rule->chained )
@@ -675,7 +675,7 @@ static int pcre_activate(void *context, prelude_option_t *opt, const char *optar
         if ( ! new )
                 return prelude_error_from_errno(errno);
 
-        PRELUDE_INIT_LIST_HEAD(&new->rule_list);
+        prelude_list_init(&new->rule_list);
         prelude_plugin_instance_set_data(context, new);
         
         return 0;
@@ -690,7 +690,7 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
         pcre_rule_container_t *rule;
         pcre_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
         
-        prelude_list_for_each_safe(tmp, bkp, &plugin->rule_list) {
+        prelude_list_for_each_safe(&plugin->rule_list, tmp, bkp) {
                 rule = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 free_rule_container(rule);
         }
