@@ -63,6 +63,12 @@ static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
 
 
+static int get_version(void *context, prelude_option_t *opt, char *buf, size_t size)
+{
+        snprintf(buf, size, "prelude-lml %s", VERSION);
+}
+
+
 static int print_version(void *context, prelude_option_t *opt, const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
@@ -282,7 +288,7 @@ int pconfig_set(int argc, char **argv)
 
 	prelude_option_add(NULL, CLI_HOOK|WIDE_HOOK, 'v', "version",
 			   "Print version number", no_argument,
-			   print_version, NULL);
+			   print_version, get_version);
 
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'q', "quiet",
 			   "Quiet mode", no_argument, set_quiet_mode,
