@@ -249,6 +249,8 @@ plugins/Makefile
 
 plugins/debug/Makefile
 plugins/pax/Makefile
+plugins/simple/Makefile
+plugins/simple/ruleset/Makefile
 
 ])
 
