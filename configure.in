@@ -98,22 +98,27 @@ dnl **************************************************
 dnl * Check for FAM.                                 *
 dnl **************************************************
 
+AC_ARG_ENABLE(fam, [  --enable-fam  Enable support for realtime file notification using FAM [default=auto]], 
+		   enable_fam="$enableval", enable_fam="$enableval")
+
 AC_ARG_WITH(fam, [  --with-fam=DIR          use DIR where fam is installed.],
             [FAM_CFLAGS="-I$withval/include"; FAM_LIBS="-L$withval/lib"])
 
-old_LDFLAGS=$LDFLAGS
-old_CPPFLAGS=$CPPFLAGS
-LDFLAGS="$LDFLAGS $FAM_LIBS"
-CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
+if test x$enable_fam = xyes; then
+   old_LDFLAGS=$LDFLAGS
+   old_CPPFLAGS=$CPPFLAGS
+   LDFLAGS="$LDFLAGS $FAM_LIBS"
+   CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
+   
+   AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
+   AC_CHECK_LIB(fam, main, , fam_lib_ok="no")
 
-AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
-AC_CHECK_LIB(fam, main, , fam_lib_ok="no")
-
-if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then 
-   	enable_fam=no;
-else
+   if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then 
+      	enable_fam=no;
+   else
 	enable_fam=yes;
 	AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
+   fi
 fi
 
 AC_SUBST(FAM_LIBS)
