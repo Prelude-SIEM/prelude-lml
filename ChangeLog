@@ -1,5 +1,15 @@
 2004-02-01  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* src/file-server.c: 
+	* src/pconfig.c (set_file): 
+	* src/log-common.c:
+	big sanitization of the API.
+	
+	* plugins/simple/simple.c (parse_ruleset_directive): 
+	if an inclusion file, do not ignore other file.
+	
+2004-02-01  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+		
 	* src/udp-server.c (udp_server_process_event): 
 	use log_file_set_source().
 	(udp_server_process_event): remove trailling syslog

@@ -33,17 +33,16 @@
 
 struct udp_server {
 	int sockfd;
-        log_file_t *lf;
+        log_source_t *ls;
 	struct sockaddr_in saddr;
 };
-
 
 
 
 void udp_server_process_event(udp_server_t *server, regex_list_t *list)
 {
         int len, ret;
-        char src[512], *sptr;
+        char src[512];
         struct sockaddr_in addr;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
         
@@ -58,7 +57,7 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
         buf[ret] = '\0';
         
         snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);        
-        log_file_set_source(server->lf, src);
+        log_source_set_name(server->ls, src);
 
         /*
          * we don't care about syslog priority / facility.
@@ -69,7 +68,7 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
         else 
                 ptr = buf;
         
-        lml_dispatch_log(list, server->lf, ptr);
+        lml_dispatch_log(list, server->ls, ptr);
 }
 
 
@@ -103,8 +102,8 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 return NULL;
         }
         
-        server->lf = log_file_new();
-        if ( ! server->lf )
+        server->ls = log_source_new();
+        if ( ! server->ls )
                 return NULL;
         
 	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -139,7 +138,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 return NULL;
 	}
 
-        log(LOG_INFO, "- syslog server created on %s:%d.\n", addr, port);
+        log(LOG_INFO, "- Listening for syslog message on %s:%d.\n", addr, port);
                 
 	return server;
 }

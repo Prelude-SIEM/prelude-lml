@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -28,7 +28,7 @@ void file_server_set_batch_mode(void);
 
 int file_server_wake_up(regex_list_t *list);
 
-int file_server_monitor_file(log_file_t *lf);
+int file_server_monitor_file(log_source_t *ls);
 
 void file_server_start_monitoring(regex_list_t *list);
 

@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * Copyright (C) 2003 Nicolas Delon <delon.nicolas@wanadoo.fr>
 * All Rights Reserved
 *
@@ -612,8 +612,10 @@ static int parse_ruleset_directive(const char *filename, int line, char *buf)
                 }
                 
                 if ( first_directive ) {
-			if ( strcmp(key, "include") == 0 )
-				return parse_include(value);
+			if ( strcmp(key, "include") == 0 ) {
+                                parse_include(value);
+                                return 0;
+                        }
                         
 			rule = create_rule();
 			if ( ! rule )

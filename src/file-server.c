@@ -91,7 +91,7 @@
 
 
 typedef struct {
-        log_file_t *lf;
+        log_source_t *source;
         
         FILE *fd;
         FILE *metadata_fd;
@@ -142,19 +142,15 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_time_t *time;
         idmef_inode_t *inode;
         log_container_t *log;
-        const char *filename;
         idmef_alert_t *alert;
         idmef_target_t *target;
         idmef_message_t *message;
         idmef_assessment_t *assessment;
-		idmef_string_t *string;
+        idmef_string_t *string;
         
-        log = log_container_new();
+        log = log_container_new(fd->source);
         if ( ! log )
                 return;
-
-        filename = log_file_get_filename(fd->lf);
-        log_container_set_source(log, filename);
         
         message = idmef_message_new();
         if ( ! message )
@@ -183,7 +179,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
                 goto err;
 
         idmef_inode_set_number(inode, st->st_ino);
-        snprintf(buf, sizeof(buf), "%s", filename);
+        snprintf(buf, sizeof(buf), "%s", log_source_get_name(fd->source));
 
         ptr = strrchr(buf, '/');
         if ( ptr ) {
@@ -280,7 +276,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         
         offptr = strchr(buf, ':');
         if ( ! offptr ) {
-                log(LOG_ERR, "%s: Invalid metadata file.\n", log_file_get_filename(monitor->lf), line);
+                log(LOG_ERR, "%s: Invalid metadata file.\n", log_source_get_name(monitor->source), line);
                 ftruncate(fileno(monitor->metadata_fd), 0);
                 return -1;
         }
@@ -333,7 +329,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         char buf[1024], sumline[METADATA_MAXSIZE], *sumptr;
 
         sumptr = sumline;
-        filename = log_file_get_filename(monitor->lf);
+        filename = log_source_get_name(monitor->source);
         
         ret = file_metadata_read(monitor, &offset, &sumptr, sizeof(sumline));
         if ( ret == 0 )
@@ -388,7 +384,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         int ret;
         char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
 
-        strncpy(file, log_file_get_filename(monitor->lf), sizeof(file));
+        strncpy(file, log_source_get_name(monitor->source), sizeof(file));
 
         while ( (ptr = strchr(file, '/')) )
                 *ptr = '-'; /* strip */
@@ -499,7 +495,7 @@ static int check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct 
 
                 eventno++;
                 
-                lml_dispatch_log(list, monitor->lf, monitor->buf);
+                lml_dispatch_log(list, monitor->source, monitor->buf);
                 file_metadata_save(monitor, st->st_size - len);
                 
                 len -= rlen;
@@ -527,7 +523,7 @@ static int check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct 
 
 
 
-static monitor_fd_t *monitor_new(log_file_t *lf) 
+static monitor_fd_t *monitor_new(log_source_t *ls) 
 {
         int ret;
         monitor_fd_t *new;
@@ -538,7 +534,7 @@ static monitor_fd_t *monitor_new(log_file_t *lf)
                 return NULL;
         }
 
-        new->lf = lf;
+        new->source = ls;
         
         ret = file_metadata_open(new);
         if ( ret < 0 ) {
@@ -580,7 +576,7 @@ static int monitor_open(monitor_fd_t *monitor)
                 return -1;
 #endif
 
-        filename = log_file_get_filename(monitor->lf);
+        filename = log_source_get_name(monitor->source);
         
         if ( strcmp(filename, STDIN_FILENAME) == 0 )
                 monitor->fd = stdin;
@@ -669,9 +665,9 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         const char *filename;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
-		idmef_string_t *classification_name, *impact_description;
+        idmef_string_t *classification_name, *impact_description;
 
-        filename = log_file_get_filename(monitor->lf);
+        filename = log_source_get_name(monitor->source);
         
 	/*
          * test if the file has been removed
@@ -878,7 +874,7 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
         if ( ret < 0 )
                 return 0;
 
-        filename = log_file_get_filename(monitor->lf);
+        filename = log_source_get_name(monitor->source);
         
         ret = FAMMonitorFile(&fc, filename, &monitor->fam_request, monitor);
         if ( ret < 0 ) {
@@ -978,7 +974,7 @@ static int process_file_event(regex_list_t *list, monitor_fd_t *monitor)
 
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
-                log(LOG_ERR, "couldn't fstat '%s'.\n", log_file_get_filename(monitor->lf));
+                log(LOG_ERR, "couldn't fstat '%s'.\n", log_source_get_name(monitor->source));
                 return -1;
         }
         
@@ -1000,7 +996,7 @@ static int process_file_event(regex_list_t *list, monitor_fd_t *monitor)
 
 
 
-int file_server_monitor_file(log_file_t *lf) 
+int file_server_monitor_file(log_source_t *ls) 
 {
         monitor_fd_t *new;
         
@@ -1010,7 +1006,7 @@ int file_server_monitor_file(log_file_t *lf)
          * FAM notification (if enabled).
          */
         
-        new = monitor_new(lf);
+        new = monitor_new(ls);
         if ( ! new )
                 return -1;
         

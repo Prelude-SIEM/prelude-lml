@@ -160,33 +160,39 @@ static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
 static int set_file(prelude_option_t *opt, const char *arg) 
 {
         int ret;
-        log_file_t *lf;
+        log_source_t *ls;
         
-        lf = log_file_new();
-        if ( ! lf )
+        ls = log_source_new();
+        if ( ! ls )
                 return prelude_option_error;
 
         if ( logfile_format ) {
-                ret = log_file_set_log_fmt(lf, logfile_format);
+                ret = log_source_set_log_fmt(ls, logfile_format);
                 if ( ret < 0 )
                         return prelude_option_error;
         }
 
         if ( logfile_ts_format ) {
-                ret = log_file_set_timestamp_fmt(lf, logfile_ts_format);
+                ret = log_source_set_timestamp_fmt(ls, logfile_ts_format);
                 if ( ret < 0 )
                         return prelude_option_error;
         }
         
-        ret = log_file_set_filename(lf, arg);
+        ret = access(arg, R_OK);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "%s does not exist or have wrong permissions: check your configuration.\n", arg);
+                return -1;
+        }
+        
+        ret = log_source_set_name(ls, arg);
         if ( ret < 0 ) 
                 return prelude_option_error;
         
-        ret = file_server_monitor_file(lf);
+        ret = file_server_monitor_file(ls);
         if ( ret < 0 ) 
                 return prelude_option_error;
         
-        log(LOG_INFO, "- Added monitor for '%s' in %p.\n", arg, lf);
+        log(LOG_INFO, "- Added monitor for '%s' in %p.\n", arg, ls);
         
         return prelude_option_success;
 }
@@ -341,13 +347,6 @@ int pconfig_set(int argc, char **argv)
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'b', "batchmode",
                            "Tell LML to run in batch mode", no_argument,
                            set_batch_mode, NULL);
-
-#if 0
-        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'w', "logwatch",
-                                 "Specify a file to monitor (you might specify \"stdin\")",
-                                 no_argument, set_logwatch, NULL);
-        prelude_option_set_priority(opt, option_run_first);
-#endif
         
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 't', "time-format", 
                            "Specify the input timestamp format", required_argument,

@@ -115,18 +115,15 @@ static void regex_match_cb(void *plugin, void *log)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, log_file_t *lf, const char *str)
+void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str)
 {
         log_container_t *log;
         
-        log = log_container_new();
+        log = log_container_new(ls);
         if ( ! log )
                 return;
         
-        log_container_set_log(lf, log, str);        
-        log_container_set_source(log, log_file_get_filename(lf));
-
-        dprint("[MSGRD] received <%s> from %s\n", str, from);
+        log_container_set_log(log, str);
 
         regex_exec(list, log->log, &regex_match_cb, log);
         log_container_delete(log);

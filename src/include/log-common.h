@@ -2,46 +2,42 @@
 #define LOG_COMMON_H
 
 
-typedef struct log_file_s log_file_t;
+typedef struct log_source_s log_source_t;
 
 
 typedef struct {
-        char *log;
-	char *source;
-        
+        char *log;        
         struct timeval tv;
 
         char *target_user;
         char *target_program;
         char *target_hostname;
+
+        log_source_t *source;
         
 } log_container_t;
 
 
 
-log_container_t *log_container_new(void);
+log_container_t *log_container_new(log_source_t *source);
 
-int log_container_set_log(log_file_t *lf, log_container_t *lc, const char *entry);
+int log_container_set_log(log_container_t *lc, const char *entry);
 
-int log_container_set_source(log_container_t *lc, const char *source);
-
-void log_container_delete(log_container_t * lc);
+void log_container_delete(log_container_t *lc);
 
 
-log_file_t *log_file_new(void);
+log_source_t *log_source_new(void);
 
-const char *log_file_get_format(log_file_t *lf);
+const char *log_source_get_format(log_source_t *ls);
 
-const char *log_file_get_filename(log_file_t *lf);
+const char *log_source_get_source(log_source_t *ls);
 
+const char *log_source_get_name(log_source_t *ls);
 
+int log_source_set_name(log_source_t *ls, const char *name);
 
-int log_file_set_source(log_file_t *lf, const char *source);
+int log_source_set_log_fmt(log_source_t *ls, const char *fmt);
 
-int log_file_set_filename(log_file_t *lf, const char *filename);
-
-int log_file_set_log_fmt(log_file_t *lf, const char *fmt);
-
-int log_file_set_timestamp_fmt(log_file_t *lf, const char *fmt);
+int log_source_set_timestamp_fmt(log_source_t *lf, const char *fmt);
 
 #endif

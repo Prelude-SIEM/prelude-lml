@@ -4,7 +4,7 @@
 #include "regex.h"
 #include "log-common.h"
 
-void lml_dispatch_log(regex_list_t *list, log_file_t *lf, const char *str);
+void lml_dispatch_log(regex_list_t *list, log_source_t *ls, const char *str);
 
 
 #ifdef DEBUG

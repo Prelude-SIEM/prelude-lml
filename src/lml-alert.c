@@ -289,10 +289,11 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 
 void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_t priority)
 {
+        const char *source;
         idmef_alert_t *alert;
 	idmef_time_t *create_time;
 	idmef_time_t *detect_time;
-
+        
 	alert = idmef_message_get_alert(message);
 
 	create_time = idmef_time_new_gettimeofday();
@@ -318,7 +319,8 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
         /*
          *
          */
-	if ( generate_additional_data(alert, "Log received from", log->source) < 0 )
+        source = log_source_get_name(log->source);
+	if ( generate_additional_data(alert, "Log received from", source) < 0 )
 		goto error;
 
         /*
