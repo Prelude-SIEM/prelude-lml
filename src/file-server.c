@@ -599,6 +599,7 @@ int file_server_standalone(regex_list_t *list)
                 while ( 1 ) {
                         file_server_wake_up(list);
                         sleep(1);
+                        prelude_wake_up_timer();
                 }
         }
 
