@@ -13,6 +13,7 @@
 
 #include <libprelude/common.h>
 #include <libprelude/prelude-log.h>
+#include <libprelude/prelude-list.h>
 
 #include "common.h"
 #include "regex.h"

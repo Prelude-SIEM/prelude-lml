@@ -4,8 +4,7 @@
 #include <limits.h>
 #include <pcre.h>
 
-typedef struct list_head regex_list_t;
-typedef struct regex_entry regex_entry_t;
+typedef prelude_list_t regex_list_t;
 
 regex_list_t *regex_init(char *filename);
 

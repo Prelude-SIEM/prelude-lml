@@ -34,7 +34,6 @@
 #include <assert.h>
 #include <inttypes.h>
 
-#include <libprelude/list.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/config-engine.h>
 #include <libprelude/prelude-io.h>

@@ -31,7 +31,6 @@
 #include <pcre.h>
 #include <netdb.h>
 
-#include <libprelude/list.h>
 #include <libprelude/common.h>
 #include <libprelude/idmef.h>
 #include <libprelude/prelude-strbuf.h>
@@ -53,7 +52,7 @@
 
 
 typedef struct {
-	struct list_head list;
+	prelude_list_t list;
         
 	char *value;
 } rule_object_value_t;
@@ -61,16 +60,16 @@ typedef struct {
 
 
 typedef struct {
-	struct list_head list;
+	prelude_list_t list;
         
 	idmef_object_t *object;
-	struct list_head rule_object_value_list;
+	prelude_list_t rule_object_value_list;
 } rule_object_t;
 
 
 
 typedef struct {
-	struct list_head list;
+	prelude_list_t list;
 
         int refno;
 	char **value;
@@ -79,7 +78,7 @@ typedef struct {
 
 
 typedef struct {
-	struct list_head list;
+	prelude_list_t list;
 
 	pcre *regex;
 	pcre_extra *extra;
@@ -90,14 +89,14 @@ typedef struct {
 	int last;
 	char *regex_string;
 
-	struct list_head rule_object_list;
-	struct list_head references_list;
+	prelude_list_t rule_object_list;
+        prelude_list_t references_list;
 } simple_rule_t;
 
 
 typedef struct {
         int rulesnum;
-        struct list_head rule_list;
+        prelude_list_t rule_list;
         char *rulesetdir;
         int last_rules_first;
 } simple_plugin_t;
@@ -131,7 +130,7 @@ static int rule_reference_value_add(simple_rule_t *rule, unsigned int reference,
 	reference_value->value = value;
         reference_value->refno = reference;
         
-	list_add_tail(&reference_value->list, &rule->references_list);
+	prelude_list_add_tail(&reference_value->list, &rule->references_list);
 
 	return 0;
 }
@@ -140,11 +139,11 @@ static int rule_reference_value_add(simple_rule_t *rule, unsigned int reference,
 
 static void free_rule_reference_value_list_content(simple_rule_t *rule)
 {
-	struct list_head *tmp;
+	prelude_list_t *tmp;
 	rule_reference_value_t *reference_value;
 	
-        list_for_each(tmp, &rule->references_list) {
-                reference_value = list_entry(tmp, rule_reference_value_t, list);
+        prelude_list_for_each(tmp, &rule->references_list) {
+                reference_value = prelude_list_entry(tmp, rule_reference_value_t, list);
 
                 free(*reference_value->value);
                 *reference_value->value = NULL;
@@ -157,10 +156,10 @@ static void free_rule_reference_value_list_content(simple_rule_t *rule)
 static void free_rule_object_list(simple_rule_t *rule)
 {
 	rule_object_t *object;
-	struct list_head *tmp, *bkp;
+	prelude_list_t *tmp, *bkp;
         
-        list_for_each_safe(tmp, bkp, &rule->rule_object_list) {
-                object = list_entry(tmp, rule_object_t, list);
+        prelude_list_for_each_safe(tmp, bkp, &rule->rule_object_list) {
+                object = prelude_list_entry(tmp, rule_object_t, list);
                 
                 idmef_object_destroy(object->object);
                 free(object);
@@ -175,12 +174,12 @@ static void resolve_rule_reference_value_list(const log_container_t *log,
 {
 	 int ret;
 	 char buf[1024];
-         struct list_head *tmp;
+         prelude_list_t *tmp;
 	 rule_reference_value_t *rval;
          
-         list_for_each(tmp, &rule->references_list) {
+         prelude_list_for_each(tmp, &rule->references_list) {
                  
-                 rval = list_entry(tmp, rule_reference_value_t, list);
+                 rval = prelude_list_entry(tmp, rule_reference_value_t, list);
                  
                  ret = pcre_copy_substring(log->log, ovector, osize, rval->refno, buf, sizeof(buf));
                  if ( ret < 0 ) {
@@ -418,7 +417,7 @@ static int add_dynamic_object_value(simple_rule_t *rule, rule_object_t *rule_obj
 		return -1;
 	}
 
-	list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
+	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 
 	return 0;		
 }
@@ -438,7 +437,7 @@ static int add_fixed_object_value(rule_object_t *rule_object, prelude_strbuf_t *
 	prelude_strbuf_dont_own(strbuf);
 	rovalue->value = prelude_strbuf_get_string(strbuf);
 
-	list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
+	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 
 	return 0;
 }
@@ -531,7 +530,7 @@ static int parse_rule_object(simple_rule_t *rule,
 		return -1;
 	}
 
-	INIT_LIST_HEAD(&rule_object->rule_object_value_list);
+	PRELUDE_INIT_LIST_HEAD(&rule_object->rule_object_value_list);
 	rule_object->object = object;
 
 	if ( parse_rule_object_value(rule, rule_object, value) < 0 ) {
@@ -540,7 +539,7 @@ static int parse_rule_object(simple_rule_t *rule,
 		return -1;
 	}
 
-	list_add_tail(&rule_object->list, &rule->rule_object_list);
+	prelude_list_add_tail(&rule_object->list, &rule->rule_object_list);
 
 	return 0;
 }
@@ -578,8 +577,8 @@ static simple_rule_t *create_rule(void)
 		return NULL;
 	}
 
-        INIT_LIST_HEAD(&rule->references_list);
-	INIT_LIST_HEAD(&rule->rule_object_list);
+        PRELUDE_INIT_LIST_HEAD(&rule->references_list);
+	PRELUDE_INIT_LIST_HEAD(&rule->rule_object_list);
 
 	return rule;
 }
@@ -661,9 +660,9 @@ static int parse_ruleset_directive(simple_plugin_t *plugin, const char *filename
 	}
 
         if ( plugin->last_rules_first && rule->last )
-                list_add(&rule->list, &plugin->rule_list);
+                prelude_list_add(&rule->list, &plugin->rule_list);
         else
-                list_add_tail(&rule->list, &plugin->rule_list);
+                prelude_list_add_tail(&rule->list, &plugin->rule_list);
         
 	plugin->rulesnum++;
 
@@ -720,18 +719,18 @@ static int strrncmp(const char *s1, const char *s2)
 
 static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 {
-	rule_object_value_t *rovalue;
-	idmef_value_t *value;
-	prelude_strbuf_t *strbuf;
-	struct list_head *tmp;
 	char *str;
+        prelude_list_t *tmp;
+        idmef_value_t *value;
+	prelude_strbuf_t *strbuf;
+	rule_object_value_t *rovalue;
 
 	strbuf = prelude_strbuf_new();
 	if ( ! strbuf )
 		return NULL;
 
-	list_for_each(tmp, &rule_object->rule_object_value_list) {
-		rovalue = list_entry(tmp, rule_object_value_t, list);
+	prelude_list_for_each(tmp, &rule_object->rule_object_value_list) {
+		rovalue = prelude_list_entry(tmp, rule_object_value_t, list);
 
                 if ( prelude_strbuf_cat(strbuf, rovalue->value) < 0 ) {
 			prelude_strbuf_destroy(strbuf);
@@ -765,18 +764,18 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 static idmef_message_t *build_message(simple_rule_t *rule)
 {
+        int ret;
+        prelude_list_t *tmp;
+        idmef_value_t *value;
 	idmef_message_t *message;
-	struct list_head *tmp;
 	rule_object_t *rule_object;
-	idmef_value_t *value;
-	int ret;
 
 	message = idmef_message_new();
 	if ( ! message )
 		return NULL;
 
-	list_for_each(tmp, &rule->rule_object_list) {
-		rule_object = list_entry(tmp, rule_object_t, list);
+	prelude_list_for_each(tmp, &rule->rule_object_list) {
+		rule_object = prelude_list_entry(tmp, rule_object_t, list);
 
                 value = build_message_object_value(rule_object);
 		if ( ! value ) {
@@ -785,11 +784,11 @@ static idmef_message_t *build_message(simple_rule_t *rule)
                 }
 
 		ret = idmef_message_set(message, rule_object->object, value);
-
+                
 		idmef_value_destroy(value);
 
 		if ( ret < 0 ) {
-			log(LOG_ERR, "idmef_message_set failed.\n");
+			log(LOG_ERR, "idmef_message_set failed for %s.\n", idmef_object_get_name(rule_object->object));
 			idmef_message_destroy(message);
 			return NULL;
 		}
@@ -804,14 +803,14 @@ static void simple_run(prelude_plugin_instance_t *pi, const log_container_t *log
 {
         int ret;
         simple_rule_t *rule;
-        struct list_head *tmp;
+        prelude_list_t *tmp;
         simple_plugin_t *plugin;
         int ovector[MAX_REFERENCE_PER_RULE * 3];
 
         plugin = prelude_plugin_instance_get_data(pi);
         
-        list_for_each(tmp, &plugin->rule_list) {
-                rule = list_entry(tmp, simple_rule_t, list);
+        prelude_list_for_each(tmp, &plugin->rule_list) {
+                rule = prelude_list_entry(tmp, simple_rule_t, list);
 
 		ret = pcre_exec(rule->regex, rule->extra, log->log,
                                 strlen(log->log), 0, 0, ovector, sizeof(ovector) / sizeof(int) );
@@ -820,7 +819,7 @@ static void simple_run(prelude_plugin_instance_t *pi, const log_container_t *log
 
                 resolve_rule_reference_value_list(log, rule, ovector, ret);
 
-                if ( ! list_empty(&rule->rule_object_list) ) 
+                if ( ! prelude_list_empty(&rule->rule_object_list) ) 
                         lml_emit_alert(log, build_message(rule), PRELUDE_MSG_PRIORITY_MID);
                 
                 free_rule_reference_value_list_content(rule);
@@ -894,7 +893,7 @@ static int simple_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt,
                 return prelude_option_error;
         }
 
-        INIT_LIST_HEAD(&new->rule_list);
+        PRELUDE_INIT_LIST_HEAD(&new->rule_list);
         prelude_plugin_instance_set_data(pi, new);
         
         return prelude_option_success;
@@ -906,11 +905,11 @@ static int simple_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt,
 static void simple_destroy(prelude_plugin_instance_t *pi)
 {
         simple_rule_t *rule;
-        struct list_head *tmp, *bkp;
+        prelude_list_t *tmp, *bkp;
         simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
         
-        list_for_each_safe(tmp, bkp, &plugin->rule_list) {
-                rule = list_entry(tmp, simple_rule_t, list);
+        prelude_list_for_each_safe(tmp, bkp, &plugin->rule_list) {
+                rule = prelude_list_entry(tmp, simple_rule_t, list);
                 free_rule(rule);
         }
         

@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include <libprelude/list.h>
 #include <libprelude/idmef.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>

@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <inttypes.h>
 
-#include <libprelude/list.h>
+#include <libprelude/prelude-list.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
@@ -19,13 +19,13 @@
 #include "plugin-log-prv.h"
 
 
-struct regex_entry {
+typedef struct {
         pcre *regex_compiled;
         pcre_extra *regex_extra;
         int options;
         prelude_plugin_instance_t *plugin;
-        struct list_head list;
-};
+        prelude_list_t list;
+} regex_entry_t;
 
 
 
@@ -72,7 +72,7 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
         new->regex_extra = NULL;
         new->options = 0;
 
-        list_add_tail(&new->list, list);
+        prelude_list_add_tail(&new->list, list);
 
         return new;
 }
@@ -82,7 +82,7 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
 
 static void regex_entry_delete(regex_entry_t *entry)
 {
-        list_del(&entry->list);
+        prelude_list_del(&entry->list);
 
         if ( entry->regex_compiled )
                 pcre_free(entry->regex_compiled);
@@ -152,7 +152,7 @@ regex_list_t *regex_init(char *filename)
                 return NULL;
         }
         
-        INIT_LIST_HEAD(conf);
+        PRELUDE_INIT_LIST_HEAD(conf);
 
         fd = fopen(filename, "r");
         if ( ! fd ) {
@@ -206,10 +206,10 @@ regex_list_t *regex_init(char *filename)
 void regex_destroy(regex_list_t *list)
 {
         regex_entry_t *entry;
-        struct list_head *tmp, *bkp;
+        prelude_list_t *tmp, *bkp;
 
-        list_for_each_safe(tmp, bkp, list) {
-                entry = list_entry(tmp, regex_entry_t, list);
+        prelude_list_for_each_safe(tmp, bkp, list) {
+                entry = prelude_list_entry(tmp, regex_entry_t, list);
                 regex_entry_delete(entry);
         }
         
@@ -222,12 +222,12 @@ void regex_destroy(regex_list_t *list)
 int regex_exec(regex_list_t *list, const char *str,
                void (*cb)(void *plugin, void *data), void *data)
 {
+        prelude_list_t *tmp;
         regex_entry_t *entry;
-        struct list_head *tmp;
         int count, ovector[20 * 3];
         
-        list_for_each(tmp, list) {
-                entry = list_entry(tmp, regex_entry_t, list);
+        prelude_list_for_each(tmp, list) {
+                entry = prelude_list_entry(tmp, regex_entry_t, list);
 
                 count = pcre_exec(entry->regex_compiled, entry->regex_extra,
                                   str, strlen(str), 0, 0, ovector, 20 * 3);

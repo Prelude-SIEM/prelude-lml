@@ -40,6 +40,7 @@
  #include <fam.h>
 #endif
 
+#include <libprelude/prelude-list.h>
 #include <libprelude/timer.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
@@ -106,7 +107,7 @@ typedef struct {
         off_t last_size;
 
         time_t last_mtime;
-        struct list_head list;
+        prelude_list_t list;
 
 #ifdef HAVE_FAM
         FAMRequest fam_request;
@@ -128,8 +129,8 @@ static FAMConnection fc;
 
 static int batch_mode = 0;
 static int fam_initialized = 0;
-static LIST_HEAD(active_fd_list);
-static LIST_HEAD(inactive_fd_list);
+static PRELUDE_LIST_HEAD(active_fd_list);
+static PRELUDE_LIST_HEAD(inactive_fd_list);
 static int rotation_interval_max_difference = DEFAULT_ROTATION_INTERVAL_MAX_DIFFERENCE;
 
 
@@ -542,7 +543,7 @@ static monitor_fd_t *monitor_new(log_source_t *ls)
                 return NULL;
         }
         
-        list_add(&new->list, &inactive_fd_list);
+        prelude_list_add(&new->list, &inactive_fd_list);
 
         return new;
 }
@@ -555,7 +556,7 @@ static void monitor_destroy(monitor_fd_t *monitor)
         if ( monitor->fd )
                 fclose(monitor->fd);
         
-        list_del(&monitor->list);
+        prelude_list_del(&monitor->list);
 
         free(monitor->file);
         
@@ -595,8 +596,8 @@ static int monitor_open(monitor_fd_t *monitor)
         monitor->index = 0;
         monitor->need_more_read = 0;
         
-        list_del(&monitor->list);
-        list_add_tail(&monitor->list, &active_fd_list);
+        prelude_list_del(&monitor->list);
+        prelude_list_add_tail(&monitor->list, &active_fd_list);
 
         return 0;
 }
@@ -606,10 +607,10 @@ static int monitor_open(monitor_fd_t *monitor)
 
 static void try_reopening_inactive_monitor(void) 
 {
-        struct list_head *tmp, *bkp;
+        prelude_list_t *tmp, *bkp;
 
-        list_for_each_safe(tmp, bkp, &inactive_fd_list) 
-                monitor_open(list_entry(tmp, monitor_fd_t, list));
+        prelude_list_for_each_safe(tmp, bkp, &inactive_fd_list) 
+                monitor_open(prelude_list_entry(tmp, monitor_fd_t, list));
 }
 
 
@@ -695,25 +696,25 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         fclose(monitor->fd);
         monitor->fd = NULL;
         
-        list_del(&monitor->list);
-        list_add_tail(&monitor->list, &inactive_fd_list);
+        prelude_list_del(&monitor->list);
+        prelude_list_add_tail(&monitor->list, &inactive_fd_list);
 
-		classification = idmef_classification_new();
-		if ( ! classification )
-			return -1;
-
-		impact = idmef_impact_new();
-		if ( ! impact ) {
-			idmef_classification_destroy(classification);
-			return -1;
-		}
-
-		idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
-		classification_name = idmef_classification_new_name(classification);
-		idmef_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
-
-		idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
-		idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
+        classification = idmef_classification_new();
+        if ( ! classification )
+                return -1;
+        
+        impact = idmef_impact_new();
+        if ( ! impact ) {
+                idmef_classification_destroy(classification);
+                return -1;
+        }
+        
+        idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
+        classification_name = idmef_classification_new_name(classification);
+        idmef_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
+        
+        idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
+        idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
         if ( is_normal_log_rotation(monitor, st) == 0 ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_MEDIUM);
@@ -1019,7 +1020,7 @@ int file_server_wake_up(regex_list_t *list)
 {
         int ret = -1, event;
         monitor_fd_t *monitor;
-        struct list_head *tmp, *bkp;
+        prelude_list_t *tmp, *bkp;
         
         if ( fam_initialized != 1 || batch_mode ) {
                 /*
@@ -1027,8 +1028,8 @@ int file_server_wake_up(regex_list_t *list)
                  */
                 try_reopening_inactive_monitor();
                 
-                list_for_each_safe(tmp, bkp, &active_fd_list) {
-                        monitor = list_entry(tmp, monitor_fd_t, list);                        
+                prelude_list_for_each_safe(tmp, bkp, &active_fd_list) {
+                        monitor = prelude_list_entry(tmp, monitor_fd_t, list);                        
 
                         event = process_file_event(list, monitor);
                         if ( event > 0 )

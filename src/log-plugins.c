@@ -13,17 +13,17 @@
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-getopt.h>
-#include <libprelude/prelude-plugin.h>
 #include <libprelude/prelude-list.h>
+#include <libprelude/prelude-linked-object.h>
+#include <libprelude/prelude-plugin.h>
 
 #include "common.h"
-#include "hashkey.h"
 #include "log-common.h"
 #include "plugin-log.h"
 #include "plugin-log-prv.h"
 
 
-static LIST_HEAD(log_plugins_instance);
+static PRELUDE_LIST_HEAD(log_plugins_instance);
 
 
 static int subscribe(prelude_plugin_instance_t *pi)
@@ -31,7 +31,7 @@ static int subscribe(prelude_plugin_instance_t *pi)
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
 	log(LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
-        prelude_list_add((prelude_linked_object_t *) pi, &log_plugins_instance);
+        prelude_linked_object_add((prelude_linked_object_t *) pi, &log_plugins_instance);
 
         return 0;
 }
@@ -43,7 +43,7 @@ static void unsubscribe(prelude_plugin_instance_t *pi)
         prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
 	log(LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
-        prelude_list_del((prelude_linked_object_t *) pi);
+        prelude_linked_object_del((prelude_linked_object_t *) pi);
 }
 
 
