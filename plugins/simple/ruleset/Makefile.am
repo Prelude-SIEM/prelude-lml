@@ -25,6 +25,7 @@ ruleset_DATA = \
 	squid.rules		\
 	ssh.rules		\
 	sudo.rules		\
+	tripwire.rules		\
 	vigor.rules		\
 	vpopmail.rules		\
 	wap11.rules		\

@@ -178,6 +178,7 @@ include = single.rules;
 include = squid.rules;
 include = ssh.rules;
 include = sudo.rules;
+include = tripwire.rules;
 include = vigor.rules;
 include = vpopmail.rules;
 include = wap11.rules;

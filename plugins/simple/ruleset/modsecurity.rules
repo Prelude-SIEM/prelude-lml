@@ -80,6 +80,7 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=high; \
+ assessment.impact.completion=failed; \
  assessment.impact.description=mod_security found "Invalid $2"; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
