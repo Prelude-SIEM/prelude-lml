@@ -307,13 +307,16 @@ static void resolve_referenced_value(rule_object_list_t *olist,
                  ret = pcre_copy_substring(log->log, ovector, osize, rval->refno, buf, sizeof(buf));
                  if ( ret < 0 ) {
                          if ( ret == PCRE_ERROR_NOMEMORY ) 
-                                 log(LOG_ERR, "not enough memory to get backward reference %d.\n", rval->refno);
+                                 log(LOG_ERR, "not enough memory to get backward reference %d.\n",
+                                     rval->refno);
                          
                          else if ( ret == PCRE_ERROR_NOSUBSTRING )
-                                 log(LOG_ERR, "backward reference %d does not exist.\n", rval->refno);
+                                 log(LOG_ERR, "backward reference %d does not exist.\n",
+                                     rval->refno);
                          
                          else
-                                 log(LOG_ERR, "unknown PCRE error while getting backward reference %d.\n", rval->refno);
+                                 log(LOG_ERR, "unknown PCRE error while getting backward reference %d.\n",
+                                     rval->refno);
 
                          continue;
                  }
@@ -331,11 +334,12 @@ static void referenced_value_destroy_content(rule_object_list_t *olist)
         
         prelude_list_for_each(tmp, &olist->referenced_value_list) {
                 rvalue = prelude_list_entry(tmp, rule_referenced_value_t, list);
-                
-                free(*rvalue->value);
-                *rvalue->value = NULL;
+
+                if ( *rvalue->value ) {
+                        free(*rvalue->value);
+                        *rvalue->value = NULL;
+                }
         }
-        
 }
 
 
@@ -362,7 +366,7 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
                 value = build_message_object_value(rule_object);
 		if ( ! value )
                         continue;
-
+                
 		ret = idmef_object_set(*message, rule_object->object, value);
 		idmef_value_destroy(value);
 
@@ -374,6 +378,8 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
                         return -1;
 		}
 	}
+
+        referenced_value_destroy_content(olist);
         
 	return 0;
 }
