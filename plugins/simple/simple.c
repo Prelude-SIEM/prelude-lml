@@ -87,7 +87,7 @@ typedef struct {
 	uint16_t id;
 	uint16_t revision;
 
-	int last;
+	int last, pass;
 	char *regex_string;
 
 	struct list_head rule_object_list;
@@ -103,6 +103,8 @@ static int is_enabled = 0;
 static plugin_log_t plugin;
 static LIST_HEAD(rule_list);
 static char *rulesetdir = NULL;
+static int pass_rules_first = 0;
+
 
 
 
@@ -172,6 +174,15 @@ static void resolve_rule_reference_value_list(const log_container_t *log,
                  
                  *rval->value = strdup(buf);
         }
+}
+
+
+
+static int parse_rule_pass(simple_rule_t *rule, const char *pass)
+{
+        rule->pass = 1;
+
+        return 0;
 }
 
 
@@ -358,6 +369,7 @@ static int parse_rule_keyword(simple_rule_t *rule,
                 { "id",			parse_rule_id		},
                 { "revision",		parse_rule_revision	},
 		{ "last",		parse_rule_last		},
+                { "pass",               parse_rule_pass         },
         };
 
 	for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
@@ -631,7 +643,11 @@ static int parse_ruleset_directive(const char *filename, int line, char *buf)
 		return -1;
 	}
 
-	list_add_tail(&rule->list, &rule_list);
+        if ( pass_rules_first && rule->pass )
+                list_add(&rule->list, &rule_list);
+        else
+                list_add_tail(&rule->list, &rule_list);
+        
 	rulesnum++;
 
         return 0;
@@ -782,9 +798,10 @@ static void simple_run(const log_container_t *log)
                                 strlen(log->log), 0, 0, ovector, sizeof(ovector) / sizeof(int) );
 		if ( ret < 0 )
                         continue;
-                
-		printf("match regex %s\n", rule->regex_string);
 
+                if ( rule->pass )
+                        return;
+                
                 resolve_rule_reference_value_list(log, rule, ovector, ret);
 
 		message = build_message(rule);
@@ -824,6 +841,17 @@ static int set_simple_state(prelude_option_t *opt, const char *optarg)
 
 	return prelude_option_success;
 }
+
+
+
+
+static int set_pass_first(prelude_option_t *opt, const char *arg)
+{
+        pass_rules_first = 1;
+        
+        return prelude_option_success;
+}
+
 
 
 
@@ -876,6 +904,10 @@ plugin_generic_t *plugin_init(int argc, char **argv)
         prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
                            "Ruleset to use", required_argument,
                            set_simple_ruleset, NULL);
+
+        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
+                           "Process \"Pass rules\" first", no_argument,
+                           set_pass_first, NULL);
         
 	plugin_set_name(&plugin, "SimpleMod");
 	plugin_set_author(&plugin, "Yoann Vandoorselaere");

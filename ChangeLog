@@ -1,3 +1,17 @@
+2004-01-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/simple.c: 
+	(set_pass_first): 
+	(parse_rule_pass): implemented.
+	(parse_rule_keyword): hook pass keyword.
+	(simple_run): stop walking rule in case we meet a "pass" rule.
+
+	(plugin_init): new option to process pas rule first, 
+	if the user want to.
+	
+	(parse_ruleset_directive): if the "pass rules" first option was
+	specified, add pass rules at the begining of the list.
+
 2004-01-20   Gene R Gomez  <gene@gomezbrothers.com>
 
 	* plugins/simple/ruleset:
