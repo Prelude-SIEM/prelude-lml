@@ -1,3 +1,12 @@
+2002-04-28  Laurent Oudot <oudot.laurent@wanadoo.fr>
+
+	* plugin/simple/ruleset/netfilter.rules: new file. Rules for netfilter 
+	firewall on Linux 2.4.x boxes.
+
+	* plugins/simple/ruleset/Makefile.am: added netfilter.rules
+
+	* plugins/simple/ruleset/zyxel.rules and cisco.rules: added comments. 
+
 2002-04-27  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/simple/ruleset/ipfw.rules: fixes, cleanup, ICMP support. 

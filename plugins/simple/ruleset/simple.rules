@@ -49,7 +49,8 @@
 include = cisco.rules;
 include = zyxel.rules;
 include = ipfw.rules;
- 
+include = netfilter.rules;
+
 regex=session opened for user root; class.name=Root login; impact.completion = succeeded; impact.type = admin; impact.severity = medium;
 
 regex=PAM_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); class.name=Authentication Failure; impact.completion = failed; impact.type = other; impact.severity = high; impact.description=Process $1 attempted to change UID from $2 to $3; 
