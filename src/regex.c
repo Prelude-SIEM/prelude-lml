@@ -4,11 +4,14 @@
 #include <assert.h>
 #include <ctype.h>
 #include <sys/time.h>
+#include <inttypes.h>
 
 #include <libprelude/list.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/plugin-common.h>
-#include <libprelude/plugin-common-prv.h>
+#include <libprelude/prelude-io.h>
+#include <libprelude/prelude-message.h>
+#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude-plugin.h>
 
 #include "common.h"
 #include "regex.h"
@@ -20,7 +23,7 @@ struct regex_entry {
         pcre *regex_compiled;
         pcre_extra *regex_extra;
         int options;
-        plugin_container_t *plugin;
+        prelude_plugin_instance_t *plugin;
         struct list_head list;
 };
 

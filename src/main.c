@@ -16,8 +16,10 @@
 #include <libprelude/list.h>
 #include <libprelude/idmef-tree.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/plugin-common.h>
-#include <libprelude/plugin-common-prv.h>
+#include <libprelude/prelude-io.h>
+#include <libprelude/prelude-message.h>
+#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude-plugin.h>
 #include <libprelude/timer.h>
 
 #include "config.h"

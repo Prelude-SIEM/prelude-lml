@@ -10,7 +10,7 @@
 # located in sensors-default.conf... You may overwrite the
 # default address for this sensor by uncommenting this entry.
 #
-# manager-addr = 127.0.0.1;
+# manager-addr = 127.0.0.1
 
 
 # Configuration for the UDP message receiver.
@@ -73,11 +73,14 @@ rotation-interval = 3600
 
 [SimpleMod]
 
-ruleset=@configdir@/ruleset/simple.rules;
+ruleset=@configdir@/ruleset/simple.rules
 
 
 # [Debug]
 #
 # This plugin issue an alert for each packet.
 # Carefull to the loging activity it generate.
+# 
+# Triger Report to the console.
+# stderr
 

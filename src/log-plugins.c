@@ -7,12 +7,14 @@
 #include <limits.h>		/* for NAME_MAX */
 #include <sys/time.h>
 #include <time.h>
-
+#include <inttypes.h>
 
 #include <libprelude/prelude-log.h>
-#include <libprelude/plugin-common.h>
-#include <libprelude/plugin-common-prv.h>
-
+#include <libprelude/prelude-io.h>
+#include <libprelude/prelude-message.h>
+#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude-plugin.h>
+#include <libprelude/prelude-list.h>
 
 #include "common.h"
 #include "hashkey.h"
@@ -21,73 +23,42 @@
 #include "plugin-log-prv.h"
 
 
-static LIST_HEAD(plugins_list);
+static LIST_HEAD(log_plugins_instance);
 
 
-static int subscribe(plugin_container_t *pc)
+static int subscribe(prelude_plugin_instance_t *pi)
 {
-	log(LOG_INFO, "- Subscribing plugin %s\n", pc->plugin->name);
-        return plugin_add(pc, &plugins_list, NULL);
-}
-
-
-
-static void unsubscribe(plugin_container_t *pc)
-{
-	log(LOG_INFO, "- Unsubscribing plugin %s\n", pc->plugin->name);
-        plugin_del(pc);
-}
-
-
-
-static plugin_container_t *log_plugin_search(plugin_generic_t *plugin) 
-{
-        struct list_head *tmp;
-        plugin_container_t *pc;
+        prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-        list_for_each(tmp, &plugins_list) {
+	log(LOG_INFO, "- Subscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        prelude_list_add((prelude_linked_object_t *) pi, &log_plugins_instance);
 
-                pc = list_entry(tmp, plugin_container_t, ext_list);
-
-                if ( pc->plugin == plugin )
-                        return pc;
-        }
-
-        return NULL;
+        return 0;
 }
 
 
 
-void log_plugin_run(plugin_container_t *pc, log_container_t *log)
+static void unsubscribe(prelude_plugin_instance_t *pi)
 {
-        plugin_run(pc, plugin_log_t, run, log);
-}
-
-
-
-
-plugin_container_t *log_plugin_register(const char *pname) 
-{
-        plugin_container_t *pc;
-        plugin_generic_t *plugin;
+        prelude_plugin_generic_t *plugin = prelude_plugin_instance_get_plugin(pi);
         
-        /*
-         * search in the whole plugin list a plugin
-         * with pname as it's name.
-         */
-        plugin = plugin_search_by_name(pname);
-        if ( ! plugin ) 
-                return NULL;
+	log(LOG_INFO, "- Unsubscribing plugin %s[%s]\n", plugin->name, prelude_plugin_instance_get_name(pi));
+        prelude_list_del((prelude_linked_object_t *) pi);
+}
 
-        /*
-         * register the plugin.
-         */
-        plugin_subscribe(plugin);
 
-        pc = log_plugin_search(plugin);
-        assert(pc);
 
-        return pc;
+void log_plugin_run(prelude_plugin_instance_t *pi, log_container_t *log)
+{
+        prelude_plugin_run(pi, plugin_log_t, run, pi, log);
+}
+
+
+
+
+prelude_plugin_instance_t *log_plugin_register(const char *pname) 
+{
+        return prelude_plugin_search_instance_by_name(pname, NULL);
 }
 
 
@@ -105,13 +76,14 @@ int log_plugins_init(const char *dirname, int argc, char **argv)
 	if ( ret < 0 ) {
 		if ( errno == ENOENT )
 			return 0;
-		log(LOG_ERR, "can't access %s.\n", dirname);
-		return -1;
+
+                log(LOG_ERR, "can't access %s.\n", dirname);
+
+                return -1;
 	}
 
-	ret = plugin_load_from_dir(dirname, argc, argv, subscribe,
-                                   unsubscribe);
-	if (ret < 0) {
+	ret = prelude_plugin_load_from_dir(dirname, subscribe, unsubscribe);
+	if ( ret < 0 ) {
 		log(LOG_ERR, "couldn't load plugin subsystem.\n");
 		return -1;
 	}

@@ -95,16 +95,21 @@ typedef struct {
 } simple_rule_t;
 
 
-static int parse_ruleset(const char *filename, FILE *fd);
+typedef struct {
+        int rulesnum;
+        struct list_head rule_list;
+        char *rulesetdir;
+        int last_rules_first;
+} simple_plugin_t;
 
 
-static int rulesnum = 0;
-static int is_enabled = 0;
-static plugin_log_t plugin;
-static LIST_HEAD(rule_list);
-static char *rulesetdir = NULL;
-static int last_rules_first = 0;
 
+static int parse_ruleset(simple_plugin_t *plugin, const char *filename, FILE *fd);
+
+
+
+
+static plugin_log_t simple_plugin;
 
 
 
@@ -145,6 +150,23 @@ static void free_rule_reference_value_list_content(simple_rule_t *rule)
                 *reference_value->value = NULL;
 	}
 }
+
+
+
+
+static void free_rule_object_list(simple_rule_t *rule)
+{
+	rule_object_t *object;
+	struct list_head *tmp, *bkp;
+        
+        list_for_each_safe(tmp, bkp, &rule->rule_object_list) {
+                object = list_entry(tmp, rule_object_t, list);
+                
+                idmef_object_destroy(object->object);
+                free(object);
+	}
+}
+
 
 
 
@@ -230,14 +252,14 @@ static int parse_rule_last(simple_rule_t *rule, const char *last)
 
 
 
-static int parse_include(const char *value) 
+static int parse_include(simple_plugin_t *plugin, const char *value) 
 {
         int ret;
         FILE *fd;
         char filename[256];
 
-        if ( rulesetdir && value[0] != '/' )
-                snprintf(filename, sizeof(filename), "%s/%s", rulesetdir, value);
+        if ( plugin->rulesetdir && value[0] != '/' )
+                snprintf(filename, sizeof(filename), "%s/%s", plugin->rulesetdir, value);
         else
                 snprintf(filename, sizeof(filename), "%s", value);
 
@@ -247,7 +269,7 @@ static int parse_include(const char *value)
                 return -1;
         }
 
-        ret = parse_ruleset(filename, fd);
+        ret = parse_ruleset(plugin, filename, fd);
 
         fclose(fd);
 
@@ -575,6 +597,8 @@ static void free_rule(simple_rule_t *rule)
         if ( rule->extra )
                 pcre_free(rule->extra);
 
+        free_rule_object_list(rule);
+        free_rule_reference_value_list_content(rule);
 	/* FIXME: free variable list */
 
         free(rule);
@@ -582,7 +606,7 @@ static void free_rule(simple_rule_t *rule)
 
 
 
-static int parse_ruleset_directive(const char *filename, int line, char *buf) 
+static int parse_ruleset_directive(simple_plugin_t *plugin, const char *filename, int line, char *buf) 
 {
 	char *in;
 	char *key;
@@ -613,7 +637,7 @@ static int parse_ruleset_directive(const char *filename, int line, char *buf)
                 
                 if ( first_directive ) {
 			if ( strcmp(key, "include") == 0 ) {
-                                parse_include(value);
+                                parse_include(plugin, value);
                                 return 0;
                         }
                         
@@ -636,19 +660,19 @@ static int parse_ruleset_directive(const char *filename, int line, char *buf)
 		return -1;
 	}
 
-        if ( last_rules_first && rule->last )
-                list_add(&rule->list, &rule_list);
+        if ( plugin->last_rules_first && rule->last )
+                list_add(&rule->list, &plugin->rule_list);
         else
-                list_add_tail(&rule->list, &rule_list);
+                list_add_tail(&rule->list, &plugin->rule_list);
         
-	rulesnum++;
+	plugin->rulesnum++;
 
         return 0;
 }
 
 
 
-static int parse_ruleset(const char *filename, FILE *fd) 
+static int parse_ruleset(simple_plugin_t *plugin, const char *filename, FILE *fd) 
 {
         int line = 0;
         char buf[8192], *ptr;
@@ -670,7 +694,7 @@ static int parse_ruleset(const char *filename, FILE *fd)
                 if ( *ptr == '\0' || *ptr == '#' )
                         continue;
 
-		parse_ruleset_directive(filename, line, ptr);
+		parse_ruleset_directive(plugin, filename, line, ptr);
         }
 
         return 0;
@@ -776,14 +800,17 @@ static idmef_message_t *build_message(simple_rule_t *rule)
 
 
 
-static void simple_run(const log_container_t *log)
+static void simple_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 {
         int ret;
         simple_rule_t *rule;
         struct list_head *tmp;
+        simple_plugin_t *plugin;
         int ovector[MAX_REFERENCE_PER_RULE * 3];
+
+        plugin = prelude_plugin_instance_get_data(pi);
         
-        list_for_each(tmp, &rule_list) {
+        list_for_each(tmp, &plugin->rule_list) {
                 rule = list_entry(tmp, simple_rule_t, list);
 
 		ret = pcre_exec(rule->regex, rule->extra, log->log,
@@ -805,35 +832,12 @@ static void simple_run(const log_container_t *log)
 
 
 
-static int set_simple_state(prelude_option_t *opt, const char *optarg)
+
+static int set_last_first(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg)
 {
-        int ret;
+        simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
         
-        if ( is_enabled ) {
-		ret = plugin_unsubscribe((plugin_generic_t *) & plugin);
-		if ( ret < 0 )
-			return prelude_option_error;
-
-		is_enabled = 0;
-	}
-
-	else {
-		ret = plugin_subscribe((plugin_generic_t *) & plugin);
-		if ( ret < 0 )
-			return prelude_option_error;
-
-		is_enabled = 1;
-	}
-
-	return prelude_option_success;
-}
-
-
-
-
-static int set_last_first(prelude_option_t *opt, const char *arg)
-{
-        last_rules_first = 1;
+        plugin->last_rules_first = 1;
         
         return prelude_option_success;
 }
@@ -841,20 +845,21 @@ static int set_last_first(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_simple_ruleset(prelude_option_t *opt, const char *arg) 
+static int set_simple_ruleset(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg) 
 {
         int ret;
         FILE *fd;
         char *ptr;
+        simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
         
-        rulesetdir = strdup(arg);
+        plugin->rulesetdir = strdup(arg);
 
-        ptr = strrchr(rulesetdir, '/');
+        ptr = strrchr(plugin->rulesetdir, '/');
         if ( ptr )
                 *ptr = '\0';
         else {
-                free(rulesetdir);
-                rulesetdir = NULL;
+                free(plugin->rulesetdir);
+                plugin->rulesetdir = NULL;
         }
         
         fd = fopen(arg, "r");
@@ -863,43 +868,81 @@ static int set_simple_ruleset(prelude_option_t *opt, const char *arg)
                 return prelude_option_error;
         }
         
-        ret = parse_ruleset(arg, fd);
+        ret = parse_ruleset(plugin, arg, fd);
 
         fclose(fd);
-        if ( rulesetdir )
-                free(rulesetdir);
+        if ( plugin->rulesetdir )
+                free(plugin->rulesetdir);
         
         if ( ret < 0 )
                 return prelude_option_error;
 
-        log(LOG_INFO, "- SimpleMod plugin added %d rules.\n", rulesnum);
+        log(LOG_INFO, "- SimpleMod plugin added %d rules.\n", plugin->rulesnum);
         
         return prelude_option_success;
 }
 
 
 
-plugin_generic_t *plugin_init(int argc, char **argv)
+static int simple_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *arg)
 {
-	prelude_option_t *opt;
-
-	opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 0, "simplemod",
-                                 "Simple plugin option", no_argument,
-                                 set_simple_state, NULL);
-
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
-                           "Ruleset to use", required_argument,
-                           set_simple_ruleset, NULL);
-
-        opt = prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
-                                 "Process rules with the \"last\" attribute first", no_argument,
-                                 set_last_first, NULL);
-        prelude_option_set_priority(opt, option_run_first);
+        simple_plugin_t *new;
         
-	plugin_set_name(&plugin, "SimpleMod");
-	plugin_set_author(&plugin, "Yoann Vandoorselaere");
-	plugin_set_contact(&plugin, "yoann@prelude-ids.org");
-	plugin_set_running_func(&plugin, simple_run);
+        new = calloc(1, sizeof(*new));
+        if ( ! new ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return prelude_option_error;
+        }
 
-	return (plugin_generic_t *) &plugin;
+        INIT_LIST_HEAD(&new->rule_list);
+        prelude_plugin_instance_set_data(pi, new);
+        
+        return prelude_option_success;
+}
+
+
+
+
+static void simple_destroy(prelude_plugin_instance_t *pi)
+{
+        simple_rule_t *rule;
+        struct list_head *tmp, *bkp;
+        simple_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        
+        list_for_each_safe(tmp, bkp, &plugin->rule_list) {
+                rule = list_entry(tmp, simple_rule_t, list);
+                free_rule(rule);
+        }
+        
+        free(plugin);
+}
+
+
+
+
+prelude_plugin_generic_t *prelude_plugin_init(void)
+{
+        prelude_option_t *opt;
+        
+        opt = prelude_plugin_option_add(NULL, CLI_HOOK|CFG_HOOK, 0, "simplemod",
+                                        "Simple plugin option", optionnal_argument,
+                                        simple_activate, NULL);
+
+        prelude_plugin_set_activation_option((void *) &simple_plugin, opt, NULL);
+        
+        prelude_plugin_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
+                                  "Ruleset to use", required_argument,
+                                  set_simple_ruleset, NULL);
+
+        prelude_plugin_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
+                                  "Process rules with the \"last\" attribute first", no_argument,
+                                  set_last_first, NULL);
+        
+	prelude_plugin_set_name(&simple_plugin, "SimpleMod");
+	prelude_plugin_set_author(&simple_plugin, "Yoann Vandoorselaere");
+	prelude_plugin_set_contact(&simple_plugin, "yoann@prelude-ids.org");
+	prelude_plugin_set_running_func(&simple_plugin, simple_run);
+        prelude_plugin_set_destroy_func(&simple_plugin, simple_destroy);
+        
+	return (void *) &simple_plugin;
 }

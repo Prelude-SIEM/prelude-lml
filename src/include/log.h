@@ -5,7 +5,7 @@
  * Definition of the common and detect plugin type.
  */
 #include <libprelude/prelude-log.h>
-#include <libprelude/plugin-common.h>
+#include <libprelude/prelude-plugin.h>
 
 #include "plugin-log.h"
 

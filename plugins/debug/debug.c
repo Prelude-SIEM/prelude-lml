@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 #include <sys/types.h>
@@ -18,12 +19,18 @@
 #include "lml-alert.h"
 
 
-static int is_enabled = 0;
-static int out_stderr = 0;
+typedef struct {
+        int out_stderr;
+} debug_plugin_t;
+
+
+
 static plugin_log_t plugin;
 
 
-static void debug_run(const log_container_t *log)
+
+
+static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 {
 	idmef_alert_t *alert;
 	idmef_message_t *message;
@@ -32,6 +39,9 @@ static void debug_run(const log_container_t *log)
 	idmef_additional_data_t *adata;
 	idmef_string_t *adata_meaning;
 	idmef_data_t *data;
+        debug_plugin_t *plugin;
+
+        plugin = prelude_plugin_instance_get_data(pi);
 
 	message = idmef_message_new();
 	assert(message);
@@ -61,84 +71,81 @@ static void debug_run(const log_container_t *log)
 
 	lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_LOW);
 
-	if ( out_stderr )
+	if ( plugin->out_stderr )
 		fprintf(stderr, "Debug: log received, log=%s\n", log->log);
 }
 
 
 
-static int set_debug_state(prelude_option_t *opt, const char *optarg)
+static int debug_activate(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *optarg)
 {
-	int ret;
+        debug_plugin_t *new;
+                
+        new = calloc(1, sizeof(*new));
+        if ( ! new ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return prelude_option_error;
+        }
 
-	if ( is_enabled ) {
-		ret = plugin_unsubscribe((plugin_generic_t *) & plugin);
-		if (ret < 0)
-			return prelude_option_error;
+        prelude_plugin_instance_set_data(pi, new);
+        
+	return prelude_option_success;
+}
 
-		is_enabled = 0;
-	}
 
-	else {
-		ret = plugin_subscribe((plugin_generic_t *) & plugin);
-		if (ret < 0)
-			return prelude_option_error;
 
-		is_enabled = 1;
-	}
+
+static void debug_destroy(prelude_plugin_instance_t *pi)
+{
+        debug_plugin_t *debug = prelude_plugin_instance_get_data(pi);
+        
+        free(debug);
+}
+
+
+
+static int debug_get_output_stderr(prelude_plugin_instance_t *pi, char *buf, size_t size)
+{
+        debug_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        
+	snprintf(buf, size, "%s", plugin->out_stderr ? "enabled" : "disabled");
 
 	return prelude_option_success;
 }
 
 
 
-static int get_debug_state(char *buf, size_t size)
+static int debug_set_output_stderr(prelude_plugin_instance_t *pi, prelude_option_t *opt, const char *optarg)
 {
-	snprintf(buf, size, "%s",
-		 is_enabled ? "enabled" : "disabled");
+        debug_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        
+	plugin->out_stderr = ! plugin->out_stderr;
 
-	return prelude_option_success;
+        return prelude_option_success;
 }
 
 
 
-static int get_output(char *buf, size_t size)
-{
-	snprintf(buf, size, "%s", out_stderr ? "enabled" : "disabled");
-
-	return prelude_option_success;
-}
-
-
-
-static int set_output(prelude_option_t *opt, const char *optarg)
-{
-	/*
-	 * enable or disable depending on the current value.
-	 */
-	out_stderr = ! out_stderr;
-	return prelude_option_success;
-}
-
-
-
-plugin_generic_t *plugin_init(int argc, char **argv)
+prelude_plugin_generic_t *prelude_plugin_init(void)
 {
 	prelude_option_t *opt;
 
-	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 0, "debug",
-				 "Debug plugin option", no_argument,
-				 set_debug_state, get_debug_state);
+	opt = prelude_plugin_option_add(NULL, CLI_HOOK | CFG_HOOK, 0, "debug",
+                                        "Debug plugin option", optionnal_argument,
+                                        debug_activate, NULL);
 
-	prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'p', "print",
-			   "Output to stderr when plugin is called",
-			   no_argument, set_output, get_output);
-
-	plugin_set_name(&plugin, "Debug");
-	plugin_set_author(&plugin, "Pierre-Jean Turpeau");
-	plugin_set_contact(&plugin, "Pierre-Jean.Turpeau@ENSEIRB.fr");
-	plugin_set_desc(&plugin, "Send an alert for each log.");
-	plugin_set_running_func(&plugin, debug_run);
-
-	return (plugin_generic_t *) & plugin;
+        prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
+        
+	prelude_plugin_option_add(opt, CLI_HOOK | CFG_HOOK, 's', "stderr",
+                                  "Output to stderr when plugin is called",
+                                  no_argument, debug_set_output_stderr, debug_get_output_stderr);
+        
+	prelude_plugin_set_name(&plugin, "Debug");
+	prelude_plugin_set_author(&plugin, "Pierre-Jean Turpeau");
+	prelude_plugin_set_contact(&plugin, "Pierre-Jean.Turpeau@enseirb.fr");
+	prelude_plugin_set_desc(&plugin, "Send an alert for each log.");
+	prelude_plugin_set_running_func(&plugin, debug_run);
+        prelude_plugin_set_destroy_func(&plugin, debug_destroy);
+        
+	return (void *) &plugin;
 }

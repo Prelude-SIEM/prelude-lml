@@ -32,10 +32,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include <libprelude/list.h>
-#include <libprelude/plugin-common.h>
-#include <libprelude/plugin-common-prv.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/config-engine.h>
 #include <libprelude/prelude-io.h>
@@ -66,7 +65,7 @@ static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
 
 
-static int print_version(prelude_option_t *opt, const char *arg)
+static int print_version(void **context, prelude_option_t *opt, const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
 	return prelude_option_end;
@@ -74,7 +73,7 @@ static int print_version(prelude_option_t *opt, const char *arg)
 
 
 
-static int print_help(prelude_option_t *opt, const char *arg)
+static int print_help(void **context, prelude_option_t *opt, const char *arg)
 {
         prelude_option_print(NULL, CLI_HOOK, 25);
 	return prelude_option_end;
@@ -82,7 +81,7 @@ static int print_help(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_batch_mode(prelude_option_t *opt, const char *arg)
+static int set_batch_mode(void **context, prelude_option_t *opt, const char *arg)
 {
         batch_mode = 1;
         file_server_set_batch_mode();
@@ -91,7 +90,7 @@ static int set_batch_mode(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_rotation_interval(prelude_option_t *opt, const char *arg) 
+static int set_rotation_interval(void **context, prelude_option_t *opt, const char *arg) 
 {
         file_server_set_rotation_interval_max_difference(atoi(arg));
         return prelude_option_success;
@@ -99,7 +98,7 @@ static int set_rotation_interval(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_quiet_mode(prelude_option_t *opt, const char *arg)
+static int set_quiet_mode(void **context, prelude_option_t *opt, const char *arg)
 {
 	prelude_log_use_syslog();
 	return prelude_option_success;
@@ -107,7 +106,7 @@ static int set_quiet_mode(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_daemon_mode(prelude_option_t *opt, const char *arg)
+static int set_daemon_mode(void **context, prelude_option_t *opt, const char *arg)
 {
         prelude_daemonize(pidfile);
         if ( pidfile )
@@ -119,7 +118,7 @@ static int set_daemon_mode(prelude_option_t *opt, const char *arg)
 }
 
 
-static int set_pidfile(prelude_option_t *opt, const char *arg)
+static int set_pidfile(void **context, prelude_option_t *opt, const char *arg)
 {
         pidfile = strdup(arg);
         if ( ! pidfile ) {
@@ -132,7 +131,7 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_logfile_format(prelude_option_t *opt, const char *arg)
+static int set_logfile_format(void **context, prelude_option_t *opt, const char *arg)
 {        
         if ( logfile_format )
                 free(logfile_format);
@@ -144,7 +143,7 @@ static int set_logfile_format(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
+static int set_logfile_ts_format(void **context, prelude_option_t *opt, const char *arg)
 {        
         if ( logfile_ts_format )
                 free(logfile_ts_format);
@@ -157,7 +156,7 @@ static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_file(prelude_option_t *opt, const char *arg) 
+static int set_file(void **context, prelude_option_t *opt, const char *arg) 
 {
         int ret;
         log_source_t *ls;
@@ -217,7 +216,7 @@ static int set_logwatch(prelude_option_t *opt, const char *arg)
 
 
 
-static int enable_udp_server(prelude_option_t *opt, const char *arg) 
+static int enable_udp_server(void **context, prelude_option_t *opt, const char *arg) 
 {
         udp_srvr = udp_server_new(udp_srvr_addr, udp_srvr_port);
         free(udp_srvr_addr);
@@ -230,7 +229,7 @@ static int enable_udp_server(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_udp_server_addr(prelude_option_t *opt, const char *arg) 
+static int set_udp_server_addr(void **context, prelude_option_t *opt, const char *arg) 
 {
         udp_srvr_addr = strdup(arg);
         if ( ! udp_srvr_addr ) {
@@ -242,7 +241,7 @@ static int set_udp_server_addr(prelude_option_t *opt, const char *arg)
 }
 
 
-static int set_udp_server_port(prelude_option_t *opt, const char *arg) 
+static int set_udp_server_port(void **context, prelude_option_t *opt, const char *arg) 
 {
         udp_srvr_port = atoi(arg);
         return prelude_option_success;
@@ -251,7 +250,7 @@ static int set_udp_server_port(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_lml_group(prelude_option_t *opt, const char *arg) 
+static int set_lml_group(void **context, prelude_option_t *opt, const char *arg) 
 {
         struct group *grp;
 
@@ -269,7 +268,7 @@ static int set_lml_group(prelude_option_t *opt, const char *arg)
 
 
 
-static int set_lml_user(prelude_option_t *opt, const char *arg) 
+static int set_lml_user(void **context, prelude_option_t *opt, const char *arg) 
 {
         struct passwd *p;
         
