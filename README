@@ -1,9 +1,13 @@
-Prelude-LML - http://www.prelude-ids.org
-by Yoann Vandoorselaere <yoann.v@prelude-ids.com>
+Prelude-LML is brought to you by PreludeIDS Technologies (http://www.prelude-ids.com).
 
+
+Prelude-LML Overview
+====================
 
 This is the Prelude-LML log analyzer, collecting events from log files
-and/or syslog UDP messages. 
+and/or syslog UDP messages. Prelude-LML is written and maintained by 
+Yoann Vandoorselaere. Initial work on Prelude-LML was done by 
+Alexandre Launay and Pierre-Jean Turpeau.
 
 
 REQUIREMENTS
