@@ -25,7 +25,7 @@
 ###################
 
 #LOG:Dec  8 14:45:17 itguxweb1 sshd[32112]: Accepted publickey for root from 12.34.56.78 port 56634 ssh2
-regex=Accepted (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=Admin login successful; \
  id=1900; \
  revision=2; \
@@ -47,7 +47,7 @@ regex=Accepted (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  last;
 
 #LOG:Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
-regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=User login successful; \
  id=1901; \
  revision=2; \
@@ -73,7 +73,7 @@ regex=Accepted (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
 ################
 
 #LOG:Dec  9 16:00:35 itguxweb2 sshd[24541]: Failed password for root from 12.34.56.78 port 1806
-regex=Failed (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=SSH Remote root login failed; \
  id=1902; \
  revision=2; \
@@ -95,7 +95,7 @@ regex=Failed (\S+) for root from (.+) port (\d+)\s*(ssh2)?; \
  last
 
 #LOG:Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
-regex=Failed (\S+) for (?!root)(\S+) from (.+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=SSH Remote user login failed; \
  id=1903; \
  revision=2; \
@@ -171,7 +171,7 @@ regex=User (\S+) not allowed because (.*)listed in (\w+); \
 
 # LOG:Jun 10 09:51:57 server sshd[9100]: Did not receive identification string from 1.2.3.4
 #
-regex=Did not receive identification string from (.+); \
+regex=Did not receive identification string from ([\d\.]+); \
  classification.text=SSH Server recognition; \
  id=1906; \
  revision=2; \

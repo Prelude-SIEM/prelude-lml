@@ -57,7 +57,7 @@ regex= security\[success\] 515 (.*) Logon Process Name:([\w\\]+); \
 # 1.b 528
 # No log sample; please submit
 regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domain:(.+)  Logon ID:\((.*)\)  Logon Type:(\d+)  Logon Process:(\w+) .* Workstation Name:(\w+); \
- classification.text=Windows Event ID [528]: Successful logon; \
+ classification.text=Login successful; \
  id=1401; \
  revision=1; \
  analyzer.name=NTsyslog; \
@@ -76,7 +76,7 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
 # 1.c 538
 # LOG:Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
 regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+)  Logon ID:\((.*)\)  Logon Type:(\d+); \
- classification.text=Windows Event ID [538]: User logoff; \
+ classification.text=Logoff; \
  id=1402; \
  revision=1; \
  analyzer.name=NTsyslog; \
@@ -175,7 +175,7 @@ regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:(.+)  Se
 # 1.h
 # No log sample; please submit
 regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  modified  Domain:(.+)  Domain ID: (.+)  Caller User Name:(.+)  Caller Domain:(.+)  Caller Logon ID:\((.+)\)  Privileges:(.+); \
- classification.text=Windows Event ID [643]: Password policy modified; \
+ classification.text=Password policy modified; \
  id=1407; \
  revision=1; \
  analyzer.name=NTsyslog; \
@@ -195,7 +195,7 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
 # 1.i 680
 # No log sample; please submit
 regex= security\[success\] 680 (.*)  Account Used for Logon by: (.+)  Account Name: (.+)  Workstation: (.+); \
- classification.text=Windows Event ID [680]: Logon attempt; \
+ classification.text=Login successful; \
  id=1408; \
  revision=1; \
  analyzer.name=NTsyslog; \
@@ -270,7 +270,7 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
 # 2.a 529 or 534
 # LOG:Dec 10 00:23:37 webbrain.itg.sac.tfs security[failure] 529 NT AUTHORITY\SYSTEM  Logon Failure:  Reason:Unknown user name or bad password  User Name:administrator  Domain:ITG  Logon Type:2  Logon Process:Advapi    Authentication Package: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Workstation Name:WEBBRAIN
 regex= security\[failure\] (529|534) (.+) Logon Failure:  Reason:(.+)  User Name:([\w ]+)  Domain:(.+)  Logon Type:(\d+)  Logon Process:(\w+)    Authentication Package:(.+)  Workstation Name:(.+); \
- classification.text=Windows Event ID [$1]: Logon failure; \
+ classification.text=Login failure; \
  id=1412; \
  revision=1; \
  analyzer.name=NTsyslog; \
