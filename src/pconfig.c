@@ -159,6 +159,8 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
 {
         int ret;
         log_source_t *ls;
+        regex_list_t *rlist;
+
         
         ls = log_source_new();
         if ( ! ls )
@@ -185,39 +187,29 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
         ret = log_source_set_name(ls, arg);
         if ( ret < 0 ) 
                 return prelude_option_error;
+
+        rlist = regex_init(arg);
+        if ( ! rlist )
+                return prelude_option_error;
         
-        ret = file_server_monitor_file(ls);
+        ret = file_server_monitor_file(rlist, ls);
         if ( ret < 0 ) 
                 return prelude_option_error;
-        
-        log(LOG_INFO, "- Added monitor for '%s' in %p.\n", arg, ls);
-        
+                
         return prelude_option_success;
 }
-
-
-
-#if 0
-static int set_logwatch(prelude_option_t *opt, const char *arg)
-{
-        log_file_t *lf;
-        
-        lf = log_file_new();
-        if ( ! lf )
-                return prelude_option_error;
-
-        prelude_option_set_private_data(opt, lf);
-        prelude_option_parse_from_context(opt, NULL);
-        
-        return prelude_option_success;
-}
-#endif
 
 
 
 static int enable_udp_server(void **context, prelude_option_t *opt, const char *arg) 
 {
-        udp_srvr = udp_server_new(udp_srvr_addr, udp_srvr_port);
+        regex_list_t *rlist;
+
+        rlist = regex_init("syslog");
+        if ( ! rlist ) 
+                return prelude_option_error;
+        
+        udp_srvr = udp_server_new(rlist, udp_srvr_addr, udp_srvr_port);
         free(udp_srvr_addr);
         
         if ( ! udp_srvr )
@@ -354,9 +346,11 @@ int pconfig_set(int argc, char **argv)
                            "Specify the input format", required_argument,
                            set_logfile_format, NULL);
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
-                           "Specify a file to monitor (you might specify \"stdin\")",
-                           required_argument, set_file, NULL);
+        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
+                                 "Specify a file to monitor (you might specify \"stdin\")",
+                                 required_argument, set_file, NULL);
+
+        prelude_option_set_priority(opt, option_run_last);
         
         ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
 	if ( ret == prelude_option_error || ret == prelude_option_end )

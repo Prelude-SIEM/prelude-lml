@@ -1,9 +1,15 @@
+##
+# filename should be one of:
 #
-# plugin-name-list      pcre-options		regex
+# - "*"      meaning any monitored logfile data is sent to the plugin.
+# - "syslog" meaning any data coming from syslog is sent to the plugin.
+# - "/path/to/logfile" any data coming from this logfile is sent to the plugin.
 #
-
-#Debug			-			.*
-SimpleMod		-			.*
+#
+# filename	plugin-name-list      pcre-options	regex
+#
+# *		Debug		      -			.*
+  * 		SimpleMod	      -			.*
 
 #
 # plugin-name-list is a coma separated list of plugins

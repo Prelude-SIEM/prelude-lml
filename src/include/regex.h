@@ -6,7 +6,7 @@
 
 typedef prelude_list_t regex_list_t;
 
-regex_list_t *regex_init(char *filename);
+regex_list_t *regex_init(const char *logfile);
 
 void regex_destroy(regex_list_t *conf);
 

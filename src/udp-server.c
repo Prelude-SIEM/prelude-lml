@@ -35,12 +35,13 @@
 struct udp_server {
 	int sockfd;
         log_source_t *ls;
+        regex_list_t *rlist;
 	struct sockaddr_in saddr;
 };
 
 
 
-void udp_server_process_event(udp_server_t *server, regex_list_t *list)
+void udp_server_process_event(udp_server_t *server)
 {
         int len, ret;
         char src[512];
@@ -69,7 +70,7 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
         else 
                 ptr = buf;
         
-        lml_dispatch_log(list, server->ls, ptr);
+        lml_dispatch_log(server->rlist, server->ls, ptr);
 }
 
 
@@ -92,7 +93,7 @@ int udp_server_get_event_fd(udp_server_t *server)
 
 
 
-udp_server_t *udp_server_new(const char *addr, uint16_t port)
+udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t port)
 {
         int ret;
 	udp_server_t *server;
@@ -102,6 +103,8 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 log(LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
+
+        server->rlist = rlist;
         
         server->ls = log_source_new();
         if ( ! server->ls )
@@ -125,8 +128,10 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                         udp_server_close(server);
                         return NULL;
                 }
-        } else
+        } else {
+                addr = "0.0.0.0";
                 server->saddr.sin_addr.s_addr = INADDR_ANY;
+        }
         
         server->saddr.sin_family = AF_INET;
         server->saddr.sin_port = htons(port);

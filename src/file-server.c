@@ -112,7 +112,8 @@ typedef struct {
 #ifdef HAVE_FAM
         FAMRequest fam_request;
 #endif
-        
+
+        regex_list_t *regex_list;
 } monitor_fd_t;
 
 
@@ -476,7 +477,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen)
 
 
 
-static int check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct stat *st) 
+static int check_logfile_data(monitor_fd_t *monitor, struct stat *st) 
 {
         int eventno = 0;
         off_t len, ret, rlen;
@@ -496,7 +497,7 @@ static int check_logfile_data(regex_list_t *list, monitor_fd_t *monitor, struct 
 
                 eventno++;
                 
-                lml_dispatch_log(list, monitor->source, monitor->buf);
+                lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf);
                 file_metadata_save(monitor, st->st_size - len);
                 
                 len -= rlen;
@@ -888,7 +889,7 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
 
 
 
-static int fam_process_event(regex_list_t *list, FAMEvent *event) 
+static int fam_process_event(FAMEvent *event) 
 {
         int ret = 0;
         struct stat st;
@@ -921,7 +922,7 @@ static int fam_process_event(regex_list_t *list, FAMEvent *event)
                 /*
                  * read and analyze available data. 
                  */
-                check_logfile_data(list, monitor, &st);
+                check_logfile_data(monitor, &st);
                 break;
                 
         case FAMDeleted:
@@ -946,7 +947,7 @@ static int fam_process_event(regex_list_t *list, FAMEvent *event)
 
 
 
-static int fam_process_queued_events(regex_list_t *list) 
+static int fam_process_queued_events(void) 
 {
         int ret;
         FAMEvent event;
@@ -959,7 +960,7 @@ static int fam_process_queued_events(regex_list_t *list)
                         return -1;
                 }
 
-                fam_process_event(list, &event);
+                fam_process_event(&event);
         }
 
         return 0;
@@ -968,7 +969,7 @@ static int fam_process_queued_events(regex_list_t *list)
 
 
 
-static int process_file_event(regex_list_t *list, monitor_fd_t *monitor) 
+static int process_file_event(monitor_fd_t *monitor) 
 {
         int ret;
         struct stat st;
@@ -991,13 +992,13 @@ static int process_file_event(regex_list_t *list, monitor_fd_t *monitor)
         /*
          * read and analyze available data. 
          */
-        return check_logfile_data(list, monitor, &st);
+        return check_logfile_data(monitor, &st);
 }
 
 
 
 
-int file_server_monitor_file(log_source_t *ls) 
+int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls) 
 {
         monitor_fd_t *new;
         
@@ -1010,13 +1011,15 @@ int file_server_monitor_file(log_source_t *ls)
         new = monitor_new(ls);
         if ( ! new )
                 return -1;
+
+        new->regex_list = rlist;
         
         return 0;
 }
 
 
 
-int file_server_wake_up(regex_list_t *list) 
+int file_server_wake_up(void) 
 {
         int ret = -1, event;
         monitor_fd_t *monitor;
@@ -1031,7 +1034,7 @@ int file_server_wake_up(regex_list_t *list)
                 prelude_list_for_each_safe(tmp, bkp, &active_fd_list) {
                         monitor = prelude_list_entry(tmp, monitor_fd_t, list);                        
 
-                        event = process_file_event(list, monitor);
+                        event = process_file_event(monitor);
                         if ( event > 0 )
                                 ret = event;
                 }
@@ -1039,7 +1042,7 @@ int file_server_wake_up(regex_list_t *list)
         
 #ifdef HAVE_FAM
         else 
-                return fam_process_queued_events(list);
+                return fam_process_queued_events();
 #endif
         
         return ret;
@@ -1069,12 +1072,12 @@ void file_server_set_rotation_interval_max_difference(int val)
 
 
 
-void file_server_start_monitoring(regex_list_t *list)
+void file_server_start_monitoring(void)
 {
         /*
          * Initialize everythings once by calling file_server_wake_up().
          */
-        file_server_wake_up(list);
+        file_server_wake_up();
 }
 
 

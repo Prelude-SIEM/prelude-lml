@@ -96,17 +96,18 @@ static void regex_entry_delete(regex_entry_t *entry)
 
 
 
-static int regex_create_entry(regex_list_t *list, const char *filename,
-                              int line, const char *pname, const char *regex, const char *options) 
+static int regex_create_entry(regex_list_t *list, int line, const char *source,
+                              const char *pname, const char *regex, const char *options) 
 {
         int erroffset;
         pcre *compiled;
         const char *errptr;
         regex_entry_t *entry;
-
+        prelude_plugin_generic_t *plugin;
+        
         compiled = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! compiled ) {
-                log(LOG_INFO, "%s:%d : unable to compile: %s.\n", filename, line, errptr);
+                log(LOG_INFO, "%s:%d : unable to compile: %s.\n", REGEX_CONF, line, errptr);
                 return -1;
         }
         
@@ -115,15 +116,20 @@ static int regex_create_entry(regex_list_t *list, const char *filename,
                 pcre_free(compiled);
                 return -1;
         }
-        
+
         entry->regex_compiled = compiled;
         entry->regex_extra = pcre_study(entry->regex_compiled, 0, &errptr);
 
         entry->plugin = log_plugin_register(pname);
         if ( ! entry->plugin ) {
                 regex_entry_delete(entry);
-                log(LOG_INFO, "%s:%d : couldn't find plugin: %s.\n", filename, line, pname);
+                log(LOG_INFO, "%s:%d : couldn't find plugin: %s.\n", REGEX_CONF, line, pname);
+                return -1;
         }
+
+        plugin = prelude_plugin_instance_get_plugin(entry->plugin);
+        log(LOG_INFO, "- Monitoring %s throught %s[%s]\n",
+            source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
         
         /*
          * TBD: take care of options field
@@ -138,13 +144,13 @@ static int regex_create_entry(regex_list_t *list, const char *filename,
 
 
 
-regex_list_t *regex_init(char *filename)
+regex_list_t *regex_init(const char *source)
 {
         FILE *fd;
         char buf[1024];
         int line = 1, ret;
         regex_list_t *conf;
-        char *name, *regex, *options;
+        char *name, *regex, *options, *file;
 
         conf = malloc(sizeof(*conf));
         if ( ! conf ) {
@@ -154,14 +160,14 @@ regex_list_t *regex_init(char *filename)
         
         PRELUDE_INIT_LIST_HEAD(conf);
 
-        fd = fopen(filename, "r");
+        fd = fopen(REGEX_CONF, "r");
         if ( ! fd ) {
-                log(LOG_ERR, "couldn't open config file %s.\n", filename);
+                log(LOG_ERR, "couldn't open config file %s.\n", REGEX_CONF);
                 return NULL;
         }
 
         while ( fgets(buf, sizeof(buf), fd) ) {
-
+                
                 trim(buf);
 
                 if ( buf[0] == '#' || buf[0] == '\0' )
@@ -169,8 +175,19 @@ regex_list_t *regex_init(char *filename)
                          * ignore comments and empty lines
                          */
                         continue;
+
+                file = strtok(buf, " \t");
+                if ( ! file ) {
+                        line++;
+                        continue;
+                }
                 
-                name = strtok(buf, " \t");
+                if ( strcmp(file, source) != 0 && strcmp(file, "*") != 0 ) {
+                        line++;
+                        continue;
+                }
+                
+                name = strtok(NULL, " \t");
                 if ( ! name ) {
                         line++;
                         continue;
@@ -187,8 +204,8 @@ regex_list_t *regex_init(char *filename)
                         line++;
                         continue;
                 }
-                
-                ret = regex_create_entry(conf, filename, line, name, regex, options);
+
+                ret = regex_create_entry(conf, line, source, name, regex, options);
                 if ( ret < 0 )
                         continue;
                 
@@ -196,7 +213,13 @@ regex_list_t *regex_init(char *filename)
         }
         
         fclose(fd);
-    
+
+        if ( prelude_list_empty(conf) ) {
+                log(LOG_ERR, "No plugin configured to receive %s data.\n", source);
+                free(conf);
+                return NULL;
+        }
+        
         return conf;
 }
 

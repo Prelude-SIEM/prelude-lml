@@ -56,9 +56,14 @@ void log_plugin_run(prelude_plugin_instance_t *pi, log_container_t *log)
 
 
 
-prelude_plugin_instance_t *log_plugin_register(const char *pname) 
+prelude_plugin_instance_t *log_plugin_register(const char *plugin) 
 {
-        return prelude_plugin_search_instance_by_name(pname, NULL);
+        int ret;
+        char pname[256], iname[256];
+        
+        ret = sscanf(plugin, "%255[^[][%255[^]]", pname, iname);
+
+        return prelude_plugin_search_instance_by_name(pname, (ret == 2) ? iname : NULL);
 }
 
 

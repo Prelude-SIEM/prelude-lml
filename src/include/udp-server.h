@@ -7,12 +7,9 @@
 typedef struct udp_server udp_server_t;
 
 
-void udp_server_process_event(udp_server_t *server, regex_list_t *list);
+void udp_server_process_event(udp_server_t *server);
 
-/*
- * Creates a new UDP socket.
- */
-udp_server_t *udp_server_new(const char *addr, uint16_t port);
+udp_server_t *udp_server_new(regex_list_t *list, const char *addr, uint16_t port);
 
 void udp_server_close(udp_server_t *server);
 

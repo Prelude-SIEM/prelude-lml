@@ -140,7 +140,7 @@ static void add_fd_to_set(fd_set *fds, int fd)
 
 
 
-static void wait_for_event(regex_list_t *list) 
+static void wait_for_event(void) 
 {
         int ret;
         fd_set fds;
@@ -178,14 +178,14 @@ static void wait_for_event(regex_list_t *list)
                         prelude_wake_up_timer();
 
                         if ( file_event_fd < 0 )
-                                file_server_wake_up(list);
+                                file_server_wake_up();
                 }
                 
                 if ( udp_event_fd > 0 && FD_ISSET(udp_event_fd, &fds) ) 
-                        udp_server_process_event(udp_srvr, list);
+                        udp_server_process_event(udp_srvr);
                 
                 if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) ) 
-                        file_server_wake_up(list);
+                        file_server_wake_up();
         }
 }
 
@@ -195,7 +195,6 @@ static void wait_for_event(regex_list_t *list)
 int main(int argc, char **argv)
 {
         int ret;
-	regex_list_t *regex_list;
         
         global_argv = argv;
         
@@ -214,17 +213,13 @@ int main(int argc, char **argv)
         if ( ret < 0 )
                 return -1;
         
-	regex_list = regex_init(REGEX_CONF);
-        if ( ! regex_list )
-                exit(1);
-        
         signal(SIGTERM, sig_handler);
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);
         signal(SIGABRT, sig_handler);
         signal(SIGHUP, sighup_handler);
 
-        file_server_start_monitoring(regex_list);
+        file_server_start_monitoring();
 
         /*
          * if either FAM or UDP server is enabled, we use polling to know
@@ -232,11 +227,11 @@ int main(int argc, char **argv)
          * then we revert to reading every data at once.
          */
         if ( (udp_srvr || file_server_get_event_fd() > 0) && ! batch_mode )
-                wait_for_event(regex_list);
+                wait_for_event();
         else {
                 do {
                         handle_sighup_if_needed();
-                        ret = file_server_wake_up(regex_list);
+                        ret = file_server_wake_up();
 
                         if ( ! batch_mode )
                                 sleep(1);
