@@ -107,8 +107,8 @@ for dir in /usr /usr/local /usr/pkg; do
 	AC_CHECK_FILE($dir/include/fam.h, fam_include_dir=$dir)
 done
 
-if test -n "$fam_lib_dir" && test -n "$fam_include_dir"; then
-	enable_fam=yes
+if test -z "$fam_lib_dir" || test -z "$fam_include_dir"; then
+	enable_fam=no
 fi
 
 if test x$fam_include_dir = x/usr; then
