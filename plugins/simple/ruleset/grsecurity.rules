@@ -1,0 +1,156 @@
+#####
+#
+# Copyright (C) 2002 Brad Spengler <spender@grsecurity.net>
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by 
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+# grsecurity support for Prelude-LML
+
+#  Part I: Kernel Auditing
+
+# mount/unmount
+regex=grsec: mount ([^ ]+) to ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Device mounted;impact.completion=succeeded;impact.type=admin;impact.severity=low;impact.description=The device $1 was mounted to the path $2 by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: unmount of ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Device unmounted;impact.completion=succeeded;impact.type=admin;impact.severity=low;impact.description=The device $1 was unmounted by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# time
+regex=grsec: time set by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=System time change;impact.completion=succeeded;impact.type=admin;impact.severity=medium;impact.description=The system time was set by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# signals
+regex=grsec: signal (\d+) sent to \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Received signal;impact.completion=succeeded;impact.type=other;impact.severity=medium;impact.description=A signal $1 was sent to the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# exec/exec in chroot
+regex=grsec: exec of \[\d+:\d+:\d+\] \(([^ ]+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=File executed;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=$1 was executed by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: exec of ([^ ]+) within chroot jail \(\d+:\d+:\d+\) by process \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=exec in chroot;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=$1 was executed in a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# chdir/fchdir
+regex=grsec: chdir\(["]([^ ]+)["]\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Chdir use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=The current working directory was changed to $1 for the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: fchdir\(\d+\) to ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Fchdir use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=The current working directory was changed to $1 for the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# ipc
+regex=grsec: message queue created by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Message queue created;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=A message queue was created by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+regex=grsec: message queue of uid:(\d+) euid:(\d+) removed by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Message queue removed;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=A message queue owned by uid $1, euid $2 was removed by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: semaphore created by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Semaphore created;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=A semaphore was created by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+regex=grsec: semaphore of uid:(\d+) euid:(\d+) removed by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Semaphore removed;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=A semaphore owned by uid $1, euid $2 was removed by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: shared memory of size (\d+) created by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Shared memory created;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Shared memory of size $1 was created by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: shared memory of uid:(\d+) euid:(\d+) removed by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Shared memory removed;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Shared memory owned by uid $1, euid $2 was removed by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# ptrace
+regex=grsec: denied ptrace of \[\d+:\d+:\d+\] \(([^ ]+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted ptrace;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=A ptrace of $1 was attempted by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: denied ptrace of \((\w+):(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted ptrace;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=A ptrace of process $1, pid $2 was attempted by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: ptrace of \((\w+):(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted ptrace;impact.completion=succeeded;impact.type=other;impact.severity=medium;impact.description=A ptrace of process $1, pid $2 was attempted by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# failed fork
+regex=grsec: failed for with errno (\d+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Failed fork;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=A fork failed with errno $1 by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# set*id
+regex=grsec: setregid\(rgid=(\d+)/egid=(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setregid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setregid with rgid $1 and egid $2 was performed by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: setgid\((\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setgid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setgid with gid $1 was performed by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: setreuid\(ruid=(\d+)/euid=(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setreuid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setreuid with ruid $1 and euid $2 was performed by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: setuid\((\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setuid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setuid with uid $1 was performed by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: setresuid\(ruid=(\d+)/suid=(\d+)/euid=(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setresuid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setresuid with ruid $1, suid $2, and euid $3 was performed by the process $4, pid $5, uid $6 euid $7, parent process $8, pid $9, uid $10 euid $11.
+regex=grsec: setresgid\(rgid=(\d+)/sgid=(\d+)/egid=(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setresgid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setresgid with rgid $1, sgid $2, and egid $3 was performed by the process $4, pid $5, uid $6 euid $7, parent process $8, pid $9, uid $10 euid $11.
+regex=grsec: setfsuid\((\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setfsuid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setfsuid with fsuid $1 was performed by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: setfsgid\((\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setfsgid use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setfsgid with fsgid $1 was performed by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: setgroups by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Setgroups use;impact.completion=succeeded;impact.type=other;impact.severity=low;impact.description=Setgroups was performed by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+#  Part II: Buffer overflow protections
+
+# kmem ioctl
+regex=grsec: attempted ioctl write to kernel memory by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Ioctl write to kernel memory;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to write to kernel memory by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# openwall stack
+regex=grsec: return onto stack by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Buffer overflow exploit;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to return onto the stack (possibly a buffer overflow exploit) by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+#  Part III: Executable protections
+
+# nr_proc limit execve
+regex=grsec: Attempt to overstep process limit by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Process limit overstep;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt was made to overstep the process limit by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# tpe bad envvars
+regex=grsec: exec of ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\) attempted to use (\d+) malicious environment(s);class.name=TPE: bad envvars;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=$10 malicious environment variables were passed to $1 by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# tpe untrusted
+regex=grsec: denied exec of ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\) reason: untrusted;class.name=TPE: untrusted exec;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=The untrusted binary $1 was attempted to be executed by process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# tpe mmap
+regex=grsec: denied exec of ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\) reason: tried to mmap binary;class.name=TPE: mmap exec;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=The untrusted binary $1 was attempted to be executed via mmap by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+#  Part IV: Filesystem protections
+
+# restricted symlinks
+regex=grsec: not following symlink \(([^ ]+)\) of \[\d+:\d+\]:\d+ owned by (\d+).(\d+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted tmp race exploit;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to exploit a /tmp race with the symlink of $1, owned by  user $2, group $3.  The exploit was launched against the process $4, pid $5, uid $6 euid $7, parent process $8, pid $9, uid $10 euid $11.
+regex=grsec: not following symlink \(([^ ]+)\) \[\d+:\d+\]:\d+ owned by (\d+).(\d+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted tmp race exploit;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to exploit a /tmp race with the symlink of $1, owned by  user $2, group $3.  The exploit was launched against the process $4, pid $5, uid $6 euid $7, parent process $8, pid $9, uid $10 euid $11.
+
+# restricted fifo
+regex=grsec: denied writing FIFO \(([^ ]+)\) of (\d+).(\d+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Dangerous FIFO write;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to write to the FIFO $1, owned by  user $2, group $3.  The exploit was launched against the process $4, pid $5, uid $6 euid $7, parent process $8, pid $9, uid $10 euid $11.
+
+# restricted chroot -> mknod
+regex=grsec: refused attempt to mknod\([a-z]:\d+:\d+\) \(([^ ]+)\) from chroot\(\) jail \(\d+:\d+\d+\) owned by \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Mknod in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to mknod $1 in a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# restricted hardlink
+regex=grsec: denied hardlink of \(([^ ]+)\) \(owned by (\d+).(\d+)\) to ([^ ]+) for \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Dangerous hardlink;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to hardlink $1, owned by user $2, group $3, to $4 by the process $5, pid $6, uid $7 euid $8, parent process $9, pid $10, uid $11 euid $12.
+
+# restricted chroot -> mount
+regex=grsec: denied attempt to mount \(([^ ]+)\) as ([^ ]+) from chroot jail \(\d+:\d+:\d+\) of \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Mount in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to mount $1 to $2 in a chroot jail by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# restricted chroot -> pivot_root
+regex=grsec: denied attempt to pivot_root\(([^ ]+),([^ ]+)\) from chroot jail \(\d+:\d+:\d+\) of \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Pivot_root in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to change the root directory from $1 to $2 in a chroot jail by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# restricted chroot -> fchdir
+regex=grsec: Attempted fchdir outside of chroot to ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Fchdir out of chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to fchdir to $1 out of a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# restricted chroot -> chroot
+regex=grsec: denied attempt to chroot\(\) from \(\d+:\d+\d+\) to \(([^ ]+)\), process \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Double chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to chroot to $1 in a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# restricted chroot -> fchmod
+regex=grsec: denied attempt to fchmod +s \(\d+:\d+:\d+\) owned by \d+.\d+ to mode \d+ from chroot jail \(\d+:\d+:\d+\) of \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Fchmod +s in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to fchmod +s in a chroot jail by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# restricted chroot -> chmod
+regex=grsec: denied attempt to chmod +s \(\d+:\d+:\d+\) \(([^ ]+)\) owned by \d+.\d+ to mode \d+ from chroot jail \(\d+:\d+:\d+\) of \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Chmod +s in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to chmod +s $1 in a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+# restricted chroot -> nice
+regex=grsec: attempted priority change of process \((\w+):(\d+)\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Nice in chroot;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt was made to change the priority of process $1, pid $2 in a chroot jail by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+regex=grsec: attempted priority change by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Nice in chroot;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt was made to change the priority of a process in a chroot jail by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# restricted chroot -> capset
+regex=grsec: denied capset of \((\w+):(\d+)\) within chroot jail \(\d+:\d+:\d+\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Capset in chroot;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt was made to change the capabilities of the process $1, pid $2 in a chroot jail by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# restricted chroot -> ptrace
+regex=grsec: denied ptrace of process\((\w+):(\d+)\) within chroot jail \(\d+:\d+:\d+\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Ptrace in chroot;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to ptrace the process $1, pid $2 in a chroot jail by the process $3, pid $4, uid $5 euid $6, parent process $7, pid $8, uid $9 euid $10.
+
+# restricted chroot -> signal
+regex=grsec: denied signal (\d+) out of chroot jail \(\d+:\d+\d+\) of \d+.\d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Signal sent out of chroot;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt was made send a signal $1 out of a chroot jail by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+
+#  Part V: Network restrictions
+
+# socket
+regex=grsec: attempted socket\(\d+,\d+,\d+\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Socket use;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt to use socket was made by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# bind
+regex=grsec: attempted bind\(\) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Bind use;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt to use bind was made by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+# connect
+regex=grsec: attempted connect\(\) to fd \d+ by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Connect use;impact.completion=failed;impact.type=other;impact.severity=medium;impact.description=An attempt to use connect was made by the process $1, pid $2, uid $3 euid $4, parent process $5, pid $6, uid $7 euid $8.
+
+#  Part VI: Sysctl
+
+regex=grsec: attempt to modify grsecurity sysctl value : ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted grsecurity sysctl changes;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to write to the grsecurity sysctl entry $1 while the system was locked by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+regex=grsec: attempt to modify grsecurity sysctl value: ([^ ]+) by \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\), parent \((\w+):(\d+)\) UID \((\d+)\) EUID \((\d+)\);class.name=Attempted grsecurity sysctl changes;impact.completion=failed;impact.type=other;impact.severity=high;impact.description=An attempt was made to write to the grsecurity sysctl entry $1 while the system was locked by the process $2, pid $3, uid $4 euid $5, parent process $6, pid $7, uid $8 euid $9.
+

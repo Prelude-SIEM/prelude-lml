@@ -31,7 +31,6 @@
 #
 file = /var/log/auth.log
 file = /var/log/messages
-file = /var/log/apache/access.log
 
 
 ####################################

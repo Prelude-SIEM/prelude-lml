@@ -1,3 +1,20 @@
+2002-06-06  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/lml-alert.c (generate_analyzer): 
+	generate analyzer. Use prelude_analyzer_fill_infos().
+	(send_heartbeat_cb): use generate_analyzer()
+	(lml_emit_alert): ditto.
+
+	* plugins/simple/ruleset/grsecurity.rules: 
+	Included GRsecurity ruleset, from Brad Spengler 
+	<spender@grsecurity.net>. 
+
+	Hand modified it a little to add some missing parenthesis, 
+	and change /d and /w to \d and \w respectively.
+
+	* plugins/simple/ruleset/Makefile.am (ruleset_DATA): 
+	install grsecurity.rules.
+
 2002-06-03  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/lml-alert.c (lml_alert_init): 

@@ -40,6 +40,7 @@
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-getopt.h>
 #include <libprelude/daemonize.h>
+#include <libprelude/idmef-tree.h>
 #include <libprelude/sensor.h>
 #include <libprelude/prelude-path.h>
 
