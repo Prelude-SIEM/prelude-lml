@@ -38,13 +38,9 @@
 #include <libprelude/common.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/idmef.h>
-#include <libprelude/prelude-io.h>
-#include <libprelude/prelude-message.h>
 #include <libprelude/prelude-message-buffered.h>
 #include <libprelude/idmef-message-write.h>
-#include <libprelude/prelude-io.h>
-#include <libprelude/prelude-message.h>
-#include <libprelude/sensor.h>
+#include <libprelude/prelude-client.h>
 #include <libprelude/prelude-inet.h>
 
 #include "log-common.h"
@@ -53,73 +49,12 @@
 
 
 static prelude_msgbuf_t *msgbuf;
-static idmef_analyzer_t *lml_analyzer;
+static idmef_analyzer_t *idmef_analyzer;
+
 
 #define ANALYZER_CLASS "HIDS"
 #define ANALYZER_MODEL "Prelude LML"
 #define ANALYZER_MANUFACTURER "The Prelude Team http://www.prelude-ids.org"
-
-
-
-static idmef_analyzer_t *generate_analyzer(void) 
-{
-	idmef_analyzer_t *analyzer;
-	idmef_string_t *string;
-
-	analyzer = idmef_analyzer_new();
-	if ( ! analyzer )
-		return NULL;
-
-        prelude_analyzer_fill_infos(analyzer);
-
-	string = idmef_analyzer_new_model(analyzer);
-	idmef_string_set_constant(string, ANALYZER_MODEL);
-
-	string = idmef_analyzer_new_class(analyzer);
-	idmef_string_set_constant(string, ANALYZER_CLASS);
-
-	string = idmef_analyzer_new_manufacturer(analyzer);
-	idmef_string_set_constant(string, ANALYZER_MANUFACTURER);
-
-	string = idmef_analyzer_new_version(analyzer);
-	idmef_string_set_constant(string, VERSION);
-
-	return analyzer;
-}
-
-
-
-static void send_heartbeat_cb(void *data) 
-{
-        idmef_message_t *message;
-        idmef_heartbeat_t *heartbeat;
-	idmef_time_t *create_time;
-        
-        message = idmef_message_new();
-        if ( ! message )
-                return;
-
-        heartbeat = idmef_message_new_heartbeat(message);
-	if ( ! message ) {
-		idmef_message_destroy(message);
-		return;
-	}
-
-	idmef_heartbeat_set_analyzer(heartbeat, idmef_analyzer_ref(lml_analyzer));
-
-	create_time = idmef_time_new_gettimeofday();
-	if ( ! create_time ) {
-		idmef_message_destroy(message);
-		return;
-	}
-
-	idmef_heartbeat_set_create_time(heartbeat, create_time);
-
-	idmef_write_message(msgbuf, message);
-	prelude_msgbuf_mark_end(msgbuf);
-
-	idmef_message_destroy(message);
-}
 
 
 
@@ -314,25 +249,17 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 			goto error;
         }
 
-	idmef_alert_set_analyzer(alert, idmef_analyzer_ref(lml_analyzer));
+	idmef_alert_set_analyzer(alert, idmef_analyzer_ref(idmef_analyzer));
 
-        /*
-         *
-         */
         source = log_source_get_name(log->source);
 	if ( generate_additional_data(alert, "Log received from", source) < 0 )
 		goto error;
-
-        /*
-         *
-         */
-        if ( log->log )
+        
+        if ( log->log ) {
 		if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
 			goto error;
+        }
         
-        /*
-         *
-         */
         idmef_write_message(msgbuf, message);
         prelude_msgbuf_mark_end(msgbuf);
         
@@ -343,21 +270,33 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 
 
 
-int lml_alert_init(void) 
-{        
-        msgbuf = prelude_msgbuf_new(0);
+int lml_alert_init(prelude_client_t *lml_client) 
+{
+        idmef_string_t *string;
+        
+        msgbuf = prelude_msgbuf_new(lml_client);
         if ( ! msgbuf ) {
                 log(LOG_ERR, "couldn't create a message stream.\n");
                 return -1;
         }
 
-	lml_analyzer = generate_analyzer();
-	if ( ! lml_analyzer ) {
+	idmef_analyzer = prelude_client_get_analyzer(lml_client);
+	if ( ! idmef_analyzer ) {
 		prelude_msgbuf_close(msgbuf);
 		return -1;
 	}
+        
+	string = idmef_analyzer_new_model(idmef_analyzer);
+	idmef_string_set_constant(string, ANALYZER_MODEL);
 
-        prelude_heartbeat_register_cb(send_heartbeat_cb, NULL);
+	string = idmef_analyzer_new_class(idmef_analyzer);
+	idmef_string_set_constant(string, ANALYZER_CLASS);
+
+	string = idmef_analyzer_new_manufacturer(idmef_analyzer);
+	idmef_string_set_constant(string, ANALYZER_MANUFACTURER);
+
+	string = idmef_analyzer_new_version(idmef_analyzer);
+	idmef_string_set_constant(string, VERSION);
 
         return 0;
 }

@@ -2,6 +2,11 @@
 # Configuration for the Prelude LML Sensor   #
 ##############################################
 
+
+include = @prefix@/prelude/default/global.conf
+include = @prefix@/prelude/default/client.conf
+
+
 # Address where the Prelude Manager Server is listening on.
 # if value is "127.0.0.1", the connection will occur throught
 # an UNIX socket.

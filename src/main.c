@@ -19,6 +19,7 @@
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-getopt.h>
 #include <libprelude/prelude-plugin.h>
+#include <libprelude/prelude-client.h>
 #include <libprelude/timer.h>
 
 #include "config.h"
@@ -39,6 +40,7 @@
 extern int batch_mode;
 static char **global_argv;
 extern udp_server_t *udp_srvr;
+extern prelude_client_t *lml_client;
 static volatile sig_atomic_t got_sighup = 0;
 
 
@@ -209,7 +211,7 @@ int main(int argc, char **argv)
         if ( ret < 0 )
                 exit(1);
         
-        ret = lml_alert_init();
+        ret = lml_alert_init(lml_client);
         if ( ret < 0 )
                 return -1;
         

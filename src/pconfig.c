@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998-2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -34,15 +34,14 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#include <libprelude/idmef.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/config-engine.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-getopt.h>
 #include <libprelude/daemonize.h>
-#include <libprelude/idmef-tree.h>
-#include <libprelude/sensor.h>
-#include <libprelude/prelude-path.h>
+#include <libprelude/prelude-client.h>
 
 #include "config.h"
 #include "pconfig.h"
@@ -51,11 +50,12 @@
 #include "file-server.h"
 #include "udp-server.h"
 
-
+#define DEFAULT_ANALYZER_NAME "prelude-lml"
 #define DEFAULT_UDP_SERVER_PORT 514
 
 
 int batch_mode = 0;
+prelude_client_t *lml_client;
 static char *pidfile = NULL;
 udp_server_t *udp_srvr = NULL;
 static uid_t prelude_lml_user = 0;
@@ -159,7 +159,6 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
         int ret;
         log_source_t *ls;
         regex_list_t *rlist;
-
         
         ls = log_source_new();
         if ( ! ls )
@@ -264,21 +263,17 @@ static int set_lml_user(void **context, prelude_option_t *opt, const char *arg)
         }
 
         prelude_lml_user = p->pw_uid;
-
-        /*
-         * tell the prelude library that every operation should be done as
-         * non root.
-         */
-        prelude_set_program_userid(p->pw_uid);
-
+        prelude_client_set_uid(*context, p->pw_uid);
+        
         return prelude_option_success;
 }
 
 
 
+
 int pconfig_set(int argc, char **argv)
 {
-	int ret;
+        int ret;
         prelude_option_t *opt;
         
 	prelude_option_add(NULL, CLI_HOOK, 'h', "help",
@@ -304,7 +299,7 @@ int pconfig_set(int argc, char **argv)
 	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'd', "daemon",
 			   "Run in daemon mode", no_argument,
 			   set_daemon_mode, NULL);
-
+        
 	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'P', "pidfile",
                                  "Write Prelude LML PID to specified pidfile",
                                  required_argument, set_pidfile, NULL);
@@ -313,7 +308,8 @@ int pconfig_set(int argc, char **argv)
         opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 's', "udp-srvr",
                            "address:port pair to listen to syslog to UDP messages (default port 514)", optionnal_argument,
                            enable_udp_server, NULL);
-
+        prelude_option_set_priority(opt, option_run_last);
+        
         prelude_option_set_priority(opt, option_run_last);
         
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'r', "rotation-interval",
@@ -326,22 +322,26 @@ int pconfig_set(int argc, char **argv)
                            "Tell LML to run in batch mode", no_argument,
                            set_batch_mode, NULL);
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 't', "time-format", 
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|ALLOW_MULTIPLE_CALL, 't', "time-format", 
                            "Specify the input timestamp format", required_argument,
                            set_logfile_ts_format, NULL);
         
-        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'l', "log-format", 
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|ALLOW_MULTIPLE_CALL, 'l', "log-format", 
                            "Specify the input format", required_argument,
                            set_logfile_format, NULL);
         
-        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
+        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|ALLOW_MULTIPLE_CALL, 'f', "file",
                                  "Specify a file to monitor (you might specify \"stdin\")",
                                  required_argument, set_file, NULL);
 
         prelude_option_set_priority(opt, option_run_last);
-        
-        ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
-	if ( ret == prelude_option_error || ret == prelude_option_end )
+
+        lml_client = prelude_client_new(PRELUDE_CLIENT_CAPABILITY_SEND_IDMEF);
+        if ( ! lml_client )
+                return -1;
+
+        ret = prelude_client_init(lml_client, "prelude-lml", PRELUDE_CONF, argc, argv);
+        if ( ret < 0 )
                 exit(1);
 
         if ( batch_mode && udp_srvr ) {
