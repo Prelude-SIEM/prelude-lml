@@ -32,5 +32,6 @@
 #include "config.h"
 #include "snprintf.h"
 #include "getaddrinfo.h"
+#include "inet_ntop.h"
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */
