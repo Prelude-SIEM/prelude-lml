@@ -78,10 +78,19 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t priority)
 {
         int ret;
+        struct timeval tv;
         idmef_additional_data_t *data;
         idmef_alert_t *alert = msg->message.alert;
         idmef_analyzer_t *analyzer = &alert->analyzer;
 
+        gettimeofday(&tv, NULL);
+        alert->create_time.sec = tv.tv_sec;
+        alert->create_time.usec = tv.tv_usec;
+
+
+        idmef_alert_detect_time_new(alert);
+        alert->detect_time->sec = log->tv.tv_sec;
+        alert->detect_time->usec = log->tv.tv_usec;
         
         if ( log->target_hostname || log->target_program ) {
                 ret = generate_target(log, alert);
