@@ -50,7 +50,7 @@
 
 
 lml_config_t config;
-static const char *config_file = PRELUDE_CONF;
+static const char *config_file = PRELUDE_LML_CONF;
 
 
 static int set_conf_file(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)

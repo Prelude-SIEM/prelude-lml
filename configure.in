@@ -156,20 +156,20 @@ AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(gettimeofday select socket strdup strerror strstr)
 
 configdir=$sysconfdir/prelude-lml
-prelude_conf=$configdir/prelude-lml.conf
+prelude_lml_conf=$configdir/prelude-lml.conf
 regex_conf=$configdir/plugins.rules
 
 plugindir=$libdir/prelude-lml
 log_plugin_dir=$plugindir
 
-AC_DEFINE_UNQUOTED(PRELUDE_CONF, "$prelude_conf", Path to the LML configuration file)
+AC_DEFINE_UNQUOTED(PRELUDE_LML_CONF, "$prelude_lml_conf", Path to the LML configuration file)
 
 defined="$defined $LIBPRELUDE_CFLAGS $PCRE_CFLAGS"
 
 AC_SUBST(defined)
 AC_SUBST(configdir)
 AC_SUBST(localstatedir)
-AC_SUBST(prelude_conf)
+AC_SUBST(prelude_lml_conf)
 AC_SUBST(regex_conf)
 AC_SUBST(log_plugin_dir)
 AC_SUBST(LIBWRAP_LIBS)
