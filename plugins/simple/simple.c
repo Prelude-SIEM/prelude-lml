@@ -46,6 +46,18 @@
 #define VARIABLE_TYPE_STRING 1
 
 
+#define generic_free_list(type, head) do {           \
+        type *decl;                                  \
+        struct list_head *tmp;                       \
+                                                     \
+        for (tmp = (head)->next; tmp != (head); ) {  \
+                decl = list_entry(tmp, type, list);  \
+                tmp = tmp->next;                     \
+                free(decl);                          \
+        }                                            \
+} while (0)
+
+
 typedef struct {
         void *ptr;
         int type;
@@ -63,6 +75,7 @@ typedef struct {
         char *regex_string;
         idmef_impact_t *impact;  
         idmef_classification_t *class;
+        idmef_source_t *source;
         struct list_head variable_list;
         struct list_head list;
 } simple_rule_t;
@@ -284,7 +297,7 @@ static int parse_regex(simple_rule_t *rule, const char *regex, int *var_type, vo
 {
         int erroffset;
         const char *errptr;
-        
+
         rule->regex = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! rule->regex ) {
                 log(LOG_INFO, "unable to compile regex: %s.\n", errptr);
@@ -297,6 +310,41 @@ static int parse_regex(simple_rule_t *rule, const char *regex, int *var_type, vo
         return 0;
 }
 
+
+/*
+ * arno (29/04/02) : new function for new imdef field : source.node.address.address
+ */
+static int parse_source_node_address_address(simple_rule_t *rule, const char *address, int *var_type, void **var_ptr) 
+{
+        idmef_node_t *idmef_node;
+        idmef_address_t *idmef_address;
+        
+        if ( ! rule->source && ! (rule->source = calloc(1, sizeof(*rule->source))) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        if ( ! rule->source->node ) {
+                if ( ! (idmef_node = idmef_source_node_new(rule->source)) ) {
+                        log(LOG_ERR, "memory exhauster.\n");
+                        return -1;
+                }
+        }
+        else
+                idmef_node = rule->source->node;
+
+        if ( ! (idmef_address = idmef_node_address_new(idmef_node)) ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        *var_type = VARIABLE_TYPE_STRING;
+        *var_ptr  = &idmef_address->address;
+        
+        idmef_string_set(&idmef_address->address, strdup(address));
+        
+        return 0;
+}
 
 
 
@@ -453,16 +501,17 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
                 const char *key;
                 int (*func)(simple_rule_t *rule, const char *value, int *var_type, void **var_ptr);
         } tbl[] = {
-                { "include", parse_include                     },
-                { "regex", parse_regex                         },
-                { "class.origin", parse_class_origin           },
-                { "class.name", parse_class_name               },
-                { "class.url", parse_class_url                 },
-                { "impact.completion", parse_impact_completion },
-                { "impact.type",       parse_impact_type       },
-                { "impact.severity",   parse_impact_severity   },
-                { "impact.description", parse_impact_desc      },
-                { NULL, NULL                                   },
+                { "include", parse_include                                          },
+                { "regex", parse_regex                                              },
+                { "class.origin", parse_class_origin                                },
+                { "class.name", parse_class_name                                    },
+                { "class.url", parse_class_url                                      },
+                { "impact.completion", parse_impact_completion                      },
+                { "impact.type",       parse_impact_type                            },
+                { "impact.severity",   parse_impact_severity                        },
+                { "impact.description", parse_impact_desc                           },
+                { "source.node.address.address", parse_source_node_address_address  },
+                { NULL, NULL                                                        },
         };
 
         ptr = buf;
@@ -532,6 +581,17 @@ static void free_rule(simple_rule_t *rule)
         if ( rule->class )
                 free(rule->class);
 
+        /*** arno (29/04/02) ***/
+
+        if ( rule->source ) {
+                if ( rule->source->node ) {
+                        generic_free_list(idmef_address_t, &rule->source->node->address_list);
+                        free(rule->source->node);
+                }
+
+                free(rule->source);
+        } 
+
         free(rule);
 }
 
@@ -592,6 +652,12 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
         idmef_message_t *message;
         idmef_classification_t *class;
         idmef_assessment_t *assessment;
+        idmef_source_t *source;
+        idmef_node_t *node;
+        idmef_address_t *address;
+        idmef_address_t *address_tmp;
+        
+        struct list_head *tmp;
         
         message = idmef_message_new();
         if ( ! message )
@@ -622,10 +688,39 @@ static void emit_alert(simple_rule_t *rule, const log_container_t *log)
                 idmef_string_copy(&class->name, &rule->class->name);
         }
 
+        /*** arno (30/04/02) ***/
+
+        if ( rule->source ) {
+                
+                source = idmef_alert_source_new(alert);
+
+                if ( ! source ) {
+                        idmef_message_free(message);
+                        return;
+                }
+
+                node = idmef_source_node_new(source);
+
+                if ( ! node ) {
+                        idmef_message_free(message);
+                        return;
+                }
+
+                address = idmef_node_address_new(node);
+
+                if ( ! address ) {
+                        idmef_message_free(message);
+                        return;
+                }
+                
+                list_for_each(tmp, &rule->source->node->address_list) {
+                        address_tmp = list_entry(tmp, idmef_address_t, list);
+                        idmef_string_copy(&address->address, &address_tmp->address);
+                }
+        }
+        
         lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_MID);
 }
-
-
 
 
 static int replace_str(idmef_string_t *str, const char *needle, const char *replacement) 
@@ -702,7 +797,6 @@ static void resolve_variable(const log_container_t *log,
                         replace_str(var->ptr, var->reference_str, buf);
         }
 }
-
 
 
 

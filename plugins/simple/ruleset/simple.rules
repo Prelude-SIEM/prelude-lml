@@ -44,7 +44,9 @@
 # - impact.description:
 #   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
-
+#
+# - source.node.address.address:
+#   Address that issued the attack.
 
 include = cisco.rules;
 include = zyxel.rules;
