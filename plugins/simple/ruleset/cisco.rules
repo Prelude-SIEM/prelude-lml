@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2002 Arnaud Guignard <arnaud.guignard@free.fr> 
 # This ruleset is currently unmaintained.  Contact the Prelude
-# prelude development team if you would like to maintain it.
+# development team if you would like to maintain it.
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -25,7 +25,7 @@
 
 # Cisco router support for Prelude-LML
 # No log sample; please submit
-regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; \
+regex=SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\); \
  classification(0).name=Cisco ip access; \
  id=500; \
  revision=1; \
@@ -47,7 +47,7 @@ regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9
  last
 
 # No log sample; please submit
-regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; \
+regex=RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+); \
  classification(0).name=RSH attempt; \
  id=501; \
  revision=1; \

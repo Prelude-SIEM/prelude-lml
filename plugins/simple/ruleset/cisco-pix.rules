@@ -62,8 +62,10 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
  target(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$4; \
- target(0).service.name=$5; \
+ target(0).service.port=$5; \
+ target(0).user.category=os-device; \
  target(0).user.userid(0).name=$6; \
+ target(0).user.userid(0).type=target-user; \
  last
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
@@ -76,8 +78,12 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 succesfully enabled; \
+ source(0).user.category=os-device; \
  source(0).user.userid(0).name=$1; \
+ source(0).user.userid(0).type=original-user; \
+ target(0).user.category=os-device; \
  target(0).user.userid(0).name=enable_15; \
+ target(0).user.userid(0).type=target-user; \
  last
 
 #Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
@@ -102,7 +108,9 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 logged out; \
+ source(0).user.category=os-device; \
  source(0).user.userid(0).name=$1; \
+ source(0).user.userid(0).type=current-user; \
  last
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
@@ -122,8 +130,10 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  target(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$4; \
- target(0).service.name=$5; \
+ target(0).service.port=$5; \
+ target(0).user.category=os-device; \
  target(0).user.userid(0).name=$6; \
+ target(0).user.userid(0).type=target-user; \
  last
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
@@ -136,7 +146,9 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
  assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
+ target(0).user.category=os-device; \
  target(0).user.userid(0).name=enable_15; \
+ target(0).user.userid(0).type=target-user; \
  last
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
@@ -148,7 +160,7 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" di
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
- assessment.impact.description=$1 making probably a server recognition; \
+ assessment.impact.description=$1 probably attempting to determine SSH version; \
  source(0).interface=$2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
@@ -257,6 +269,47 @@ regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\
  target(0).service.port=$4; \
  last
 
+#Feb  3 01:47:37 pix %PIX-4-405001: Received ARP response collision from 12.34.56.78/000b.bf5b.9408 on interface outside
+regex=PIX-4-405001: Received ARP (request|response) collision from ([\d\.]+)\/([A-Fa-f\d\.]+) on interface (\S+); \
+ classification(0).name=ARP $1 mismatch; \
+ id=213; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=The firewall received an ARP packet, and the MAC address in the packet differs from the ARP cache entry.; \
+ source(0).spoofed=yes; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).node.address(1).category=mac; \
+ source(0).node.address(1).address=$3; \
+ source(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ last; 
+
+#Jan 25 14:59:33 pix %PIX-3-710003: TCP access denied by ACL from 148.208.247.3/2984 to outside:12.40.199.252/ssh
+regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+); \
+ classification(0).name=Unauthorized admin session attempt; \
+ id=214; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=admin; \
+ assessment.impact.description=This message appears when the firewall denies an attempt to connect to the interface service from an unauthorized management station.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=$1; \
+ source(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).interface=$4; \
+ last
+
 # Events taken from the Cisco System Log Messages List that will need rules
 # (include 'attack' or 'intrusion' in description; no log samples):
 # %PIX-2-106017: Deny IP due to Land Attack from IP_address to IP_address 
@@ -267,14 +320,11 @@ regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\
 # %PIX-1-107002: RIP pkt failed from IP_address: version=number on interface interface_name 
 # %PIX-4-109017: User at IP_address exceeded auth proxy connection limit (max)
 # %PIX-2-201003: Embryonic limit exceeded nconns/elimit for outside_address/outside_port (global_address) inside_address/inside_port on interface interface_name 
-# %PIX-4-209003: Fragment database limit of number exceeded: src = IP_address,dest = IP_address, proto = protocol, id = number
 # %PIX-3-320001: The subject name of the peer cert is not allowed for connection 
 # %PIX-4-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number
 # %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol 
-# %PIX-4-405001: Received ARP {request | response} collision from IP_address/mac_address on interface interface_name 
 # %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host 
 # %PIX-6-605004: Login denied from {source_address/source_port | serial} to {interface_name:dest_address/service | console} for user "user"
-# %PIX-3-710003: {TCP|UDP} access denied by ACL from source_address/source_port to interface_name:dest_address/service 
 # %PIX-7-710005: {TCP|UDP} request discarded from source_address/source_port to interface_name:dest_address/service 
 # %PIX-7-710006: protocol request discarded from source_address to interface_name:dest_address
 # %PIX-2-106020: Deny IP teardrop fragment (size = number, offset = number) from IP_address to IP_address
