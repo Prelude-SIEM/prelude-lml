@@ -302,7 +302,7 @@ static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string
         
         destroy_udp_server(opt, err, context);
         
-        if ( arg ) {
+        if ( arg && *arg ) {
                 ptr = strrchr(arg, ':');
                 if ( ptr ) {
                         *ptr = 0;
