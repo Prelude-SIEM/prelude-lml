@@ -56,16 +56,16 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$9; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$9; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$9; \
  last
 
 # 1.b Source or Target port is a service name
@@ -79,16 +79,16 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$9; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$9; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$9; \
  last
 
 # No sample log entry; please submit
@@ -101,16 +101,16 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$9; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$9; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$9; \
  last
 
 # 1.c Both ports are service names
@@ -124,16 +124,16 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$9; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$9; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$9; \
  last
 
 
@@ -149,16 +149,16 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$5; \
  last
 
 # 2.b One port is a service name
@@ -172,16 +172,16 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$5; \
  last
 
 # No sample log entry; please submit
@@ -194,16 +194,16 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$5; \
  last
 
 # 2.c Only service names
@@ -217,16 +217,16 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$5; \
  last
 
 
@@ -242,12 +242,12 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=FireWall $1 dropped and logged an icmp packet sent by $5 to $6, with type $7 and code $8 (rule #$9); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$6; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$6; \
  last
 
 # 3.2 Accepted packets
@@ -261,12 +261,12 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=FireWall $1 dropped and logged an icmp packet sent by $5 to $6, with type $7 and code $8 (rule #$9); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$6; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$6; \
  last
 
 
@@ -281,14 +281,14 @@ regex=product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.
  assessment.impact.type = other; \
  assessment.impact.severity = low; \
  assessment.impact.description=FireWall-1 has logged a $5 packet sent by $1:$2 to $3:$4 (rule #$6); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$3; \
- target.service.protocol=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=$5; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=$5; \
  last
 
 
@@ -320,12 +320,12 @@ regex=product: SmartDefense. dst: ([\d\.]+). attack: Port Scanning. src: ([\d\.]
  assessment.impact.severity=low; \
  assessment.impact.type=recon; \
  assessment.impact.description=Checkpoint SmartDefense has detected a port scan from $2 to $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$1; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$1; \
  last
 
 
@@ -352,13 +352,13 @@ regex=product: SmartDefense. service: ([\w-]+|\d+). attack: Successive Multiple 
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Checkpoint Smart Defense: multiple connections from $3 to $2:$1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$2; \
- target.service.name=$1; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).service.name=$1; \
  last
 
 # 4. Bad packet
@@ -372,14 +372,14 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 #4.2 port number to Service Name
@@ -392,14 +392,14 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 #4.3 Service Name to service name
@@ -412,14 +412,14 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.name=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.name=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 #4.4 Service Name to port number
@@ -432,14 +432,14 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.name=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.name=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 # 5. Large ping
@@ -452,12 +452,12 @@ regex=product: SmartDefense. Attack Info: Echo request too long. attack: Large p
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Large ping sent by $1 to $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$2; \
  last
 
 # 6. Small MSS
@@ -471,14 +471,14 @@ regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small 
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=A $6 packet with too small MSS ($1) was sent to $4:$5 by $2:$3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 # 6.2 Service name
@@ -491,14 +491,14 @@ regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small 
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=A $6 packet with too small MSS ($1) was sent to $4:$5 by $2:$3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 # 7. Bad proto sequence
@@ -512,14 +512,14 @@ regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP seque
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Dropped packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.port=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.port=$5; \
  last
 
 # 7.2 Service name
@@ -532,14 +532,14 @@ regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP seque
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Dropped packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.name=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.name=$5; \
  last
 
 # 8. Packet rejected : URL worm
@@ -553,14 +553,14 @@ regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Rejected packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.port=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.port=$5; \
  last
 
 # 8.2 Service number
@@ -573,14 +573,14 @@ regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=Rejected packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.name=$5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.name=$5; \
  last
 
 # 9. Generic Smart Defense alert

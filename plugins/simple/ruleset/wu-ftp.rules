@@ -40,16 +40,16 @@ regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\]
  assessment.impact.type=user; \
  assessment.impact.severity=low; \
  assessment.impact.description=An anonymous FTP user has logged into $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.protocol=tcp; \
- target.service.port=21; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=anonymous; \
- source.user.userid; \
- source.user.userid.name=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=21; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=anonymous; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$3; \
  last
 
 #Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
@@ -62,12 +62,12 @@ regex=([\w\-\.]+) ftpd\[\d+\]: FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description=A user failed logon on $1 due to $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.protocol=tcp; \
- target.service.port=21; \
- target.service.protocol=tcp; \
- source.user.userid; \
- source.user.userid.name=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=21; \
+ target(0).service.protocol=tcp; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$3; \
  last

@@ -38,12 +38,12 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Cisco PIX IDS detected an event; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
  last
 
 #Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
@@ -56,14 +56,14 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Cisco PIX detected a successful login as user $3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$2; \
- target.user.userid; \
- target.user.userid.name=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$3; \
  last
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
@@ -76,10 +76,10 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=User $1 succesfully enabled; \
- source.user.userid; \
- source.user.userid.name=$1; \
- target.user.userid; \
- target.user.userid.name=enable_15; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.name=enable_15; \
  last
 
 #Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
@@ -104,8 +104,8 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=PIX user $1 logged out; \
- source.user.userid; \
- source.user.userid.name=$1; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$1; \
  last
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
@@ -118,14 +118,14 @@ regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
  assessment.impact.description=Cisco PIX detected a failed login as user $3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$2; \
- target.user.userid; \
- target.user.userid.name=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$3; \
  last
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 1.2.3.210))
@@ -138,8 +138,8 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
  assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
- target.user.userid; \
- target.user.userid.name=enable_15; \
+ target(0).user.userid; \
+ target(0).user.userid.name=enable_15; \
  last
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 192.168.250.6 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
@@ -152,12 +152,12 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disc
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
  assessment.impact.description=$1 making probably a server recognition; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=22; \
- target.service.protocol=tcp; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
  last
 
 #Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.33.8.58(192.168.250.58)/80 on interface outside
@@ -170,16 +170,16 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.description=The embryonic connection limit on your PIX has been met and exceeded.; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.port=$2; \
- source.service.protocol=tcp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$3; \
- target.service.port=$4; \
- target.service.protocol=tcp; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.port=$2; \
+ source(0).service.protocol=tcp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
+ target(0).service.protocol=tcp; \
  last
 
 # Events taken from the Cisco System Log Messages List that will need rules

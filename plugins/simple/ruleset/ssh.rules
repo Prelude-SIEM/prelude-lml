@@ -44,16 +44,16 @@ regex=sshd\[\d+\]: Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; 
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.description=Root logged in from $2:$3 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv46-addr; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=root; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv46-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=root; \
  last;
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
@@ -66,16 +66,16 @@ regex=sshd\[\d+\]: Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.description=User $2 logged in from $3:$4 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv46-addr; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv46-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last
 
 ################
@@ -92,16 +92,16 @@ regex=sshd\[\d+\]: Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.description=Someone tried to login as root from $2:$3 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv4-addr; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=root; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv4-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=root; \
  last
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
@@ -114,16 +114,16 @@ regex=sshd\[\d+\]: Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(s
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.description=Someone tried to login as $2 from $3:$4 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv4-addr; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv4-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last
 
 ##############################################
@@ -140,13 +140,13 @@ regex=sshd\[\d+\]: Illegal user (\S+) from (\S+); \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.description=Someone tried to login with the invalid user "$1" from $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$1; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$1; \
  last
 
 ##################################################################################
@@ -163,10 +163,10 @@ regex=sshd\[\d+\]: User (\S+) not allowed because .*listed in (\w+); \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.description=User $1 failed to login because he is listed in $2; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$1; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$1; \
  last
 
 ##################################################################
@@ -184,12 +184,12 @@ regex=sshd\[\d+\]: Did not receive identification string from ([\d\.]+); \
  assessment.impact.completion=failed; \
  assessment.impact.type=recon; \
  assessment.impact.description=$1 making probably a server recognition; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=22; \
- target.service.protocol=tcp; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
  last
 
 #########################################################################
@@ -208,13 +208,13 @@ regex=sshd\[\d+\]: ROOT LOGIN REFUSED FROM (\w+); \
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.description=Root tried to login while it is forbidden; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=22; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=root; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=root; \
  last
 

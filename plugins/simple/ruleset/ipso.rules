@@ -43,8 +43,8 @@ regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
  assessment.impact.severity=high; \
  assessment.impact.type=user; \
  assessment.impact.description=PAM: $3; \
- target.node.name=$1; \
- target.process.pid=$2; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
  last
 
 # 2. Misc ALERT logs
@@ -57,7 +57,7 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=ALERT log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last
 
 
@@ -77,8 +77,8 @@ regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$1 was rebooted; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$2; \
  last
 
 # No log sample; please submit
@@ -91,8 +91,8 @@ regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 attempted to reboot $1; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$2; \
  last
 
 # No log sample; please submit
@@ -105,8 +105,8 @@ regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=dos; \
  assessment.impact.description=$2 halted $1; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$2; \
  last
 
 # No log sample; please submit
@@ -146,7 +146,7 @@ regex=regex= (\w+) \[LOG_CRIT\]; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=CRIT log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last
 
 
@@ -166,9 +166,9 @@ regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.description=A mail was refused by the SMTP server of $1; \
- target.node.name=$1; \
- target.process.pid=$2; \
- target.process.name=mail; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).process.name=mail; \
  last
 
 
@@ -182,9 +182,9 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\)
  assessment.impact.type=dos; \
  assessment.impact.severity=low; \
  assessment.impact.description=SMTP port #$3 could not be opened on $1; \
- target.node.name=$1; \
- target.process.pid=$2; \
- target.process.name=mail; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).process.name=mail; \
  last
 
 
@@ -198,10 +198,10 @@ regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" p
  assessment.impact.type=dos; \
  assessment.impact.severity=low; \
  assessment.impact.description=$1 could not connect to the SMTP server $3:$4; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$3; \
- target.service.port=$4; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
  last
 
 
@@ -215,5 +215,5 @@ regex=regex= (\w+) \[LOG_ERR\]; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=ERR log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last

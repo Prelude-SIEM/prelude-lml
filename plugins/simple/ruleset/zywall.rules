@@ -39,16 +39,16 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address = $1; \
- source.service.port = $2; \
- source.service.protocol = $5; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address = $3; \
- target.service.port = $4; \
- target.service.protocol = $5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address = $1; \
+ source(0).service.port = $2; \
+ source(0).service.protocol = $5; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address = $3; \
+ target(0).service.port = $4; \
+ target(0).service.protocol = $5; \
  assessment.impact.description=$5$6 packet blocked from $1 port $2 to $3 port $4 [$7]; \
  last
 
@@ -61,16 +61,16 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address = $1; \
- source.service.port = $2; \
- source.service.protocol = $5; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address = $3; \
- target.service.port = $4; \
- target.service.protocol = $5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address = $1; \
+ source(0).service.port = $2; \
+ source(0).service.protocol = $5; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address = $3; \
+ target(0).service.port = $4; \
+ target(0).service.protocol = $5; \
  assessment.impact.description=$5$6 packet forwarded from $1 port $2 to $3 port $4 [$7]; \
  last
 
@@ -83,15 +83,15 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address = $1; \
- source.service.port = $2; \
- source.service.protocol = $5; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address = $3; \
- target.service.port = $4; \
- target.service.protocol = $5; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address = $1; \
+ source(0).service.port = $2; \
+ source(0).service.protocol = $5; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address = $3; \
+ target(0).service.port = $4; \
+ target(0).service.protocol = $5; \
  assessment.impact.description=$5$6 packet matched from $1 port $2 to $3 port $4 [$7]; \
  last

@@ -49,16 +49,16 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo
  assessment.impact.type = other; \
  assessment.impact.severity = medium; \
  assessment.impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5)  ruleset $6 rule $7; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address = $1; \
- source.service.port = 0x$4; \
- source.service.protocol = $3; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address = $2; \
- target.service.port = 0x$5; \
- target.service.protocol = $3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address = $1; \
+ source(0).service.port = 0x$4; \
+ source(0).service.protocol = $3; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address = $2; \
+ target(0).service.port = 0x$5; \
+ target(0).service.protocol = $3; \
  last
 
 # Jul 19 14:44:13 192.168.1.1 ZyXEL Communications Corp.: IP[Src=192.168.1.33 Dst=202.132.154.1 ICMP]}S03>R01mF
@@ -72,14 +72,14 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*
  assessment.impact.type = other;\
  assessment.impact.severity = medium; \
  assessment.impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3)  ruleset $4 rule $5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address = $1; \
- source.service.protocol = $3; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address = $2; \
- target.service.protocol = $3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address = $1; \
+ source(0).service.protocol = $3; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address = $2; \
+ target(0).service.protocol = $3; \
  last
 
 # 4) PPP Log :

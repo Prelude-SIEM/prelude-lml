@@ -38,11 +38,11 @@ regex=([\d\.]+)  User \[(\S+)\], Group \[\S+\] disconnected; \
  classification(0).origin=vendor-specific; \
  assessment.impact.severity=low; \
  assessment.impact.description=VPN user $2 disconnected; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.user.userid; \
- source.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).user.userid; \
+ source(0).user.userid.name=$2; \
  last
 
 #Oct 29 19:18:20 vpn 1793 10/29/2003 19:18:20.190 SEV=3 AUTH/5 RPT=6 12.34.56.78  Authentication rejected: Reason = Invalid password handle = 66, server = Internal, user = gene.gomez, domain = <not specified>
@@ -55,11 +55,11 @@ regex=([\d\.]+)  Authentication rejected: Reason = (.+) handle = \d+, server = \
  assessment.impact.type=user; \
  assessment.impact.completion=failed; \
  assessment.impact.description=VPN user $3 failed authentication because of $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.user.userid; \
- target.user.userid.name=$3; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$3; \
  last
 
 #Oct 28 18:50:21 vpn 1414 10/28/2003 18:50:21.930 SEV=4 IKE/52 RPT=22 12.34.56.78  Group [Staff] User [gene.gomez] User (gene.gomez) authenticated.
@@ -72,11 +72,11 @@ regex=([\d\.]+)  Group \[\S+\] User \[(\S+)\] User \(\S+\) authenticated; \
  assessment.impact.type=user; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=VPN user $2 authenticated; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last
 
 #Oct 29 19:53:18 vpn 1843 10/29/2003 19:53:18.680 SEV=5 AUTH/31 RPT=2  User [ admin ] Protocol [ HTTP ] attempted ADMIN logon.. Status: <REFUSED> authentication failure !
@@ -89,8 +89,8 @@ regex=User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <REF
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
  assessment.impact.description=VPN administration authentication failure: $1 using $2; \
- target.user.userid; \
- target.user.userid.name=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$1; \
  last
 
 #Oct 28 12:33:48 vpn 1359 10/28/2003 12:33:48.610 SEV=5 AUTH/36 RPT=1 12.34.56.78  User [ admin ] Protocol [ HTTP ] attempted ADMIN logon.. Status: <ACCESS GRANTED> !
@@ -103,9 +103,9 @@ regex=([\d\.]+)  User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. S
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=VPN administration authentication success: $2 using $3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last

@@ -16,17 +16,17 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains denied a TCP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=tcp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=tcp; \
+ source(0).interface=$2; \
  last
 
 # UDP
@@ -40,17 +40,17 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains denied an UDP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=udp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=udp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=udp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=udp; \
+ source(0).interface=$2; \
  last
 
 # ICMP
@@ -64,17 +64,17 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains denied an ICMP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=icmp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=icmp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=icmp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=icmp; \
+ source(0).interface=$2; \
  last
 
 #
@@ -92,17 +92,17 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains accepted a TCP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=tcp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=tcp; \
+ source(0).interface=$2; \
  last
 
 # UDP
@@ -116,17 +116,17 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains accepted an UDP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=udp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=udp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=udp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=udp; \
+ source(0).interface=$2; \
  last
 
 # ICMP
@@ -140,15 +140,15 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Ipchains accepted an ICMP packet : $3:$4 -> $5:$6 on $2 (Rulename is '$1'); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=icmp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$5; \
- target.service.port=$6; \
- target.service.protocol=icmp; \
- source.interface=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=icmp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.protocol=icmp; \
+ source(0).interface=$2; \
  last

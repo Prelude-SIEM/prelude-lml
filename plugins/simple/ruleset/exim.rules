@@ -29,5 +29,5 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected.*; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.description=Exim refused a request : $1 rejected; \
- target.service.protocol=smtp; \
+ target(0).service.protocol=smtp; \
  last

@@ -35,14 +35,14 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Vigor $1 dropped a TCP packet $2:$3 -> $4:$5; \
- source.node.address; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=TCP; \
- target.node.address; \
- target.node.address.address=$4; \
- target.service.port=$5; \
- target.service.protocol=TCP; \
+  \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=TCP; \
+  \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
+ target(0).service.protocol=TCP; \
  last;
 
 # 2) UDP :
@@ -59,14 +59,14 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Vigor $1 dropped an UDP packet $2:$3 -> $4:$5; \
- source.node.address; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=UDP; \
- target.node.address; \
- target.node.address.address=$4; \
- target.service.port=$5; \
- target.service.protocol=UDP; \
+  \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=UDP; \
+  \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
+ target(0).service.protocol=UDP; \
  last;
 
 # 3) ICMP :
@@ -83,10 +83,10 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
  assessment.impact.description=Vigor $1 dropped an ICMP packet $2 -> $3 ($4/$5); \
- source.node.address; \
- source.node.address.address=$2; \
- source.service.protocol=ICMP; \
- target.node.address; \
- target.node.address.address=$3; \
- target.service.protocol=ICMP; \
+  \
+ source(0).node.address(0).address=$2; \
+ source(0).service.protocol=ICMP; \
+  \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=ICMP; \
  last;

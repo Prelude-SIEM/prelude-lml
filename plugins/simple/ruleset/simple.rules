@@ -45,75 +45,75 @@
 #   May contain a textual description of the impact, if the analyzer
 #   is able to provide additional details.
 #
-# - source.node.address.address:
+# - source(0).node.address(0).address:
 #   Address that issued the attack.
 #   There can be more than one.
 # 
-# - target.node.address.address:
+# - target(0).node.address(0).address:
 #   Address that has been attacked.
 #   There can be more than one.
 #
-# - source.node.name,
-#   target.node.name:
+# - source(0).node.name,
+#   target(0).node.name:
 #   The name of the equipment. This information MUST be provided if no Address
 #   information is given.
 #
-# - source.node.category,
-#   target.node.category:
+# - source(0).node.category,
+#   target(0).node.category:
 #   The domain from which the name information was obtained.
 #   Possible values are: unknow, ads, afs, coda, dfs, dns, hosts, kerberos,
 #   nds, nis, nisplus, nt, wfw
 #
-# - source.node.location,
-#   target.node.location:
+# - source(0).node.location,
+#   target(0).node.location:
 #   The location of the equipment.
 #
-# - source.spoofed,
-#   target.decoy:
+# - source(0).spoofed,
+#   target(0).decoy:
 #   An indication of wheter the source/target is a decoy.
 #   The permitted values are: unknown, yes, no.
 #
-# - source.interface,
-#   target.interface:
+# - source(0).interface,
+#   target(0).interface:
 #   May be used by a network-based analyzer with multiple interfaces to
 #   indicate which interfaces this source/target was seen on.
 #
-# - source.service.name,
-#   target.service.name:
+# - source(0).service.name,
+#   target(0).service.name:
 #   The name of the service. Whenever possible, the name from the IANA list
 #   of well-known ports SHOULD be used.
 #
-# - source.service.port,
-#   target.service.port:
+# - source(0).service.port,
+#   target(0).service.port:
 #   The port number being used.
 #
-# - source.service.protocol,
-#   target.service.protocol:
+# - source(0).service.protocol,
+#   target(0).service.protocol:
 #   The protocol being used.
 #
-# - source.service.portlist,
-#   target.service.portlist:
+# - source(0).service.portlist,
+#   target(0).service.portlist:
 #   A list of port numbers beeing used.
 #
-# - source.user.category,
-#   target.user.category:
+# - source(0).user.category,
+#   target(0).user.category:
 #   The type of user represented (unknown, application, os-device).
 #
-# - source.user.userid,
-#   target.user.userid:
+# - source(0).user.userid,
+#   target(0).user.userid:
 #   Create a new UserId inside an User object (that may contain several UserId).
 #
-# - source.user.userid.type,
-#   target.user.userid.type:
+# - source(0).user.userid.type,
+#   target(0).user.userid.type:
 #   The type of user information represented (current-user, original-user, target-user,
 #   user-privs, current-group, group-privs, other-privs).
 #
-# - source.user.userid.name,
-#   target.user.userid.name:
+# - source(0).user.userid.name,
+#   target(0).user.userid.name:
 #   A user or group name.
 #
-# - source.user.userid.number,
-#   target.user.userid.number:
+# - source(0).user.userid.number,
+#   target(0).user.userid.number:
 #   A user or group number.
 
 include = ms-sql.rules;
@@ -151,8 +151,8 @@ regex=session opened for user root; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = admin; \
  assessment.impact.severity = medium; \
- target.user.userid; \
- target.user.userid.name=root; \
+ target(0).user.userid; \
+ target(0).user.userid.name=root; \
  last
 
 # No log sample; please submit
@@ -165,10 +165,10 @@ regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
  assessment.impact.type = other; \
  assessment.impact.severity = high; \
  assessment.impact.description=Process $1 attempted to change UID from $2 to $3; \
- source.user.userid; \
- source.user.userid.number=$2; \
- target.user.userid; \
- target.user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.number=$2; \
+ target(0).user.userid; \
+ target(0).user.userid.number=$3; \
  last
 
 # No log sample; please submit

@@ -32,14 +32,14 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): A
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as user '$2' but failed; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=21; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=21; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last;
 
 # Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
@@ -53,14 +53,14 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)';
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=21; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=21; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last;
 
 # Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
@@ -74,15 +74,15 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such u
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
  assessment.impact.description= Someone tried to login to your FTP server as a non-existant user '$2' but failed; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$3; \
- target.service.port=$4; \
- target.service.protocol=tcp; \
- target.user.userid; \
- target.user.userid.name=$2; \
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+  \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
+ target(0).service.protocol=tcp; \
+ target(0).user.userid; \
+ target(0).user.userid.name=$2; \
  last;

@@ -32,17 +32,17 @@ regex=grsec: denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- target.process.name=$1; \
- target.process.pid=$2;\
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3;\
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4;\
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ target(0).process.name=$1; \
+ target(0).process.pid=$2;\
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3;\
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4;\
  assessment.impact.description=An attempt was made to ptrace a read-only binary.  The attempt was denied by the ACL system.; \
  last
 
@@ -54,15 +54,15 @@ regex=grsec: attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other;impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was made to open /dev/kmem.  Grsecurity denied this attempt.  If the process was any other then klogd, you should consider this a kernel compromise attempt.; \
  last
 
@@ -75,15 +75,15 @@ regex=grsec: not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$6; \
- source.process.pid=$7; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$8; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$9; \
+ source(0).process.name=$6; \
+ source(0).process.pid=$7; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$8; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$9; \
  assessment.impact.description=An attempt was made to follow a link in a world-writable +t directory owned by a non-root user pointing to a file not owned by that user.  It is possible that this was the result of an intentional tmp race exploit.; \
  last
 
@@ -96,15 +96,15 @@ regex=grsec: attempt to open ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -117,15 +117,15 @@ regex=grsec: attempt to open ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UI
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading and writing.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -138,15 +138,15 @@ regex=grsec: attempt to open ([^ ]+) for reading appending by \(([^:]+):(\d+)\) 
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for reading and appending.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -159,15 +159,15 @@ regex=grsec: attempt to open ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for writing.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -180,15 +180,15 @@ regex=grsec: attempt to open ([^ ]+) for appending by \(([^:]+):(\d+)\) UID\((\d
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high;\
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to open the file $1 for appending.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -201,15 +201,15 @@ regex=grsec: attempt to access hidden file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to access the hidden file with device number $1 and inode $2.  This access was denied by the ACL system.  This could have resulted from an incomplete ACL, or an attack may be in progress on your system.; \
  last
 
@@ -222,15 +222,15 @@ regex=grsec: denied writing FIFO \(([^)]+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt was made to write to a FIFO in a world-writable +t directory that was created by a non-root user.  This attempt was denied.  It is possible that this was the result of an intentional FIFO race on your system.; \
  last
 
@@ -243,15 +243,15 @@ regex=grsec: refused attempt to mknod\([a-z]:(\d+:\d+)\) \(([^)]+)\) from chroot
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$7; \
- source.process.pid=$8; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$9; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$10; \
+ source(0).process.name=$7; \
+ source(0).process.pid=$8; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$9; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$10; \
  assessment.impact.description=An attempt was made to mknod the device $2 in a chroot jail.; \
  last
 
@@ -264,15 +264,15 @@ regex=grsec: attempt to mknod ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to create the device $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -285,15 +285,15 @@ regex=grsec: attempt to mkdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to create the directory $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -306,15 +306,15 @@ regex=grsec: attempt to rmdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to remove the directory $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -327,15 +327,15 @@ regex=grsec: attempt to unlink ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4;\
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4;\
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to remove the file $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -348,15 +348,15 @@ regex=grsec: attempt to symlink ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to symlink $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -369,15 +369,15 @@ regex=grsec: denied hardlink of ([^ ]+) \(owned by (\d+).(\d+)\) to ([^ ]+) for 
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$5; \
- source.process.pid=$6; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$7; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$8; \
+ source(0).process.name=$5; \
+ source(0).process.pid=$6; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$7; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$8; \
  assessment.impact.description=An attempt was made to hardlink $1 to $4.  This could have been attempted by a malicious user wanting to exploit a /tmp race condition.; \
  last
 
@@ -390,15 +390,15 @@ regex=grsec: attempt to link ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to link $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -411,15 +411,15 @@ regex=grsec: attempt to rename ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to rename $1 to $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -432,15 +432,15 @@ regex=grsec: denied ptrace of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt was made to ptrace $3.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -453,15 +453,15 @@ regex=grsec: attempt to overstep process limit by \(([^:]+):(\d+)\) UID\((\d+)\)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was made to overstep the process limit via execve(2).; \
  last
 
@@ -474,15 +474,15 @@ regex=grsec: denying execution of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to execute $1.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -495,19 +495,19 @@ regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUI
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- target.process.name=$1; \
- target.process.pid=$2; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$3; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$9; \
+ target(0).process.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$3; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$9; \
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The user with uid $9 has been banned from logging in for $10 seconds for causing this alert.; \
  last
  
@@ -520,15 +520,15 @@ class.origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- target.process.name=$1; \
- target.process.pid=$2; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$3; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$4; \
+ target(0).process.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$3; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$4; \
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The process being bruteforced is banned from execution for $11 seconds.; \
  last
 
@@ -541,18 +541,18 @@ regex=grsec: Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1;\
- target.process.name=$2; \
- target.process.pid=$3; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$4; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$5;\
+  \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1;\
+ target(0).process.name=$2; \
+ target(0).process.pid=$3; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$4; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$5;\
  assessment.impact.description=A possible exploit bruteforce attempt was made.  The process being bruteforced is banned from execution for $11 seconds.; \
  last
 
@@ -565,15 +565,15 @@ regex=grsec: denied attempt to mount \(([^)]+)\) as ([^ ]+) from chroot jail \((
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$7; \
- source.process.pid=$8; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$9; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$10; \
+ source(0).process.name=$7; \
+ source(0).process.pid=$8; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$9; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$10; \
  assessment.impact.description=An attempt was made to mount $1 as $2 in a chroot jail.  The attempt was denied.; \
  last
 
@@ -586,15 +586,15 @@ regex=grsec: denied attempt to pivot_root\(([^,]+),([^)]+)\) from chroot jail \[
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$7; \
- source.process.pid=$8; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$9; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$10; \
+ source(0).process.name=$7; \
+ source(0).process.pid=$8; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$9; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$10; \
  assessment.impact.description=An attempt was made to pivot_root (move the current root to $2 and use $1 as the new root) in a chroot jail.  The attempt was denied.; \
  last
 
@@ -607,15 +607,15 @@ regex=grsec: attempted to truncate file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to truncate the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -628,15 +628,15 @@ regex=grsec: attempted to change access time for file \[(\d+:\d+):(\d+)\] by \((
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to modify the access time of the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -649,15 +649,15 @@ regex=grsec: attempted to access file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) U
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to access(2) the file with device $1 and inode $2 for more privilege than the ACL system allowed.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -670,15 +670,15 @@ regex=grsec: Attempted to chdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to chdir to the directory with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -691,15 +691,15 @@ regex=grsec: Attempted fchdir outside of chroot to ([^ ]+) by \(([^:]+):(\d+)\) 
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to fchdir out of a chroot jail to the director $1.  Access was denied.; \
  last
 
@@ -712,15 +712,15 @@ regex=grsec: attempted to fchdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to fchdir to the directory with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -733,15 +733,15 @@ regex=grsec: fchdir\((\d+)\) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\(
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=A successful fchdir to $2 was made.; \
  last
 
@@ -754,15 +754,15 @@ regex=grsec: denied attempt to chroot\(\) from \((\d+:\d+):(\d+)\) to \(([^)]+)\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt was made to chroot to $3 in a chroot jail.  Access was denied.; \
  last
 
@@ -775,15 +775,15 @@ regex=grsec: Attempt to fchmod file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to fchmod to the file with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -796,15 +796,15 @@ regex=grsec: denied attempt to fchmod +s \((\d+:\d+):(\d+)\) owned by (\d+).(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$10; \
- source.process.pid=$11; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$12; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$13; \
+ source(0).process.name=$10; \
+ source(0).process.pid=$11; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$12; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$13; \
  assessment.impact.description=An attempt was made to fchmod +s the file with device $1 inode $2.  Access was denied.; \
  last
 
@@ -817,15 +817,15 @@ regex=grsec: Attempt to chmod file \[(\d+:\d+):(\d+)\] ([^ ]+) by \(([^:]+):(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt was made to chmod the file $3 with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -838,15 +838,15 @@ regex=grsec: denied attempt to chmod +s \((\d+:\d+):(\d+)\) \(([^)]+)\) owned by
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$11; \
- source.process.pid=$12; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$13; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$14; \
+ source(0).process.name=$11; \
+ source(0).process.pid=$12; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$13; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$14; \
  assessment.impact.description=An attempt was made to fchmod +s the file $3 with device $1 inode $2.  Access was denied.; \
  last
 
@@ -859,15 +859,15 @@ regex=grsec: Attempt to chown file \[(\d+:\d+):(\d+)\] to (\d+).(\d+) by \(([^:]
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$5; \
- source.process.pid=$6; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$7; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$8; \
+ source(0).process.name=$5; \
+ source(0).process.pid=$6; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$7; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$8; \
  assessment.impact.description=An attempt was made to chown to file with device $1 and inode $2 to uid $3 gid $4.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -880,15 +880,15 @@ regex=grsec: attempt to load writable library \[(\d+:\d+):(\d+)\] by \(([^:]+):(
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to load a writable library with device $1 and inode $2.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
@@ -901,15 +901,15 @@ regex=grsec: shutdown auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=The ACL system was successfully disabled.; \
  last
 
@@ -922,15 +922,15 @@ regex=grsec: shutdown auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=The ACL system was unsuccessfully disabled.; \
  last
 
@@ -943,15 +943,15 @@ regex=grsec: ignoring shutdown for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A request to disable the ACL system was ignored.; \
  last
 
@@ -964,15 +964,15 @@ regex=grsec: segvmod auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A ban on a user or binary due to possible exploit bruteforcing has been successfully removed.; \
  last
 
@@ -985,15 +985,15 @@ regex=grsec: segvmod auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A ban on a user or binary due to possible exploit bruteforcing has failed to be removed.; \
  last
 
@@ -1006,15 +1006,15 @@ regex=grsec: ignoring segvmod for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was ignored to remove a ban on a user or binary due to possible exploit bruteforcing.; \
  last
 
@@ -1039,15 +1039,15 @@ regex=grsec: Unable to load grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt to enable the ACL system failed.  This is most likely due to being out of memory.; \
  last
 
@@ -1084,15 +1084,15 @@ regex=grsec: Failed reload of grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt to reload the ACL system failed.  This is most likely due to incorrect authentication.; \
  last
 
@@ -1105,15 +1105,15 @@ regex=grsec: Ignoring change to admin mode for disabled acl for \(([^:]+):(\d+)\
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was ignored to change to administration mode.; \
  last
 
@@ -1126,15 +1126,15 @@ regex=grsec: successful change to admin mode by \(([^:]+):(\d+)\) UID\((\d+)\) E
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A successful attempt was made to change to administration mode.; \
  last
 
@@ -1147,15 +1147,15 @@ regex=grsec: admin mode exited by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
  assessment.impact.completion=succeeded; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An ACL administrator exited administration mode.; \
  last
 
@@ -1168,15 +1168,15 @@ regex=grsec: admin auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\)
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An ACL administrator exited administration mode.; \
  last
 
@@ -1189,15 +1189,15 @@ regex=grsec: Invalid mode (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.completion=failed; \
  assessment.impact.type=admin; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was made to pass an invalid mode to the ACL system.; \
  last
 
@@ -1222,17 +1222,17 @@ regex=grsec: attempted priority change of process \(([^:]+):(\d+)\) by \(([^:]+)
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- target.process.name=$1; \
- target.process.pid=$2; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ target(0).process.name=$1; \
+ target(0).process.pid=$2; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=An attempt was made to raise the priority of a process in a chroot.  Access was denied.; \
  last
 
@@ -1245,17 +1245,17 @@ regex=grsec: denied capset of \(([^:]+):(\d+)\) within chroot jail \[(\d+:\d+):(
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- target.process.name=$1; \
- target.process.pid=$2; \
- source.process.name=$5; \
- source.process.pid=$6; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$7; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$8; \
+ target(0).process.name=$1; \
+ target(0).process.pid=$2; \
+ source(0).process.name=$5; \
+ source(0).process.pid=$6; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$7; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$8; \
  assessment.impact.description=An attempt was made to change the capabilities of a process in a chroot.  Access was denied.; \
  last
 
@@ -1268,15 +1268,15 @@ regex=grsec: failed fork with errno (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=A fork failed with errno $1.  A user may be attempting a fork bomb on your system.; \
  last
 
@@ -1289,15 +1289,15 @@ regex=grsec: attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt was made in a chroot to renice a process to a higher priority.  Access was denied.; \
  last
 
@@ -1310,15 +1310,15 @@ regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- target.process.name=$2; \
- target.process.pid=$3; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$4; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$5; \
+ target(0).process.name=$2; \
+ target(0).process.pid=$3; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$4; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$5; \
  assessment.impact.description=Signal $1 was sent to a process.; \
  last
 
@@ -1331,24 +1331,24 @@ regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- target.process.name=$2; \
- target.process.pid=$3; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$4; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$5; \
- source.process.name=$9; \
- source.process.pid=$10; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$11; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$12; \
+ target(0).process.name=$2; \
+ target(0).process.pid=$3; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$4; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$5; \
+ source(0).process.name=$9; \
+ source(0).process.pid=$10; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$11; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$12; \
  assessment.impact.description=Signal $1 was sent to a process.; \
  last
 
@@ -1361,24 +1361,24 @@ regex=grsec: Attempted send of signal (\d+) to protected task \(([^:]+):(\d+)\) 
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- target.process.name=$2; \
- target.process.pid=$3; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$4; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$5; \
- source.process.name=$9; \
- source.process.pid=$10; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$11; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$12; \
+ target(0).process.name=$2; \
+ target(0).process.pid=$3; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$4; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$5; \
+ source(0).process.name=$9; \
+ source(0).process.pid=$10; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$11; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$12; \
  assessment.impact.description=An attempt was made to send signal $1 to a protected process.  Access was denied.; \
  last
 
@@ -1391,15 +1391,15 @@ regex=grsec: attempt to modify grsecurity sysctl value : ([^ ]+) by \(([^:]+):(\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to modify the grsecurity sysctl value $1 after the lock had been set.  Access was denied.; \
  last
 
@@ -1412,15 +1412,15 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to read from the sysctl entry $1.  Access was denied.; \
  last
 
@@ -1433,15 +1433,15 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to write to the sysctl entry $1.  Access was denied.; \
  last
 
@@ -1454,15 +1454,15 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt was made to read/write to the sysctl entry $1.  Access was denied.; \
  last
 
@@ -1475,15 +1475,15 @@ regex=grsec: time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=The system time was modified.; \
  last
 
@@ -1496,15 +1496,15 @@ regex=grsec: attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+)
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt was made to mmap the file $3 with device $1 and inode $2 executable.  Access was denied.; \
  last
 
@@ -1517,15 +1517,15 @@ regex=grsec: attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=An attempt to socket($1, $2, $3) was made.  Access was denied.; \
  last
 
@@ -1538,15 +1538,15 @@ regex=grsec: attempted bind\(\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=An attempt to bind to a socket was made.  Access was denied.; \
  last
 
@@ -1559,15 +1559,15 @@ regex=grsec: attempted connect\(\) to fd (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\)
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=An attempt to connect to a socket was made.  Access was denied.; \
  last
 
@@ -1580,15 +1580,15 @@ regex=grsec: attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) prot
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$5; \
- source.process.pid=$6; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$7; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$8; \
+ source(0).process.name=$5; \
+ source(0).process.pid=$6; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$7; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$8; \
  assessment.impact.description=An attempt was made to bind to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
@@ -1601,15 +1601,15 @@ regex=grsec: attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) p
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source.process.name=$5; \
- source.process.pid=$6;\
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$7; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$8; \
+ source(0).process.name=$5; \
+ source(0).process.pid=$6;\
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$7; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$8; \
  assessment.impact.description=An attempt was made to connect to IP $1 port $2 socket type $3 protocol $4.  Access was denied.; \
  last
 
@@ -1622,15 +1622,15 @@ regex=grsec: exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=The binary $1 was executed within a chroot jail.; \
  last
 
@@ -1643,15 +1643,15 @@ regex=grsec: ([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\)
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=The path $1 was remounted.; \
  last
 
@@ -1664,15 +1664,15 @@ regex=grsec: remount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=The path $1 was remounted. ; \
  last
 
@@ -1685,15 +1685,15 @@ regex=grsec: unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=The path $1 was unmounted.; \
  last
 
@@ -1706,15 +1706,15 @@ regex=grsec: mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=medium; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
  assessment.impact.description=The device $1 was mounted to the path $2.; \
  last
 
@@ -1726,15 +1726,15 @@ regex=grsec: chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file;impact.severity=low; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=The current working directory for a process was changed to $1.; \
  last
 
@@ -1747,15 +1747,15 @@ regex=grsec: exec of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
- source.process.name=$4; \
- source.process.pid=$5; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$6; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$7; \
+ source(0).process.name=$4; \
+ source(0).process.pid=$5; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$6; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$7; \
  assessment.impact.description=The command: $3 was executed.; \
  last
 
@@ -1768,15 +1768,15 @@ regex=grsec: message queue created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A message queue was created.; \
  last
 
@@ -1789,22 +1789,22 @@ regex=grsec: message queue of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) 
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$1; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$2; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$2; \
  assessment.impact.description=A message queue was removed.; \
  last
 
@@ -1816,15 +1816,15 @@ regex=grsec: semaphore created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file;impact.severity=low; \
- source.process.name=$1; \
- source.process.pid=$2; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$3; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$4; \
+ source(0).process.name=$1; \
+ source(0).process.pid=$2; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$3; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$4; \
  assessment.impact.description=A semaphore was created.; \
  last
 
@@ -1837,22 +1837,22 @@ regex=grsec: semaphore of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file; \
  assessment.impact.severity=low; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$1; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$2; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$2; \
  assessment.impact.description=A semaphore was removed.; \
  last
 
@@ -1864,15 +1864,15 @@ regex=grsec: shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file;impact.severity=low; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=Shared memory of size $1 was created.; \
  last
 
@@ -1884,22 +1884,22 @@ regex=grsec: shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) 
  classification(0).origin=vendor-specific; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=file;impact.severity=low; \
- source.process.name=$3; \
- source.process.pid=$4; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$5; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$6; \
- target.user.category=application; \
- target.user.userid; \
- target.user.userid.type=current-user; \
- target.user.userid.number=$1; \
- target.user.userid; \
- target.user.userid.type=original-user; \
- target.user.userid.number=$2; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$4; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$5; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$6; \
+ target(0).user.category=application; \
+ target(0).user.userid; \
+ target(0).user.userid.type=current-user; \
+ target(0).user.userid.number=$1; \
+ target(0).user.userid; \
+ target(0).user.userid.type=original-user; \
+ target(0).user.userid.number=$2; \
  assessment.impact.description=Shared memory was removed.; \
  last
 
@@ -1912,14 +1912,14 @@ regex=PAX: terminating task: ([^(]+)\(([^)]+)\):(\d+) uid/euid: (/d+)/(/d+), EIP
  assessment.impact.completion=failed; \
  assessment.impact.type=file; \
  assessment.impact.severity=high; \
- source.process.name=$2; \
- source.process.pid=$3; \
- source.user.category=application; \
- source.user.userid; \
- source.user.userid.type=current-user; \
- source.user.userid.number=$4; \
- source.user.userid; \
- source.user.userid.type=original-user; \
- source.user.userid.number=$5; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.userid; \
+ source(0).user.userid.type=current-user; \
+ source(0).user.userid.number=$4; \
+ source(0).user.userid; \
+ source(0).user.userid.type=original-user; \
+ source(0).user.userid.number=$5; \
  assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
  last
