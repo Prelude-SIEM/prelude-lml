@@ -58,8 +58,6 @@
 int batch_mode = 0;
 static char *pidfile = NULL;
 udp_server_t *udp_srvr = NULL;
-static char *udp_srvr_addr = NULL;
-static uint16_t udp_srvr_port = 514;
 static uid_t prelude_lml_user = 0;
 static gid_t prelude_lml_group = 0;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
@@ -205,10 +203,10 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
 static int enable_udp_server(void **context, prelude_option_t *opt, const char *arg) 
 {
         int port;
-        char *ptr;
-        const char *addr;
+        char *ptr = NULL;
         regex_list_t *rlist;
-
+        const char *addr = NULL;
+        
         port = DEFAULT_UDP_SERVER_PORT;
 
         if ( arg ) {
