@@ -33,13 +33,13 @@ static char *trim(char *str)
 		return NULL;
 
 	for ( ibuf = str, obuf = str; *ibuf; ) {
-		while ( *ibuf && isspace(*ibuf) )
+		while ( *ibuf && isspace((int) *ibuf) )
 			ibuf++;
                 
 		if ( *ibuf && (obuf != str) )
 			*(obuf++) = ' ';
                 
-		while (*ibuf && (!isspace(*ibuf)))
+		while ( *ibuf && (!isspace((int) *ibuf)) )
 			*(obuf++) = *(ibuf++);
 	}
 	*obuf = '\0';

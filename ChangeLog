@@ -12,6 +12,12 @@
 
 	* src/log-common.c: include string.h.
 
+	
+	* src/regex.c (trim): 
+	* src/log-common.c (format_syslog_header): 
+	cast to int when calling isalnum and isspace.
+
+	
 2002-07-11  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* plugins/debug/debug.c (set_debug_state): 

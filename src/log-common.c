@@ -50,7 +50,7 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
          */
         for ( i = 0; i < strlen(tag); i++ ) {
                 
-                if ( ! isalnum(tag[i]) ) {
+                if ( ! isalnum((int) tag[i]) ) {
                         tag[i] = '\0';
                         break;
                 }
