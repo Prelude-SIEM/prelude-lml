@@ -923,7 +923,7 @@ static int filter_string(char *input, char **key, char **value)
          /*
          * filter space at the begining of the line.
          */
-        while ( *input == ' ' && *input != '\0' )
+        while ( (*input == ' ' || *input == 0x09) && *input != '\0' )
                 input++;
 
         if ( *input == '\0' )

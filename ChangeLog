@@ -1,3 +1,12 @@
+2002-06-13  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+    Patch from Arnaud Guignard <arnaud.guignard@free.fr> :
+
+    * plugins/simple/simple.c (parse_ruleset):
+    fixed a bug when a TAB was at a beginning of a line in a
+    multiline rule.
+
+
 2002-06-10  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* configure.in: only enable gtkdoc if requested.
