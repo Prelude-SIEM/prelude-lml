@@ -268,6 +268,6 @@ void rule_regex_destroy(rule_regex_t *ptr)
         if ( ptr->extra )
                 pcre_free(ptr->extra);
 
-        prelude_list_del(&ptr->list);
+        prelude_linked_object_del((prelude_linked_object_t *) ptr);
         free(ptr);
 }
