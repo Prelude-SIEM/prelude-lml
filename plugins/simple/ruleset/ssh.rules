@@ -36,10 +36,10 @@
 
 #Dec  8 14:45:17 itguxweb1 sshd[32112]: Accepted publickey for root from 12.34.56.78 port 56634 ssh2
 regex=sshd\[\d+\]: Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote root logging; \
+ classification.name=SSH Remote root logging; \
  id=1900; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -58,10 +58,10 @@ regex=sshd\[\d+\]: Accepted (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; 
 
 #Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
 regex=sshd\[\d+\]: Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote user logging; \
+ classification.name=SSH Remote user logging; \
  id=1901; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.completion=succeeded; \
  impact.type=user; \
@@ -84,10 +84,10 @@ regex=sshd\[\d+\]: Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*
 
 #Dec  9 16:00:35 itguxweb2 sshd[24541]: Failed password for root from 12.34.56.78 port 1806
 regex=sshd\[\d+\]: Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote root logging failed; \
+ classification.name=SSH Remote root logging failed; \
  id=1902; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -106,10 +106,10 @@ regex=sshd\[\d+\]: Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 
 #Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
 regex=sshd\[\d+\]: Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote user logging failed; \
+ classification.name=SSH Remote user logging failed; \
  id=1903; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=user; \
@@ -132,10 +132,10 @@ regex=sshd\[\d+\]: Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(s
 
 #Dec  9 18:48:29 itguxweb2 sshd[29536]: Failed password for illegal user ROOT from 12.34.56.78 port 2886
 regex=sshd\[\d+\]: Illegal user (\S+) from (\S+); \
- class.name=SSH Remote logging failed with an invalid user; \
+ classification.name=SSH Remote logging failed with an invalid user; \
  id=1904; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=user; \
@@ -155,10 +155,10 @@ regex=sshd\[\d+\]: Illegal user (\S+) from (\S+); \
 
 # No log sample; please submit
 regex=sshd\[\d+\]: User (\S+) not allowed because .*listed in (\w+); \
- class.name=SSH Remote logging failed with a denied user; \
+ classification.name=SSH Remote logging failed with a denied user; \
  id=1905; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=user; \
@@ -176,10 +176,10 @@ regex=sshd\[\d+\]: User (\S+) not allowed because .*listed in (\w+); \
 
 # No log sample; please submit
 regex=sshd\[\d+\]: Did not receive identification string from ([\d\.]+); \
- class.name=SSH Server recognition; \
+ classification.name=SSH Server recognition; \
  id=1906; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=recon; \
@@ -200,10 +200,10 @@ regex=sshd\[\d+\]: Did not receive identification string from ([\d\.]+); \
 
 # No log sample; please submit
 regex=sshd\[\d+\]: ROOT LOGIN REFUSED FROM (\w+); \
- class.name=SSH Remote root logging forbidden; \
+ classification.name=SSH Remote root logging forbidden; \
  id=1907; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=admin; \

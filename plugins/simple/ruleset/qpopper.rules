@@ -25,10 +25,10 @@
 # Jan 13 21:05:09 (none) popper[6950]: [AUTH] Failed attempted login to vegeta from host (Mix-Dijon-114-2-232.abo.wanadoo.fr) 193.249.231.232
 
 regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\.]+\) ([\d\.]+); \
- class.name=qpopper - invalid password for this user; \
+ classification.name=qpopper - invalid password for this user; \
  id=1700; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \
@@ -49,10 +49,10 @@ regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\
 # Jan 13 21:05:09 (none) popper[6950]: vegeta at Mix-Dijon-114-2-232.abo.wanadoo.fr (193.249.231.232): -ERR [AUTH] Password supplied for "vegeta" is incorrect.
 
 regex=popper\[\d+\]: (\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password supplied for "\S+" is incorrect; \
- class.name=qpopper - invalid password for user; \
+ classification.name=qpopper - invalid password for user; \
  id=1701; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
  impact.severity=medium; \

@@ -8,10 +8,10 @@
 # TCP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=TCP packet denied; \
+ classification.name=TCP packet denied; \
  id=700; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \
@@ -32,10 +32,10 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d
 # UDP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=UDP packet denied; \
+ classification.name=UDP packet denied; \
  id=701; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \
@@ -56,10 +56,10 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\
 # ICMP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=ICMP Packet denied; \
+ classification.name=ICMP Packet denied; \
  id=702; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=medium; \
@@ -84,10 +84,10 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d
 # TCP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=TCP packet accepted; \
+ classification.name=TCP packet accepted; \
  id=703; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
@@ -108,10 +108,10 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(
 # UDP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=UDP packet accepted; \
+ classification.name=UDP packet accepted; \
  id=704; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
@@ -132,10 +132,10 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):
 # ICMP
 # No log sample; please submit
 regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
- class.name=ICMP Packet accepted; \
+ classification.name=ICMP Packet accepted; \
  id=705; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \

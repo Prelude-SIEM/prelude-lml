@@ -25,10 +25,10 @@
 # x.x.x.x Wireless PC connected   00-03-2F-0C-D4-D1^M 
 
 regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
- class.name=Wireless PC connected; \
+ classification.name=Wireless PC connected; \
  id=2200; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.severity=low; \
  impact.description=Successful wireless PC connection from $2 to AP $1; \
@@ -43,10 +43,10 @@ regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
 # x.x.x.x Unauthorized wireless PC try to connected   00-03-2F-0C-D4-D1^M 
 
 regex=([\d\.]+)[\s]+Unauthorized wireless PC try to connected[\s]+([A-Fa-f\d\-]+); \
- class.name=Unauthorized wireless PC connection attempt; \
+ classification.name=Unauthorized wireless PC connection attempt; \
  id=2201; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.completion=failed; \
  impact.severity=medium; \
  impact.description=Unauthorized wireless PC connection attempt from $2 to $1; \

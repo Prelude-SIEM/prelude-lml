@@ -33,10 +33,10 @@
 
 #Nov  3 17:10:28 mrfreeze.itg.sac.tfs norton antivirus[error] 5  Virus Found!Virus name: W32.Yaha.F@mm.enc in File: C:\Program Files\Exchsrvr\Mailroot\vsi 1\Queue\NTFS_6e44a57a01c3a270000282de.EML by: Realtime Protection scan.  Action: Clean failed : Quarantine failed : Access denied
 regex=norton antivirus\[\w+\] 5  Virus Found!Virus name: (.+) in File; \
- class.name=Virus found: $1; \
+ classification.name=Virus found: $1; \
  id=1200; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=high; \
  impact.type=file; \
  impact.description=A virus has been identified by Norton Antivirus; \
@@ -46,10 +46,10 @@ regex=norton antivirus\[\w+\] 5  Virus Found!Virus name: (.+) in File; \
 
 #Nov  6 00:23:51 superman.itg.sac.tfs norton antivirus[info] 16  Download of virus definition file from LiveUpdate server succeeded.
 regex=norton antivirus\[\w+\] \d+  Download of virus definition file from LiveUpdate server succeeded; \
- class.name=Virus definitions updated; \
+ classification.name=Virus definitions updated; \
  id=1201; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=other; \
  impact.description=Norton Antivirus Virus definitions have been updated; \

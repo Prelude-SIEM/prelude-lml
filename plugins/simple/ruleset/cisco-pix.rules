@@ -32,10 +32,10 @@
 
 #Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
 regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
- class.name=$1; \
+ classification.name=$1; \
  id=200; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=medium; \
  impact.description=Cisco PIX IDS detected an event; \
  source.node.address; \
@@ -48,10 +48,10 @@ regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+); \
 
 #Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
- class.name=Successful PIX login; \
+ classification.name=Successful PIX login; \
  id=201; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=admin; \
  impact.completion=succeeded; \
@@ -68,10 +68,10 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+).+ to \S+:([\d\.]+).+ for user
 
 #Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
- class.name=Successful PIX enable; \
+ classification.name=Successful PIX enable; \
  id=202; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=admin; \
  impact.completion=succeeded; \
@@ -84,10 +84,10 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
 
 #Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
- class.name=PIX configuration written to $2; \
+ classification.name=PIX configuration written to $2; \
  id=203; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=admin; \
  impact.completion=succeeded; \
@@ -96,10 +96,10 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
 
 #Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
 regex=PIX-5-611103: User logged out: Uname: (\S+); \
- class.name=PIX logout; \
+ classification.name=PIX logout; \
  id=204; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=admin; \
  impact.completion=succeeded; \
@@ -110,10 +110,10 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
 
 #Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(\S+)"; \
- class.name=Failed PIX login; \
+ classification.name=Failed PIX login; \
  id=205; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=admin; \
  impact.completion=failed; \
@@ -130,10 +130,10 @@ regex=PIX-6-605004: Login denied from ([\d\.]+).+ to \S+:([\d\.]+).+ for user "(
 
 #Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 1.2.3.210))
 regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
- class.name=Failed PIX enable; \
+ classification.name=Failed PIX enable; \
  id=206; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=admin; \
  impact.completion=failed; \
@@ -144,10 +144,10 @@ regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+
 
 #Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 192.168.250.6 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
 regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
- class.name=SSH Server recognition; \
+ classification.name=SSH Server recognition; \
  id=207; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=recon; \
@@ -162,10 +162,10 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface \S+ for user "" disc
 
 #Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.33.8.58(192.168.250.58)/80 on interface outside
 regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\([\d\.]+\)\/(\d+); \
- class.name=Embryonic connection limit exceeded; \
+ classification.name=Embryonic connection limit exceeded; \
  id=208; \
  revision=1; \
- class.origin=vendor-specific; \
+ classification.origin=vendor-specific; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=other; \
