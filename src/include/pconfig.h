@@ -22,9 +22,3 @@
 *****/
 
 int pconfig_set(int argc, char **argv);
-
-const char *pconfig_get_udp_srvr_addr(void);
-
-int pconfig_get_udp_srvr_port(void);
-
-int pconfig_is_udp_srvr_enabled(void);

@@ -30,7 +30,7 @@
 #include "file-server.h"
 
 
-static udp_server_t *myudp = NULL;
+extern udp_server_t *udp_srvr;
 
 
 static void sig_handler(int signum)
@@ -38,8 +38,8 @@ static void sig_handler(int signum)
 	fprintf(stderr, "\n\nCaught signal %d.\n", signum);
         signal(signum, SIG_DFL);
 
-        if ( myudp )
-                udp_server_close(myudp);
+        if ( udp_srvr )
+                udp_server_close(udp_srvr);
         
 	exit(2);
 }
@@ -121,11 +121,11 @@ int main(int argc, char **argv)
         myqueue = queue_new(NULL);
         if ( ! myqueue )
                 exit(1);
-        
+
         ret = file_server_new(myqueue);
         if ( ret < 0 )
                 exit(1);
-
+        
         ret = pconfig_set(argc, argv);
         if ( ret < 0 )
                 exit(1);
@@ -134,14 +134,8 @@ int main(int argc, char **argv)
         if ( ! regex_list )
                 exit(1);
 
-        if ( pconfig_is_udp_srvr_enabled() ) {
-                myudp = udp_server_new(pconfig_get_udp_srvr_addr(),
-                                       pconfig_get_udp_srvr_port(), message_reader, myqueue);
-                if ( ! myudp )
-                        exit(1);
-
-                udp_server_start(myudp);
-        }
+        if ( udp_srvr )
+                udp_server_start(udp_srvr, message_reader, myqueue);
 
 	signal(SIGTERM, sig_handler);
 	signal(SIGINT, sig_handler);

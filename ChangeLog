@@ -1,5 +1,17 @@
 2002-03-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/file-server.c (file_server_monitor_file): 
+	take an already open FD as argument (so that we don't 
+	require root access here).
+
+	* src/udp-server.c (udp_server_start): 
+	reader and queue are passed to udp_server_start,
+	not udp_server new.
+
+	* src/pconfig.c (pconfig_set): 
+	new -u (--user) option. Prelude LML can now run as a
+	simple user.
+
 	* src/udp-server.c (udp_server_new): 
 	resolve the provided address if any. Else use INADDR_ANY.
 

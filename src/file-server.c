@@ -89,16 +89,10 @@ static int close_file(void *sdata, server_logic_client_t *client)
 
 
 
-int file_server_monitor_file(const char *file) 
+int file_server_monitor_file(const char *file, int fd) 
 {
-        int fd, ret;
+        int ret;
         monitor_fd_t *new;
-
-        fd = open(file, O_RDONLY|O_NONBLOCK);
-        if ( fd < 0 ) {
-                log(LOG_ERR, "couln't open %s for reading.\n", file);
-                return -1;
-        }
         
         ret = lseek(fd, 0, SEEK_END);
         if ( ret < 0 ) {

@@ -60,13 +60,16 @@ static void udp_server_standalone(udp_server_t *server)
 
 
 
-void udp_server_start(udp_server_t *server)
+void udp_server_start(udp_server_t *server,
+                      udp_server_msg_reader_t *mreader, queue_t *queue)
 {
 	pthread_t thread;
 
 	if ( ! server )
 		return;
-        
+
+        server->queue = queue;
+	server->mreader = mreader;
 	pthread_create(&thread, NULL, (void *) &udp_server_standalone, server);
 }
 
@@ -80,8 +83,7 @@ void udp_server_close(udp_server_t *server)
 
 
 
-udp_server_t *udp_server_new(const char *addr, uint16_t port,
-                             udp_server_msg_reader_t *mreader, queue_t *queue)
+udp_server_t *udp_server_new(const char *addr, uint16_t port)
 {
         int ret;
 	udp_server_t *server;
@@ -91,9 +93,6 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port,
                 log(LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
-        
-        server->queue = queue;
-	server->mreader = mreader;
         
 	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	if ( server->sockfd < 0 ) {

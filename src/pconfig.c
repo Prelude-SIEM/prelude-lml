@@ -26,6 +26,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <libprelude/list.h>
 #include <libprelude/plugin-common.h>
@@ -37,25 +41,35 @@
 #include <libprelude/prelude-getopt.h>
 #include <libprelude/daemonize.h>
 #include <libprelude/sensor.h>
+#include <libprelude/prelude-path.h>
 
 #include "config.h"
 #include "pconfig.h"
 #include "queue.h"
 #include "file-server.h"
+#include "udp-server.h"
 
+#define MAX_FD 1024
 
-static const char *pidfile = NULL;
+static struct {
+        int fd;
+        const char *file;
+} fd_tbl[MAX_FD];
 
-static int udp_srvr_enabled = 0;
+static int fd_index = 0;
+
+udp_server_t *udp_srvr = NULL;
+
 static uint16_t udp_srvr_port = 514;
-static const char *udp_srvr_addr = NULL;
-
+static char *udp_srvr_addr = NULL;
+static char *pidfile = NULL;
+static uid_t prelude_lml_user = 0;
 
 
 static int print_version(const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
-	return prelude_option_success;
+	return prelude_option_end;
 }
 
 
@@ -79,15 +93,18 @@ static int set_quiet_mode(const char *arg)
 static int set_daemon_mode(const char *arg)
 {
         prelude_daemonize(pidfile);
+        if ( pidfile )
+                free(pidfile);
+        
         prelude_log_use_syslog();
-
+        
         return prelude_option_success;
 }
 
 
 static int set_pidfile(const char *arg)
 {
-        pidfile = arg;
+        pidfile = strdup(arg);
 	return prelude_option_success;
 }
 
@@ -95,13 +112,28 @@ static int set_pidfile(const char *arg)
 
 static int set_file(const char *arg) 
 {
-        int ret;
-        
-        ret = file_server_monitor_file(arg);
-        if ( ret < 0 )
-                return prelude_option_error;
+        int fd;
 
-        log(LOG_INFO, "- Added monitor for '%s'.\n", arg);
+        /*
+         * we have to store FD in a temporary table
+         * because they have to be opened as root,
+         * but the function that'll create the FD monitor
+         * may create a thread, and we want this thread to run
+         * as the specified user.
+         */        
+        if ( fd_index == MAX_FD ) {
+                log(LOG_ERR, "Too much file descriptor in the table.\n");
+                return prelude_option_error;
+        }
+        
+        fd = open(arg, O_RDONLY|O_NONBLOCK);
+        if ( fd < 0 ) {
+                log(LOG_ERR, "couldn't open %s for reading.\n", arg);
+                return prelude_option_success; /* do not stop */
+        }
+
+        fd_tbl[fd_index].fd = fd;
+        fd_tbl[fd_index++].file = strdup(arg);
         
         return prelude_option_success;
 }
@@ -110,7 +142,12 @@ static int set_file(const char *arg)
 
 static int enable_udp_server(const char *arg) 
 {
-        udp_srvr_enabled = 1;
+        udp_srvr = udp_server_new(udp_srvr_addr, udp_srvr_port);
+        free(udp_srvr_addr);
+        
+        if ( ! udp_srvr )
+                return prelude_option_error;
+        
         return prelude_option_success;
 }
 
@@ -118,7 +155,7 @@ static int enable_udp_server(const char *arg)
 
 static int set_udp_server_addr(const char *arg) 
 {
-        udp_srvr_addr = arg;
+        udp_srvr_addr = strdup(arg);
         return prelude_option_success;
 }
 
@@ -131,10 +168,32 @@ static int set_udp_server_port(const char *arg)
 
 
 
+static int set_lml_user(const char *arg) 
+{
+        struct passwd *p;
+        
+        p = getpwnam(arg);
+        if ( ! p ) {
+                log(LOG_ERR, "couldn't find user %s.\n", arg);
+                return prelude_option_error;
+        }
+
+        prelude_lml_user = p->pw_uid;
+
+        /*
+         * tell the prelude library that every operation should be done as
+         * non root.
+         */
+        prelude_set_program_userid(p->pw_uid);
+
+        return prelude_option_success;
+}
+
+
 
 int pconfig_set(int argc, char **argv)
 {
-	int ret;
+	int ret, i;
         prelude_option_t *opt;
         
 	prelude_option_add(NULL, CLI_HOOK, 'h', "help",
@@ -145,21 +204,25 @@ int pconfig_set(int argc, char **argv)
 			   "Print version number", no_argument,
 			   print_version, NULL);
 
-	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'q', "quiet",
+        prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'q', "quiet",
 			   "Quiet mode", no_argument, set_quiet_mode,
 			   NULL);
-
+        
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'u', "user",
+                           "Run as the specified user", required_argument,
+                           set_lml_user, NULL);
+        
 	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'd', "daemon",
 			   "Run in daemon mode", no_argument,
 			   set_daemon_mode, NULL);
 
 	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'P', "pidfile",
-                                 "Write Prelude PID to pidfile",
+                                 "Write Prelude LML PID to specified pidfile",
                                  required_argument, set_pidfile, NULL);
         prelude_option_set_priority(opt, option_run_first);
         
-        opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'u', "udp-srvr",
-                                 "Listen to UDP messages", no_argument,
+        opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 's', "udp-srvr",
+                                 "Listen syslog to UDP messages", no_argument,
                                  enable_udp_server, NULL);
 
         prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'a', "addr",
@@ -171,32 +234,30 @@ int pconfig_set(int argc, char **argv)
                            set_udp_server_port, NULL);
         
         prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'f', "file",
-                           "File to monitor", required_argument, set_file, NULL);
+                           "Specify a file to monitor", required_argument, set_file, NULL);
+
         
 	ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
-	if (ret == prelude_option_error || ret == prelude_option_end)
-		exit(1);
+	if ( ret == prelude_option_error || ret == prelude_option_end )
+                exit(1);
 
+        
+        if ( prelude_lml_user && setuid(prelude_lml_user) < 0 ) {
+                log(LOG_ERR, "couldn't set UID to %d.\n", prelude_lml_user);
+                return -1;
+        }
+
+        /*
+         * load FD in server-logic now, so that created thread
+         * are owned by the specified user.
+         */
+        for ( i = 0; i < fd_index; i++ ) {
+                ret = file_server_monitor_file(fd_tbl[i].file, fd_tbl[i].fd);
+                if ( ret < 0 )
+                        return prelude_option_error;
+                
+                log(LOG_INFO, "- Added monitor for '%s'.\n", fd_tbl[i].file);
+        }
+        
 	return 0;
 }
-
-
-
-const char *pconfig_get_udp_srvr_addr(void) 
-{
-        return udp_srvr_addr;
-}
-
-
-int pconfig_get_udp_srvr_port(void) 
-{
-        return udp_srvr_port;
-}
-
-
-int pconfig_is_udp_srvr_enabled(void)
-{
-        return udp_srvr_enabled;
-}
-
-

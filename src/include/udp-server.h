@@ -28,8 +28,7 @@ typedef void (udp_server_msg_reader_t)(queue_t *queue,
 /*
  * Creates a new UDP socket.
  */
-udp_server_t *udp_server_new(const char *addr, uint16_t port,
-			     udp_server_msg_reader_t *mreader, queue_t *queue);
+udp_server_t *udp_server_new(const char *addr, uint16_t port);
 
 /*
  * Start the server within a thread. When a UDP packet is received,
@@ -37,7 +36,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port,
  * during creation of the server by a statically allocated string
  * buffer.
  */
-void udp_server_start(udp_server_t *server);
+void udp_server_start(udp_server_t *server, udp_server_msg_reader_t *mreader, queue_t *queue);
 
 void udp_server_close(udp_server_t *server);
 
