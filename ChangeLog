@@ -1,5 +1,11 @@
 2003-02-04  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* plugins/simple/ruleset/simple.rules (include): 
+	include exim.rules.
+
+	* plugins/simple/ruleset/exim.rules: included 
+	contribution from Laurent Oudot <oudot.laurent@wanadoo.fr>.
+
 	* Ruleset update from Stéphane Loeuillet 
 	<LeRoutier@wanadoo.fr>. Include new ProFTPD,
 	vpopmail, and qpopper, rulesets.

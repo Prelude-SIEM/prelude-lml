@@ -118,6 +118,7 @@
 
 
 include = cisco.rules;
+include = exim.rules;
 include = zyxel.rules;
 include = ipfw.rules;
 include = netfilter.rules;
