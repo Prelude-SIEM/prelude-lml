@@ -85,11 +85,11 @@ prelude_plugin_instance_t *log_plugin_register(const char *plugin)
         
         ret = sscanf(plugin, "%255[^[][%255[^]]", pname, iname);
         
-        pi = prelude_plugin_search_instance_by_name(pname, (ret == 2) ? iname : NULL);        
+        pi = prelude_plugin_search_instance_by_name(NULL, pname, (ret == 2) ? iname : NULL);        
         if ( pi )
                 return pi;
         
-        pl = prelude_plugin_search_by_name(pname);
+        pl = prelude_plugin_search_by_name(NULL, pname);
         if ( ! pl )
                 return NULL;
         
@@ -121,7 +121,7 @@ int log_plugins_init(const char *dirname, void *data)
                 return -1;
         }
 
-        ret = prelude_plugin_load_from_dir(dirname, LML_PLUGIN_SYMBOL, data, subscribe, unsubscribe);
+        ret = prelude_plugin_load_from_dir(NULL, dirname, LML_PLUGIN_SYMBOL, data, subscribe, unsubscribe);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "couldn't load plugin subsystem.\n");
                 return -1;

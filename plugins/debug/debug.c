@@ -34,7 +34,8 @@
 #include "prelude-lml.h"
 
 
-int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *data);
+int debug_LTX_prelude_plugin_version(void);
+int debug_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *data);
 
 
 typedef struct {
@@ -57,7 +58,7 @@ static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls,
         idmef_message_t *message;
         idmef_classification_t *class;
 
-        plugin = prelude_plugin_instance_get_data(pi);
+        plugin = prelude_plugin_instance_get_plugin_data(pi);
 
         ret = idmef_message_new(&message);
         if ( ret < 0 ) {
@@ -103,7 +104,7 @@ static int debug_activate(prelude_option_t *opt, const char *optarg, prelude_str
         if ( ! new ) 
                 return prelude_error_from_errno(errno);
 
-        prelude_plugin_instance_set_data(context, new);
+        prelude_plugin_instance_set_plugin_data(context, new);
         
         return 0;
 }
@@ -113,7 +114,7 @@ static int debug_activate(prelude_option_t *opt, const char *optarg, prelude_str
 
 static void debug_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 {
-        debug_plugin_t *debug = prelude_plugin_instance_get_data(pi);
+        debug_plugin_t *debug = prelude_plugin_instance_get_plugin_data(pi);
         free(debug);
 }
 
@@ -121,7 +122,7 @@ static void debug_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 
 static int debug_get_output_stderr(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
-        debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
+        debug_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
         return prelude_string_sprintf(out, "%s", plugin->out_stderr ? "true" : "false");
 }
 
@@ -129,7 +130,7 @@ static int debug_get_output_stderr(prelude_option_t *opt, prelude_string_t *out,
 
 static int debug_set_output_stderr(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
-        debug_plugin_t *plugin = prelude_plugin_instance_get_data(context);
+        debug_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
         
         plugin->out_stderr = ! plugin->out_stderr;
 
@@ -138,13 +139,11 @@ static int debug_set_output_stderr(prelude_option_t *opt, const char *optarg, pr
 
 
 
-int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_optlist)
+int debug_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist)
 {
         int ret;
         prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG;
-
-        *pret = (void *) &plugin;
         
         ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
@@ -155,12 +154,19 @@ int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_op
                            "Output to stderr when plugin is called", PRELUDE_OPTION_ARGUMENT_NONE,
                            debug_set_output_stderr, debug_get_output_stderr);
         
-        prelude_plugin_set_name(&plugin, "Debug");
-        prelude_plugin_set_author(&plugin, "Yoann Vandoorselaere");
-        prelude_plugin_set_desc(&plugin, "Send an alert for each log.");
-        prelude_plugin_set_destroy_func(&plugin, debug_destroy);
-
         plugin.run = debug_run;
+        prelude_plugin_set_name(&plugin, "Debug");
+        prelude_plugin_set_destroy_func(&plugin, debug_destroy);
+        
+        prelude_plugin_entry_set_plugin(pe, (void *) &plugin);
         
         return 0;
 }
+
+
+
+int debug_LTX_prelude_plugin_version(void)
+{
+        return PRELUDE_PLUGIN_API_VERSION;
+}
+

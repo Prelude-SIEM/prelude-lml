@@ -38,7 +38,8 @@
 #include "rule-regex.h"
 
 
-int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *data);
+int pcre_LTX_prelude_plugin_version(void);
+int pcre_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *data);
 
 
 typedef struct {
@@ -589,7 +590,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, 
         pcre_plugin_t *plugin;
         pcre_rule_container_t *rc;
         
-        plugin = prelude_plugin_instance_get_data(pi);
+        plugin = prelude_plugin_instance_get_plugin_data(pi);
 
         prelude_list_for_each(&plugin->rule_list, tmp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
@@ -606,7 +607,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, 
 
 static int set_last_first(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
-        pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
+        pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
         
         plugin->last_rules_first = TRUE;
         
@@ -623,7 +624,7 @@ static int set_pcre_ruleset(prelude_option_t *opt, const char *optarg, prelude_s
         char *ptr;
         prelude_list_t *tmp, *bkp;
         pcre_rule_container_t *rc;
-        pcre_plugin_t *plugin = prelude_plugin_instance_get_data(context);
+        pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
         
         plugin->rulesetdir = strdup(optarg);
 
@@ -673,7 +674,7 @@ static int pcre_activate(prelude_option_t *opt, const char *optarg, prelude_stri
                 return prelude_error_from_errno(errno);
 
         prelude_list_init(&new->rule_list);
-        prelude_plugin_instance_set_data(context, new);
+        prelude_plugin_instance_set_plugin_data(context, new);
         
         return 0;
 }
@@ -685,7 +686,7 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 {
         prelude_list_t *tmp, *bkp;
         pcre_rule_container_t *rule;
-        pcre_plugin_t *plugin = prelude_plugin_instance_get_data(pi);
+        pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(pi);
         
         prelude_list_for_each_safe(&plugin->rule_list, tmp, bkp) {
                 rule = prelude_list_entry(tmp, pcre_rule_container_t, list);
@@ -698,7 +699,7 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 
 
 
-int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_optlist)
+int pcre_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist)
 {
         int ret;
         prelude_option_t *opt, *popt;
@@ -709,7 +710,7 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_opt
         if ( ret < 0 )
                 return ret;
         
-        prelude_plugin_set_activation_option((void *) &pcre_plugin, opt, NULL);
+        prelude_plugin_set_activation_option(pe, opt, NULL);
         
         ret = prelude_option_add(opt, NULL, hook, 'r', "ruleset", "Ruleset to use",
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pcre_ruleset, NULL);
@@ -723,14 +724,19 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_opt
                 return ret;
         prelude_option_set_priority(popt, PRELUDE_OPTION_PRIORITY_FIRST);
         
-        
+
+        pcre_plugin.run = pcre_run;
         prelude_plugin_set_name(&pcre_plugin, "pcre");
-        prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");
-        prelude_plugin_set_contact(&pcre_plugin, "yoann.v@prelude-ids.com");
         prelude_plugin_set_destroy_func(&pcre_plugin, pcre_destroy);
         
-        pcre_plugin.run = pcre_run;
-        *pret = (void *) &pcre_plugin;
-
+        prelude_plugin_entry_set_plugin(pe, (void *) &pcre_plugin);
+        
         return 0;
+}
+
+
+
+int pcre_LTX_prelude_plugin_version(void)
+{
+        return PRELUDE_PLUGIN_API_VERSION;
 }
