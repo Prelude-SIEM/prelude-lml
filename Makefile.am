@@ -7,7 +7,8 @@ EXTRA_DIST = $(preludeconf_DATA) config.h \
              AUTHORS COPYING COPYING.OpenSSL CREDITS INSTALL NEWS README \
              prelude.spec ChangeLog
 
-install-data-local:        
+install-data-local:
+	$(INSTALL) -m 700 -d $(DESTDIR)/$(configdir)/metadata;							
 	@if test -f $(DESTDIR)/$(configdir)/prelude-lml.conf; then         					\
 		echo "********************************************************************************"; 	\
                 echo;                                                                                    	\

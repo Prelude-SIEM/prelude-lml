@@ -33,6 +33,14 @@ file = /var/log/auth.log
 file = /var/log/messages
 
 
+#
+# Specifies the maximum difference, in seconds, between
+# the interval of two logfiles' rotation. If this difference 
+# is reached, a high severity alert will be emited
+#
+rotation-interval = 3600
+
+
 ####################################
 # Here start plugins configuration #
 ####################################

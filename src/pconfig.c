@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2002 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998, 1999, 2000, 2002, 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -70,8 +70,16 @@ static int print_version(prelude_option_t *opt, const char *arg)
 
 static int print_help(prelude_option_t *opt, const char *arg)
 {
-	prelude_option_print(NULL, CLI_HOOK, 25);
+        prelude_option_print(NULL, CLI_HOOK, 25);
 	return prelude_option_end;
+}
+
+
+
+static int set_rotation_interval(prelude_option_t *opt, const char *arg) 
+{
+        file_server_set_rotation_interval_max_difference(atoi(arg));
+        return prelude_option_success;
 }
 
 
@@ -112,7 +120,13 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 static int set_file(prelude_option_t *opt, const char *arg) 
 {
         int ret;
-                
+
+        ret = access(arg, F_OK);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "%s does not exist at program startup: check your configuration.\n", arg);
+                return prelude_option_error;
+        }
+        
         ret = file_server_monitor_file(arg);
         if ( ret < 0 ) 
                 return prelude_option_error;
@@ -221,15 +235,20 @@ int pconfig_set(int argc, char **argv)
         prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'p', "port",
                            "Port to listen on (default 514)", required_argument,
                            set_udp_server_port, NULL);
+
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'r', "rotation-interval",
+                           "Specifies the maximum difference, in seconds, between the interval " \
+                           "of two logfiles' rotation. If this difference is reached, a high "   \
+                           "severity alert will be emited", required_argument,
+                           set_rotation_interval, NULL);
         
         prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'f', "file",
-                           "Specify a file to monitor", required_argument, set_file, NULL);
+                           "Specify a file to monitor (you might specify \"stdin\")",
+                           required_argument, set_file, NULL);
 
-        
-	ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
+        ret = prelude_sensor_init("prelude-lml", PRELUDE_CONF, argc, argv);
 	if ( ret == prelude_option_error || ret == prelude_option_end )
-                exit(1);
-
+                exit(1);        
         
         if ( prelude_lml_user && setuid(prelude_lml_user) < 0 ) {
                 log(LOG_ERR, "couldn't set UID to %d.\n", prelude_lml_user);
