@@ -3,7 +3,6 @@ ruleset_DATA = \
 	cisco.rules		\
 	cisco-pix.rules		\
 	cisco-vpn.rules		\
-	exim.rules		\
 	grsecurity.rules	\
 	honeyd.rules		\
 	ipchains.rules		\
@@ -14,12 +13,15 @@ ruleset_DATA = \
 	navce.rules		\
 	netfilter.rules		\
 	ntsyslog.rules		\
+	pam.rules		\
 	portsentry.rules	\
 	proftpd.rules		\
 	qpopper.rules		\
 	simple.rules		\
+	single.rules		\
 	squid.rules		\
 	ssh.rules		\
+	sudo.rules		\
 	vigor.rules		\
 	vpopmail.rules		\
 	wap11.rules		\
