@@ -22,7 +22,8 @@
 #####
 
 
-# x.x.x.x Wireless PC connected   00-03-2F-0C-D4-D1^M 
+#x.x.x.x Wireless PC connected   00-03-2F-0C-D4-D1^M 
+# No log sample; please submit
 
 regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
  classification.text=Wireless PC connected; \
@@ -41,6 +42,7 @@ regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
  last
 
 # x.x.x.x Unauthorized wireless PC try to connected   00-03-2F-0C-D4-D1^M 
+# No log sample; please submit
 
 regex=([\d\.]+)[\s]+Unauthorized wireless PC try to connected[\s]+([A-Fa-f\d\-]+); \
  classification.text=Unauthorized wireless PC connection attempt; \

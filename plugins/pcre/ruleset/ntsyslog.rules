@@ -71,7 +71,7 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
  last
 
 # 1.c 538
-# Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
+# LOG:Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
 regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+)  Logon ID:\((.*)\)  Logon Type:(\d+); \
  classification.text=Windows Event ID [538]: User logoff; \
  id=1402; \
@@ -247,7 +247,7 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
 
 # 2. Failure events
 # 2.a 529 or 534
-#Dec 10 00:23:37 webbrain.itg.sac.tfs security[failure] 529 NT AUTHORITY\SYSTEM  Logon Failure:  Reason:Unknown user name or bad password  User Name:administrator  Domain:ITG  Logon Type:2  Logon Process:Advapi    Authentication Package: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Workstation Name:WEBBRAIN
+# LOG:Dec 10 00:23:37 webbrain.itg.sac.tfs security[failure] 529 NT AUTHORITY\SYSTEM  Logon Failure:  Reason:Unknown user name or bad password  User Name:administrator  Domain:ITG  Logon Type:2  Logon Process:Advapi    Authentication Package: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Workstation Name:WEBBRAIN
 regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\w ]+)  Domain:(.+)  Logon Type:(\d+)  Logon Process:(\w+)    Authentication Package:(.+)  Workstation Name:(.+); \
  classification.text=Windows Event ID [$1]: Logon failure; \
  id=1412; \
@@ -266,7 +266,7 @@ regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\
  last
 
 # 2.b 578
-#Dec  9 17:42:49 testdb.itg.sac.tfs security[failure] 578 ITG\mzirion  Privileged object operation:  Object Server:Security  Object Handle:4294967295  Process ID:3540  Primary User Name:TESTDB$  Primary Domain:ITG  Primary Logon ID:(0x0,0x3E7)  Client User Name:mzirion  Client Domain:ITG  Client Logon ID:(0x2,0x5E829351)  Privileges:SeIncreaseBasePriorityPrivilege
+# LOG:Dec  9 17:42:49 testdb.itg.sac.tfs security[failure] 578 ITG\mzirion  Privileged object operation:  Object Server:Security  Object Handle:4294967295  Process ID:3540  Primary User Name:TESTDB$  Primary Domain:ITG  Primary Logon ID:(0x0,0x3E7)  Client User Name:mzirion  Client Domain:ITG  Client Logon ID:(0x2,0x5E829351)  Privileges:SeIncreaseBasePriorityPrivilege
 regex= security\[failure\] 578 (.+) Privileged object operation:  Object Server:Security  Object Handle:(\d+)  Process ID:(\d+)  Primary User Name:(.+)  Primary Domain:(.+)  Primary Logon ID:\(.*\)  Client User Name:([\w ]+)  Client Domain:(.+)  Client Logon ID:\((.*)\)  Privileges:(.+); \
  classification.text=Windows Event ID [578]: Privileged object operation; \
  id=1413; \
@@ -283,7 +283,7 @@ regex= security\[failure\] 578 (.+) Privileged object operation:  Object Server:
  last
 
 # 2.c 627
-#Dec  7 20:07:49 testdb.itg.sac.tfs security[failure] 627 NT AUTHORITY\SYSTEM  Change Password Attempt:  Target Account Name:TsInternetUser  Target Domain:TESTDB  Target Account ID: %{S-1-5-21-854245398-413027322-725345543-1000}  Caller User Name:TESTDB$  Caller Domain:ITG  Caller Logon ID:(0x0,0x3E7)  Privileges:-
+# LOG:Dec  7 20:07:49 testdb.itg.sac.tfs security[failure] 627 NT AUTHORITY\SYSTEM  Change Password Attempt:  Target Account Name:TsInternetUser  Target Domain:TESTDB  Target Account ID: %{S-1-5-21-854245398-413027322-725345543-1000}  Caller User Name:TESTDB$  Caller Domain:ITG  Caller Logon ID:(0x0,0x3E7)  Privileges:-
 regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Name:(.+)  Target Domain:(.+)  Target Account ID: (.+)  Caller User Name:(.+)  Caller Domain:(.+)  Caller Logon ID:(\(.+\))  Privileges:(.+); \
  classification.text=Windows Event ID [627]: Change password attempt; \
  id=1414; \
@@ -303,7 +303,7 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
  last
 
 # 2.d 681
-#Dec 10 08:20:07 mrfreeze.itg.sac.tfs security[failure] 681 NT AUTHORITY\SYSTEM  The logon to account: tfslegalask@itg.sac.tfs  by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  from workstation: MRFREEZE  failed. The error code was: 3221225572
+# LOG:Dec 10 08:20:07 mrfreeze.itg.sac.tfs security[failure] 681 NT AUTHORITY\SYSTEM  The logon to account: tfslegalask@itg.sac.tfs  by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  from workstation: MRFREEZE  failed. The error code was: 3221225572
 regex= security\[failure\] 681 (.+)  The logon to account: (\w+)  by:(.+)  from workstation: (\w+)  failed. The error code was: (\d+); \
  classification.text=Windows Event ID [681]: Logon failure; \
  id=1415; \

@@ -26,11 +26,8 @@
 # source regex : portsentry\[?(\d+)+\]?:.* attackalert: (\S+) scan from host: (\S+)/($IP) to (TCP|UDP) port: (\d+)
 
 # Sample matching logs :
-#Sep 16 21:12:21 icecube portsentry[719]: attackalert: SYN/Normal scan from host: ebert-plesk.c.dnsbox.de/217.175.248.226 to TCP port: 443
-#May 11 23:20:10 icecube portsentry[791]: attackalert: SYN/Normal scan from host: su90.internetdsl.tpnet.pl/80.55.98.90 to TCP port: 443
-#May 11 23:29:48 icecube portsentry[791]: attackalert: SYN/Normal scan from host: server1.miniclip.com/64.23.60.30 to TCP port: 443
-#May  8 08:58:22 icecube portsentry[795]: attackalert: UDP scan from host: 193.63.249.24/193.63.249.24 to UDP port: 177
-#May  7 22:52:45 icecube portsentry[795]: attackalert: UDP scan from host: dynamic1.lshtm.ac.uk/194.80.231.1 to UDP port: 68
+#LOG:May 11 23:29:48 icecube portsentry[791]: attackalert: SYN/Normal scan from host: server1.miniclip.com/64.23.60.30 to TCP port: 443
+#LOG:May  8 08:58:22 icecube portsentry[795]: attackalert: UDP scan from host: 193.63.249.24/193.63.249.24 to UDP port: 177
 
 regex=attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
  classification.text=$1 Scan; \
@@ -50,13 +47,11 @@ regex=attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|U
  last;
 
 # 2) Connection :
-
+#
 # source regex : portsentry\[?(\d+)+\]?:.* attackalert: Connect from host: (\S+)/($IP) to (TCP|UDP) port: (\d+)
-
-# Sample matching logs :
-#Nov 19 00:12:53 hosty portsentry[17645]: [ID 702911 daemon.notice] attackalert: Connect from host: ns1.colo.f1host.com.br/207.153.110.234 to TCP port: 80
-#Mar 28 00:03:25 hoste portsentry[103]: attackalert: Connect from host: 217.33.28.29/217.33.28.29 to TCP port: 111
-
+#
+#LOG:Mar 28 00:03:25 hoste portsentry[103]: attackalert: Connect from host: 217.33.28.29/217.33.28.29 to TCP port: 111
+#
 regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
  classification.text=$3/$4 connection logged; \
  id=1501; \
@@ -75,10 +70,9 @@ regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP)
  last;
 
 # 3) Rules :
-
-# Sample matching logs :
-#Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
-
+#
+#LOG:Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
+#
 regex=attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
  classification.text=Connection blocked \
  id=1502; \

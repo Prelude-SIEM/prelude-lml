@@ -26,7 +26,7 @@
 # Copyright (C) 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 # All Rights Reserved
 
-#Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
+#LOG:Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
 regex=(\S+) entered promiscuous mode; \
  classification.text=Promiscuous mode detected; \
  id=400; \
@@ -59,7 +59,7 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
 # Copyright (C) 2004 Gene Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
-#Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
+#LOG:Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
 regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMINAL: (\S+); \
  classification.text=Database audit; \
  id=402; \
@@ -77,7 +77,7 @@ regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMIN
  source(0).node.name=$3; \
  last
 
-#Apr 28 08:56:46 somehost xinetd[17300]: START: tftp pid=10590 from=12.34.56.78
+#LOG:Apr 28 08:56:46 somehost xinetd[17300]: START: tftp pid=10590 from=12.34.56.78
 regex=START: tftp pid=(\d+) from=([\d\.]+); \
  classification.text=TFTP Session; \
  id=403; \
@@ -96,7 +96,7 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
  target(0).process.pid=$1; \
  last
 
-#Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
+#LOG:Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
 regex='\S+' contains a virus \(Infection: (\S+)\); \
  classification.text=Virus found: $1; \
  id=404; \
@@ -110,8 +110,8 @@ regex='\S+' contains a virus \(Infection: (\S+)\); \
  assessment.impact.description=A virus has been identified by P3Scan; \
  last
 
-#Jun 22 12:58:25 mail syslog: syslogd shutdown succeeded
-#Jun 22 12:58:55 mail syslog: syslogd startup succeeded
+#LOG:Jun 22 12:58:25 mail syslog: syslogd shutdown succeeded
+#LOG:Jun 22 12:58:55 mail syslog: syslogd startup succeeded
 regex=syslogd (startup|shutdown) succeeded; \
  classification.text=Syslog $1; \
  id=405; \

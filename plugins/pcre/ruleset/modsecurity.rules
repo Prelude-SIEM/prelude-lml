@@ -30,7 +30,7 @@
 #
 #####
 
-#May 10 08:35:36 somehost httpd[24775]: [error] [client 12.34.56.78] mod_security: Warning. Pattern match "/test\.php" at THE_REQUEST.
+#LOG:May 10 08:35:36 somehost httpd[24775]: [error] [client 12.34.56.78] mod_security: Warning. Pattern match "/test\.php" at THE_REQUEST.
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\.; \
  classification.text=HTTP $3 "$2"; \
  id=3100; \
@@ -46,7 +46,7 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\
  target(0).service.name=http; \
  last
 
-#May 10 08:36:43 somehost httpd[24776]: [error] [client 12.34.56.78] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
+#LOG:May 10 08:36:43 somehost httpd[24776]: [error] [client 12.34.56.78] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+)\.; \
  classification.text=HTTP $4 "$3" Blocked; \
  id=3101; \
@@ -78,7 +78,7 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. 
  target(0).service.name=http; \
  last
 
-#May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
+#LOG:May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
 regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
  classification.text=HTTP Invalid $2; \
  id=3103; \
@@ -103,7 +103,7 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
 #
 #####
 
-#Jun 16 08:42:23 metatron httpd[10837]: [error] [client 127.0.0.1] mod_security: Warning. Pattern match "/cgforum\\.cgi" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/cgforum.cgi"] [unique_id Kxq9XgoBSmsAACpVN4MAAAAE]
+#LOG:Jun 16 08:42:23 metatron httpd[10837]: [error] [client 127.0.0.1] mod_security: Warning. Pattern match "/cgforum\\.cgi" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/cgforum.cgi"] [unique_id Kxq9XgoBSmsAACpVN4MAAAAE]
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\]; \
  classification.text=HTTP $3 "$2"; \
  id=3104; \
@@ -120,7 +120,7 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) 
  target(0).service.name=http; \
  last
 
-#Jun 16 08:42:23 metatron httpd[10833]: [error] [client 127.0.0.1] mod_security: Access denied with code 403. Pattern match "/bb-replog\\.sh" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/bb-replog.sh"] [unique_id KxpIRgoBSmsAACpRNmAAAAAD]
+#LOG:Jun 16 08:42:23 metatron httpd[10833]: [error] [client 127.0.0.1] mod_security: Access denied with code 403. Pattern match "/bb-replog\\.sh" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/bb-replog.sh"] [unique_id KxpIRgoBSmsAACpRNmAAAAAD]
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\]; \
  classification.text=HTTP $4 "$3" Blocked; \
  id=3105; \

@@ -30,7 +30,7 @@
 #
 #####
 
-#Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'probe'.
+#LOG:Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'probe'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
  classification.text=Database user login failure; \
  id=1000; \
@@ -47,7 +47,7 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
  target(0).process.name=$1; \
  last
 
-#Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'sa'.
+#LOG:Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'sa'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
  classification.text=Database admin login failure; \
  id=1001; \

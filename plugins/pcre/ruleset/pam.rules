@@ -21,7 +21,7 @@
 #
 #####
 
-#Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
+#LOG:Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
 regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
  classification.text=User authentication successful; \
  id=1; \
@@ -41,7 +41,7 @@ regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
  target(0).user.user_id(0).name=$1; \
  last
 
-# authentication failure; logname=xxxx uid=xxxx euid=xxxx tty=xxxx ruser=xxxx rhost=xxxx  user=xxxx
+# No log sample; please submit
 regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.*) rhost=(.*) user=(.*); \
  classification.text = User authentication failed; \
  id=2; \

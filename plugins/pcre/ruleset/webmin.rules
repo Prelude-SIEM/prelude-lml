@@ -30,7 +30,7 @@
 #
 #####
 
-#Mar 14 15:18:22 gtsproduxlvs1 webmin[27244]: Successful login as root from 12.34.56.78 
+#LOG:Mar 14 15:18:22 gtsproduxlvs1 webmin[27244]: Successful login as root from 12.34.56.78 
 regex=Successful login as (.+) from ([\d\.]+); \
  classification.text=Web administration admin login successful; \
  id=2900; \
@@ -46,7 +46,7 @@ regex=Successful login as (.+) from ([\d\.]+); \
  source(0).node.address(0).address=$2; \
  last
 
-#Mar 17 19:18:32 gtsdmzuxids1 webmin[28655]: Invalid login as root from 10.100.17.38
+#LOG:Mar 17 19:18:32 gtsdmzuxids1 webmin[28655]: Invalid login as root from 10.100.17.38
 regex=Invalid login as (.+) from ([\d\.]+); \
  classification.text=Web administration admin login failed; \
  id=2901; \

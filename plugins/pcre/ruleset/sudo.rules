@@ -30,7 +30,7 @@
 #
 #####
 
-#Feb 11 06:52:09 12.34.56.78 sudo:   cpatel : TTY=pts/0 ; PWD=/etc/rc.d/init.d ; USER=root ; COMMAND=./resin start
+#LOG:Feb 11 06:52:09 12.34.56.78 sudo:   cpatel : TTY=pts/0 ; PWD=/etc/rc.d/init.d ; USER=root ; COMMAND=./resin start
 regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
  classification.text=SUDO Command Executed; \
  id=2700; \
@@ -49,7 +49,7 @@ regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
  target(0).user.user_id(0).name=$2; \
  last
 
-#Jan 15 09:53:11 12.34.56.78 sudo:   ekwong : user NOT in sudoers ; TTY=pts/2 ; PWD=/ ; USER=root ; COMMAND=/bin/ls
+#LOG:Jan 15 09:53:11 12.34.56.78 sudo:   ekwong : user NOT in sudoers ; TTY=pts/2 ; PWD=/ ; USER=root ; COMMAND=/bin/ls
 regex=(\S+) : user NOT in sudoers . TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
  classification.text=SUDO from Unauthorized User; \
  id=2701; \

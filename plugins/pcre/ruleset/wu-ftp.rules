@@ -30,7 +30,7 @@
 #
 #####
 
-#Oct 28 20:38:47 www.tyco-training.stag ftpd[12781]: ANONYMOUS FTP LOGIN FROM p508ee95a.dip.t-dialin.net [80.142.233.90], Igpuser@home.com
+#LOG:Oct 28 20:38:47 www.tyco-training.stag ftpd[12781]: ANONYMOUS FTP LOGIN FROM p508ee95a.dip.t-dialin.net [80.142.233.90], Igpuser@home.com
 regex=ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
  classification.text=Anonymous FTP logon; \
  id=2300; \
@@ -53,7 +53,7 @@ regex=ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
  source(0).user.user_id(0).name=$2; \
  last
 
-#Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
+#LOG:Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
 regex=FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
  classification.text=FTP logon failed; \
  id=2301; \

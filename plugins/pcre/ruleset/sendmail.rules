@@ -29,8 +29,8 @@
 #
 #####
 
-#Jun 20 04:21:33 mail sendmail[28792]: ruleset=check_relay, arg1=c-67-181-100-174.client.comcast.net, arg2=67.181.100.174, relay=c-67-181-100-174.client.comcast.net [67.181.100.174], reject=550 5.7.1 Mail from 67.181.100.174 refused - see http://dsbl.org/
-#Jun 22 09:01:52 mail sendmail[5475]: ruleset=check_relay, arg1=[61.102.237.129], arg2=61.102.237.129, relay=[61.102.237.129], reject=550 5.7.1 Mail from 61.102.237.129 refused - see http://dsbl.org/
+#LOG:Jun 20 04:21:33 mail sendmail[28792]: ruleset=check_relay, arg1=c-67-181-100-174.client.comcast.net, arg2=67.181.100.174, relay=c-67-181-100-174.client.comcast.net [67.181.100.174], reject=550 5.7.1 Mail from 67.181.100.174 refused - see http://dsbl.org/
+#LOG:Jun 22 09:01:52 mail sendmail[5475]: ruleset=check_relay, arg1=[61.102.237.129], arg2=61.102.237.129, relay=[61.102.237.129], reject=550 5.7.1 Mail from 61.102.237.129 refused - see http://dsbl.org/
 regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.*\[[\d\.]+\], reject=550 5\.7\.1; \
  classification.text=Mail server relay access denied; \
  id=3700; \
@@ -49,7 +49,7 @@ regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.*\[[\d\.
  target(0).service.port=25; \
  last;
 
-#Jun 19 23:20:27 mail sendmail[28096]: i5K6KJmk028096: ruleset=check_rcpt, arg1=<support@microsoft.com>, relay=[211.243.40.167], reject=550 5.7.1 <support@microsoft.com>... Relaying denied. IP name lookup failed [211.243.40.167]
+#LOG:Jun 19 23:20:27 mail sendmail[28096]: i5K6KJmk028096: ruleset=check_rcpt, arg1=<support@microsoft.com>, relay=[211.243.40.167], reject=550 5.7.1 <support@microsoft.com>... Relaying denied. IP name lookup failed [211.243.40.167]
 regex=ruleset=check_rcpt, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=550 5\.7\.1; \
  classification.text=Mail server relay access denied; \
  id=3701; \
@@ -69,7 +69,7 @@ regex=ruleset=check_rcpt, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=550 5\
  target(0).service.port=25; \
  last;
 
-#Jun 25 17:30:55 mail sendmail[29822]: i5Q0Ukjt029822: ruleset=check_mail, arg1=<vrrfvbvwzihdz@cninfo.net>, relay=[211.210.172.167], reject=553 5.1.8 <vrrfvbvwzihdz@cninfo.net>... Domain of sender address vrrfvbvwzihdz@cninfo.net does not exist
+#LOG:Jun 25 17:30:55 mail sendmail[29822]: i5Q0Ukjt029822: ruleset=check_mail, arg1=<vrrfvbvwzihdz@cninfo.net>, relay=[211.210.172.167], reject=553 5.1.8 <vrrfvbvwzihdz@cninfo.net>... Domain of sender address vrrfvbvwzihdz@cninfo.net does not exist
 regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\.1\.8; \
  classification.text=Mail server relay access denied; \
  id=3702; \
@@ -89,8 +89,8 @@ regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\
  target(0).service.port=25; \
  last;
 
-#Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
-#Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
+#LOG:Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
+#LOG:Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
 regex=regex=sendmail (startup|shudown) succeeded; \
  classification.text=Mail server $1 ; \
  id=3703; \
@@ -104,7 +104,7 @@ regex=regex=sendmail (startup|shudown) succeeded; \
  assessment.impact.severity=low; \
  last;
 
-#Jun 22 06:43:01 mail sendmail[5195]: i5MDgomk005195: AClermont-Ferrand-108-1-6-103.w81-49.abo.wanadoo.fr [81.49.192.103] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
+#LOG:Jun 22 06:43:01 mail sendmail[5195]: i5MDgomk005195: AClermont-Ferrand-108-1-6-103.w81-49.abo.wanadoo.fr [81.49.192.103] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
 regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA; \
  classification.text=Mail server suspicious access; \
  id=3704; \
@@ -123,7 +123,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connect
  target(0).service.port=25; \
  last;
 
-#Jun 25 18:59:39 mail sendmail[29873]: i5Q1xRjt029873: <boagcxwl@gomezbrothers.com>... User unknown
+#LOG:Jun 25 18:59:39 mail sendmail[29873]: i5Q1xRjt029873: <boagcxwl@gomezbrothers.com>... User unknown
 regex=<(\S+@\S+)>... User unknown; \
  classification.text=Mail server unknown user; \
  id=3705; \
@@ -141,7 +141,7 @@ regex=<(\S+@\S+)>... User unknown; \
  target(0).service.port=25; \
  last;
 
-#Jun  4 12:25:26 mail sendmail[21691]: i54JPQCi021691: Authentication-Warning: mail.somehost.com: apache set sender to someguy@somehost.com using -f
+#LOG:Jun  4 12:25:26 mail sendmail[21691]: i54JPQCi021691: Authentication-Warning: mail.somehost.com: apache set sender to someguy@somehost.com using -f
 regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; \
  classification.text=Mail server user obfuscation; \
  id=3706; \
@@ -162,7 +162,7 @@ regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; 
  target(0).service.port=25; \
  last;
 
-#Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: VRFY somebody [rejected]
+#LOG:Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: VRFY somebody [rejected]
 regex=([\w\-\.]+) \[([\d\.]+)\]: VRFY (\S+) \[rejected\]; \
  classification.text=Mail server user discovery; \
  id=3707; \
@@ -183,7 +183,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\]: VRFY (\S+) \[rejected\]; \
  target(0).service.port=25; \
  last;
 
-#Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: EXPN somegroup [rejected]
+#LOG:Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: EXPN somegroup [rejected]
 regex=([\w\-\.]+) \[([\d\.]+)\]: EXPN (\S+) \[rejected\]; \
  classification.text=Mail server group member discovery; \
  id=3708; \
