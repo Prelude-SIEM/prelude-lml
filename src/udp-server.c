@@ -58,7 +58,6 @@ struct udp_server {
         int sockfd;
         lml_log_source_t *ls;
         regex_list_t *rlist;
-        struct sockaddr_in saddr;
 };
 
 
@@ -123,7 +122,9 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
 {
         int ret;
         udp_server_t *server;
-
+        char buf[sizeof("65535")];
+        struct addrinfo hints, *ai;
+        
         server = malloc(sizeof(*server));
         if ( ! server ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -143,21 +144,23 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t por
                 return NULL;
         }
 
+        memset(&hints, 0, sizeof(hints));
+        snprintf(buf, sizeof(buf), "%u", port);
         
-        ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "couldn't resolve %s.\n", addr);
-                udp_server_close(server);
+        hints.ai_family = PF_UNSPEC;
+        hints.ai_socktype = SOCK_DGRAM;
+        hints.ai_protocol = IPPROTO_UDP;
+        
+        ret = getaddrinfo(addr, buf, &hints, &ai);
+        if ( ret != 0 ) {
+                fprintf(stderr, "could not resolve %s: %s.\n", addr,
+                        (ret == EAI_SYSTEM) ? strerror(errno) : gai_strerror(ret));
                 return NULL;
         }
         
-        server->saddr.sin_family = AF_INET;
-        server->saddr.sin_port = htons(port);
-        memset(server->saddr.sin_zero, 0, sizeof(server->saddr.sin_zero));                
-
-        ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
+        ret = bind(server->sockfd, ai->ai_addr, ai->ai_addrlen);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't bind to socket.\n");
+                prelude_log(PRELUDE_LOG_ERR, "couldn't bind to socket: %s.\n", strerror(errno));
                 udp_server_close(server);
                 return NULL;
         }
