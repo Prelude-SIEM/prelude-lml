@@ -1,5 +1,15 @@
 2004-02-01  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
+	* src/udp-server.c (udp_server_process_event): 
+	use log_file_set_source().
+
+	* src/log-common.c (log_file_set_source): 
+	implemented. Doesn't check wether the file exist.
+	free previous value if already set.
+	
+	(log_file_set_filename): free filename if it already
+	exist.
+
 	* src/udp-server.c (udp_server_new): verbose message
 	when the syslog server is enabled.
 	

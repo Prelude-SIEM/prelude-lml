@@ -57,10 +57,8 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
 
         buf[ret] = '\0';
         
-        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);
-        sptr = strdup(src);
-        
-        log_file_set_filename(server->lf, sptr);
+        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);        
+        log_file_set_source(server->lf, src);
 
         /*
          * we don't care about syslog priority / facility.
@@ -70,8 +68,6 @@ void udp_server_process_event(udp_server_t *server, regex_list_t *list)
                 ptr = buf;
         
         lml_dispatch_log(list, server->lf, inet_ntoa(addr.sin_addr));
-
-        free(sptr);
 }
 
 
