@@ -235,6 +235,7 @@ static void free_rule_object_value_list(rule_object_t *object)
         prelude_list_for_each_safe(&object->rule_object_value_list, tmp, bkp) {
                 rovalue = prelude_list_entry(tmp, rule_object_value_t, list);
 
+                free(rovalue->value);
                 prelude_list_del(&rovalue->list);
                 free(rovalue);
         }
@@ -475,10 +476,7 @@ void rule_object_list_destroy(rule_object_list_t *olist)
         
         prelude_list_for_each_safe(&olist->referenced_value_list, tmp, bkp) {
                 rvalue = prelude_list_entry(tmp, rule_referenced_value_t, list);
-                
-                free(*rvalue->value);
-                *rvalue->value = NULL;
-                
+
                 prelude_list_del(&rvalue->list);
                 free(rvalue);
         }
