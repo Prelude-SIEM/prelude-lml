@@ -32,13 +32,13 @@ typedef struct {
         uint16_t id;
         uint16_t revision;
 
-        int last;
-        int chained;
-        int required;
-        int refcount;
+        prelude_bool_t last;
+        prelude_bool_t chained;
+        unsigned int required_goto;
+        unsigned int refcount;
 
-        int min_optgoto_match;
-        int min_optregex_match;
+        unsigned int min_optgoto_match;
+        unsigned int min_optregex_match;
         
         prelude_list_t rule_list;
         prelude_list_t regex_list;

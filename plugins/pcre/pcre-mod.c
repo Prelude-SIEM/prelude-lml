@@ -218,18 +218,18 @@ static int parse_rule_min_optregex_match(pcre_plugin_t *plugin, pcre_rule_t *rul
 
 
 
-static int parse_rule_last(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *last)
+static int parse_rule_last(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
-        rule->last = 1;
+        rule->last = TRUE;
 
         return 0;
 }
 
 
 
-static int parse_rule_chained(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *last)
+static int parse_rule_chained(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
-        rule->chained = 1;
+        rule->chained = TRUE;
 
         return 0;
 }
