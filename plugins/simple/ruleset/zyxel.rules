@@ -21,8 +21,12 @@
 #
 #####
 
-# ZyXEL router support for Prelude-LML
+# ZyXEL router support for Prelude-LML 
+# (should work with most ZynOS network devices)
 
-regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9]+)  dpo=([0-9]+).*; class.name=ZyXEL ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5);
+regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9]+)  dpo=([0-9]+).*; class.name=ZyXEL ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5); source.node.address.address = $1; source.service.port = $4; source.service.protocol = $3; target.node.address.address = $2; target.service.port = $5; target.service.protocol = $3;
 
-regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*; class.name=ZyXEL ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3);
+regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*; class.name=ZyXEL ip access; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3); source.node.address.address = $1; source.service.protocol = $3; target.node.address.address = $2; target.service.protocol = $3;
+
+
+
