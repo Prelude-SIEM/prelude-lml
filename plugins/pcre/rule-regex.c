@@ -46,12 +46,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
-#ifdef DEBUG
- #define dprint(args...) fprintf(stderr, args)
-#else
- #define dprint(args...) do { } while(0)
-#endif
-
 
 struct rule_regex {
         PRELUDE_LINKED_OBJECT;
@@ -105,7 +99,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
 
-        dprint("\nInput = %s\n", lml_log_entry_get_message(log_entry));
+        prelude_log(PRELUDE_LOG_DEBUG, "\nInput = %s\n", lml_log_entry_get_message(log_entry));
         
         prelude_list_for_each(&rule->regex_list, tmp) {
                 item = prelude_linked_object_get_object(tmp);
@@ -114,7 +108,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
                                    lml_log_entry_get_message_len(log_entry),
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
                 
-                dprint("match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
+                prelude_log(PRELUDE_LOG_DEBUG, "match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
                 if ( ret <= 0 && ! item->optreg )
                         return -1;
                 
@@ -128,7 +122,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
                         continue;
                 
                 for ( i = 2; i < (ret * 2); i += 2 ) {
-                        dprint("assign %d-%d\n", retval * 2 + i, retval * 2 + i + 1);
+                        prelude_log(PRELUDE_LOG_DEBUG, "assign %d-%d\n", retval * 2 + i, retval * 2 + i + 1);
                         ovector[(retval * 2) + i] = tmpovector[i];
                         ovector[(retval * 2) + i + 1] = tmpovector[i + 1];
                 }
@@ -139,7 +133,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         retval++;
          
         if ( rule->min_optregex_match ) {
-                dprint("optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
+                prelude_log(PRELUDE_LOG_DEBUG, "optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
                 return (optional_match >= rule->min_optregex_match) ? retval : -1;
         }
         

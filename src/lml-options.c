@@ -128,6 +128,13 @@ static int set_quiet_mode(prelude_option_t *opt, const char *optarg, prelude_str
 }
 
 
+static int set_debug_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+{
+        prelude_log_set_flags(prelude_log_get_flags() | PRELUDE_LOG_FLAGS_DEBUG);
+        return 0;
+}
+
+
 static int set_daemon_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         prelude_daemonize(config.pidfile);
@@ -356,7 +363,10 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
-                
+
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'D', "debug",
+                           "Debug mode", PRELUDE_OPTION_ARGUMENT_NONE, set_debug_mode, NULL);
+        
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_daemon_mode, NULL);
