@@ -24,7 +24,7 @@
 # Jan 13 20:42:56 (none) popper[6754]: [AUTH] Failed attempted login to leroutier from host (www.leroutier.net) 81.91.66.90
 # Jan 13 21:05:09 (none) popper[6950]: [AUTH] Failed attempted login to vegeta from host (Mix-Dijon-114-2-232.abo.wanadoo.fr) 193.249.231.232
 
-regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\.]+\) ([\d\.]+); \
+regex=\[AUTH\] Failed attempted login to (\S+) from host \([\w\-\.]+\) ([\d\.]+); \
  classification(0).name=qpopper - invalid password for this user; \
  id=1700; \
  revision=1; \
@@ -48,7 +48,7 @@ regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\
 # Jan 13 21:02:59 (none) popper[6936]: azerty at Mix-Dijon-114-2-232.abo.wanadoo.fr (193.249.231.232): -ERR [AUTH] Password supplied for "azerty" is incorrect.
 # Jan 13 21:05:09 (none) popper[6950]: vegeta at Mix-Dijon-114-2-232.abo.wanadoo.fr (193.249.231.232): -ERR [AUTH] Password supplied for "vegeta" is incorrect.
 
-regex=popper\[\d+\]: (\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password supplied for "\S+" is incorrect; \
+regex=(\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password supplied for "\S+" is incorrect; \
  classification(0).name=qpopper - invalid password for user; \
  id=1701; \
  revision=1; \

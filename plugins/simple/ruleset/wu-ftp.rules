@@ -31,7 +31,7 @@
 #####
 
 #Oct 28 20:38:47 www.tyco-training.stag ftpd[12781]: ANONYMOUS FTP LOGIN FROM p508ee95a.dip.t-dialin.net [80.142.233.90], Igpuser@home.com
-regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
+regex=ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
  classification(0).name=Anonymous FTP logon; \
  id=2300; \
  revision=1; \
@@ -39,21 +39,21 @@ regex=([\w\-\.]+) ftpd\[\d+\]: ANONYMOUS FTP LOGIN FROM [\w\-\.]+ \[([\d\.)]+)\]
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.severity=low; \
- assessment.impact.description=An anonymous FTP user has logged into $1; \
+ assessment.impact.description=An anonymous FTP user has logged in; \
   \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$2; \
+ source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \
   \
  target(0).user.userid(0).name=anonymous; \
   \
- source(0).user.userid(0).name=$3; \
+ source(0).user.userid(0).name=$2; \
  last
 
 #Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
-regex=([\w\-\.]+) ftpd\[\d+\]: FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
+regex=FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([\d\.)]+)\], (\S+); \
  classification(0).name=FTP logon failed; \
  id=2301; \
  revision=1; \
@@ -61,10 +61,10 @@ regex=([\w\-\.]+) ftpd\[\d+\]: FTP LOGIN FAILED \(([\w\s]+)\) for [\w\-\.]+ \[([
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
- assessment.impact.description=A user failed logon on $1 due to $2; \
+ assessment.impact.description=A user failed login due to $1; \
   \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$3; \
+ source(0).node.address(0).address=$2; \
  source(0).service.protocol=tcp; \
  target(0).service.port=21; \
  target(0).service.protocol=tcp; \

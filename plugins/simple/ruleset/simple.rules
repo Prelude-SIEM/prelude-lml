@@ -141,6 +141,7 @@ include = portsentry.rules;
 include = vigor.rules;
 include = ipchains.rules;
 include = wap11.rules;
+include = honeyd.rules;
 
 #Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
 regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \

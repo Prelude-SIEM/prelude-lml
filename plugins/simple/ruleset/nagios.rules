@@ -31,7 +31,7 @@
 #####
 
 #Oct 27 23:22:53 shadowcat nagios: SERVICE ALERT: adtcadb;SQL Server;CRITICAL;HARD;3;Socket timeout after 10 seconds
-regex=nagios: SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$; \
+regex=SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$; \
  classification(0).name=Service $3; \
  id=1100; \
  revision=1; \
@@ -42,7 +42,7 @@ regex=nagios: SERVICE ALERT: (\w+).([\w\s]+).(CRITICAL|WARNING|OK).HARD.\d.(.+)$
  last
 
 #Oct 28 11:42:33 shadowcat nagios: HOST ALERT: rcts2;UP;HARD;2;PING OK - Packet loss = 0%, RTA = 0.26 ms
-regex=nagios: HOST ALERT: (\w+).(DOWN|UP).HARD.\d.(.+)$; \
+regex=HOST ALERT: (\w+).(DOWN|UP).HARD.\d.(.+)$; \
  classification(0).name=Host $2; \
  id=1101; \
  revision=1; \

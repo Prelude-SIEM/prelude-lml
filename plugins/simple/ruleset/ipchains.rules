@@ -7,7 +7,7 @@
 
 # TCP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=TCP packet denied; \
  id=700; \
  revision=1; \
@@ -31,7 +31,7 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d
 
 # UDP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=UDP packet denied; \
  id=701; \
  revision=1; \
@@ -55,7 +55,7 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\
 
 # ICMP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=ICMP Packet denied; \
  id=702; \
  revision=1; \
@@ -83,7 +83,7 @@ regex=kernel: Packet log: (\w+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d
 
 # TCP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=TCP packet accepted; \
  id=703; \
  revision=1; \
@@ -107,7 +107,7 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(
 
 # UDP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=UDP packet accepted; \
  id=704; \
  revision=1; \
@@ -131,7 +131,7 @@ regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):
 
 # ICMP
 # No log sample; please submit
-regex=kernel: Packet log: (\w+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
+regex=Packet log: (\w+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  classification(0).name=ICMP Packet accepted; \
  id=705; \
  revision=1; \

@@ -23,7 +23,7 @@
 
 # Jan 13 22:19:52 (none) proftpd[7804]: leroutier.net (193.249.231.232[193.249.231.232]) - PAM(leroutier): Authentication failure.
 
-regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): Authentication failure; \
+regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): Authentication failure; \
  classification(0).name=FTP logon failed; \
  id=1600; \
  revision=1; \
@@ -44,7 +44,7 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): A
 
 # Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
 
-regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)'; \
+regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)'; \
  classification(0).name=FTP logon failed; \
  id=1601; \
  revision=1; \
@@ -65,7 +65,7 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)';
 
 # Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
 
-regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such user found from [\w\-\.]+ \[[\w\-\.]+\] to ([\w\-\.]+):(\d+); \
+regex=[\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such user found from [\w\-\.]+ \[[\w\-\.]+\] to ([\w\-\.]+):(\d+); \
  classification(0).name=FTP logon failed; \
  id=1602; \
  revision=1; \

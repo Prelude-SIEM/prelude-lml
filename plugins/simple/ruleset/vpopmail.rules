@@ -25,7 +25,7 @@
 # Feb 24 13:19:49 c vpopmail[9505]: vchkpw: vpopmail user not found temp@alexus.org:66.181.160.250
 # Jan 14 17:30:13 spotk vpopmail[28425]: vchkpw: vpopmail user not found toto@:192.168.100.50
 
-regex=vpopmail\[\d+\]: vchkpw: vpopmail user not found (\S+):([\d\.]+); \
+regex=vchkpw: vpopmail user not found (\S+):([\d\.]+); \
  classification(0).name=vpopmail - no such user; \
  id=2100; \
  revision=1; \
@@ -46,7 +46,7 @@ regex=vpopmail\[\d+\]: vchkpw: vpopmail user not found (\S+):([\d\.]+); \
 
 # Jan 14 17:24:54 spotk vpopmail[28359]: vchkpw: password fail xxx@spotk.net:127.0.0.1
 
-regex=vpopmail\[\d+\]: vchkpw: password fail (\S+):([\d\.]+); \
+regex=vchkpw: password fail (\S+):([\d\.]+); \
  classification(0).name=vpopmail - bad password for this user; \
  id=2101; \
  revision=1; \
