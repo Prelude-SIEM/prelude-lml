@@ -15,6 +15,7 @@ ruleset_DATA = \
 	netfilter.rules		\
 	ntsyslog.rules		\
 	pam.rules		\
+	pcanywhere.rules	\
 	portsentry.rules	\
 	proftpd.rules		\
 	qpopper.rules		\

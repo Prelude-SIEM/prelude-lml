@@ -160,6 +160,7 @@ include = navce.rules;
 include = netfilter.rules;
 include = ntsyslog.rules;
 include = pam.rules;
+include = pcanywhere.rules;
 include = portsentry.rules;
 include = proftpd.rules;
 include = qpopper.rules;

@@ -53,3 +53,23 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  assessment.impact.description=Exim refused a request : $1 rejected; \
  target(0).service.protocol=smtp; \
  last
+
+# Copyright (C) 2004 Gene Gomez <gene at gomezbrothers dot com>
+# MAXIMUS (www.maximus.com)
+# All Rights Reserved
+
+#Apr 13 11:31:55 10.5.1.9 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
+regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMINAL: (\S+); \
+ classification(0).name=Oracle DBA Audit Trail; \
+ id=402; \
+ revision=1; \
+ classification(0).origin=vendor-specific; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=admin; \
+ assessment.impact.description=The command $1 was executed; \
+ source(0).user.category=application; \
+ source(0).user.userid(0).name=$2; \
+ source(0).user.userid(0).type=original-user; \
+ source(0).node.name=$3; \
+ last
