@@ -38,6 +38,7 @@
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-inet.h>
 
+#include "libmissing.h"
 #include "log-common.h"
 #include "lml-alert.h"
 #include "config.h"
@@ -85,7 +86,7 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
 
 
 
-static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai) 
+static int fill_target(idmef_node_t *node, struct addrinfo *ai) 
 {
         char str[128];
         void *in_addr;
@@ -127,6 +128,45 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
 }
 
 
+static int fill_analyzer(const log_container_t *log, idmef_analyzer_t *analyzer)
+{
+        int ret;
+        idmef_node_t *node;
+        idmef_process_t *process;
+        prelude_string_t *process_name;
+        if ( log->target_program && ! idmef_analyzer_get_process(analyzer) ) {
+                process = idmef_analyzer_new_process(analyzer);
+                if ( ! process )
+                        return -1;
+
+                process_name = idmef_process_new_name(process);
+                prelude_string_set_ref(process_name, log->target_program);
+        }
+
+        if ( log->target_hostname && ! idmef_analyzer_get_node(analyzer) ) {
+                struct addrinfo *ai, hints;
+                
+                node = idmef_analyzer_new_node(analyzer);
+                if ( ! node ) 
+                        return -1;
+
+                memset(&hints, 0, sizeof(hints));
+                hints.ai_flags = AI_CANONNAME;
+                hints.ai_socktype = SOCK_STREAM;
+
+                ret = getaddrinfo(log->target_hostname, NULL, &hints, &ai);
+                if ( ret != 0 ) {
+                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, gai_strerror(ret));
+                        return resolve_failed_fallback(log, node);
+                }
+
+                fill_target(node, ai);
+                freeaddrinfo(ai);
+        }
+
+        return 0;
+}
+
 
 static int generate_target(const log_container_t *log, idmef_alert_t *alert) 
 {
@@ -167,7 +207,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         }
         
         if ( log->target_hostname && ! idmef_target_get_node(target) ) {
-                prelude_addrinfo_t *ai, hints;
+                struct addrinfo *ai, hints;
                 
                 node = idmef_target_new_node(target);
                 if ( ! node ) 
@@ -177,16 +217,14 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
 
-                /* This function conforms to getaddrinfo(3), not a general calling convention in libprelude */
-                ret = prelude_inet_getaddrinfo(log->target_hostname, NULL, &hints, &ai);
+                ret = getaddrinfo(log->target_hostname, NULL, &hints, &ai);
                 if ( ret != 0 ) {
-                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, prelude_inet_gai_strerror(ret));
+                        log(LOG_ERR, "error resolving \"%s\": %s.\n", log->target_hostname, gai_strerror(ret));
                         return resolve_failed_fallback(log, node);
                 }
 
                 fill_target(node, ai);
-
-                prelude_inet_freeaddrinfo(ai);
+                freeaddrinfo(ai);
         }
 
         return 0;
@@ -234,12 +272,16 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
         idmef_time_set_from_time(detect_time, (const time_t *) &log->tv.tv_sec);
         idmef_time_set_usec(detect_time, log->tv.tv_usec);
 
+        cur_analyzer = idmef_alert_get_analyzer(alert);
+        
         if ( log->target_hostname || log->target_program ) {
                 if ( generate_target(log, alert) < 0 )
                         goto error;
-        }
 
-        cur_analyzer = idmef_alert_get_analyzer(alert);
+                if ( cur_analyzer && fill_analyzer(log, cur_analyzer) < 0 )
+                        goto error;
+        }
+        
         if ( cur_analyzer ) 
                 idmef_analyzer_set_analyzer(cur_analyzer, idmef_analyzer_ref(idmef_analyzer));
         else
