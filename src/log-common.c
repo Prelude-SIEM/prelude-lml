@@ -356,8 +356,9 @@ log_file_t *log_file_new(void)
                 return NULL;
         }
 
+        lf->ts_fmt = SYSLOG_TS_FMT;
         lf->log_fmt = SYSLOG_LOG_FMT;
-
+        
         return lf;
 }
 

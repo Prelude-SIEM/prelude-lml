@@ -1,3 +1,8 @@
+2004-01-11  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/log-common.c (log_file_new): 
+	oops, set default ts_fmt.
+
 2004-01-10  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* src/log-common.c 
