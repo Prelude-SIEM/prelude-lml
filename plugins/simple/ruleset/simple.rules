@@ -25,6 +25,8 @@
 #   use the classification().name from the other rule.
 # - Use only the actual log message, none of the syslog headers (this generally
 #   includes timestamp, originating node, originating process, and pid).
+# - Submit new rulesets to the prelude-devel mailing list for consideration.
+#
 #
 # Below you will find a listing of most of the IDMEF fields Prelude-LML accepts.  Where
 # you see an item listed with (), it means that item is indexed.  Indexing starts at 0,
