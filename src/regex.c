@@ -16,35 +16,35 @@
 
 
 struct regex_entry {
-	pcre *regex_compiled;
-	pcre_extra *regex_extra;
-	int options;
+        pcre *regex_compiled;
+        pcre_extra *regex_extra;
+        int options;
         plugin_container_t *plugin;
-	struct list_head list;
+        struct list_head list;
 };
 
 
 
 static char *trim(char *str)
 {
-	char *ibuf, *obuf;
+        char *ibuf, *obuf;
 
-	if ( ! str )
-		return NULL;
+        if ( ! str )
+                return NULL;
 
-	for ( ibuf = str, obuf = str; *ibuf; ) {
-		while ( *ibuf && isspace((int) *ibuf) )
-			ibuf++;
+        for ( ibuf = str, obuf = str; *ibuf; ) {
+                while ( *ibuf && isspace((int) *ibuf) )
+                        ibuf++;
                 
-		if ( *ibuf && (obuf != str) )
-			*(obuf++) = ' ';
+                if ( *ibuf && (obuf != str) )
+                        *(obuf++) = ' ';
                 
-		while ( *ibuf && (!isspace((int) *ibuf)) )
-			*(obuf++) = *(ibuf++);
-	}
-	*obuf = '\0';
+                while ( *ibuf && (!isspace((int) *ibuf)) )
+                        *(obuf++) = *(ibuf++);
+        }
+        *obuf = '\0';
 
-	return str;
+        return str;
 }
 
 
@@ -52,21 +52,21 @@ static char *trim(char *str)
 
 static regex_entry_t *regex_entry_new(regex_list_t *list)
 {
-	regex_entry_t *new;
+        regex_entry_t *new;
 
         new = malloc(sizeof(*new));
-	if ( ! new ) {
+        if ( ! new ) {
                 log(LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
 
-	new->regex_compiled = NULL;
-	new->regex_extra = NULL;
-	new->options = 0;
+        new->regex_compiled = NULL;
+        new->regex_extra = NULL;
+        new->options = 0;
 
-	list_add_tail(&new->list, list);
+        list_add_tail(&new->list, list);
 
-	return new;
+        return new;
 }
 
 
@@ -74,7 +74,7 @@ static regex_entry_t *regex_entry_new(regex_list_t *list)
 
 static void regex_entry_delete(regex_entry_t *entry)
 {
-	list_del(&entry->list);
+        list_del(&entry->list);
 
         if ( entry->regex_compiled )
                 pcre_free(entry->regex_compiled);
@@ -82,7 +82,7 @@ static void regex_entry_delete(regex_entry_t *entry)
         if ( entry->regex_extra )
                 pcre_free(entry->regex_extra);
         
-	free(entry);
+        free(entry);
 }
 
 
@@ -132,27 +132,27 @@ static int regex_create_entry(regex_list_t *list, const char *filename,
 
 regex_list_t *regex_init(char *filename)
 {
-	FILE *f;
-	int line = 1, ret;
+        FILE *f;
+        int line = 1, ret;
         char *token, *tmp = NULL;
         char buf[MAX_LINE_LEN];
         char name[MAX_NAME_LEN];
         char regex[MAX_LINE_LEN];
         char options[MAX_OPTIONS_LEN];
 
-	regex_list_t *conf = malloc(sizeof(*conf));
-	assert(conf);
-	INIT_LIST_HEAD(conf);
+        regex_list_t *conf = malloc(sizeof(*conf));
+        assert(conf);
+        INIT_LIST_HEAD(conf);
 
-	f = fopen(filename, "r");
-	if (NULL == f) {
-		log(LOG_ERR, "couldn't open config file.\n");
-		return NULL;
-	}
+        f = fopen(filename, "r");
+        if (NULL == f) {
+                log(LOG_ERR, "couldn't open config file.\n");
+                return NULL;
+        }
 
-	while ( fgets(buf, MAX_LINE_LEN, f) ) {
+        while ( fgets(buf, MAX_LINE_LEN, f) ) {
                 
-		trim(buf);
+                trim(buf);
 
                 if ( buf[0] == '#' || buf[0] == '\0' )
                         /*
@@ -160,35 +160,39 @@ regex_list_t *regex_init(char *filename)
                          */
                         continue;
                 
-		token = strtok_r(buf, " \t", &tmp);
-		if (NULL == token) {
-			line++;
-			continue;
-		}
-		strncpy(name, token, MAX_NAME_LEN);
+                token = strtok_r(buf, " \t", &tmp);
+                if (NULL == token) {
+                        line++;
+                        continue;
+                }
+                strncpy(name, token, MAX_NAME_LEN);
+                name[MAX_NAME_LEN - 1] = 0;
                 
-		token = strtok_r(NULL, " \t", &tmp);
-		if (NULL == token) {
-			line++;
-			continue;
-		}
-		strncpy(options, token, MAX_OPTIONS_LEN);
-
-		token = strtok_r(NULL, "", &tmp);
-		if (NULL == token) {
-			line++;
-			continue;
-		}
-		strncpy(regex, token, MAX_LINE_LEN);
-
+                token = strtok_r(NULL, " \t", &tmp);
+                if (NULL == token) {
+                        line++;
+                        continue;
+                }
+                strncpy(options, token, MAX_OPTIONS_LEN);
+                option[MAX_OPTIONS_LEN - 1] = 0;
+                
+                token = strtok_r(NULL, "", &tmp);
+                if (NULL == token) {
+                        line++;
+                        continue;
+                }
+                strncpy(regex, token, MAX_LINE_LEN);
+                regex[MAX_LINE_LEN - 1] = 0;
+        
                 ret = regex_create_entry(conf, filename, line, name, regex, options);
                 if ( ret < 0 )
                         continue;
                 
-		line++;
-	}
-
-	return conf;
+                line++;
+        }
+        fclose(f);
+    
+        return conf;
 }
 
 
@@ -197,14 +201,14 @@ regex_list_t *regex_init(char *filename)
 void regex_destroy(regex_list_t *list)
 {
         regex_entry_t *entry;
-	struct list_head *tmp, *bkp;
+        struct list_head *tmp, *bkp;
 
-	list_for_each_safe(tmp, bkp, list) {
-		entry = list_entry(tmp, regex_entry_t, list);
-		regex_entry_delete(entry);
-	}
+        list_for_each_safe(tmp, bkp, list) {
+                entry = list_entry(tmp, regex_entry_t, list);
+                regex_entry_delete(entry);
+        }
         
-	free(list);
+        free(list);
 }
 
 
@@ -214,20 +218,20 @@ int regex_exec(regex_list_t *list, const char *str,
                void (*cb)(void *plugin, void *data), void *data)
 {
         regex_entry_t *entry;
-	struct list_head *tmp;
+        struct list_head *tmp;
         int count, ovector[20 * 3];
         
-	list_for_each(tmp, list) {
+        list_for_each(tmp, list) {
                 entry = list_entry(tmp, regex_entry_t, list);
 
-		count = pcre_exec(entry->regex_compiled, entry->regex_extra,
+                count = pcre_exec(entry->regex_compiled, entry->regex_extra,
                                   str, strlen(str), 0, 0, ovector, 20 * 3);
                 if ( count <= 0 )
                         continue;
                 
                 dprint("[REGEX] string <%s> matched - count = %d\n", str, count);
                 cb(entry->plugin, data);
-	}
+        }
         
-	return 0;
+        return 0;
 }

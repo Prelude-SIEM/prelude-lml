@@ -1,3 +1,14 @@
+2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
+
+	* src/file-server.c (logfile_alert): fix unterminated
+	string.
+	
+	* plugins/simple/simple.c (parse_include): fix unterminated
+	string. Close the open file.
+
+	* src/regex.c: coding style fixes
+	(regex_init): fix unterminated strings.
+	
 2002-08-20  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/log-common.c (format_syslog_header): 

@@ -1331,7 +1331,7 @@ static int parse_include(simple_rule_t *rule, const char *value, int *var_type, 
         if ( rulesetdir && value[0] != '/' )
                 snprintf(filename, sizeof(filename), "%s/%s", rulesetdir, value);
         else
-                strncpy(filename, value, sizeof(filename));
+                snprintf(filename, sizeof(filename), "%s", value);
         
         fd = fopen(filename, "r");
         if ( ! fd ) {
@@ -1340,6 +1340,8 @@ static int parse_include(simple_rule_t *rule, const char *value, int *var_type, 
         }
 
         ret = parse_ruleset(filename, fd);
+        fclose(fd);
+
         if ( ret < 0 )
                 return -1;
 
