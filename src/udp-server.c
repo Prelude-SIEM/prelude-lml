@@ -155,6 +155,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
                 ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
                 if ( ret < 0 ) {
                         log(LOG_INFO, "couldn't resolve %s.\n", addr);
+                        udp_server_close(server);
                         return NULL;
                 }
         } else
@@ -167,8 +168,7 @@ udp_server_t *udp_server_new(const char *addr, uint16_t port)
         ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
         if ( ret < 0 ) {
 		log(LOG_ERR, "couldn't bind to socket.\n");
-                close(server->sockfd);
-                free(server);
+                udp_server_close(server);
                 return NULL;
 	}
         

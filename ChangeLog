@@ -1,3 +1,13 @@
+2002-08-24  Guillaume Pelat  <endymion@linux-secure.com>
+
+	* src/log-common.c (log_container_new):
+	* src/pconfig.c (set_pidfile):
+	(set_udp_server_addr):
+	checking strdup return value.
+
+	* src/udp-server.c (udp_server_new):
+	fixing memory leak
+
 2002-08-21  Guillaume Pelat  <endymion@linux-secure.com>
 
 	* src/file-server.c (check_modification_time):

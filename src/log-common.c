@@ -87,11 +87,30 @@ log_container_t *log_container_new(const char *log, const char *from)
         lc->log = (log) ? strdup(log) : NULL;
         
 	lc->source = strdup(from);
+        if ( ! lc->source ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                free(lc);
+                return NULL;
+        }
         
         ret = format_syslog_header(log, &lc->tv, host, tag);
         if ( ret == 0 ) {
                 lc->target_program = strdup(tag);
+                if ( ! lc->target_program ) {
+                        log(LOG_ERR, "memory exhausted.\n");
+                        free(lc->source);
+                        free(lc);
+                        return NULL;
+                }
+
                 lc->target_hostname = strdup(host);
+                if ( ! lc->target_hostname ) {
+                        log(LOG_ERR, "memory exhausted.\n");
+                        free(lc->target_program);
+                        free(lc->source);
+                        free(lc);
+                        return NULL;
+                }
         } else 
                 gettimeofday(&lc->tv, NULL);
 

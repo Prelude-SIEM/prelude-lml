@@ -100,6 +100,11 @@ static int set_daemon_mode(prelude_option_t *opt, const char *arg)
 static int set_pidfile(prelude_option_t *opt, const char *arg)
 {
         pidfile = strdup(arg);
+        if ( ! pidfile ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return prelude_option_error;
+        }
+                                                
 	return prelude_option_success;
 }
 
@@ -136,6 +141,11 @@ static int enable_udp_server(prelude_option_t *opt, const char *arg)
 static int set_udp_server_addr(prelude_option_t *opt, const char *arg) 
 {
         udp_srvr_addr = strdup(arg);
+        if ( ! udp_srvr_addr ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return prelude_option_error;
+        }
+
         return prelude_option_success;
 }
 
