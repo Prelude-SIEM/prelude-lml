@@ -3,8 +3,8 @@
 ##############################################
 
 
-include = @prefix@/prelude/default/global.conf
-include = @prefix@/prelude/default/client.conf
+include = @prefix@/etc/prelude/default/global.conf
+include = @prefix@/etc/prelude/default/client.conf
 
 
 # Address where the Prelude Manager Server is listening on.
