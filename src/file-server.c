@@ -21,10 +21,6 @@
 *
 *****/
 
-#include "config.h"
-#undef HAVE_FAM
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,6 +33,8 @@
 #include <assert.h>
 #include <time.h>
 #include <sys/uio.h>
+
+#include "config.h"
 
 #ifdef HAVE_FAM 
  #include <fam.h>
@@ -710,14 +708,13 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                          */
                         if ( st->st_ino == st_new.st_ino ) 
                                 return 0;
-                        else {
-                                fclose(monitor->fd);
-                                monitor_open(monitor);
-                        }
-                } else {
-                        monitor_close(monitor);
-                }
-		log(LOG_INFO, "- logfile %s has been renamed.\n", filename);
+                       
+                        fclose(monitor->fd);
+                        monitor_open(monitor);
+                } 
+                
+                else monitor_close(monitor);
+                log(LOG_INFO, "- logfile %s has been renamed.\n", filename);
 	} else {
 		log(LOG_INFO, "- logfile %s reached 0 hard link.\n", filename);	
                 monitor_close(monitor);
@@ -742,9 +739,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
         soff = get_rotation_size_offset(monitor, st);
         toff = get_rotation_time_offset(monitor, st);
-        
-        printf("%d <= %d || %d <= %d\n", toff, max_rotation_time_offset, soff, max_rotation_size_offset);
-        
+                
         if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
                 impact_description = idmef_impact_new_description(impact);
@@ -925,7 +920,7 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
 static int fam_process_event(FAMEvent *event) 
 {
         int ret = 0;
-        struct stat st, st2;
+        struct stat st;
         monitor_fd_t *monitor = event->userdata;
 
         switch (event->code) {
