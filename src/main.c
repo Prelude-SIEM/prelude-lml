@@ -46,7 +46,6 @@ extern prelude_client_t *lml_client;
 static volatile sig_atomic_t got_sighup = 0;
 
 
-
 static void sig_handler(int signum)
 {
 	log(LOG_INFO, "\n\nCaught signal %d.\n", signum);
@@ -202,7 +201,7 @@ int main(int argc, char **argv)
         
         global_argv = argv;
 
-	LTDL_SET_PRELOADED_SYMBOLS();
+        PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {

@@ -7,8 +7,8 @@
 #include <limits.h>		/* for NAME_MAX */
 #include <sys/time.h>
 #include <time.h>
-#include <inttypes.h>
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>

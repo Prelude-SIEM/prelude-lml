@@ -28,7 +28,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <errno.h>
 #include <assert.h>
 #include <time.h>
@@ -40,6 +39,7 @@
  #include <fam.h>
 #endif
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/prelude-list.h>
 #include <libprelude/timer.h>
 #include <libprelude/prelude-log.h>

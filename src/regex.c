@@ -4,8 +4,8 @@
 #include <assert.h>
 #include <ctype.h>
 #include <sys/time.h>
-#include <inttypes.h>
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/prelude-list.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>

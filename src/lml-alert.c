@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -35,6 +34,7 @@
 #include <netdb.h>
 #include <assert.h>
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/common.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/idmef.h>

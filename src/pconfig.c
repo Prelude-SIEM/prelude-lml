@@ -32,8 +32,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
-#include <inttypes.h>
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/idmef.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/config-engine.h>

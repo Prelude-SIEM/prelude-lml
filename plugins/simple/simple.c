@@ -25,12 +25,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <pcre.h>
 #include <netdb.h>
 
+#include <libprelude/prelude-inttypes.h>
 #include <libprelude/common.h>
 #include <libprelude/idmef.h>
 #include <libprelude/prelude-strbuf.h>
