@@ -130,7 +130,7 @@ static void try_reopening_inactive_fd(void)
                 monitor->fd = fopen(monitor->file, "r");
                 if ( ! monitor->fd )
                         continue;
-
+                
                 ret = fstat(fileno(monitor->fd), &st);
                 if ( ret < 0 ) {
                         log(LOG_ERR, "stat: error on file %s.\n", monitor->file);
@@ -409,6 +409,7 @@ int file_server_monitor_file(const char *file)
         
         new->fd = fopen(file, "r");
         if ( ! new->fd ) {
+                log(LOG_INFO, "%s doesn't exist, will try to re-open periodically.\n", file);
                 list_add_tail(&new->list, &inactive_fd_list);
                 return 0;
         }
@@ -433,7 +434,7 @@ int file_server_monitor_file(const char *file)
         
         new->last_size = st.st_size;
         new->last_mtime = st.st_mtime;
-        
+
         list_add_tail(&new->list, &active_fd_list);
         
         return 0;

@@ -1,3 +1,29 @@
+* 2002-08-29, prelude-lml-0.8.1:
+	- Check strdup() return value, and fix a possible
+	  memory leak in the udp-server code.
+	  (Guillaume Pelat).
+
+	- Fix possible assertion when two modifications
+	  are done in the logfile at the same second.
+	  (Guillaume Pelat).
+
+	- Fix possible unterminated string.
+	  (Guillaume Pelat).
+
+	- Fix possible file descriptor leak.
+	  (Guillaume Pelat).
+
+	- Dup the filename before checking if opening the file
+	  suceeded, so that re-opening inactive file work agin.
+	  (Yoann Vandoorselaere).
+
+	- Emit an alert if the modification time get modified,
+	  but file size doesn't increase.
+	  (Yoann Vandoorselaere).
+
+	- Emit an alert if logfile hard link count reach 0.
+          (Yoann Vandoorselaere).
+
 * 2002-07-30, prelude-lml-0.8.0:
 	- Initial release.
 	- Support for (GrSecurity, NetFilter, Cisco, ZyXel, IpFw, Pax).
