@@ -1,3 +1,9 @@
+2003-12-26  Nicolas Delon  <delon.nicolas@wanadoo.fr>
+
+	* src/lml-alert.c:
+	(send_heartbeat_cb)
+	call prelude_msgbuf_mark_end() to flush the alert
+
 2003-12-26  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* src/lml-alert.c (generate_target): 

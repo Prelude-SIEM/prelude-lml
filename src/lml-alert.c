@@ -117,6 +117,7 @@ static void send_heartbeat_cb(void *data)
 	idmef_heartbeat_set_create_time(heartbeat, create_time);
 
 	idmef_send_message(msgbuf, message);
+	prelude_msgbuf_mark_end(msgbuf);
 
 	idmef_message_destroy(message);
 }
