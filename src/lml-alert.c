@@ -37,6 +37,7 @@
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-inet.h>
+#include <libprelude/idmef-message-print.h>
 
 #include "libmissing.h"
 #include "log-common.h"
