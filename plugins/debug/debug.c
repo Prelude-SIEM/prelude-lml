@@ -1,3 +1,26 @@
+/*****
+*
+* Copyright (C) 2002 - 2005 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* All Rights Reserved
+*
+* This file is part of the Prelude program.
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 2, or (at your option)
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; see the file COPYING.  If not, write to
+* the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+*
+*****/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,8 +153,7 @@ prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
                            debug_set_output_stderr, debug_get_output_stderr);
         
         prelude_plugin_set_name(&plugin, "Debug");
-        prelude_plugin_set_author(&plugin, "Pierre-Jean Turpeau");
-        prelude_plugin_set_contact(&plugin, "Pierre-Jean.Turpeau@enseirb.fr");
+        prelude_plugin_set_author(&plugin, "Yoann Vandoorselaere");
         prelude_plugin_set_desc(&plugin, "Send an alert for each log.");
         prelude_plugin_set_running_func(&plugin, debug_run);
         prelude_plugin_set_destroy_func(&plugin, debug_destroy);
