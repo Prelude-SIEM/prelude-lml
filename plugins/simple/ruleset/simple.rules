@@ -145,13 +145,13 @@ include = honeyd.rules;
 
 #Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
 regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
- classification(0).name=User authentication failed; \
+ classification(0).name=User authentication; \
  id=1; \
  revision=1; \
  classification(0).origin=vendor-specific; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = user; \
- assessment.impact.severity = medium; \
+ assessment.impact.severity = low; \
  assessment.impact.description = User $2 authenticated to $1 successfuly; \
  source(0).user.category = os-device; \
  source(0).user.userid(0).type = current-user; \
@@ -164,7 +164,7 @@ regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
                                                                                                                          
 # authentication failure; logname=xxxx uid=xxxx euid=xxxx tty=xxxx ruser=xxxx rhost=xxxx  user=xxxx
 regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.*) rhost=(.*) user=(.*); \
- classification(0).name = User $1 failed to authenticate as $7; \
+ classification(0).name = User authentication; \
  id=2; \
  revision=1; \
  classification(0).origin=vendor-specific; \
