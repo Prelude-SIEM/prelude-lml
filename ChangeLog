@@ -1,3 +1,16 @@
+2003-12-26  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* src/file-server.c (file_server_wake_up): 
+	(initialize_fam): don't try to initialize fam on
+	each file monitored in case fam initialization fail once.
+
+	* src/pconfig.c (set_logwatch): remove new logfile
+	configuration scheme for now, it's not ready yet.
+	(set_file): create the log_file_t object here, and
+	set the format according to the last format variable
+	value (default is syslog if not set). Option order is
+	respected.
+
 2003-12-22  Nicolas Delon  <delon.nicolas@wanadoo.fr>
 
 	* plugins/simple/ruleset/*.rules:

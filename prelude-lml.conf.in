@@ -29,7 +29,9 @@
 #
 # Files to monitor
 #
-[LogWatch]
+# You should define the log format / log timestamp format before
+# you define a file to monitor. If not specified, syslog format is
+# used.
 
 log-fmt = %tag %log
 time-fmt = %b %d %H:%M:%S;

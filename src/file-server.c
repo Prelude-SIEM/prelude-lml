@@ -836,8 +836,10 @@ static int initialize_fam(void)
 {
         int ret;
         
-        if ( fam_initialized )
-                return 0;
+        if ( fam_initialized != 0 )
+                return fam_initialized;
+
+        fam_initialized = -1;
         
         ret = FAMOpen(&fc);
         if ( ret < 0 ) {
@@ -1023,7 +1025,7 @@ int file_server_wake_up(regex_list_t *list)
         monitor_fd_t *monitor;
         struct list_head *tmp, *bkp;
         
-        if ( ! fam_initialized || batch_mode ) {
+        if ( fam_initialized != 1 || batch_mode ) {
                 /*
                  * try to open inactive fd (file was not existing previously).
                  */

@@ -63,7 +63,7 @@ static char *udp_srvr_addr = NULL;
 static uint16_t udp_srvr_port = 514;
 static uid_t prelude_lml_user = 0;
 static gid_t prelude_lml_group = 0;
-
+static char *logfile_format = NULL, *logfile_ts_format = NULL;
 
 
 static int print_version(prelude_option_t *opt, const char *arg)
@@ -134,13 +134,11 @@ static int set_pidfile(prelude_option_t *opt, const char *arg)
 
 static int set_logfile_format(prelude_option_t *opt, const char *arg)
 {
-        log_file_t *lf;
+        if ( logfile_format )
+                free(logfile_format);
+        
+        logfile_format = strdup(arg);       
 
-        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
-        assert(lf);
-        
-        log_file_set_log_fmt(lf, arg);
-        
         return prelude_option_success;
 }
 
@@ -148,13 +146,11 @@ static int set_logfile_format(prelude_option_t *opt, const char *arg)
 
 static int set_logfile_ts_format(prelude_option_t *opt, const char *arg)
 {
-        log_file_t *lf;
+        if ( logfile_ts_format )
+                free(logfile_ts_format);
         
-        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
-        assert(lf);
-        
-        log_file_set_timestamp_fmt(lf, arg);
-        
+        logfile_ts_format = strdup(arg);
+                
         return prelude_option_success;
 }
 
@@ -166,11 +162,24 @@ static int set_file(prelude_option_t *opt, const char *arg)
         int ret;
         log_file_t *lf;
 
-        lf = prelude_option_get_private_data(prelude_option_get_parent(opt));
-        assert(lf);
+        lf = log_file_new();
+        if ( ! lf )
+                return prelude_option_error;
 
+        if ( logfile_format ) {
+                ret = log_file_set_log_fmt(lf, logfile_format);
+                if ( ret < 0 )
+                        return prelude_option_error;
+        }
+
+        if ( logfile_ts_format ) {
+                ret = log_file_set_timestamp_fmt(lf, logfile_ts_format);
+                if ( ret < 0 )
+                        return prelude_option_error;
+        }
+        
         ret = log_file_set_filename(lf, arg);
-        if ( ret < 0 )
+        if ( ret < 0 ) 
                 return prelude_option_error;
         
         ret = file_server_monitor_file(lf);
@@ -184,6 +193,7 @@ static int set_file(prelude_option_t *opt, const char *arg)
 
 
 
+#if 0
 static int set_logwatch(prelude_option_t *opt, const char *arg)
 {
         log_file_t *lf;
@@ -193,10 +203,11 @@ static int set_logwatch(prelude_option_t *opt, const char *arg)
                 return prelude_option_error;
 
         prelude_option_set_private_data(opt, lf);
-        //prelude_option_parse_from_context(opt, NULL);
+        prelude_option_parse_from_context(opt, NULL);
         
         return prelude_option_success;
 }
+#endif
 
 
 
@@ -331,20 +342,22 @@ int pconfig_set(int argc, char **argv)
                            "Tell LML to run in batch mode", no_argument,
                            set_batch_mode, NULL);
 
+#if 0
         opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'w', "logwatch",
                                  "Specify a file to monitor (you might specify \"stdin\")",
                                  no_argument, set_logwatch, NULL);
         prelude_option_set_priority(opt, option_run_first);
-
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'f', "file",
+#endif
+        
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'f', "file",
                            "Specify a file to monitor (you might specify \"stdin\")",
                            required_argument, set_file, NULL);
         
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 't', "time-format", 
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 't', "time-format", 
                            "Specify the input timestamp format", required_argument,
                            set_logfile_ts_format, NULL);
         
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'l', "log-format", 
+        prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'l', "log-format", 
                            "Specify the input format", required_argument,
                            set_logfile_format, NULL);
         
