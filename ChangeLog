@@ -1,5 +1,9 @@
 2002-04-02  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/udp-server.c: make the size of our buffer 
+	compliant with what is specified in RFC 3164 (1024
+	bytes max per syslog messages).
+
 	* plugins.rules.in: comment the Debug plugin entry 
 	by default.
 

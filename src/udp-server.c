@@ -23,6 +23,16 @@
 #include "file-server.h"
 
 
+/*
+ * From RFC 3164, section 4.1:
+ *
+ * The full format of a syslog message seen on the wire has three
+ * discernable parts.  The first part is called the PRI, the second part
+ * is the HEADER, and the third part is the MSG.  The total length of
+ * the packet MUST be 1024 bytes or less.
+ */
+#define SYSLOG_MSG_MAX_SIZE 1024
+
 
 struct udp_server {
 	int sockfd;
@@ -40,8 +50,8 @@ static void udp_server_standalone(udp_server_t *server)
 {
         fd_set fds;
         int len, ret;
-        char buf[8192];
         struct sockaddr_in addr;
+        char buf[SYSLOG_MSG_MAX_SIZE];
         struct timeval now, last, timeout;
 
         FD_ZERO(&fds);
