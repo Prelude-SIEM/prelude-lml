@@ -21,6 +21,7 @@ ruleset_DATA = \
 	portsentry.rules	\
 	proftpd.rules		\
 	qpopper.rules		\
+	shadow-utils.rules	\
 	simple.rules		\
 	single.rules		\
 	squid.rules		\

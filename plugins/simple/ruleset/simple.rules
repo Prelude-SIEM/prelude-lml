@@ -175,6 +175,7 @@ include = pcanywhere.rules;
 include = portsentry.rules;
 include = proftpd.rules;
 include = qpopper.rules;
+include = shadow-utils.rules;
 include = single.rules;
 include = squid.rules;
 include = ssh.rules;
