@@ -77,6 +77,7 @@ void udp_server_process_event(udp_server_t *server)
 
 void udp_server_close(udp_server_t *server)
 {
+        log_source_destroy(server->ls);
 	close(server->sockfd);
 	free(server);
 }
