@@ -1,3 +1,8 @@
+2002-05-30  Laurent Oudot  <oudot.laurent@wanadoo.fr>
+
+        * plugins/simple/ruleset/zyxel.rules:
+        upgrade of the rules owing to the new simple.c possibilities
+
 2002-05-27  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/file-server.c (try_reopening_inactive_fd): 
