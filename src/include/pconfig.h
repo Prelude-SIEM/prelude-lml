@@ -21,4 +21,4 @@
 *
 *****/
 
-int pconfig_set(int argc, char **argv);
+int pconfig_set(prelude_option_t *ropt, int argc, char **argv);

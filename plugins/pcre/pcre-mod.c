@@ -60,7 +60,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd);
 
 
 static plugin_log_t pcre_plugin;
-
+extern prelude_option_t *lml_root_optlist;
 
 
 
@@ -675,8 +675,8 @@ prelude_plugin_generic_t *pcre_LTX_prelude_plugin_init(void)
 {
         prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
-        
-        opt = prelude_option_add(NULL, hook, 0, "pcre", "Pcre plugin option",
+
+        opt = prelude_option_add(lml_root_optlist, hook, 0, "pcre", "Pcre plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, pcre_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &pcre_plugin, opt, NULL);

@@ -58,6 +58,8 @@ udp_server_t *udp_srvr = NULL;
 
 int batch_mode = 0;
 prelude_client_t *lml_client;
+extern prelude_option_t *lml_root_option;
+
 static char *pidfile = NULL;
 static uid_t prelude_lml_user = 0;
 static gid_t prelude_lml_group = 0;
@@ -331,41 +333,41 @@ static int set_lml_user(void *context, prelude_option_t *opt, const char *arg)
 
 
 
-int pconfig_set(int argc, char **argv)
+int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
 {
         int ret;
         prelude_option_t *opt;
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
-	prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
+	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
 			   "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
 
-	prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
 			   "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
 			   print_version, get_version);
 
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
 			   "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
         
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'u', "user",
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'u', "user",
                            "Run as the specified user", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_lml_user, NULL);
 
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'g', "group",
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'g', "group",
                            "Run in the specified group", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_lml_group, NULL);
         
-	prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
+	prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
 			   "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
 			   set_daemon_mode, NULL);
         
-	opt = prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
+	opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
                                  "Write Prelude LML PID to specified pidfile",
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
         
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_FIRST);
         
-        opt = prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
+        opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
                                  PRELUDE_OPTION_TYPE_WIDE, 's', "udp-srvr",
                                  "address:port pair to listen to syslog to UDP messages (default port 514)", 
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
@@ -373,31 +375,31 @@ int pconfig_set(int argc, char **argv)
         prelude_option_set_destroy_callback(opt, destroy_udp_server);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
                 
-        prelude_option_add(NULL, all_hook, 't', "max-rotation-time-offset",
+        prelude_option_add(ropt, all_hook, 't', "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
                            "severity alert will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_rotation_time_offset, get_rotation_time_offset);
         
-        prelude_option_add(NULL, all_hook, 's', "max-rotation-size-offset",
+        prelude_option_add(ropt, all_hook, 's', "max-rotation-size-offset",
                            "Specifies the maximum difference, in bytes, between two logfile "
                            "rotation. If this difference is reached, a high severity alert "
                            "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset, 
                            get_rotation_size_offset);
         
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batchmode",
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batchmode",
                            "Tell LML to run in batch mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_batch_mode, NULL);
         
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                            't', "time-format", "Specify the input timestamp format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_ts_format, NULL);
         
-        prelude_option_add(NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                            'l', "log-format", "Specify the input format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_format, NULL);
         
-        opt = prelude_option_add(NULL,  PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
+        opt = prelude_option_add(ropt,  PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
                                  'f', "file", "Specify a file to monitor (you might specify \"stdin\")",
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
 
@@ -424,8 +426,8 @@ int pconfig_set(int argc, char **argv)
                 prelude_perror(ret, "error starting prelude-client");
                 return -1;
         }
-
-        ret = prelude_option_parse_arguments(lml_client, NULL, PRELUDE_CONF, &argc, argv);
+        
+        ret = prelude_option_parse_arguments(lml_client, ropt, PRELUDE_CONF, &argc, argv);
         if ( ret < 0 )
                 return -1;
         

@@ -35,9 +35,9 @@
 extern int batch_mode;
 static char **global_argv;
 extern udp_server_t *udp_srvr;
+prelude_option_t *lml_root_optlist;
 extern prelude_client_t *lml_client;
 static volatile sig_atomic_t got_sighup = 0;
-
 
 static void sig_handler(int signum)
 {
@@ -193,7 +193,8 @@ int main(int argc, char **argv)
         int ret;
         
         global_argv = argv;
-
+        lml_root_optlist = prelude_option_new_root();
+        
 	PRELUDE_PLUGIN_SET_PRELOADED_SYMBOLS();
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
@@ -203,7 +204,7 @@ int main(int argc, char **argv)
 	}
 	log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
         
-        ret = pconfig_set(argc, argv);
+        ret = pconfig_set(lml_root_optlist, argc, argv);
         if ( ret < 0 )
                 exit(1);
         

@@ -23,7 +23,7 @@ typedef struct {
 
 
 static plugin_log_t plugin;
-
+extern prelude_option_t *lml_root_optlist;
 
 
 
@@ -126,7 +126,7 @@ prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
 	prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
-	opt = prelude_option_add(NULL, hook, 0, "debug", "Debug plugin option",
+	opt = prelude_option_add(lml_root_optlist, hook, 0, "debug", "Debug plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
