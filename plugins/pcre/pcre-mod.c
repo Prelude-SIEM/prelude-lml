@@ -29,11 +29,7 @@
 #include <pcre.h>
 #include <netdb.h>
 
-#include <libprelude/prelude-linked-object.h>
-#include <libprelude/prelude-inttypes.h>
-#include <libprelude/common.h>
-#include <libprelude/idmef.h>
-#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude.h>
 
 #include "libmissing.h"
 #include "log-common.h"
@@ -585,7 +581,7 @@ static int set_last_first(void *context, prelude_option_t *opt, const char *arg)
         
         plugin->last_rules_first = 1;
         
-        return prelude_option_success;
+        return 0;
 }
 
 
@@ -613,7 +609,7 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
         fd = fopen(arg, "r");
         if ( ! fd ) {
                 log(LOG_ERR, "couldn't open %s for reading.\n", arg);
-                return prelude_option_error;
+                return -1;
         }
         
         ret = parse_ruleset(plugin, arg, fd);
@@ -623,7 +619,7 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
                 free(plugin->rulesetdir);
         
         if ( ret < 0 )
-                return prelude_option_error;
+                return -1;
 
         log(LOG_INFO, "- Pcre plugin added %d rules.\n", plugin->rulesnum);
         
@@ -634,7 +630,7 @@ static int set_pcre_ruleset(void *context, prelude_option_t *opt, const char *ar
                         free_rule_container(rc);
         }
 
-        return prelude_option_success;
+        return 0;
 }
 
 
@@ -646,13 +642,13 @@ static int pcre_activate(void *context, prelude_option_t *opt, const char *arg)
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
                 log(LOG_ERR, "memory exhausted.\n");
-                return prelude_option_error;
+                return prelude_error_from_errno(errno);
         }
 
         PRELUDE_INIT_LIST_HEAD(&new->rule_list);
         prelude_plugin_instance_set_data(context, new);
         
-        return prelude_option_success;
+        return 0;
 }
 
 
@@ -678,20 +674,19 @@ static void pcre_destroy(prelude_plugin_instance_t *pi)
 prelude_plugin_generic_t *pcre_LTX_prelude_plugin_init(void)
 {
         prelude_option_t *opt;
+        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
         
-        opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 0, "pcre",
-                                 "Pcre plugin option", optionnal_argument,
-                                 pcre_activate, NULL);
+        opt = prelude_option_add(NULL, hook, 0, "pcre", "Pcre plugin option",
+                                 PRELUDE_OPTION_ARGUMENT_OPTIONAL, pcre_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &pcre_plugin, opt, NULL);
         
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'r', "ruleset",
-                           "Ruleset to use", required_argument,
-                           set_pcre_ruleset, NULL);
+        prelude_option_add(opt, hook, 'r', "ruleset", "Ruleset to use",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pcre_ruleset, NULL);
 
-        prelude_option_add(opt, CLI_HOOK|CFG_HOOK, 'p', "pass-first",
-                           "Process rules with the \"last\" attribute first", no_argument,
-                           set_last_first, NULL);
+        prelude_option_add(opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'p',
+                           "pass-first", "Process rules with the \"last\" attribute first",
+                           PRELUDE_OPTION_ARGUMENT_NONE, set_last_first, NULL);
         
 	prelude_plugin_set_name(&pcre_plugin, "pcre");
 	prelude_plugin_set_author(&pcre_plugin, "Yoann Vandoorselaere");

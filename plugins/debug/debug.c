@@ -5,13 +5,7 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include <libprelude/prelude-inttypes.h>
-#include <libprelude/idmef.h>
-#include <libprelude/prelude-io.h>
-#include <libprelude/prelude-message.h>
-#include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-message-id.h>
-#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude.h>
 
 #include "libmissing.h"
 #include "log-common.h"
@@ -87,12 +81,12 @@ static int debug_activate(void *context, prelude_option_t *opt, const char *opta
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
                 log(LOG_ERR, "memory exhausted.\n");
-                return prelude_option_error;
+                return prelude_error_from_errno(errno);
         }
 
         prelude_plugin_instance_set_data(context, new);
         
-	return prelude_option_success;
+	return 0;
 }
 
 
@@ -113,7 +107,7 @@ static int debug_get_output_stderr(void *context, prelude_option_t *opt, char *b
         
 	snprintf(buf, size, "%s", plugin->out_stderr ? "enabled" : "disabled");
 
-	return prelude_option_success;
+	return 0;
 }
 
 
@@ -124,7 +118,7 @@ static int debug_set_output_stderr(void *context, prelude_option_t *opt, const c
         
 	plugin->out_stderr = ! plugin->out_stderr;
 
-        return prelude_option_success;
+        return 0;
 }
 
 
@@ -132,16 +126,16 @@ static int debug_set_output_stderr(void *context, prelude_option_t *opt, const c
 prelude_plugin_generic_t *debug_LTX_prelude_plugin_init(void)
 {
 	prelude_option_t *opt;
-
-	opt = prelude_option_add(NULL, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 0, "debug",
-                                 "Debug plugin option", optionnal_argument,
-                                 debug_activate, NULL);
+        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
+        
+	opt = prelude_option_add(NULL, hook, 0, "debug", "Debug plugin option",
+                                 PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
         prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
         
-	prelude_option_add(opt, CLI_HOOK|CFG_HOOK|WIDE_HOOK, 's', "stderr",
-                           "Output to stderr when plugin is called",
-                           no_argument, debug_set_output_stderr, debug_get_output_stderr);
+	prelude_option_add(opt, hook, 's', "stderr",
+                           "Output to stderr when plugin is called", PRELUDE_OPTION_ARGUMENT_NONE,
+                           debug_set_output_stderr, debug_get_output_stderr);
         
 	prelude_plugin_set_name(&plugin, "Debug");
 	prelude_plugin_set_author(&plugin, "Pierre-Jean Turpeau");

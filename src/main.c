@@ -13,13 +13,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/prelude-io.h>
-#include <libprelude/prelude-message.h>
-#include <libprelude/prelude-getopt.h>
-#include <libprelude/prelude-plugin.h>
-#include <libprelude/prelude-client.h>
-#include <libprelude/timer.h>
+#include <libprelude/prelude-timer.h>
 
 #include "config.h"
 #include "common.h"
@@ -175,7 +171,7 @@ static void wait_for_event(void)
                 
                 if ( ret == 0 || end.tv_sec - start.tv_sec >= 1 ) {
                         gettimeofday(&start, NULL);
-                        prelude_wake_up_timer();
+                        prelude_timer_wake_up();
 
                         if ( file_event_fd < 0 )
                                 file_server_wake_up();
@@ -234,7 +230,7 @@ int main(int argc, char **argv)
                         if ( ! batch_mode )
                                 sleep(1);
                         
-                        prelude_wake_up_timer();
+                        prelude_timer_wake_up();
                         
                 } while ( batch_mode == 0 || ret > 0 );
 

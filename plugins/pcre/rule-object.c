@@ -156,8 +156,7 @@ static int add_fixed_object_value(rule_object_t *rule_object, prelude_string_t *
 		return -1;
 	}
 
-	prelude_string_dont_own(strbuf);
-	rovalue->value = prelude_string_get_string(strbuf);
+	rovalue->value = prelude_string_get_string_released(strbuf);
 
 	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 

@@ -40,13 +40,9 @@
  #include <fam.h>
 #endif
 
-#include <libprelude/prelude-inttypes.h>
-#include <libprelude/prelude-list.h>
-#include <libprelude/timer.h>
+#include <libprelude/prelude.h>
+#include <libprelude/prelude-timer.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/prelude-io.h>
-#include <libprelude/idmef.h>
-#include <libprelude/prelude-message.h>
 
 #include "regex.h"
 #include "common.h"
