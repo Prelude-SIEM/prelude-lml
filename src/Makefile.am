@@ -5,9 +5,10 @@ DEFS = -I$(top_srcdir)/ -I$(srcdir)/include @defined@ -DLOG_PLUGIN_DIR=\"@log_pl
 	-DLOCALSTATEDIR=\"@localstatedir@\" @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@
 
 bin_PROGRAMS = prelude-lml
-
-prelude_lml_LDFLAGS = -export-dynamic
 prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@
+prelude_lml_LDFLAGS = -export-dynamic 				\
+	"-dlopen" $(top_builddir)/plugins/debug/debug.la   	\
+	"-dlopen" $(top_builddir)/plugins/simple/simple.la
 
 prelude_lml_SOURCES = 			\
 	main.c				\

@@ -13,6 +13,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <ltdl.h>
+
 #include <libprelude/idmef-tree.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
@@ -199,6 +201,8 @@ int main(int argc, char **argv)
         int ret;
         
         global_argv = argv;
+
+	LTDL_SET_PRELOADED_SYMBOLS();
         
 	ret = log_plugins_init(LOG_PLUGIN_DIR, argc, argv);
 	if (ret < 0) {
