@@ -1,9 +1,13 @@
 2002-05-30  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/lml-alert.c (lml_emit_alert):
+	include string.h for strlen()... Thanks to 
+	Razvan Cosma (razvan.cosma@catv.telemach.ro) for pointing this out.
+	
 	* plugins/pax/pax.c (pax_log_processing): 
 	* plugins/debug/debug.c (debug_run): 
 	* src/lml-alert.c (lml_emit_alert): 
-	
+
 	use idmef_additional_data_set_data().
 
 2002-05-30  Laurent Oudot  <oudot.laurent@wanadoo.fr>

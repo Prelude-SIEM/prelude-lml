@@ -21,6 +21,7 @@
 *
 *****/
 
+#include <string.h>
 #include <inttypes.h>
 #include <sys/types.h>
 #include <sys/socket.h>
