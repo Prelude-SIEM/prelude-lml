@@ -1,3 +1,8 @@
+2002-09-20  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
+
+	* plugins/simple/ruleset/simple.rules:
+	fix typo. 
+
 2002-09-19  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/debug/debug.c:

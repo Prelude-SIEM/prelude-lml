@@ -129,4 +129,4 @@ regex=PAM_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); class.name=Authentic
 
 regex=entered promiscuous mode; class.name=Promiscuous mode detected; impact.completion = succeeded; impact.type = other; impact.severity = medium; impact.description=A sniffer is probably running on this machine;
 
-regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tryed to log in using a non existing user;
+regex=no such user; class.name=Invalid User; impact.completion = failed; impact.type = other; impact.severity = medium; impact.description = Someone tried to log in using a non existing user;
