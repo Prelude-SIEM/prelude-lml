@@ -1530,8 +1530,6 @@ static void simple_run(const log_container_t *log)
                 if ( ret < 0 )
                         continue;
                 
-                printf("[%s]: matched %s\n", log->source, rule->regex_string);
-                                
                 resolve_variable(log, rule, ovector, ret);
                 emit_alert(rule, log);
                 free_variable_allocated_data(rule);

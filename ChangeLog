@@ -1,3 +1,8 @@
+2002-05-30  Laurent Oudot  <oudot.laurent@wanadoo.fr>
+
+	* plugins/simple/simple.c
+	remove a debuging printf() in the changelog (suggested by yoann)
+
 2002-05-30  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/lml-alert.c (lml_emit_alert):
