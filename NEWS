@@ -1,4 +1,19 @@
-* 2003-02-27, prelude-lml 0.8.3:
+* 2003-04-24, prelude-lml 0.8.3:
+	
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Implement logfile metadata:
+
+	  If there is metadata available and current logfile size is
+	  less than the specified metadata offset, assume the log got 
+	  rotated, and start analyzing the file at offset 0.
+
+	  If there are metadata available and current logfile size is
+	  more or equal than the specified metadata offset: start analyzing
+	  the logfile from the specified offset. Unless the checksum doesn't
+	  match, in which case we'll issue an alert, and restart from 0.
+
+	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
+	  Should now be able to read up to 2 ^ (64-1) bytes logfile.
 
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
 	  Implemented runtime detection and workaround of the FAM (Dnotify)
@@ -12,6 +27,11 @@
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
 	  Implemented handling of the source and destination address,
 	  by the Simple (signature) plugin.
+	
+	- Vincent Glaume <vglaume@exaprobe.com>:
+	  Implemented handling of the "last" keyword, telling LML to stop
+	  matching regex against a line of log once one of them has been 
+	  matched.
 
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
 	  LML alert now carry LML version.
@@ -26,6 +46,10 @@
 	- Stéphane Loeuillet <LeRoutier@wanadoo.fr>:
 	  ProFTPD, vpopmail, qpopper rulesets.
 
+	- Vincent Glaume <vglaume@exaprobe.com>:
+	  Squid, NtSyslog, Ipso, Checkpoint, rulesets.
+
+	
 * 2002-12-06, prelude-lml-0.8.2:
 
 	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 

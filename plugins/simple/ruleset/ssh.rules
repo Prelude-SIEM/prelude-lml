@@ -47,7 +47,8 @@ regex=sshd.+: Accepted (\S+) for root from (\S+) port (\d+)\s*(ssh2)?; \
  source.service.protocol=tcp; \
 # target.node.address.category=ipv46-addr; \
  target.service.port=22; \
- target.service.protocol=tcp;
+ target.service.protocol=tcp; \
+ last;
 
 regex=sshd.+: Accepted (\S+) for (?!root)(\S+) from (\S+) port (\d+)\s*(ssh2)?; \
  class.name=SSH Remote user logging; \

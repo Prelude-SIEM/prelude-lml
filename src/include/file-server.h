@@ -23,6 +23,11 @@
 
 
 int file_server_get_event_fd(void);
-int file_server_monitor_file(const char *file);
 
 int file_server_wake_up(regex_list_t *list);
+
+int file_server_monitor_file(const char *file);
+
+void file_server_start_monitoring(regex_list_t *list);
+
+void file_server_set_rotation_interval_max_difference(int val);

@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# Copyright (C) 2003 Stephane Loeuillet (stephane.loeuillet@tiscali.fr)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -35,7 +35,8 @@ regex=.*popper\[(\d+)\]: \[AUTH\] Failed attempted login to (\S+) from host \((\
  source.node.address.address=$4; \
  source.service.protocol=tcp; \
  target.service.port=110; \
- target.service.protocol=tcp;
+ target.service.protocol=tcp; \
+ last;
 
 # Jan 13 20:42:31 (none) popper[6752]: tamere at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "tamere" is incorrect.
 # Jan 13 20:42:56 (none) popper[6754]: leroutier at www.leroutier.net (81.91.66.90): -ERR [AUTH] Password supplied for "leroutier" is incorrect.
@@ -53,5 +54,5 @@ regex=.*popper\[(\d+)\]: (\S+) at (\S+) \((\S+)\): -ERR \[AUTH\] Password suppli
  source.node.address.address=$4; \
  source.service.protocol=tcp; \
  target.service.port=110; \
- target.service.protocol=tcp;
-
+ target.service.protocol=tcp; \
+ last;

@@ -222,6 +222,8 @@ int main(int argc, char **argv)
         signal(SIGABRT, sig_handler);
         signal(SIGHUP, sighup_handler);
 
+        file_server_start_monitoring(regex_list);
+        
         if ( udp_srvr || file_server_get_event_fd() > 0 )
                 wait_for_event(regex_list);
         else {

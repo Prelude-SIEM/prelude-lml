@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# Copyright (C) 2003 Stephane Loeuillet (stephane.loeuillet@tiscali.fr)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -36,7 +36,8 @@ regex=.*vpopmail\[(\d+)\]: vchkpw: vpopmail user not found (\S+):(\S+).*; \
  source.node.address.address=$3; \
  source.service.protocol=tcp; \
  target.service.port=110; \
- target.service.protocol=tcp;
+ target.service.protocol=tcp; \
+ last;
 
 # Jan 14 17:24:54 spotk vpopmail[28359]: vchkpw: password fail xxx@spotk.net:127.0.0.1
 
@@ -51,5 +52,5 @@ regex=.*vpopmail\[(\d+)\]: vchkpw: password fail (\S+):(\S+).*; \
  source.node.address.address=$3; \
  source.service.protocol=tcp; \
  target.service.port=110; \
- target.service.protocol=tcp;
-
+ target.service.protocol=tcp; \
+ last;

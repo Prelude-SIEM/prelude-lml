@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2003 Stephane Loeuillet (LeRoutier@wanadoo.fr)
+# Copyright (C) 2003 Stephane Loeuillet (stephane.loeuillet@tiscali.fr)
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -21,7 +21,7 @@
 #
 #####
 
-#Jan 13 22:19:52 (none) proftpd[7804]: leroutier.net (193.249.231.232[193.249.231.232]) - PAM(leroutier): Authentication failure.
+# Jan 13 22:19:52 (none) proftpd[7804]: leroutier.net (193.249.231.232[193.249.231.232]) - PAM(leroutier): Authentication failure.
 
 regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - PAM\((\S+)\): Authentication failure.*; \
  class.name=proftpd - invalid password for user '$5'; \
@@ -34,7 +34,8 @@ regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - PAM\((\S+)\): Authen
  source.node.address.address=$4; \
  source.service.protocol=tcp; \
  target.service.port=21; \
- target.service.protocol=tcp;
+ target.service.protocol=tcp; \
+ last;
 
 # Jan 13 22:19:58 (none) proftpd[7805]: leroutier.net (193.249.231.232[193.249.231.232]) - no such user 'uh'
 
@@ -49,7 +50,8 @@ regex=.*proftpd\[(\d+)\]: (\S+) \(([\d\.]+)\[(\d\.]+)\]\) - no such user '(\S+)'
  source.node.address.address=$4; \
  source.service.protocol=tcp; \
  target.service.port=21; \
- target.service.protocol=tcp;
+ target.service.protocol=tcp; \
+ last;
 
 # Jan 13 22:39:03 (none) proftpd[8023]: leroutier.net (193.249.231.232[193.249.231.232]) - USER rr: no such user found from 193.249.231.232 [193.249.231.232] to 81.91.66.90:21 
 
@@ -67,5 +69,5 @@ regex=.*proftpd\[(\d+)\]:.*[\(\[]([\d\.]+)[\)\]].* - USER (\S+): no such user fo
  target.node.address.category=ipv4-addr; \
  target.node.address.address=$5; \
  target.service.port=$6; \
- target.service.protocol=tcp;
-
+ target.service.protocol=tcp; \
+ last;

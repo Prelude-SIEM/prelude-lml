@@ -76,6 +76,8 @@ typedef struct {
 typedef struct {
         pcre *regex;
         pcre_extra *extra;
+
+        int last;
         char *regex_string;
      
         idmef_impact_t *impact;  
@@ -908,6 +910,15 @@ static int parse_target_node_address_category(simple_rule_t *rule, const char *c
         return create_address_category(addr, category, var_type, var_ptr);
 }
 
+
+
+
+
+static int parse_last(simple_rule_t *rule, const char *last, int *var_type, void **var_ptr)
+{
+        rule->last = 1;
+        return 0;
+}
 
 
 
@@ -1784,6 +1795,7 @@ static int parse_rule(const char *filename, int line, simple_rule_t *rule, char 
         } tbl[] = {
                 { "include",                      parse_include                      },
                 { "regex",                        parse_regex                        },
+                { "last",                         parse_last                         },
                 { "class.origin",                 parse_class_origin                 },
                 { "class.name",                   parse_class_name                   },
                 { "class.url",                    parse_class_url                    },
@@ -2002,6 +2014,8 @@ static int parse_ruleset(const char *filename, FILE *fd)
                 }
 
                 INIT_LIST_HEAD(&rule->variable_list);
+
+                rule->last = 0;
                 
                 ret = parse_rule(filename, line, rule, ptr);
                 if ( ret < 0 ) {
@@ -2411,6 +2425,9 @@ static void simple_run(const log_container_t *log)
                 resolve_variable(log, rule, ovector, ret);
                 emit_alert(rule, log);
                 free_variable_allocated_data(rule);
+                
+                if ( rule->last )
+                        return;
         }
 }
 

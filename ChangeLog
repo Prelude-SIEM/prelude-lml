@@ -1,3 +1,136 @@
+2003-04-26  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+        * configure.in: bump version number to 0.8.3.
+
+        * src/file-server.c (check_logfile_data): 
+        handle case where the logfile get truncated.
+        
+        (read_logfile): return immediatly with rlen set to 0
+        if available is 0.
+        
+2003-04-26  Stephane Loeuillet <stephane.loeuillet@tiscali.fr>
+        * plugins/simple/ruleset/{proftpd,qpopper,ssh,vpopmail}.rules :
+
+        - added 'last' keyword when needed to not parse a log line 2 times
+
+        - changed my mail address
+
+2003-04-25  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+        * src/file-server.c (read_logfile): changed the semantic
+        of this function:
+
+        - Now return -1 if it couldn't read a full log line (data 
+          doesn't end with \n). 
+
+        - Return the size of the whole log line otherwise (not only 
+          what has been read uppon this call, as a log line might 
+          require several call of this function in order to be read). 
+
+        - The function now take a pointer to a 64 bits integer as 
+          argument, which is _always_ modified to reflect the size of 
+          what have been read.
+
+        - The function now take an "available" 64bits integer argument
+          that specify how many byte we should read at max (needed because
+          the file size might change between the time we call stat() and we
+          read the file).
+
+        (check_logfile_data): update to fit the new read_logfile() semantic.
+
+        * src/pconfig.c (set_file): 
+        fail if the given file doesn't exist (only fail on startup).
+
+        * src/file-server.c (file_metadata_read): 
+        in case the metadata file contain invalid stuff, issue
+        a warning and truncate it.
+        
+        (check_logfile_data): remove invalid assertion(). 
+        Call abort() if FAM is activated and that it notified us,
+        but the number of bytes read doesn't match the new file size.
+        That should never happen.
+
+        * src/main.c (main): call file_server_start_monitoring().
+
+        * src/file-server.c: cleanup, re-organisation.
+        
+        (file_server_start_monitoring): New function, initialize
+        everything once by calling file_server_wake_up(), which'll
+        have the side effect of opening un-opened file.
+
+        (file_server_monitor_file): do not call monitor_open() here:
+        we want all unread bytes to be processed before activating
+        FAM notification if enabled.
+
+        (check_logfile_data): assert in case rwe get an EOF on
+        read an FAM was initialized.
+
+        (file_metadata_get_position): set last_size to current
+        file size only if we want to start at the tail. 
+
+        Emit an alert and set file position to 0 if the checksum 
+        is invalid.
+
+        Include size of checksumed line in last_size.
+
+        (file_metadata_save): truncate the file before writing
+        to it. Avoid garbage to remain in the file.
+
+        * configure.in: check for FILENAME_MAX, define it
+        if it's not defined on this system.
+
+2003-04-24  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+        * src/pconfig.c (pconfig_set): 
+        add the rotation-interval option.
+
+        * src/Makefile.am (DEFS): 
+        add -D_FILE_OFFSET_BITS=64 to the CFLAGS.
+
+        * Makefile.am (install-data-local): 
+        create the metadata directory.
+
+        * plugins/simple/ruleset/squid.rules: 
+        * plugins/simple/ruleset/ntsyslog.rules: 
+        * plugins/simple/ruleset/checkpoint.rules: 
+        * plugins/simple/ruleset/ipso.rules: 
+        new rulesets from Vincent Glaume <vglaume@exaprobe.com>.
+
+        * plugins/simple/simple.c: Include modified patch
+        from Vincent Glaume <vglaume@exaprobe.com>, adding a "last"
+        keyword, telling to stop walking our regex list data once a 
+        regex has been matched.
+        
+2003-04-23  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+        * src/file-server.c 
+        (file_metadata_read): read the offset and the last log line 
+        where we stopped analyzing data from the logfile metadata. 
+        
+        (file_metadata_save): Save current offset and current log line.
+
+        (file_metadata_position_monitor): Position the monitor provided 
+        the content of the metadata. If there is no metadata, we start
+        reading the file from it's tail.
+
+        If there is metadata available and current logfile size is
+        less than the specified metadata offset, the log got rotated,
+        and we start analyzing the file at 0.
+
+        If there are metadata available and current logfile size is
+        more or equan than the specified metadata offset: start analyzing
+        the logfile from the specified offset. Unless the checksum doesn't
+        match, in which case we'll issue an alert, and restart from 0.
+        
+        (file_metadata_open): compute metadata filename associated with
+        the monitor. Open it.
+
+2003-04-22  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+        * src/file-server.c (monitor_open): 
+        if provided filename is "stdin", use stdin as the input
+        descriptor.
+
 2003-03-18  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/simple/ruleset/Makefile.am:
