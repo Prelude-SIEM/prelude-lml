@@ -39,7 +39,7 @@
 
 #include "config.h"
 #include "libmissing.h"
-#include "pconfig.h"
+#include "lml-options.h"
 #include "regex.h"
 #include "log-common.h"
 #include "lml-alert.h"

@@ -20,7 +20,7 @@
 #include "config.h"
 #include "common.h"
 #include "regex.h"
-#include "pconfig.h"
+#include "lml-options.h"
 #include "udp-server.h"
 #include "log-common.h"
 #include "plugin-log.h"

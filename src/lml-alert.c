@@ -42,7 +42,7 @@
 #include "libmissing.h"
 #include "log-common.h"
 #include "lml-alert.h"
-#include "pconfig.h"
+#include "lml-options.h"
 #include "config.h"
 
 

@@ -18,10 +18,7 @@ prelude_lml_SOURCES = 			\
 	regex.c				\
 	log-common.c			\
 	log-plugins.c			\
-	pconfig.c			\
+	lml-options.c			\
 	file-server.c			\
 	lml-alert.c
-
-
-
 
