@@ -198,7 +198,6 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 {
 	idmef_additional_data_t *adata;
 	prelude_string_t *adata_meaning;
-	idmef_data_t *adata_data;
 
         adata = idmef_alert_new_additional_data(alert);
         if ( ! adata )
@@ -207,12 +206,7 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 	adata_meaning = idmef_additional_data_new_meaning(adata);
 	prelude_string_set_ref(adata_meaning, meaning);
 
-	idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
-
-	adata_data = idmef_additional_data_new_data(adata);
-	idmef_data_set_ref(adata_data, data, strlen(data) + 1);
-
-	return 0;
+	return idmef_additional_data_set_string_ref(adata, data);
 }
 
 
