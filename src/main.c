@@ -192,6 +192,8 @@ int main(int argc, char **argv)
 {
         int ret;
         
+        prelude_init(&argc, argv);
+        
         global_argv = argv;
         lml_root_optlist = prelude_option_new_root();
         

@@ -46,7 +46,6 @@
 #include "file-server.h"
 #include "udp-server.h"
 
-#define DEFAULT_ANALYZER_NAME "prelude-lml"
 #define DEFAULT_UDP_SERVER_PORT 514
 
 /*
@@ -58,12 +57,21 @@ udp_server_t *udp_srvr = NULL;
 
 int batch_mode = 0;
 prelude_client_t *lml_client;
+prelude_bool_t dry_run = FALSE;
+prelude_io_t *text_output_fd = NULL;
 extern prelude_option_t *lml_root_option;
 
 static char *pidfile = NULL;
-static uid_t prelude_lml_user = 0;
-static gid_t prelude_lml_group = 0;
+static const char *config_file = PRELUDE_CONF;
 static char *logfile_format = NULL, *logfile_ts_format = NULL;
+
+
+
+static int set_conf_file(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
+{
+        config_file = strdup(optarg);
+        return 0;
+}
 
 
 static int print_version(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
@@ -126,7 +134,6 @@ static int set_quiet_mode(void *context, prelude_option_t *opt, const char *opta
 }
 
 
-
 static int set_daemon_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
         prelude_daemonize(pidfile);
@@ -172,6 +179,40 @@ static int set_logfile_ts_format(void *context, prelude_option_t *opt, const cha
         return 0;
 }
 
+
+
+static int set_dry_run(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+{
+        dry_run = TRUE;
+}
+
+
+
+static int set_text_output(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
+{
+        int ret;
+        FILE *fd;
+        
+        ret = prelude_io_new(&text_output_fd);
+        if ( ret < 0 )
+                return ret;
+
+        if ( ! arg ) {
+                prelude_io_set_file_io(text_output_fd, stdout);
+                return 0;
+        }
+
+        fd = fopen(arg, "w");
+        if ( ! fd ) {
+                log(LOG_INFO, "could not open %s for writing.\n", arg);
+                prelude_io_destroy(text_output_fd);
+                return -1;
+        }
+
+        prelude_io_set_file_io(text_output_fd, fd);
+
+        return 0;
+}
 
 
 
@@ -307,6 +348,18 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_daemon_mode, NULL);
+
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
+                           "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_OPTIONAL,
+                           set_text_output, NULL);
+        
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 0, "dry-run",
+                           "No alert emission / Prelude connection", PRELUDE_OPTION_ARGUMENT_NONE,
+                           set_dry_run, NULL);
+        
+        prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'c', "config",
+                           "Configuration file to use", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           set_conf_file, NULL);
         
         opt = prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
                                  "Write Prelude LML PID to specified pidfile",
@@ -346,14 +399,23 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                            set_logfile_format, NULL);
         
         opt = prelude_option_add(ropt,  PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_ALLOW_MULTIPLE_CALL,
-                                 'f', "file", "Specify a file to monitor (you might specify \"stdin\")",
+                                 'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
-
+        
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
         
-        ret = prelude_client_new(&lml_client, PRELUDE_CONNECTION_CAPABILITY_CONNECT,
-                                 "prelude-lml", PRELUDE_CONF, &argc, argv);
+        
+        ret = prelude_option_parse_arguments(NULL, ropt, &config_file, &argc, argv, &err);
+        if ( ret < 0 ) {
+                if ( err )
+                        log(LOG_INFO, "%s.\n", prelude_string_get_string(err));
+                else
+                        prelude_perror(ret, "failed parsing LML options");
+                
+                return -1;
+        }
 
+        ret = prelude_client_new(&lml_client, PRELUDE_CONNECTION_CAPABILITY_CONNECT, "prelude-lml", config_file);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-client");
                 
@@ -366,35 +428,17 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
         ret = lml_alert_init(lml_client);
         if ( ret < 0 )
                 return -1;
-        
-        ret = prelude_client_start(lml_client);
-        if ( ret < 0 ) {
-                prelude_perror(ret, "error starting prelude-client");
-                return -1;
-        }
-        
-        ret = prelude_option_parse_arguments(lml_client, ropt, PRELUDE_CONF, &argc, argv, &err);
-        if ( ret < 0 ) {
-                if ( err )
-                        log(LOG_INFO, "%s.\n", prelude_string_get_string(err));
-                else
-                        prelude_perror(ret, "failed parsing LML options.\n");
-                
-                return -1;
+
+        if ( ! dry_run ) {
+                ret = prelude_client_start(lml_client);
+                if ( ret < 0 ) {
+                        prelude_perror(ret, "error starting prelude-client");
+                        return -1;
+                }
         }
         
         if ( batch_mode && udp_srvr ) {
                 log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
-                return -1;
-        }
-        
-        if ( prelude_lml_group && setgid(prelude_lml_group) < 0 ) {
-                log(LOG_ERR, "couldn't set GID to %d.\n", prelude_lml_group);
-                return -1;
-        }
-
-        if ( prelude_lml_user && setuid(prelude_lml_user) < 0 ) {
-                log(LOG_ERR, "couldn't set UID to %d.\n", prelude_lml_user);
                 return -1;
         }
         

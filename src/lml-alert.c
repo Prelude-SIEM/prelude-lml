@@ -44,7 +44,9 @@
 #include "config.h"
 
 
+extern prelude_bool_t dry_run;
 extern prelude_client_t *lml_client;
+extern prelude_io_t *text_output_fd;
 static idmef_analyzer_t *idmef_analyzer;
 
 
@@ -297,7 +299,11 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
                         goto error;
         }
 
-        prelude_client_send_idmef(lml_client, message);
+        if ( text_output_fd )
+                idmef_message_print(message, text_output_fd);
+        
+        if ( ! dry_run ) 
+                prelude_client_send_idmef(lml_client, message);
                 
  error:
         idmef_message_destroy(message);
