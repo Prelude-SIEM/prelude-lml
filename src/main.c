@@ -237,6 +237,12 @@ int main(int argc, char **argv)
                         prelude_wake_up_timer();
                         
                 } while ( batch_mode == 0 || ret > 0 );
+
+                /*
+                 * only call prelude_client_destroy in case we are running in batch
+                 * mode, causing an heartbeat to be sent to notice of a normal exit.
+                 */
+                prelude_client_destroy(lml_client);
         }
         
 	return 0;
