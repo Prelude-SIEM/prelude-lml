@@ -81,7 +81,7 @@ static pcre_rule_container_t *create_rule_container(pcre_rule_t *rule)
 
 static int parse_rule_id(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *id) 
 {
-        rule->id = (uint16_t) strtol(id, NULL, 0);
+        rule->id = (unsigned int) strtoul(id, NULL, 0);
 
         return 0;
 }
@@ -90,7 +90,7 @@ static int parse_rule_id(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *i
 
 static int parse_rule_revision(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *revision) 
 {
-        rule->revision = (uint16_t) strtol(revision, NULL, 0);
+        rule->revision = (unsigned int) strtoul(revision, NULL, 0);
 
         return 0;
 }

@@ -43,7 +43,7 @@ typedef struct {
 
         udp_server_t *udp_srvr;
         char *udp_srvr_addr;
-        uint16_t udp_srvr_port;
+        unsigned int udp_srvr_port;
 
         prelude_io_t *text_output_fd;
 } lml_config_t;

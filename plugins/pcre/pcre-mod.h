@@ -29,8 +29,8 @@
 
 
 typedef struct {
-        uint16_t id;
-        uint16_t revision;
+        unsigned int id;
+        unsigned int revision;
 
         prelude_bool_t last;
         prelude_bool_t chained;

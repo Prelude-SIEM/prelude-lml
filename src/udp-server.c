@@ -118,7 +118,7 @@ int udp_server_get_event_fd(udp_server_t *server)
 
 
 
-udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, uint16_t port)
+udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int port)
 {
         int ret;
         udp_server_t *server;
