@@ -4,6 +4,7 @@ ruleset_DATA = \
 	cisco.rules		\
 	cisco-pix.rules		\
 	cisco-vpn.rules		\
+	clamav.rules		\
 	grsecurity.rules	\
 	honeyd.rules		\
 	ipchains.rules		\

@@ -158,6 +158,7 @@ include = checkpoint.rules;
 include = cisco.rules;
 include = cisco-vpn.rules;
 include = cisco-pix.rules;
+include = clamav.rules;
 include = grsecurity.rules;
 include = honeyd.rules;
 include = ipchains.rules;
