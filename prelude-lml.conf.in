@@ -47,7 +47,7 @@ file = /var/log/auth.log
 # Example configuration for metalog output:
 #
 # time-format = "%b %d %H:%M:%S"
-# log-format = "%ltime %tprog"
+# log-format = "%ltime [%tprog]"
 #
 # file = /var/log/everything/current
 

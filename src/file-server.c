@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -721,12 +721,12 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 
         if ( is_normal_log_rotation(monitor, st) == 0 ) {
                 idmef_impact_set_severity(impact, impact_medium);
-				impact_description = idmef_impact_new_description(impact);
-				idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
+                impact_description = idmef_impact_new_description(impact);
+                idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
         } else {
-				idmef_impact_set_severity(impact, impact_high);
-				impact_description = idmef_impact_new_description(impact);
-				idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT_HIGH);
+                idmef_impact_set_severity(impact, impact_high);
+                impact_description = idmef_impact_new_description(impact);
+                idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT_HIGH);
         }
 
         logfile_alert(monitor, st, classification, impact);

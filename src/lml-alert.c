@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
+* Copyright (C) 1998 - 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -207,10 +207,13 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         idmef_target_t *target;
         idmef_process_t *process;
 	idmef_string_t *process_name;
-        
-        target = idmef_alert_new_target(alert);
-        if ( ! target ) 
-                return -1;
+
+        target = idmef_alert_get_next_target(alert, NULL);
+        if ( ! target ) {
+                target = idmef_alert_new_target(alert);
+                if ( ! target ) 
+                        return -1;
+        }
 
         if ( log->target_user ) {
                 user = idmef_target_new_user(target);
