@@ -84,6 +84,8 @@ static int read_logfile(monitor_fd_t *fd)
                                  * missing end of line (\n).
                                  */
                                 fd->need_more_read = 1;
+	    
+			clearerr_unlocked(fd->fd);
 
                         return -1;
                 }
