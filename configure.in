@@ -63,8 +63,8 @@ dnl **************************************************
 dnl * Check for PCRE                                 *
 dnl **************************************************
 
-AC_PATH_GENERIC(pcre, 3.0, ,
-  AC_MSG_ERROR(Cannot find pcre: Is pcre-config in the path?) )
+AC_PATH_GENERIC(pcre, 4.1, ,
+  AC_MSG_ERROR(PCRE 4.1 or later required. Get it from http://www.pcre.org) )
 
 
 
@@ -88,7 +88,12 @@ if test x$enable_fam = xyes; then
    AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
    AC_CHECK_LIB(fam, main, , fam_lib_ok="no")
 
+   LDFLAGS="$old_LDFLAGS"
+   CPPFLAGS="$old_CPPFLAGS"
+
    if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then 
+        FAM_LIBS=""
+	FAM_CFLAGS=""
       	enable_fam=no;
    else
 	enable_fam=yes;
