@@ -302,7 +302,7 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
         int len, ret;
         char buf[METADATA_MAXSIZE];
         
-        len = snprintf(buf, sizeof(buf), "%llu:%s\n", offset, monitor->buf);
+        len = snprintf(buf, sizeof(buf), "%" PRIu64 ":%s\n", offset, monitor->buf);
         if ( len >= sizeof(buf) || len < 0 )
                 return -1;
         
@@ -362,7 +362,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         
         ret = fseek(monitor->fd, offset, SEEK_SET);
         if ( ret < 0 ) {
-                log(LOG_ERR, "- %s: couldn't seek to byte %llu.\n", filename, offset);
+                log(LOG_ERR, "- %s: couldn't seek to byte %" PRIu64 ".\n", filename, offset);
                 return -1; 
         }
 
@@ -376,7 +376,8 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         monitor->last_size = offset;
         monitor->last_size += strlen(sumptr);
         
-        log(LOG_INFO, "- %s: Metadata available, starting log analyzis at offset %llu.\n", filename, monitor->last_size);
+        log(LOG_INFO, "- %s: Metadata available, starting log analyzis at offset %" PRIu64 ".\n",
+            filename, monitor->last_size);
         
         return 0;
 }
@@ -513,9 +514,9 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         
         if ( monitor->need_more_read ) {
                 log(LOG_INFO,
-                    "If you hit this point, please contact the Prelude mailing list\n" \
-                    "and include the following information in your report: st_size=%llu\n" \
-                    "remaining=%llu, rlen=%llu, len=%llu\n",
+                    "If you hit this point, please contact the Prelude mailing list\n"            \
+                    "and include the following information in your report: st_size=%" PRIu64 "\n" \
+                    "remaining=%" PRIu64 ", rlen=%" PRIu64 ", len=%" PRIu64 "\n",
                     st->st_size, monitor->need_more_read, rlen, len);
 
                 abort();
