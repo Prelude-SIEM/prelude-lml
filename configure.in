@@ -116,72 +116,139 @@ AC_SUBST(HTML_DIR)
 
 
 
-
 dnl **************************************************
-dnl * Do we need aligned access ? (from tcpdump)     *
+dnl * Check if FAM detect writev() issued changes    *
 dnl **************************************************
 
-AC_MSG_CHECKING(if unaligned accesses fail)
 
-AC_CACHE_VAL(ac_cv_lbl_unaligned_fail,
-        [case "$host_cpu" in
+cat > conftest.c << EOF
 
-        # XXX: should also check that they don't do weird things (like on arm)
-        alpha*|arm*|hp*|mips*|sparc*|ia64)
-                ac_cv_lbl_unaligned_fail=yes
-                ;;
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/uio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <fam.h>
 
-        *)
-                cat >conftest.c <<EOF
-#               include <sys/types.h>
-#               include <sys/wait.h>
-#               include <stdio.h>
-                unsigned char a[[5]] = { 1, 2, 3, 4, 5 };
-                main() {
-                unsigned int i;
-                pid_t pid;
-                int status;
-                /* avoid "core dumped" message */
-                pid = fork();
-                if (pid <  0)
-                        exit(2);
-                if (pid > 0) {
-                        /* parent */
-                        pid = waitpid(pid, &status, 0);
-                        if (pid < 0)
-                                exit(3);
-                        exit(!WIFEXITED(status));
-                }
-                /* child */
-                i = *(unsigned int *)&a[[1]];
-                printf("%d\n", i);
-                exit(0);
-                }
+#define FAM_FILENAME "testfam.tmp"
+#define FAM_STRING "test string\n"
+
+
+
+static int get_expected_event(FAMConnection *fc, int eventno)
+{
+	int ret;
+	fd_set fds;
+	FAMEvent event;
+	struct timeval tv;
+
+	FD_ZERO(&fds);
+	FD_SET(fc->fd, &fds);
+
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+
+	if ( ! FAMPending(fc) ) {
+		ret = select(fc->fd + 1, &fds, NULL, NULL, &tv);
+		if ( ret <= 0 )
+			return -1;
+	}
+
+	/*
+	 * Wait for the notification started event.
+	 */
+	ret = FAMNextEvent(fc, &event);
+        if ( ret < 0 || event.code != eventno ) 
+                return -1;
+
+	return 0;
+}
+
+
+
+int main(void)
+{
+	int ret, fd;
+	FAMRequest fr;
+	char buf[[1024]];
+	FAMConnection fc;
+	struct iovec iov[[1]];
+
+        getcwd(buf, sizeof(buf));
+        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "/%s", FAM_FILENAME);
+        
+	fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
+	if ( fd < 0 ) {
+		fprintf(stderr, "error opening %s for writing: %s.\n", buf, strerror(errno));
+		return -1;
+	}
+
+	ret = FAMOpen(&fc);
+	if ( ret < 0 ) {
+		fprintf(stderr, "error initializing FAM: %s.\n", FamErrlist[[FAMErrno]]);
+		return -1;
+	}
+
+	ret = FAMMonitorFile(&fc, buf, &fr, NULL);
+	if ( ret < 0 ) {
+		fprintf(stderr, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[[FAMErrno]]);
+		return -1;
+	}
+
+	ret = get_expected_event(&fc, FAMExists);
+	if ( ret < 0 )
+		return -1;
+
+	ret = get_expected_event(&fc, FAMEndExist);
+	if ( ret < 0 )
+		return -1;
+
+	iov[[0]].iov_len = sizeof(FAM_STRING);
+	iov[[0]].iov_base = FAM_STRING;
+        
+	/* ret = write(fd, FAM_STRING, sizeof(FAM_STRING)); */
+
+	ret = writev(fd, iov, 1);
+	if ( ret != sizeof(FAM_STRING) ) {
+		fprintf(stderr, "error writing test string to %s: %s.\n", buf, strerror(errno));
+		return -1;
+	}
+	
+	ret = get_expected_event(&fc, FAMChanged);
+	if ( ret < 0 )
+		return -1;
+
+	printf("Got expected FAMChanged event.\n");
+
+        return 0;
+}
 EOF
-                ${CC-cc} -o conftest $CFLAGS $CPPFLAGS $LDFLAGS \
-                    conftest.c $LIBS >/dev/null 2>&1
-                if test ! -x conftest ; then
-                        dnl failed to compile for some reason
-                        ac_cv_lbl_unaligned_fail=yes
-                else
-                        ./conftest >conftest.out
-                        if test ! -s conftest.out ; then
-                                ac_cv_lbl_unaligned_fail=yes
-                        else
-                                ac_cv_lbl_unaligned_fail=no
-                        fi
-                fi
-                rm -f conftest* core core.conftest
-                ;;
-        esac])
-    
-AC_MSG_RESULT($ac_cv_lbl_unaligned_fail)
-if test $ac_cv_lbl_unaligned_fail = yes ; then
-	AC_DEFINE(NEED_ALIGNED_ACCESS)
+
+AC_MSG_CHECKING(whether FAM detect writev change)
+
+${CC-cc} -o conftest $CFLAGS -Wall $CPPFLAGS $LDFLAGS conftest.c -lfam
+if test ! -x conftest; then
+	AC_MSG_RESULT(couldn't compile FAM test program)
+	enable_fam=no;
+else
+	./conftest > conftest.out
+
+	if test -s conftest.out; then
+		rm -f conftest.out
+
+		AC_MSG_RESULT(FAM working)
+		AC_DEFINE(HAVE_FAM,, compiled in FAM support)
+		enable_fam=yes
+        else
+		AC_MSG_RESULT(FAM not working)
+		enable_fam=no
+        fi
 fi
 
-
-
+rm -f conftest conftest.out
 
 
 dnl Checks for header files.
@@ -206,7 +273,7 @@ regex_conf=$configdir/plugins.rules
 plugindir=$libdir/prelude-lml
 log_plugin_dir=$plugindir/
 
-AC_DEFINE_UNQUOTED(PRELUDE_CONF, "$prelude_conf")
+AC_DEFINE_UNQUOTED(PRELUDE_CONF, "$prelude_conf", Path to the LML configuration file)
 
 defined="$defined $LIBPRELUDE_CFLAGS $PCRE_CFLAGS"
 
@@ -249,6 +316,6 @@ plugins/simple/ruleset/Makefile
 
 echo
 echo "*** Dumping configuration ***"
+echo "    - Enable FAM support     : $enable_fam"
 echo "    - Enable profiling       : $enable_profiling"
 echo "    - Generate documentation : $enable_gtk_doc"
-

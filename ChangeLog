@@ -1,3 +1,18 @@
+2002-12-05  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/file-server.c: include config.h before checking
+	if HAVE_FAM is set.
+
+	* acconfig.h: removed.
+
+	* configure.in: 
+	implemented FAM detection code. This code will both 
+	check if FAM is available, and if FAM notice writev()
+	change (known Linux kernel bug).
+
+	Also removed code that check if we need aligned access,
+	libprelude do that for us, and it's not needed anyway.
+
 2002-11-28  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/pconfig.c (print_help): fit prelude-getopt

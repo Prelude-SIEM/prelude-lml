@@ -1,4 +1,0 @@
-#undef HAVE_GETOPT_LONG
-#undef HAVE_SSL
-#undef PRELUDE_CONF
-#undef NEED_ALIGNED_ACCESS

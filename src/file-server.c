@@ -32,6 +32,8 @@
 #include <errno.h>
 #include <assert.h>
 
+#include "config.h"
+
 #ifdef HAVE_FAM
  #include <fam.h>
  static FAMConnection fc;
