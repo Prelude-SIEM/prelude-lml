@@ -92,6 +92,7 @@ int file_server_wake_up(regex_list_t *list, queue_t *queue)
 int file_server_monitor_file(const char *file, int fd) 
 {
         int ret;
+        struct stat st;
         monitor_fd_t *new;
         
         ret = lseek(fd, 0, SEEK_END);
@@ -108,8 +109,16 @@ int file_server_monitor_file(const char *file, int fd)
                 return -1;
         }        
 
+        ret = fstat(fd, &st);
+        if ( ret < 0 ) {
+                log(LOG_ERR, "couldn't stat '%s'.\n", file);
+                free(new);
+                close(fd);
+                return -1;
+        }
+        
         new->fd = fd;
-        new->last_modified = 0;
+        new->last_modified = st.st_mtime;
         new->file = strdup(file);
         fd_tbl[fd_index++] = new;
         
