@@ -1,4 +1,5 @@
 ruleset_DATA = \
+	apc-emu.rules		\
 	checkpoint.rules	\
 	cisco.rules		\
 	cisco-pix.rules		\

@@ -144,6 +144,7 @@
 #   target().process.pid:
 #   A process number
 
+include = apc-emu.rules;
 include = checkpoint.rules;
 include = cisco.rules;
 include = cisco-vpn.rules;
