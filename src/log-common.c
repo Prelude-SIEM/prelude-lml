@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 600
+
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -12,34 +14,43 @@
 
 static int format_syslog_header(const char *buf, struct timeval *tv, char host[256], char tag[33]) 
 {
+        char *log;
         int ret, i;
-        char month[4];
-        int day, hour, minute, second;
-        struct {
-                const char *month;
-                int value;
-        } mtbl[] = {
-                { "Jan", 1  },
-                { "Feb", 2  },
-                { "Mar", 3  },
-                { "Apr", 4  },
-                { "May", 5  },
-                { "Jun", 6  },
-                { "Jul", 7  },
-                { "Aug", 8  },
-                { "Sep", 9  },
-                { "Oct", 10 },
-                { "Nov", 11 },
-                { "Dec", 12 },
-        };
-        
-        ret = sscanf(buf, "%3s %d %d:%d:%d %255s %32s", month, &day, &hour, &minute, &second, host, tag);
-        if ( ret != 7 )
-                /*
-                 * Not syslog format.
-                 */
+        time_t now;
+        struct tm localtime;
+
+        /*
+         * We first get the localtime from this system,
+         * so that all the struct tm member are filled.
+         *
+         * As syslog header doesn't contain a complete timestamp, this
+         * avoid us some computation error.
+         */
+        now = time(NULL);
+        if ( ! localtime_r(&now, &localtime) ) {
+                log(LOG_ERR, "couldn't get local time.\n");
                 return -1;
+        }
+
+        /*
+         * Now, let's format the timestamp provided in the syslog message.
+         * strptime() return a pointer to the first non matched character.
+         */
+        log = strptime(buf, "%b %d %H:%M:%S", &localtime);
+        if ( ! log ) {
+                log(LOG_ERR, "there was an error trying to parse syslog date.\n");
+                return -1;
+        }
         
+        ret = sscanf(log, "%255s %32s", host, tag);
+        if ( ret != 2 ) {
+                log(LOG_ERR, "unknown format : \"%s\".\n", log);
+                return -1;
+        }
+
+        /*
+         * the tag end as soon as we meet a non alpha numeric character.
+         */
         for ( i = 0; i < strlen(tag); i++ ) {
                 
                 if ( ! isalnum(tag[i]) ) {
@@ -47,11 +58,12 @@ static int format_syslog_header(const char *buf, struct timeval *tv, char host[2
                         break;
                 }
         }
-        
-        (*tv).tv_usec =  0;
-        (*tv).tv_sec  =  day * (24 * 60 * 60);
-        (*tv).tv_sec  += hour * (60 * 60);
-        (*tv).tv_sec  += minute * 60;
+
+        /*
+         * convert back to a timeval.
+         */
+        (*tv).tv_usec = 0;
+        (*tv).tv_sec = mktime(&localtime);
 
         return 0;
 }

@@ -1,3 +1,12 @@
+2002-05-31  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* src/log-common.c (format_syslog_header): 
+	format the syslog timestamp. 
+
+	We use strptime() in order to do that, combined with localtime()
+	to get missing information, and mktime() to convert back to a
+	timeval.
+
 2002-05-31  Krzysztof Zaraska  <kzaraska@student.uci.agh.edu.pl>
 
 	* plugins/simple/ruleset/ipfw.rules: updated to use new SimpleMod
