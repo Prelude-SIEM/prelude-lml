@@ -22,7 +22,7 @@
 #####
 #
 # Started on  Thu Oct 17 12:01:59 2002
-# Last update Fri Oct 25 23:32:44 2002
+## Last update Wed Dec 17 19:24:10 2003 
 #
 # Version 0.1
 #
@@ -35,98 +35,93 @@
 ###################
 
 regex=sshd.+: Accepted (\S+) for root from (\S+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote root logging; \
+ classification(0).name=SSH Remote root logging; \
  impact.severity=low; \
  impact.completion=succeeded; \
  impact.type=admin; \
  impact.description=Root logged in from $2:$3 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv46-addr; \
- target.service.port=22; \
- target.service.protocol=tcp; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv46-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp; \
  last;
 
 regex=sshd.+: Accepted (\S+) for (?!root)(\S+) from (\S+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote user logging; \
+ classification(0).name=SSH Remote user logging; \
  impact.severity=low; \
  impact.completion=succeeded; \
  impact.type=user; \
  impact.description=User $2 logged in from $3:$4 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv46-addr; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv46-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 ################
 # Login failed #
 ################
 
 regex=sshd.+: Failed (\S+) for root from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote root logging failed; \
+ classification(0).name=SSH Remote root logging failed; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=admin; \
  impact.description=Someone tried to login as root from $2:$3 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv4-addr; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv4-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 regex=sshd.+: Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
- class.name=SSH Remote user logging failed; \
+ classification(0).name=SSH Remote user logging failed; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=user; \
  impact.description=Someone tried to login as $2 from $3:$4 using the $1 method; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- source.service.port=$4; \
- source.service.protocol=tcp; \
-# target.node.address.category=ipv4-addr; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.protocol=tcp; \
+# target(0).node.address(0).category=ipv4-addr; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 ##############################################
 # Invalid (not existing) user tried to login #
 ##############################################
 
 regex=sshd.+: Illegal user (\S+) from (\S+); \
- class.name=SSH Remote logging failed with an invalid user; \
+ classification(0).name=SSH Remote logging failed with an invalid user; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=user; \
  impact.description=Someone tried to login with the invalid user "$1" from $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 ##################################################################################
 # User listed in DenyGroups or DenyUsers (sshd_config directives) tried to login #
 ##################################################################################
 
 regex=sshd.+: User (\S+) not allowed because .*listed in (\w+); \
- class.name=SSH Remote logging failed with a denied user; \
+ classification(0).name=SSH Remote logging failed with a denied user; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=user; \
  impact.description=User $1 failed to login because he is listed in $2; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 ##################################################################
 # Sshd did not receive the identification string from the client #
@@ -134,17 +129,16 @@ regex=sshd.+: User (\S+) not allowed because .*listed in (\w+); \
 ##################################################################
 
 regex=sshd.+: Did not receive identification string from (\S+); \
- class.name=SSH Server recognition; \
+ classification(0).name=SSH Server recognition; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=recon; \
  impact.description=$1 making probably a server recognition; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=22; \
- target.service.protocol=tcp;
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;
 
 #########################################################################
 # Forbidden root logging                                                #
@@ -153,15 +147,13 @@ regex=sshd.+: Did not receive identification string from (\S+); \
 #########################################################################
 
 regex=sshd.+: ROOT LOGIN REFUSED FROM (\w+); \
- class.name=SSH Remote root logging forbidden; \
+ classification(0).name=SSH Remote root logging forbidden; \
  impact.severity = medium; \
  impact.completion=failed; \
  impact.type=admin; \
  impact.description=Root tried to login while it is forbidden; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=tcp; \
- target.service.port=22; \
- target.service.protocol=tcp;
-
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=tcp; \
+ target(0).service.port=22; \
+ target(0).service.protocol=tcp;

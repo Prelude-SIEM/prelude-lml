@@ -21,10 +21,9 @@
 
  
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected.*; \
- class.name=Exim request rejected; \
+ classification(0).name=Exim request rejected; \
  impact.severity = low; \
  impact.completion=failed; \
  impact.type=other; \
  impact.description=Exim refused a request : $1 rejected; \
- target.service.protocol=smtp;
-
+ target(0).service.protocol=smtp;

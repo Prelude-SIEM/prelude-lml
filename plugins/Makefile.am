@@ -1,1 +1,1 @@
-SUBDIRS = debug simple pax
+SUBDIRS = debug simple

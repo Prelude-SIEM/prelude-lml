@@ -6,12 +6,11 @@
 #include <sys/time.h>
 
 #include <libprelude/list.h>
-#include <libprelude/idmef-tree.h>
-#include <libprelude/idmef-tree-func.h>
+#include <libprelude/idmef.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-msg-send.h>
+#include <libprelude/idmef-message-send.h>
 #include <libprelude/idmef-message-id.h>
 #include <libprelude/prelude-getopt.h>
 
@@ -28,29 +27,42 @@ static plugin_log_t plugin;
 static void debug_run(const log_container_t *log)
 {
 	idmef_alert_t *alert;
-	idmef_additional_data_t *additional;
-	idmef_message_t *message = idmef_message_new();
-        
+	idmef_message_t *message;
+	idmef_analyzer_t *analyzer;
+	idmef_string_t *analyzer_model, *analyzer_class;
+	idmef_additional_data_t *adata;
+	idmef_string_t *adata_meaning;
+	idmef_data_t *data;
+
+	message = idmef_message_new();
 	assert(message);
 
-	idmef_alert_new(message);
-	alert = message->message.alert;
+	alert = idmef_message_new_alert(message);
+	assert(alert);
 
-	idmef_string_set_constant(&alert->analyzer.model,
-				  "Prelude-LML Debug Plugin");
-	idmef_string_set_constant(&alert->analyzer.class,
-				  "An alert for any log received");
+	analyzer = idmef_alert_new_analyzer(alert);
+	assert(analyzer);
 
-	additional = idmef_alert_additional_data_new(alert);
-	assert(additional);
+	analyzer_model = idmef_analyzer_new_model(analyzer);
+	idmef_string_set_constant(analyzer_model, "Prelude-LML Debug Plugin");
 
-	additional->type = string;
-	idmef_string_set_constant(&additional->meaning, "log message");
-        idmef_additional_data_set_data(additional, string, log->log, strlen(log->log) + 1);
+	analyzer_class = idmef_analyzer_new_class(analyzer);
+	idmef_string_set_constant(analyzer_class, "An alert for any log received");
+
+	adata = idmef_alert_new_additional_data(alert);
+	assert(adata);
+
+	idmef_additional_data_set_type(adata, string);
+
+	adata_meaning = idmef_additional_data_new_meaning(adata);
+	idmef_string_set_constant(adata_meaning, "log message");
+
+	data = idmef_additional_data_new_data(adata);
+	idmef_data_set_ref(data, log->log, strlen(log->log) + 1);
 
 	lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_LOW);
 
-	if (out_stderr)
+	if ( out_stderr )
 		fprintf(stderr, "Debug: log received, log=%s\n", log->log);
 }
 
@@ -60,13 +72,15 @@ static int set_debug_state(prelude_option_t *opt, const char *optarg)
 {
 	int ret;
 
-	if (is_enabled == 1) {
+	if ( is_enabled ) {
 		ret = plugin_unsubscribe((plugin_generic_t *) & plugin);
 		if (ret < 0)
 			return prelude_option_error;
 
 		is_enabled = 0;
-	} else {
+	}
+
+	else {
 		ret = plugin_subscribe((plugin_generic_t *) & plugin);
 		if (ret < 0)
 			return prelude_option_error;
@@ -77,18 +91,25 @@ static int set_debug_state(prelude_option_t *opt, const char *optarg)
 	return prelude_option_success;
 }
 
+
+
 static int get_debug_state(char *buf, size_t size)
 {
 	snprintf(buf, size, "%s",
-		 (is_enabled == 1) ? "enabled" : "disabled");
+		 is_enabled ? "enabled" : "disabled");
+
 	return prelude_option_success;
 }
 
+
+
 static int get_output(char *buf, size_t size)
 {
-	snprintf(buf, size, "%s", (out_stderr) ? "enabled" : "disabled");
+	snprintf(buf, size, "%s", out_stderr ? "enabled" : "disabled");
+
 	return prelude_option_success;
 }
+
 
 
 static int set_output(prelude_option_t *opt, const char *optarg)
@@ -96,9 +117,11 @@ static int set_output(prelude_option_t *opt, const char *optarg)
 	/*
 	 * enable or disable depending on the current value.
 	 */
-	out_stderr = !out_stderr;
+	out_stderr = ! out_stderr;
 	return prelude_option_success;
 }
+
+
 
 plugin_generic_t *plugin_init(int argc, char **argv)
 {

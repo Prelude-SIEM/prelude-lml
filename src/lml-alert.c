@@ -38,12 +38,11 @@
 #include <libprelude/list.h>
 #include <libprelude/common.h>
 #include <libprelude/prelude-log.h>
-#include <libprelude/idmef-tree.h>
-#include <libprelude/idmef-tree-func.h>
+#include <libprelude/idmef.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-message-buffered.h>
-#include <libprelude/idmef-msg-send.h>
+#include <libprelude/idmef-message-send.h>
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/sensor.h>
@@ -54,9 +53,8 @@
 #include "config.h"
 
 
-static size_t target_buf_index;
 static prelude_msgbuf_t *msgbuf;
-
+static idmef_analyzer_t *lml_analyzer;
 
 #define ANALYZER_CLASS "HIDS"
 #define ANALYZER_MODEL "Prelude LML"
@@ -64,59 +62,63 @@ static prelude_msgbuf_t *msgbuf;
 
 
 
-static void generate_analyzer(idmef_analyzer_t *analyzer) 
+static idmef_analyzer_t *generate_analyzer(void) 
 {
+	idmef_analyzer_t *analyzer;
+	idmef_string_t *string;
+
+	analyzer = idmef_analyzer_new();
+	if ( ! analyzer )
+		return NULL;
+
         prelude_analyzer_fill_infos(analyzer);
-        idmef_string_set_constant(&analyzer->model, ANALYZER_MODEL);
-        idmef_string_set_constant(&analyzer->class, ANALYZER_CLASS);
-        idmef_string_set_constant(&analyzer->manufacturer, ANALYZER_MANUFACTURER);
-        idmef_string_set_constant(&analyzer->version, VERSION);
+
+	string = idmef_analyzer_new_model(analyzer);
+	idmef_string_set_constant(string, ANALYZER_MODEL);
+
+	string = idmef_analyzer_new_class(analyzer);
+	idmef_string_set_constant(string, ANALYZER_CLASS);
+
+	string = idmef_analyzer_new_manufacturer(analyzer);
+	idmef_string_set_constant(string, ANALYZER_MANUFACTURER);
+
+	string = idmef_analyzer_new_version(analyzer);
+	idmef_string_set_constant(string, VERSION);
+
+	return analyzer;
 }
 
 
 
 static void send_heartbeat_cb(void *data) 
 {
-        struct timeval tv;
-        idmef_heartbeat_t *hb;
         idmef_message_t *message;
+        idmef_heartbeat_t *heartbeat;
+	idmef_time_t *create_time;
         
         message = idmef_message_new();
         if ( ! message )
                 return;
-        
-        idmef_heartbeat_new(message);
-        hb = message->message.heartbeat;
 
-        generate_analyzer(&hb->analyzer);
-                
-        gettimeofday(&tv, NULL);
-        hb->create_time.sec = tv.tv_sec;
-        hb->create_time.usec = tv.tv_usec;
+        heartbeat = idmef_message_new_heartbeat(message);
+	if ( ! message ) {
+		idmef_message_destroy(message);
+		return;
+	}
 
-        idmef_msg_send(msgbuf, message, PRELUDE_MSG_PRIORITY_MID);
-        idmef_message_free(message);
-}
+	idmef_heartbeat_set_analyzer(heartbeat, idmef_analyzer_ref(lml_analyzer));
 
+	create_time = idmef_time_new_gettimeofday();
+	if ( ! create_time ) {
+		idmef_message_destroy(message);
+		return;
+	}
 
+	idmef_heartbeat_set_create_time(heartbeat, create_time);
 
-static char *keep_buffer(const char *str) 
-{
-        int ret;
-        static char buf[1024], *ptr; 
+	idmef_send_message(msgbuf, message);
 
-        /*
-         * FIXME: ugly hack because of IDMEF API memory handling uglyness
-         */
-        ret = snprintf(&buf[target_buf_index], sizeof(buf) - target_buf_index, "%s", str);        
-        if ( (ret + target_buf_index) >= sizeof(buf) || ret < 0 )
-                return "";
-
-        
-        ptr = &buf[target_buf_index];
-        target_buf_index += ret + 1;
-
-        return ptr;
+	idmef_message_destroy(message);
 }
 
 
@@ -125,22 +127,26 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
 {
         int ret;
         idmef_address_t *address;
+	idmef_string_t *string;
         
         /*
-         * we want to know if it's an Ip address or an hostname.
+         * we want to know if it's an ip address or an hostname.
          */
         ret = inet_addr(log->target_hostname);
         if ( ret < 0 ) {
                 /*
                  * hostname.
                  */
-                idmef_string_set(&node->name, log->target_hostname);
+		string = idmef_node_new_name(node);
+		idmef_string_set_ref(string, log->target_hostname);
+
         } else {
-                address = idmef_node_address_new(node);
+                address = idmef_node_new_address(node);
                 if ( ! address ) 
                         return -1;
-                
-                idmef_string_set(&address->address, log->target_hostname);
+
+                string = idmef_address_new_address(address);
+		idmef_string_set_ref(string, log->target_hostname);
         }
 
         return 0;
@@ -154,33 +160,35 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
         char str[128];
         void *in_addr;
         idmef_address_t *addr;
+	idmef_string_t *string;
 
-        target_buf_index = 0;
-        
         while ( ai ) {
 
-                if ( ai->ai_flags & AI_CANONNAME ) 
-                        idmef_string_set(&node->name, keep_buffer(ai->ai_canonname));
+                if ( ai->ai_flags & AI_CANONNAME ) {
+			string = idmef_node_new_name(node);
+			if ( idmef_string_set_dup(string, ai->ai_canonname) < 0 )
+				return -1;
+		}
                 
-                addr = idmef_node_address_new(node);
+                addr = idmef_node_new_address(node);
                 if ( ! addr )
                         return -1;
 
                 in_addr = prelude_inet_sockaddr_get_inaddr(ai->ai_addr);
                 assert(in_addr);
-                
-                if ( ai->ai_family == AF_INET ) 
-                        addr->category = ipv4_addr;
-                else
-                        addr->category = ipv6_addr;
+
+		idmef_address_set_category(addr,
+					   (ai->ai_family == AF_INET) ? ipv4_addr : ipv6_addr);
                 
                 if ( ! prelude_inet_ntop(ai->ai_family, in_addr, str, sizeof(str)) ) {
                         log(LOG_ERR, "inet_ntop returned an error.\n");
                         return -1;
                 }
-                
-                idmef_string_set(&addr->address, keep_buffer(str));
-                
+
+		string = idmef_address_new_address(addr);
+		if ( idmef_string_set_dup(string, str) < 0 )
+			return -1;
+
                 ai = ai->ai_next;
         }
 
@@ -195,30 +203,32 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         idmef_node_t *node;
         idmef_target_t *target;
         idmef_process_t *process;
+	idmef_string_t *process_name;
         
-        target = idmef_alert_target_new(alert);
+        target = idmef_alert_new_target(alert);
         if ( ! target ) 
                 return -1;
 
         if ( log->target_program ) {
-                process = idmef_target_process_new(target);
+                process = idmef_target_new_process(target);
                 if ( ! process )
                         return -1;
-                
-                idmef_string_set(&process->name, log->target_program);
+
+		process_name = idmef_process_new_name(process);
+		idmef_string_set_ref(process_name, log->target_program);
         }
 
         if ( log->target_hostname ) {
                 prelude_addrinfo_t *ai, hints;
                 
-                node = idmef_target_node_new(target);
+                node = idmef_target_new_node(target);
                 if ( ! node ) 
                         return -1;
 
                 memset(&hints, 0, sizeof(hints));
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
-                
+
                 /* This function conforms to getaddrinfo(3), not a general calling convention in libprelude */
                 ret = prelude_inet_getaddrinfo(log->target_hostname, NULL, &hints, &ai);
                 if ( ret != 0 ) {
@@ -236,64 +246,78 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 
 
 
-
-void lml_emit_alert(const log_container_t *log, idmef_message_t *msg, uint8_t priority)
+static int generate_additional_data(idmef_alert_t *alert, const char *meaning, const char *data)
 {
-        int ret;
-        struct timeval tv;
-        idmef_additional_data_t *data;
-        idmef_alert_t *alert = msg->message.alert;
+	idmef_additional_data_t *adata;
+	idmef_string_t *adata_meaning;
+	idmef_data_t *adata_data;
+
+        adata = idmef_alert_new_additional_data(alert);
+        if ( ! adata )
+		return -1;
+
+	adata_meaning = idmef_additional_data_new_meaning(adata);
+	idmef_string_set_ref(adata_meaning, meaning);
+
+	idmef_additional_data_set_type(adata, string);
+
+	adata_data = idmef_additional_data_new_data(adata);
+	idmef_data_set_ref(adata_data, data, strlen(data) + 1);
+
+	return 0;
+}
+
+
+
+void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_t priority)
+{
+        idmef_alert_t *alert;
+	idmef_time_t *create_time;
+	idmef_time_t *detect_time;
+
+	alert = idmef_message_get_alert(message);
+
+	create_time = idmef_time_new_gettimeofday();
+	if ( ! create_time )
+		goto error;
+
+	idmef_alert_set_create_time(alert, create_time);
         
-        gettimeofday(&tv, NULL);
-        alert->create_time.sec = tv.tv_sec;
-        alert->create_time.usec = tv.tv_usec;
-        
-        idmef_alert_detect_time_new(alert);
-        alert->detect_time->sec = log->tv.tv_sec;
-        alert->detect_time->usec = log->tv.tv_usec;
-        
+        detect_time = idmef_alert_new_detect_time(alert);
+	if ( ! detect_time )
+		goto error;
+
+	idmef_time_set_sec(detect_time, log->tv.tv_sec);
+	idmef_time_set_usec(detect_time, log->tv.tv_usec);
+
         if ( log->target_hostname || log->target_program ) {
-                ret = generate_target(log, alert);
-                if ( ret < 0 ) {
-                      idmef_message_free(msg);
-                      return;  
-                }
-        }        
+                if ( generate_target(log, alert) < 0 )
+			goto error;
+        }
 
-        generate_analyzer(&alert->analyzer);
+	idmef_alert_set_analyzer(alert, idmef_analyzer_ref(lml_analyzer));
 
         /*
          *
          */
-        data = idmef_alert_additional_data_new(alert);
-        if ( ! data ) {
-                idmef_message_free(msg);
-                return;
-        }
-        
-        idmef_string_set_constant(&data->meaning, "Log received from");
-        idmef_additional_data_set_data(data, string, log->source, strlen(log->source) + 1);
-        
+	if ( generate_additional_data(alert, "Log received from", log->source) < 0 )
+		goto error;
+
         /*
          *
          */
-        if ( log->log ) {
-                data = idmef_alert_additional_data_new(alert);
-                if ( ! data ) {
-                        idmef_message_free(msg);
-                        return;
-                }
-                
-                idmef_string_set_constant(&data->meaning, "Original Log");
-                idmef_additional_data_set_data(data, string, log->log, strlen(log->log) + 1);
-        }
+        if ( log->log )
+		if ( generate_additional_data(alert, "Original Log", log->log) < 0 )
+			goto error;
         
         /*
          *
          */
         
-        idmef_msg_send(msgbuf, msg, priority);
-        idmef_message_free(msg);
+        idmef_send_message(msgbuf, message);
+
+ error:
+        idmef_message_destroy(message);
 }
 
 
@@ -307,9 +331,12 @@ int lml_alert_init(void)
                 return -1;
         }
 
-        /*
-         * setup analyzer node.
-         */        
+	lml_analyzer = generate_analyzer();
+	if ( ! lml_analyzer ) {
+		prelude_msgbuf_close(msgbuf);
+		return -1;
+	}
+
         prelude_heartbeat_register_cb(send_heartbeat_cb, NULL);
 
         return 0;

@@ -46,215 +46,193 @@
 # 1. Dropped packets; several cases depending on the service format.
 # 1.a Both ports are numbers
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet dropped and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet dropped and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$9; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$9; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$9; \
  last
 
 # 1.b Source or Target port is a service name
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet dropped and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet dropped and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$9; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$9; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$9; \
  last
 
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet dropped and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet dropped and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$9; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$9; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$9; \
  last
 
 # 1.c Both ports are service names
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet dropped and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet dropped and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=FireWall $1 dropped and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$9; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$9; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$9; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$9; \
  last
 
 
 # 2. Accepted packets; same as above...
 # 2.a Both ports are numbers
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet accepted and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet accepted and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
  impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$5; \
  last
 
 # 2.b One port is a service name
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet accepted and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet accepted and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
  impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.port=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.port=$6; \
+ source(0).service.protocol=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$5; \
  last
 
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet accepted and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet accepted and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
  impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.port=$8; \
- target.service.protocol=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.port=$8; \
+ target(0).service.protocol=$5; \
  last
 
 # 2.c Only service names
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet accepted and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet accepted and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
  impact.description=FireWall $1 accepted and logged a $9 packet sent by $5:$6 to $7:$8 (rule #$10); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- source.service.name=$6; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$7; \
- target.service.name=$8; \
- target.service.protocol=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ source(0).service.name=$6; \
+ source(0).service.protocol=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$7; \
+ target(0).service.name=$8; \
+ target(0).service.protocol=$5; \
  last
 
 
 # 3 ICMP packets
 # 3.1 Dropped packets
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). dst: ([\d\.]+). proto: icmp. icmp-type: (\d+). icmp-code: (\d+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet dropped and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet dropped and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=FireWall $1 dropped and logged an icmp packet sent by $5 to $6, with type $7 and code $8 (rule #$9); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$6; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$6; \
  last
 
 # 3.2 Accepted packets
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). dst: ([\d\.]+). proto: icmp. icmp-type: (\d+). icmp-code: (\d+). rule: (\d+); \
- class.name=CheckPoint FireWall-1: packet accepted and logged; \
- class.origin=vendor-specific; \
+ classification(0).name=CheckPoint FireWall-1: packet accepted and logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
  impact.severity=medium; \
  impact.description=FireWall $1 dropped and logged an icmp packet sent by $5 to $6, with type $7 and code $8 (rule #$9); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$6; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$6; \
  last
 
 
 # 4. Misc. other Packets, we won't try to be as exhaustive as above
 regex=product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
- class.name=Checkpoint Firewall-1: packet logged; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint Firewall-1: packet logged; \
+ classification(0).origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
  impact.severity = low; \
  impact.description=FireWall-1 has logged a $5 packet sent by $1:$2 to $3:$4 (rule #$6); \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- source.service.protocol=$5; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$3; \
- target.service.protocol=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.protocol=$5; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.protocol=$5; \
  last
 
 
@@ -272,24 +250,22 @@ regex=product: VPN-1 & FireWall-1; \
 
 # 1. Port scanning
 regex=product: SmartDefense. dst: ([\d\.]+). attack: Port Scanning. src: ([\d\.]+); \
- class.name=Checkpoint SmartDefense: Port scan detection; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Port scan detection; \
+ classification(0).origin=vendor-specific; \
  impact.severity=low; \
  impact.type=recon; \
  impact.description=Checkpoint SmartDefense has detected a port scan from $2 to $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$1; \
  last
 
 
 # 2. Successive alerts
 regex=product: SmartDefense. attack: Successive Alerts; \
- class.name=Checkpoint SmartDefense: Successive alerts; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Successive alerts; \
+ classification(0).origin=vendor-specific; \
  impact.severity=low; \
  impact.type=other; \
  impact.description=Checkpoint Smart Defense: Successive alerts; \
@@ -298,213 +274,189 @@ regex=product: SmartDefense. attack: Successive Alerts; \
 
 # 3. Successive multiple connections
 regex=product: SmartDefense. service: ([\w-]+|\d+). attack: Successive Multiple Connections. dst: ([\d\.]+). src: ([\d\.]+); \
- class.name=Checkpoint SmartDefense: Successive multiple connections; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Successive multiple connections; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Checkpoint Smart Defense: multiple connections from $3 to $2:$1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$2; \
- target.service.name=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).service.name=$1; \
  last
 
 # 4. Bad packet
 # 4.1 Port number to port number
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 flags; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 flags; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 #4.2 port number to Service Name
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 flags; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 flags; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 #4.3 Service Name to service name
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 flags; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 flags; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.name=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.name=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 #4.4 Service Name to port number
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 flags; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 flags; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description= $1 sent by $2:$3 to $4:$5; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.name=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.name=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 # 5. Large ping
 regex=product: SmartDefense. Attack Info: Echo request too long. attack: Large ping. src: ([\d\.]+). dst: ([\d\.]+); \
- class.name=Checkpoint SmartDefense: Large ping; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Large ping; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Large ping sent by $1 to $2; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$1; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$2; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$2; \
  last
 
 # 6. Small MSS
 # 6.1 Port number
 regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small PMTU. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Small PMTU; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Small PMTU; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=A $6 packet with too small MSS ($1) was sent to $4:$5 by $2:$3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.port=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.port=$5; \
  last
 
 # 6.2 Service name
 regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small PMTU. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Small PMTU; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Small PMTU; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=A $6 packet with too small MSS ($1) was sent to $4:$5 by $2:$3; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- source.service.port=$3; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- target.service.name=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ target(0).service.name=$5; \
  last
 
 # 7. Bad proto sequence
 # 7.1 Port number 
 regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP sequence. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 sequence; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 sequence; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Dropped packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.port=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.port=$5; \
  last
 
 # 7.2 Service name
 regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP sequence. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: Bad $6 sequence; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Bad $6 sequence; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Dropped packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.name=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.name=$5; \
  last
 
 # 8. Packet rejected : URL worm
 # 8.1 Port number
 regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: URL worm; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: URL worm; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Rejected packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.port=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.port=$5; \
  last
 
 # 8.2 Service number
 regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
- class.name=Checkpoint SmartDefense: URL worm; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: URL worm; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Rejected packet send by $2 to $4 with $1; \
- source.node.address; \
- source.node.address.category=ipv4-addr; \
- source.node.address.address=$2; \
- target.node.address; \
- target.node.address.category = ipv4-addr; \
- target.node.address.address=$4; \
- source.service.port=$3; \
- target.service.name=$5; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ target(0).node.address(0).category = ipv4-addr; \
+ target(0).node.address(0).address=$4; \
+ source(0).service.port=$3; \
+ target(0).service.name=$5; \
  last
 
 # 9. Generic Smart Defense alert
 regex=product: SmartDefense; \
- class.name=Checkpoint SmartDefense: Misc logs; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint SmartDefense: Misc logs; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=Checkpoint Smart Defense: generic alert; \
@@ -514,8 +466,8 @@ regex=product: SmartDefense; \
 # III. System Monitor
 ###
 regex=([\d+\.]+) (<|>)\s+(\w+) System Alert message: (.+). Object: (\w+). (.+). product: System Monitor; \
- class.name=Checkpoint System Monitor; \
- class.origin=vendor-specific; \
+ classification(0).name=Checkpoint System Monitor; \
+ classification(0).origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
  impact.description=System alert reported a $4; \

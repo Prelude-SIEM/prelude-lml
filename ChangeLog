@@ -1,3 +1,50 @@
+2003-12-21  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/simple.c: 
+	some code simplification. Include patch from 
+	Nicolas Delon, (2003-12-20 Changelog entry).
+
+2003-12-20  Nicolas Delon  <delon.nicolas@wanadoo.fr>
+
+	* plugins/debug/debug.c:
+	* plugins/pax/pax.c:
+	* plugins/simple/simple.c:
+	* plugins/simple/ruleset/checkpoint.rules:
+	* plugins/simple/ruleset/cisco.rules:
+	* plugins/simple/ruleset/exim.rules:
+	* plugins/simple/ruleset/grsecurity.rules:
+	* plugins/simple/ruleset/ipchains.rules:
+	* plugins/simple/ruleset/ipfw.rules:
+	* plugins/simple/ruleset/ipso.rules:
+	* plugins/simple/ruleset/netfilter.rules:
+	* plugins/simple/ruleset/ntsyslog.rules:
+	* plugins/simple/ruleset/portsentry.rules:
+	* plugins/simple/ruleset/proftpd.rules:
+	* plugins/simple/ruleset/qpopper.rules:
+	* plugins/simple/ruleset/simple.rules:
+	* plugins/simple/ruleset/squid.rules:
+	* plugins/simple/ruleset/ssh.rules:
+	* plugins/simple/ruleset/vigor.rules:
+	* plugins/simple/ruleset/vpopmail.rules:
+	* plugins/simple/ruleset/wap11.rules:
+	* plugins/simple/ruleset/zywall.rules:
+	* plugins/simple/ruleset/zyxel.rules:
+	* src/file-server.c:
+	* src/lml-alert.c:
+	prelude-lml has been ported to the new IDMEF API
+	the most important thing is that simple.c now use
+	idmef_object to create object from the rules files
+	the code has also been cleaned up and thanks to idmef_object
+	simple.c is just about 900 lines long against 2500 before
+	the port
+	because of the use of idmef_object, the format of rules has changed
+	a little bit: "class" become "classification" and listed elements of
+	the object must be indexed, for example:
+	source.node.address; 
+	source.node.address.address=$1;
+	become
+	source(0).node.address(0).address=$1
+
 2003-12-15  Yoann Vandoorselaere  <yoann@prelude-ids.org>
 
 	* Merge from 0-8.

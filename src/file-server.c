@@ -43,8 +43,7 @@
 #include <libprelude/timer.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
-#include <libprelude/idmef-tree.h>
-#include <libprelude/idmef-tree-func.h>
+#include <libprelude/idmef.h>
 #include <libprelude/prelude-message.h>
 
 #include "regex.h"
@@ -136,26 +135,25 @@ static int rotation_interval_max_difference = DEFAULT_ROTATION_INTERVAL_MAX_DIFF
 
 
 static void logfile_alert(monitor_fd_t *fd, struct stat *st,
-                          idmef_classification_t *cl, idmef_impact_t *impact)
+                          idmef_classification_t *classification, idmef_impact_t *impact)
 {
-        idmef_file_t *f;
-        idmef_time_t *time;
         char buf[256], *ptr;
+        idmef_file_t *file;
+        idmef_time_t *time;
         idmef_inode_t *inode;
         log_container_t *log;
         const char *filename;
         idmef_alert_t *alert;
         idmef_target_t *target;
         idmef_message_t *message;
-        idmef_classification_t *class;
         idmef_assessment_t *assessment;
+		idmef_string_t *string;
         
         log = log_container_new();
         if ( ! log )
                 return;
 
         filename = log_file_get_filename(fd->lf);
-        
         log_container_set_source(log, filename);
         
         message = idmef_message_new();
@@ -165,70 +163,66 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         /*
          * Initialize the idmef structures
          */
-        idmef_alert_new(message);
-        alert = message->message.alert;
+        alert = idmef_message_new_alert(message);
+        if ( ! alert )
+                goto err;
 
-        target = idmef_alert_target_new(alert);
+        target = idmef_alert_new_target(alert);
         if ( ! target )
                 goto err;
 
-        f = idmef_target_file_new(target);
-        if ( ! f ) 
+        file = idmef_target_new_file(target);	
+        if ( ! file ) 
                 goto err;
 
-        f->category = current;
-        f->data_size = st->st_size;
+        idmef_file_set_category(file, current);
+        idmef_file_set_data_size(file, st->st_size);
 
-        inode = idmef_file_inode_new(f);
+        inode = idmef_file_new_inode(file);
         if ( ! inode )
                 goto err;
 
-        inode->number = st->st_ino;
+        idmef_inode_set_number(inode, st->st_ino);
         snprintf(buf, sizeof(buf), "%s", filename);
 
         ptr = strrchr(buf, '/');
         if ( ptr ) {
                 *ptr = '\0';
-                idmef_string_set(&f->name, ptr + 1);
+                string = idmef_file_new_name(file);
+                idmef_string_set_ref(string, ptr + 1);
         }
-        
-        idmef_string_set(&f->path, buf);
 
-        time = idmef_file_access_time_new(f);
+        string = idmef_file_new_path(file);
+        idmef_string_set_ref(string, buf);
+
+        time = idmef_file_new_access_time(file);
         if ( ! time )
                 goto err;
         
-        time->sec = st->st_atime;
-        
-        time = idmef_file_modify_time_new(f);
+        idmef_time_set_sec(time, st->st_atime);
+
+        time = idmef_file_new_modify_time(file);
         if ( ! time )
                 goto err;
 
-        time->sec = st->st_mtime;
-        
-        idmef_alert_assessment_new(alert);
-        assessment = alert->assessment;
+        idmef_time_set_sec(time, st->st_mtime);
 
-        idmef_assessment_impact_new(assessment);
-        memcpy(assessment->impact, impact, sizeof(*assessment->impact));
-        
-        class = idmef_alert_classification_new(alert);
-        if ( ! class )
+        assessment = idmef_alert_new_assessment(alert);
+        if ( ! assessment )
                 goto err;
         
-        class->origin = cl->origin;
-        idmef_string_copy(&class->url, &cl->url);
-        idmef_string_copy(&class->name, &cl->name);
-
+        idmef_assessment_set_impact(assessment, impact);
+        idmef_alert_set_classification(alert, classification);
+        
         lml_emit_alert(log, message, PRELUDE_MSG_PRIORITY_HIGH);
-
+        
         log_container_delete(log);
         
         return;
         
  err:
         log_container_delete(log);
-        idmef_message_free(message);
+        idmef_message_destroy(message);
 }
 
 
@@ -237,21 +231,34 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
 
 static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st) 
 {
-        idmef_impact_t impact;
-        idmef_classification_t class;
-
-        memset(&class, 0, sizeof(class));
-        memset(&impact, 0, sizeof(impact));
+        idmef_impact_t *impact;
+        idmef_classification_t *classification;
+        idmef_string_t *classification_name;
+        idmef_string_t *impact_description;
         
-        class.origin = origin_unknown;
-        idmef_string_set_constant(&class.name, LOGFILE_MODIFICATION_CLASS);
+        impact = idmef_impact_new();
+        if ( ! impact )
+                return;
         
-        impact.type = file;
-        impact.completion = succeeded;
-        impact.severity = impact_high;
-        idmef_string_set_constant(&impact.description, LOGFILE_MODIFICATION_IMPACT);
+        classification = idmef_classification_new();
+        if ( ! classification ) {
+                idmef_impact_destroy(impact);
+                return;
+        }
         
-        logfile_alert(monitor, st, &class, &impact);
+        idmef_classification_set_origin(classification, origin_unknown);
+        
+        classification_name = idmef_classification_new_name(classification);
+        idmef_string_set_constant(classification_name, LOGFILE_MODIFICATION_CLASS);
+        
+        idmef_impact_set_type(impact, file);
+        idmef_impact_set_completion(impact, succeeded);
+        idmef_impact_set_severity(impact, impact_high);
+        
+        impact_description = idmef_impact_new_description(impact);
+        idmef_string_set_constant(impact_description, LOGFILE_MODIFICATION_IMPACT);
+        
+        logfile_alert(monitor, st, classification, impact);
 }
 
 
@@ -660,8 +667,9 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
 {
 	struct stat st_new;
         const char *filename;
-        idmef_impact_t impact;
-        idmef_classification_t class;
+        idmef_impact_t *impact;
+        idmef_classification_t *classification;
+		idmef_string_t *classification_name, *impact_description;
 
         filename = log_file_get_filename(monitor->lf);
         
@@ -694,24 +702,34 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         list_del(&monitor->list);
         list_add_tail(&monitor->list, &inactive_fd_list);
 
-        memset(&class, 0, sizeof(class));
-        memset(&impact, 0, sizeof(impact));
-        
-        class.origin = origin_unknown;
-        idmef_string_set_constant(&class.name, LOGFILE_DELETION_CLASS);
+		classification = idmef_classification_new();
+		if ( ! classification )
+			return -1;
 
-        impact.type = file;
-        impact.completion = succeeded;
+		impact = idmef_impact_new();
+		if ( ! impact ) {
+			idmef_classification_destroy(classification);
+			return -1;
+		}
+
+		idmef_classification_set_origin(classification, origin_unknown);
+		classification_name = idmef_classification_new_name(classification);
+		idmef_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
+
+		idmef_impact_set_type(impact, file);
+		idmef_impact_set_completion(impact, succeeded);
 
         if ( is_normal_log_rotation(monitor, st) == 0 ) {
-                impact.severity = impact_medium;
-                idmef_string_set_constant(&impact.description, LOGFILE_DELETION_IMPACT);
+                idmef_impact_set_severity(impact, impact_medium);
+				impact_description = idmef_impact_new_description(impact);
+				idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
         } else {
-                impact.severity = impact_high;
-                idmef_string_set_constant(&impact.description, LOGFILE_DELETION_IMPACT_HIGH);
+				idmef_impact_set_severity(impact, impact_high);
+				impact_description = idmef_impact_new_description(impact);
+				idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT_HIGH);
         }
-                
-        logfile_alert(monitor, st, &class, &impact);
+
+        logfile_alert(monitor, st, classification, impact);
         
         return -1;
 }

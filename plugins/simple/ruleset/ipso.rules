@@ -35,22 +35,22 @@
 
 # 1. PAM alerts: often an authentification issue; high severity to comply with simple.rules
 regex= (\w+) \[LOG_ALERT\] PAM_unix\[(\d+)\]: (.*); \
- class.name=Nokia: PAM alert; \
+ classification(0).name=Nokia: PAM alert; \
  impact.severity=high; \
  impact.type=user; \
  impact.description=PAM: $3; \
- target.node.name=$1; \
- target.process.pid=$2; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
  last
 
 
 # 2. Misc ALERT logs
 regex=regex= (\w+) \[LOG_ALERT\]; \
- class.name=Nokia: Misc. ALERT logs; \
+ classification(0).name=Nokia: Misc. ALERT logs; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=ALERT log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last
 
 
@@ -61,40 +61,37 @@ regex=regex= (\w+) \[LOG_ALERT\]; \
 
 # 1. Rebooting or halting the system: severity should depend on the machine ?
 regex= (\w+) \[LOG_CRIT\] reboot: rebooted by (\w+); \
- class.name=Nokia: Reboot; \
+ classification(0).name=Nokia: Reboot; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=dos; \
  impact.description=$1 was rebooted; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid(0).name=$2; \
  last
 
 
 regex= (\w+) \[LOG_CRIT\] reboot: Attempt to reboot by (\w+); \
- class.name=Nokia: Reboot attempt; \
+ classification(0).name=Nokia: Reboot attempt; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=dos; \
  impact.description=$2 attempted to reboot $1; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid(0).name=$2; \
  last
 
 
 regex= (\w+) \[LOG_CRIT\] halt: halted by (\w+); \
- class.name=Nokia: Stopping system; \
+ classification(0).name=Nokia: Stopping system; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=dos; \
  impact.description=$2 halted $1; \
- source.user.userid; \
- source.user.userid.name=$2; \
+ source(0).user.userid(0).name=$2; \
  last
 
 
 regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
- class.name=Nokia: Reboot announce; \
+ classification(0).name=Nokia: Reboot announce; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=dos; \
@@ -104,7 +101,7 @@ regex= (\w+) \[LOG_CRIT\] halt: System reboots approximately in (.*); \
 
 # 2. Installation failure
 regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
- class.name=Nokia: Install/upgrade failure; \
+ classification(0).name=Nokia: Install/upgrade failure; \
  impact.severity=high; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -114,11 +111,11 @@ regex= (\w+) \[LOG_CRIT\] PKG_INSTALL: \**INSTALL/UPGRADE PROCESS FAILED\**; \
 
 # 3. Misc CRIT logs
 regex=regex= (\w+) \[LOG_CRIT\]; \
- class.name=Nokia: Misc. CRIT logs; \
+ classification(0).name=Nokia: Misc. CRIT logs; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=CRIT log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last
 
 
@@ -129,49 +126,46 @@ regex=regex= (\w+) \[LOG_CRIT\]; \
 
 # 1. SMTP: mail rejection
 regex=  (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: smtp server didn't accept MAIL; \
- class.name=Nokia: Unauthorized SMTP use; \
+ classification(0).name=Nokia: Unauthorized SMTP use; \
  impact.severity=medium; \
  impact.completion=failed; \
  impact.type=other; \
  impact.description=A mail was refused by the SMTP server of $1; \
- target.node.name=$1; \
- target.process.pid=$2; \
- target.process.name=mail; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).process.name=mail; \
  last
 
 
 # 2. SMTP: can't open port 25
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: can't open the smtp port \((\d+)\) on ([\d\.]+); \
- class.name=Nokia: SMTP port failure; \
+ classification(0).name=Nokia: SMTP port failure; \
  impact.type=dos; \
  impact.severity=low; \
  impact.description=SMTP port #$3 could not be opened on $1; \
- target.node.name=$1; \
- target.process.pid=$2; \
- target.process.name=mail; \
+ target(0).node.name=$1; \
+ target(0).process.pid=$2; \
+ target(0).process.name=mail; \
  last
 
 
 # 3. SMTP: can't connect service SMTP
 regex= (\w+) \[LOG_ERR\] sSMTP mail\[(\d+)\]: unable to connect to "([\d\.]+)" port (\d+); \
- class.name=Nokia: SMTP unreachable; \
+ classification(0).name=Nokia: SMTP unreachable; \
  impact.type=dos; \
  impact.severity=low; \
  impact.description=$1 could not connect to the SMTP server $3:$4; \
- target.node.address; \
- target.node.address.category=ipv4-addr; \
- target.node.address.address=$3; \
- target.service.port=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
  last
 
 
 # 4. Misc ERR logs
 regex=regex= (\w+) \[LOG_ERR\]; \
- class.name=Nokia: Misc. ERR logs; \
+ classification(0).name=Nokia: Misc. ERR logs; \
  impact.severity=medium; \
  impact.type=other; \
  impact.description=ERR log from $1; \
- target.node.name=$1; \
+ target(0).node.name=$1; \
  last
-
-
