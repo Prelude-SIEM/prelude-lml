@@ -20,11 +20,11 @@
 
 
 typedef struct {
+        prelude_list_t list;
         pcre *regex_compiled;
         pcre_extra *regex_extra;
         int options;
         prelude_plugin_instance_t *plugin;
-        prelude_list_t list;
 } regex_entry_t;
 
 
