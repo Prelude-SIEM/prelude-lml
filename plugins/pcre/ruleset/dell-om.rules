@@ -29,7 +29,7 @@
 #
 #####
 
-#LOG:Jun 8 18:12:44 12.34.56.78 server administrator[warning] 1306  Redundancy lost Redundancy unit: System Power Unit Chassis location: Main System Chassis Previous redundancy state was: FULL Number of devices required for full redundancy: 2
+#LOG:Jun  8 18:12:44 12.34.56.78 server administrator[warning] 1306  Redundancy lost Redundancy unit: System Power Unit Chassis location: Main System Chassis Previous redundancy state was: FULL Number of devices required for full redundancy: 2
 regex=1306  Redundancy lost Redundancy unit: (.+) Chassis location:; \
  classification.text=Power supply redundancy failure; \
  id=3800; \
@@ -57,7 +57,7 @@ regex=1352  Power supply returned to normal Sensor location: (.+) Chassis locati
  assessment.impact.description=$1 status returned to normal; \
  last
 
-#LOG:Jun 8 18:12:44 12.34.56.78 server administrator[warning] 1353  Power supply detected a warning Sensor location: Power supply 1 Chassis location: Main System Chassis Previous state was: OK (Normal) Power supply fan has failed
+#LOG:Jun  8 18:12:44 12.34.56.78 server administrator[warning] 1353  Power supply detected a warning Sensor location: Power supply 1 Chassis location: Main System Chassis Previous state was: OK (Normal) Power supply fan has failed
 regex=1353  Power supply detected a warning Sensor location: (.+) Chassis location: .+ Previous state was: (\w+ \(\w+\)|Unknown) (.+); \
  classification.text=Power supply warning; \
  id=3802; \

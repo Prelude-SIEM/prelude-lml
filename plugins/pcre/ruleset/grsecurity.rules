@@ -447,7 +447,7 @@ regex=denied ptrace of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\
  assessment.impact.description=An attempt was made to ptrace $3.  Access was denied.  This may have been the result of an incomplete ACL, or an attack may be in progress on the system.; \
  last
 
-# LOG:May 2 18:13:42 lt kernel: grsec: From 192.168.1.22: attempt to overstep process limit by (dovecot:14491) UID(0) EUID(0), parent (dovecot:23872) UID(0) EUID(0)
+# LOG:May  2 18:13:42 lt kernel: grsec: From 192.168.1.22: attempt to overstep process limit by (dovecot:14491) UID(0) EUID(0), parent (dovecot:23872) UID(0) EUID(0)
 #
 regex=attempt to overstep process limit by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Attempted process limit overstep; \
@@ -1311,7 +1311,7 @@ regex=attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
  assessment.impact.description=An attempt was made in a chroot to renice a process to a higher priority.  Access was denied.; \
  last
 
-# LOG:May 2 18:13:42 lt kernel: grsec: signal 11 sent to (java_vm:22598) UID(501) EUID(501), parent (netscape-bin:32224) UID(501) EUID(501)
+# LOG:May  2 18:13:42 lt kernel: grsec: signal 11 sent to (java_vm:22598) UID(501) EUID(501), parent (netscape-bin:32224) UID(501) EUID(501)
 #
 regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  classification.text=Signal sent; \

@@ -43,7 +43,7 @@ regex=(\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
  target(0).interface=$7; \
  last
 
-# LOG:Jan 6 22:31:29 lhotse /kernel: ipfw: 140 Deny ICMP:11.0 1.2.3.4 5.6.7.8 in via vx3 
+# LOG:Jan  6 22:31:29 lhotse /kernel: ipfw: 140 Deny ICMP:11.0 1.2.3.4 5.6.7.8 in via vx3 
 regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  classification.text=Incoming ICMP packet dropped; \
  id=802; \
@@ -61,7 +61,7 @@ regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  source(0).interface=$6; \
  last
 
-# LOG:Feb 3 16:33:00 lhotse /kernel: ipfw: 65000 Deny ICMP:0.0 12.34.56.78 206.99.235.10 out via tun0 
+# LOG:Feb  3 16:33:00 lhotse /kernel: ipfw: 65000 Deny ICMP:0.0 12.34.56.78 206.99.235.10 out via tun0 
 regex=(\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  classification.text=Outgoing ICMP packet dropped; \
  id=803; \
@@ -120,7 +120,7 @@ regex=(\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
  target(0).interface=$7; \
  last
 
-# LOG:May 5 16:57:38 myhost /kernel: ipfw: 40100 Accept ICMP:8.0 1.2.3.4 5.6.7.8 in via ed1
+# LOG:May  5 16:57:38 myhost /kernel: ipfw: 40100 Accept ICMP:8.0 1.2.3.4 5.6.7.8 in via ed1
 regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  classification.text=Incoming ICMP Packet accepted; \
  id=806; \
@@ -138,7 +138,7 @@ regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  source(0).interface=$6; \
  last
 
-# LOG:May 5 16:57:38 myhost /kernel: ipfw: 40100 Accept ICMP:8.0 1.2.3.4 5.6.7.8 out via ed1
+# LOG:May  5 16:57:38 myhost /kernel: ipfw: 40100 Accept ICMP:8.0 1.2.3.4 5.6.7.8 out via ed1
 regex=(\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  classification.text=Packet accepted by firewall; \
  id=807; \

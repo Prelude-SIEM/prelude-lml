@@ -145,7 +145,7 @@ regex=Illegal user (\S+) from (\S+); \
 # User listed in DenyGroups or DenyUsers (sshd_config directives) tried to login #
 ##################################################################################
 
-# LOG:Jan 6 22:50:24 localhost sshd[15489]: User nobody not allowed because none of user's groups are listed in AllowGroups
+# LOG:Jan  6 22:50:24 localhost sshd[15489]: User nobody not allowed because none of user's groups are listed in AllowGroups
 regex=User (\S+) not allowed because (.*)listed in (\w+); \
  classification.text=SSH Remote login failed with a denied user; \
  id=1905; \
