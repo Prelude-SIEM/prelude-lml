@@ -1,3 +1,15 @@
+2002-06-10  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* plugins/simple/ruleset/simple.rules (include): 
+	include grsecurity.rules.
+
+	* plugins/simple/simple.c (read_multiline): 
+	new function, handle multiline (line ending with \).
+
+	(parse_ruleset): use read_multiline().
+	(parse_ruleset): handle TAB at the begining of the line.
+	
+
 2002-06-06  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
 	* src/lml-alert.c (generate_analyzer): 

@@ -1199,22 +1199,42 @@ static void free_rule(simple_rule_t *rule)
 
 
 
+static int read_multiline(const char *filename, int *line, FILE *fd, char *buf, size_t size) 
+{
+        int i;
+
+        if ( ! fgets(buf, size, fd) )
+                return -1;
+
+        (*line)++;
+        i = strlen(buf);
+        
+        while ( --i > 0 && (buf[i] == ' ' || buf[i] == '\n') );
+        
+        if ( buf[i] == '\\' ) 
+                return read_multiline(filename, line, fd, buf + i, size - i);
+                
+        return 0;
+}
+
+
+
+
 static int parse_ruleset(const char *filename, FILE *fd) 
 {
         int ret, line = 0;
         simple_rule_t *rule;
-        char buf[1024], *ptr;
-        
-        while ( fgets(buf, sizeof(buf), fd) ) {
+        char buf[8192], *ptr;
 
-                line++;
+        while ( read_multiline(filename, &line, fd, buf, sizeof(buf)) == 0  ) {
+                
                 ptr = buf;
                 buf[strlen(buf) - 1] = '\0'; /* strip \n */
 
                  /*
-                  * filter space at the begining of the line.
+                  * filter space and tab at the begining of the line.
                   */
-                while ( *ptr == ' ' && *ptr != '\0' )
+                while ( (*ptr == ' ' || *ptr == 0x09) && *ptr != '\0' )
                         ptr++;
                 
                 /*
