@@ -42,12 +42,11 @@
 #include "libmissing.h"
 #include "log-common.h"
 #include "lml-alert.h"
+#include "pconfig.h"
 #include "config.h"
 
 
-extern prelude_bool_t dry_run;
-extern prelude_client_t *lml_client;
-extern prelude_io_t *text_output_fd;
+extern struct lml_config config;
 static idmef_analyzer_t *idmef_analyzer;
 
 
@@ -253,7 +252,7 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 
 static void insert_analyzer(idmef_alert_t *alert, idmef_analyzer_t *cur_analyzer)
 {
-        if ( dry_run )
+        if ( config.dry_run )
                 return;
         
         if ( cur_analyzer ) 
@@ -310,11 +309,11 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
                         goto error;
         }
         
-        if ( text_output_fd )
-                idmef_message_print(message, text_output_fd);
+        if ( config.text_output_fd )
+                idmef_message_print(message, config.text_output_fd);
         
-        if ( ! dry_run ) 
-                prelude_client_send_idmef(lml_client, message);
+        if ( ! config.dry_run ) 
+                prelude_client_send_idmef(config.lml_client, message);
                 
  error:
         idmef_message_destroy(message);

@@ -21,4 +21,31 @@
 *
 *****/
 
-int pconfig_set(prelude_option_t *ropt, int argc, char **argv);
+#ifndef _LML_PCONFIG_H
+#define _LML_PCONFIG_H
+
+#include <libprelude/prelude-inttypes.h>
+#include "regex.h"
+#include "udp-server.h"
+
+int pconfig_init(prelude_option_t *lml_optlist, int argc, char **argv);
+
+struct lml_config {
+        char *pidfile;
+        char *logfile_format;
+        char *logfile_ts_format;
+
+        prelude_client_t *lml_client;
+
+        prelude_bool_t batch_mode;
+        prelude_bool_t dry_run;
+        prelude_bool_t ignore_metadata;
+
+        udp_server_t *udp_srvr;
+        char *udp_srvr_addr;
+        uint16_t udp_srvr_port;
+
+        prelude_io_t *text_output_fd;
+};
+
+#endif /* _LML_PCONFIG_H */

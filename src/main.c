@@ -32,12 +32,9 @@
  #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
 
-extern int batch_mode;
+extern struct lml_config config;
 static char **global_argv;
-extern udp_server_t *udp_srvr;
-extern prelude_bool_t dry_run;
 prelude_option_t *lml_root_optlist;
-extern prelude_client_t *lml_client;
 static volatile sig_atomic_t got_sighup = 0;
 
 
@@ -48,8 +45,8 @@ static void sig_handler(int signum)
         
         signal(signum, SIG_DFL);
 
-        if ( udp_srvr )
-                udp_server_close(udp_srvr);
+        if ( config.udp_srvr )
+                udp_server_close(config.udp_srvr);
         
         exit(2);
 }
@@ -79,11 +76,11 @@ static void handle_sighup_if_needed(void)
         
         log(LOG_INFO, "- Restarting Prelude LML (%s).\n", global_argv[0]);
 
-        if ( udp_srvr )
+        if ( config.udp_srvr )
                 /*
                  * close the UDP server, so that we can bind the port again.
                  */
-                udp_server_close(udp_srvr);
+                udp_server_close(config.udp_srvr);
 
         /*
          * Here we go !
@@ -146,7 +143,7 @@ static void wait_for_event(void)
         struct timeval tv, start, end;
         int file_event_fd, udp_event_fd;
         
-        udp_event_fd = udp_server_get_event_fd(udp_srvr);
+        udp_event_fd = udp_server_get_event_fd(config.udp_srvr);
         file_event_fd = file_server_get_event_fd();
 
         FD_ZERO(&fds);                
@@ -181,7 +178,7 @@ static void wait_for_event(void)
                 }
                 
                 if ( udp_event_fd > 0 && FD_ISSET(udp_event_fd, &fds) ) 
-                        udp_server_process_event(udp_srvr);
+                        udp_server_process_event(config.udp_srvr);
                 
                 if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) )
                         file_server_wake_up();
@@ -209,7 +206,7 @@ int main(int argc, char **argv)
         }
         log(LOG_INFO, "- Initialized %d logs plugins.\n", ret);
         
-        ret = pconfig_set(lml_root_optlist, argc, argv);
+        ret = pconfig_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )
                 exit(1);
         
@@ -226,26 +223,26 @@ int main(int argc, char **argv)
          * if there are data available for reading. if batch_mode is set,
          * then we revert to reading every data at once.
          */
-        if ( (udp_srvr || file_server_get_event_fd() > 0) && ! batch_mode )
+        if ( (config.udp_srvr || file_server_get_event_fd() > 0) && ! config.batch_mode )
                 wait_for_event();
         else {
                 do {
                         handle_sighup_if_needed();
                         ret = file_server_wake_up();
 
-                        if ( ! batch_mode )
+                        if ( ! config.batch_mode )
                                 sleep(1);
                         
                         prelude_timer_wake_up();
                         
-                } while ( batch_mode == 0 || ret > 0 );
+                } while ( config.batch_mode == 0 || ret > 0 );
 
                 /*
                  * only call prelude_client_destroy in case we are running in batch
                  * mode, causing an heartbeat to be sent to notice of a normal exit.
                  */
-                if ( ! dry_run )
-                        prelude_client_destroy(lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
+                if ( ! config.dry_run )
+                        prelude_client_destroy(config.lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
         }
         
         return 0;

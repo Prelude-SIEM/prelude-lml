@@ -48,24 +48,9 @@
 
 #define DEFAULT_UDP_SERVER_PORT 514
 
-/*
- * udp server stuff
- */
-static char *udp_srvr_addr;
-static uint16_t udp_srvr_port;
-udp_server_t *udp_srvr = NULL;
 
-int batch_mode = 0;
-int ignore_metadata = 0;
-prelude_client_t *lml_client;
-prelude_bool_t dry_run = FALSE;
-prelude_io_t *text_output_fd = NULL;
-extern prelude_option_t *lml_root_option;
-
-static char *pidfile = NULL;
+struct lml_config config;
 static const char *config_file = PRELUDE_CONF;
-static char *logfile_format = NULL, *logfile_ts_format = NULL;
-
 
 
 static int set_conf_file(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
@@ -93,7 +78,7 @@ static int print_help(void *context, prelude_option_t *opt, const char *optarg, 
 
 static int set_batch_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
-        batch_mode = 1;
+        config.batch_mode = TRUE;
         file_server_set_batch_mode();
         return 0;
 }
@@ -102,7 +87,7 @@ static int set_batch_mode(void *context, prelude_option_t *opt, const char *opta
 
 static int set_ignore_metadata(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
-        ignore_metadata = 1;
+        config.ignore_metadata = TRUE;
         file_server_set_ignore_metadata();
         return 0;
 }
@@ -144,9 +129,9 @@ static int set_quiet_mode(void *context, prelude_option_t *opt, const char *opta
 
 static int set_daemon_mode(void *context, prelude_option_t *opt, const char *optarg, prelude_string_t *err)
 {
-        prelude_daemonize(pidfile);
-        if ( pidfile )
-                free(pidfile);
+        prelude_daemonize(config.pidfile);
+        if ( config.pidfile )
+                free(config.pidfile);
         
         prelude_log_use_syslog();
         
@@ -156,8 +141,8 @@ static int set_daemon_mode(void *context, prelude_option_t *opt, const char *opt
 
 static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {
-        pidfile = strdup(arg);
-        if ( ! pidfile )
+        config.pidfile = strdup(arg);
+        if ( ! config.pidfile )
                 return prelude_error_from_errno(errno);
         
         return 0;
@@ -167,10 +152,10 @@ static int set_pidfile(void *context, prelude_option_t *opt, const char *arg, pr
 
 static int set_logfile_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {        
-        if ( logfile_format )
-                free(logfile_format);
+        if ( config.logfile_format )
+                free(config.logfile_format);
         
-        logfile_format = strdup(arg);
+        config.logfile_format = strdup(arg);
 
         return 0;
 }
@@ -179,10 +164,10 @@ static int set_logfile_format(void *context, prelude_option_t *opt, const char *
 
 static int set_logfile_ts_format(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {        
-        if ( logfile_ts_format )
-                free(logfile_ts_format);
+        if ( config.logfile_ts_format )
+                free(config.logfile_ts_format);
         
-        logfile_ts_format = strdup(arg);
+        config.logfile_ts_format = strdup(arg);
                 
         return 0;
 }
@@ -191,7 +176,7 @@ static int set_logfile_ts_format(void *context, prelude_option_t *opt, const cha
 
 static int set_dry_run(void *context, prelude_option_t *opt, const char *arg, prelude_string_t *err)
 {
-        dry_run = TRUE;
+        config.dry_run = TRUE;
 
         return 0;
 }
@@ -203,23 +188,23 @@ static int set_text_output(void *context, prelude_option_t *opt, const char *arg
         int ret;
         FILE *fd;
         
-        ret = prelude_io_new(&text_output_fd);
+        ret = prelude_io_new(&(config.text_output_fd));
         if ( ret < 0 )
                 return ret;
 
         if ( ! arg ) {
-                prelude_io_set_file_io(text_output_fd, stdout);
+                prelude_io_set_file_io(config.text_output_fd, stdout);
                 return 0;
         }
 
         fd = fopen(arg, "w");
         if ( ! fd ) {
                 log(LOG_INFO, "could not open %s for writing.\n", arg);
-                prelude_io_destroy(text_output_fd);
+                prelude_io_destroy(config.text_output_fd);
                 return -1;
         }
 
-        prelude_io_set_file_io(text_output_fd, fd);
+        prelude_io_set_file_io(config.text_output_fd, fd);
 
         return 0;
 }
@@ -236,14 +221,14 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg, prelu
         if ( ! ls )
                 return prelude_error_from_errno(errno);
 
-        if ( logfile_format ) {
-                ret = log_source_set_log_fmt(ls, logfile_format);
+        if ( config.logfile_format ) {
+                ret = log_source_set_log_fmt(ls, config.logfile_format);
                 if ( ret < 0 )
                         return ret;
         }
 
-        if ( logfile_ts_format ) {
-                ret = log_source_set_timestamp_fmt(ls, logfile_ts_format);
+        if ( config.logfile_ts_format ) {
+                ret = log_source_set_timestamp_fmt(ls, config.logfile_ts_format);
                 if ( ret < 0 )
                         return ret;
         }
@@ -273,13 +258,13 @@ static int set_file(void *context, prelude_option_t *opt, const char *arg, prelu
 
 static int destroy_udp_server(void *context, prelude_option_t *opt, prelude_string_t *err)
 {
-        if ( ! udp_srvr )
+        if ( ! config.udp_srvr )
                 return 0;
                 
-        log(LOG_INFO, "- closing syslog server listening at %s:%d.\n", udp_srvr_addr, udp_srvr_port);
+        log(LOG_INFO, "- closing syslog server listening at %s:%d.\n", config.udp_srvr_addr, config.udp_srvr_port);
 
-        udp_server_close(udp_srvr);
-        udp_srvr = NULL;
+        udp_server_close(config.udp_srvr);
+        config.udp_srvr = NULL;
         
         return 0;
 }
@@ -288,10 +273,10 @@ static int destroy_udp_server(void *context, prelude_option_t *opt, prelude_stri
 
 static int get_udp_server(void *context, prelude_option_t *opt, prelude_string_t *out)
 {
-        if ( ! udp_srvr )
+        if ( ! config.udp_srvr )
                 return 0;
         
-        return prelude_string_sprintf(out, "%s:%u", udp_srvr_addr, udp_srvr_port);
+        return prelude_string_sprintf(out, "%s:%u", config.udp_srvr_addr, config.udp_srvr_port);
 }
 
 
@@ -305,32 +290,30 @@ static int set_udp_server(void *context, prelude_option_t *opt, const char *arg,
         if ( ! arg )
                 return 0;
         
-        udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
-
         if ( arg ) {
                 ptr = strrchr(arg, ':');
                 if ( ptr ) {
                         *ptr = 0;
-                        udp_srvr_port = atoi(ptr + 1);
+                        config.udp_srvr_port = atoi(ptr + 1);
                 }
                 
-                udp_srvr_addr = strdup(arg);
+                config.udp_srvr_addr = strdup(arg);
                 
                 if ( ptr )
                         *ptr = ':';
         } 
         
-        else udp_srvr_addr = strdup("0.0.0.0");
+        else config.udp_srvr_addr = strdup("0.0.0.0");
         
         rlist = regex_init("syslog");
         if ( ! rlist ) 
                 return -1;
         
-        udp_srvr = udp_server_new(rlist, udp_srvr_addr, udp_srvr_port);        
-        if ( ! udp_srvr )
+        config.udp_srvr = udp_server_new(rlist, config.udp_srvr_addr, config.udp_srvr_port);        
+        if ( ! config.udp_srvr )
                 return -1;
 
-        log(LOG_INFO, "- Listening for syslog message on %s:%d.\n", udp_srvr_addr, udp_srvr_port);
+        log(LOG_INFO, "- Listening for syslog message on %s:%d.\n", config.udp_srvr_addr, config.udp_srvr_port);
 
         return 0;
 }
@@ -338,12 +321,24 @@ static int set_udp_server(void *context, prelude_option_t *opt, const char *arg,
 
 
 
-int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
+int pconfig_init(prelude_option_t *ropt, int argc, char **argv)
 {
         int ret;
         prelude_option_t *opt;
         prelude_string_t *err;
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
+
+        config.pidfile = NULL;
+        config.logfile_format = NULL;
+        config.logfile_ts_format = NULL;
+        config.lml_client = NULL;
+        config.batch_mode = FALSE;
+        config.dry_run = FALSE;
+        config.ignore_metadata = FALSE;
+        config.udp_srvr = NULL;
+        config.udp_srvr_addr = NULL;
+        config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
+        config.text_output_fd = NULL;
         
         prelude_option_add(ropt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
@@ -429,29 +424,29 @@ int pconfig_set(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
         
-        if ( batch_mode && udp_srvr ) {
+        if ( config.batch_mode && config.udp_srvr ) {
                 log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
                 return -1;
         }
 
-        if ( dry_run )
+        if ( config.dry_run )
                 return 0;
         
-        ret = prelude_client_new(&lml_client, PRELUDE_CONNECTION_CAPABILITY_CONNECT, "prelude-lml", config_file);
+        ret = prelude_client_new(&(config.lml_client), PRELUDE_CONNECTION_CAPABILITY_CONNECT, "prelude-lml", config_file);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-client");
                 
-                if ( prelude_client_is_setup_needed(lml_client, ret) )
-                        prelude_client_print_setup_error(lml_client);
+                if ( prelude_client_is_setup_needed(config.lml_client, ret) )
+                        prelude_client_print_setup_error(config.lml_client);
                 
                 return -1;
         }
         
-        ret = lml_alert_init(lml_client);
+        ret = lml_alert_init(config.lml_client);
         if ( ret < 0 )
                 return -1;
         
-        ret = prelude_client_start(lml_client);
+        ret = prelude_client_start(config.lml_client);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error starting prelude-client");
                 return -1;
