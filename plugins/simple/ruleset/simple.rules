@@ -178,6 +178,7 @@ include = portsentry.rules;
 include = postfix.rules;
 include = proftpd.rules;
 include = qpopper.rules;
+include = sendmail.rules;
 include = shadow-utils.rules;
 include = single.rules;
 include = squid.rules;
