@@ -193,7 +193,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state, const
                         return -1;
         }
         
-        if ( state->reqmatch < rule->required )
+        if ( state->reqmatch < rule->required_goto )
                 return -1;
         
         if ( state->optmatch < rule->min_optgoto_match ) 
