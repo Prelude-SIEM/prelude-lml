@@ -41,7 +41,8 @@ regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
  target(0).user.user_id(0).name=$1; \
  last
 
-# No log sample; please submit
+# LOG:Dec 21 21:18:46 share2 sshd(pam_unix)[15525]: authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=a.b.c.d  user=root
+#
 regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.*) rhost=(.*) user=(.*); \
  classification.text = User authentication failed; \
  id=2; \
