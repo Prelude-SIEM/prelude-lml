@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+* Copyright (C) 1998 - 2003 Yoann Vandoorselaere <yoann@prelude-ids.org>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -2494,7 +2494,7 @@ plugin_generic_t *plugin_init(int argc, char **argv)
         
 	plugin_set_name(&plugin, "SimpleMod");
 	plugin_set_author(&plugin, "Yoann Vandoorselaere");
-	plugin_set_contact(&plugin, "yoann@mandrakesoft.com");
+	plugin_set_contact(&plugin, "yoann@prelude-ids.org");
 	plugin_set_running_func(&plugin, simple_run);
 
 	return (plugin_generic_t *) & plugin;

@@ -133,11 +133,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Fri Aug 17 2001 Yoann Vandoorselaere <yoann@mandrakesoft.com> 0.4.0-1mdk
+* Fri Aug 17 2001 Yoann Vandoorselaere <yoann@prelude-ids.org> 0.4.0-1mdk
 
 - Update to 0.4.0
 
-* Thu Mar 29 2001 Yoann Vandoorselaere <yoann@mandrakesoft.com> 0.3-1mdk
+* Thu Mar 29 2001 Yoann Vandoorselaere <yoann@prelude-ids.org> 0.3-1mdk
 - first packaging attempt.
 
 
