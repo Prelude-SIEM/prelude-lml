@@ -48,28 +48,29 @@ struct udp_server {
 
 static void udp_server_standalone(udp_server_t *server)
 {
-        fd_set fds;
         int len, ret;
+        fd_set fds, rfds;
         struct sockaddr_in addr;
         struct timeval now, last, timeout;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
         
         FD_ZERO(&fds);
         FD_SET(server->sockfd, &fds);
-
+        
         gettimeofday(&last, NULL);
         
 	while ( 1 ) {
 
+                rfds = fds;
                 timeout.tv_sec = 1;
                 timeout.tv_usec = 0;
                 
-                ret = select(server->sockfd + 1, &fds, NULL, NULL, &timeout);
+                ret = select(server->sockfd + 1, &rfds, NULL, NULL, &timeout);
                 if ( ret < 0 ) {
                         log(LOG_ERR, "select returned an error.\n");
                         return;
                 }
-
+                
                 gettimeofday(&now, NULL);
                 if ( (now.tv_sec - last.tv_sec) > 1 ) {
                         file_server_wake_up(server->list, server->queue);
