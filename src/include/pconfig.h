@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 2000 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+* Copyright (C) 2000, 2002 Yoann Vandoorselaere <yoann@mandrakesoft.com>
 * All Rights Reserved
 *
 * This file is part of the Prelude program.
@@ -21,11 +21,10 @@
 *
 *****/
 
-
-typedef struct {
-	int daemonize;
-	const char *pidfile;
-	int report_only_one;
-} Pconfig_t;
-
 int pconfig_set(int argc, char **argv);
+
+const char *pconfig_get_udp_srvr_addr(void);
+
+int pconfig_get_udp_srvr_port(void);
+
+int pconfig_is_udp_srvr_enabled(void);

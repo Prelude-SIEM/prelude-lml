@@ -35,6 +35,7 @@
 #include <libprelude/prelude-io.h>
 #include <libprelude/prelude-message.h>
 #include <libprelude/prelude-getopt.h>
+#include <libprelude/daemonize.h>
 #include <libprelude/sensor.h>
 
 #include "config.h"
@@ -42,21 +43,18 @@
 #include "queue.h"
 #include "file-server.h"
 
-extern Pconfig_t config;
+
+static const char *pidfile = NULL;
+
+static int udp_srvr_enabled = 0;
+static uint16_t udp_srvr_port = 514;
+static const char *udp_srvr_addr = NULL;
 
 
 
 static int print_version(const char *arg)
 {
 	printf("prelude-lml %s.\n", VERSION);
-	return prelude_option_success;
-}
-
-
-
-static int get_version(char *buf, size_t size)
-{
-	snprintf(buf, size, "prelude-lml %s\n", VERSION);
 	return prelude_option_success;
 }
 
@@ -80,17 +78,18 @@ static int set_quiet_mode(const char *arg)
 
 static int set_daemon_mode(const char *arg)
 {
-	config.daemonize = 1;
-	return prelude_option_success;
+        prelude_daemonize(pidfile);
+        prelude_log_use_syslog();
+
+        return prelude_option_success;
 }
 
 
 static int set_pidfile(const char *arg)
 {
-	config.pidfile = arg;
+        pidfile = arg;
 	return prelude_option_success;
 }
-
 
 
 
@@ -109,24 +108,42 @@ static int set_file(const char *arg)
 
 
 
+static int enable_udp_server(const char *arg) 
+{
+        udp_srvr_enabled = 1;
+        return prelude_option_success;
+}
+
+
+
+static int set_udp_server_addr(const char *arg) 
+{
+        udp_srvr_addr = arg;
+        return prelude_option_success;
+}
+
+
+static int set_udp_server_port(const char *arg) 
+{
+        udp_srvr_port = atoi(arg);
+        return prelude_option_success;
+}
+
+
+
+
 int pconfig_set(int argc, char **argv)
 {
 	int ret;
-
-	/*
-	 * default.
-	 */
-	config.daemonize = 0;
-	config.report_only_one = 1;
-	config.pidfile = NULL;
-
+        prelude_option_t *opt;
+        
 	prelude_option_add(NULL, CLI_HOOK, 'h', "help",
 			   "Print this help", no_argument, print_help,
 			   NULL);
 
-	prelude_option_add(NULL, CLI_HOOK | WIDE_HOOK, 'v', "version",
+	prelude_option_add(NULL, CLI_HOOK, 'v', "version",
 			   "Print version number", no_argument,
-			   print_version, get_version);
+			   print_version, NULL);
 
 	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'q', "quiet",
 			   "Quiet mode", no_argument, set_quiet_mode,
@@ -136,10 +153,23 @@ int pconfig_set(int argc, char **argv)
 			   "Run in daemon mode", no_argument,
 			   set_daemon_mode, NULL);
 
-	prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'P', "pidfile",
-			   "Write Prelude PID to pidfile",
-			   required_argument, set_pidfile, NULL);
+	opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'P', "pidfile",
+                                 "Write Prelude PID to pidfile",
+                                 required_argument, set_pidfile, NULL);
+        prelude_option_set_priority(opt, option_run_first);
+        
+        opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'u', "udp-srvr",
+                                 "Listen to UDP messages", no_argument,
+                                 enable_udp_server, NULL);
 
+        prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'a', "addr",
+                           "Address to listen on (default 0.0.0.0)", required_argument,
+                           set_udp_server_addr, NULL);
+        
+        prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'p', "port",
+                           "Port to listen on (default 514)", required_argument,
+                           set_udp_server_port, NULL);
+        
         prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 'f', "file",
                            "File to monitor", required_argument, set_file, NULL);
         
@@ -149,3 +179,24 @@ int pconfig_set(int argc, char **argv)
 
 	return 0;
 }
+
+
+
+const char *pconfig_get_udp_srvr_addr(void) 
+{
+        return udp_srvr_addr;
+}
+
+
+int pconfig_get_udp_srvr_port(void) 
+{
+        return udp_srvr_port;
+}
+
+
+int pconfig_is_udp_srvr_enabled(void)
+{
+        return udp_srvr_enabled;
+}
+
+

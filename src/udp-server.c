@@ -3,6 +3,7 @@
    Author: Pierre-Jean Turpeau */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -27,48 +28,6 @@ struct udp_server {
 	queue_t *queue;
 };
 
-
-
-
-udp_server_t *udp_server_new(uint16_t port,
-			     udp_server_msg_reader_t *mreader, queue_t *queue)
-{
-        int ret;
-	udp_server_t *server;
-
-	server = malloc(sizeof(*server));
-        if ( ! server ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                return NULL;
-        }
-        
-	server->mreader = mreader;
-	server->queue = queue;
-
-	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if ( server->sockfd < 0 ) {
-		log(LOG_ERR, "couldn't create socket.\n");
-                free(server);
-                return NULL;
-	}
-
-	server->saddr.sin_family = AF_INET;
-	server->saddr.sin_port = htons(port);
-	server->saddr.sin_addr.s_addr = INADDR_ANY;	/* automatically fill with my IP */
-	memset(&(server->saddr.sin_zero), '\0', 8);	/* zero the rest of the struct */
-
-        ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
-        if ( ret < 0 ) {
-		log(LOG_ERR, "couldn't bind to socket.\n");
-                close(server->sockfd);
-                free(server);
-                return NULL;
-	}
-
-	dprint("[UDP  ] Server created on port %d, fd %d\n", port, server->sockfd);
-        
-	return server;
-}
 
 
 
@@ -118,3 +77,60 @@ void udp_server_close(udp_server_t *server)
 	close(server->sockfd);
 	free(server);
 }
+
+
+
+udp_server_t *udp_server_new(const char *addr, uint16_t port,
+                             udp_server_msg_reader_t *mreader, queue_t *queue)
+{
+        int ret;
+	udp_server_t *server;
+
+        server = malloc(sizeof(*server));
+        if ( ! server ) {
+                log(LOG_ERR, "memory exhausted.\n");
+                return NULL;
+        }
+        
+        server->queue = queue;
+	server->mreader = mreader;
+        
+	server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	if ( server->sockfd < 0 ) {
+		log(LOG_ERR, "couldn't create socket.\n");
+                free(server);
+                return NULL;
+	}
+
+        /*
+         * resolve provided address, or use INADDR_ANY if no address
+         * were provided.
+         */
+        if ( addr ) {
+                ret = prelude_resolve_addr(addr, &server->saddr.sin_addr);
+                if ( ret < 0 ) {
+                        log(LOG_INFO, "couldn't resolve %s.\n", addr);
+                        return NULL;
+                }
+        } else
+                server->saddr.sin_addr.s_addr = INADDR_ANY;
+        
+        server->saddr.sin_family = AF_INET;
+        server->saddr.sin_port = htons(port);
+        memset(&(server->saddr.sin_zero), '\0', 8);                
+
+        ret = bind(server->sockfd, (struct sockaddr *) &server->saddr, sizeof(struct sockaddr));
+        if ( ret < 0 ) {
+		log(LOG_ERR, "couldn't bind to socket.\n");
+                close(server->sockfd);
+                free(server);
+                return NULL;
+	}
+        
+	dprint("[UDP ] Server created on %s:%d, fd %d\n", addr, port, server->sockfd);
+        
+	return server;
+}
+
+
+

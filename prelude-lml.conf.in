@@ -2,7 +2,7 @@
 # Configuration for the Prelude LML Sensor   #
 ##############################################
 
-[Prelude NIDS]
+[Prelude LML]
 
 # Address where the Prelude Manager Server is listening on.
 # if value is "127.0.0.1", the connection will occur throught
@@ -15,14 +15,23 @@
 # manager-addr = 127.0.0.1;
 
 
+# Configuration for the UDP message receiver.
+# commented out by default since most people only want to 
+# monitor files.
+# 
+# [Udp-Srvr]
+#
+# port = 514
+# addr = 0.0.0.0
 
-##########################################
-# Configuration for Local Files tracking #
-##########################################
 
-[LocalFiles]
 
-file-list = /var/log/auth.log /var/log/apache/access.log
+#
+# Files to monitor
+#
+file = /var/log/messages
+file = /var/log/apache/access_log
+
 
 
 ####################################
