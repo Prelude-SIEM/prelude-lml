@@ -702,7 +702,7 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_opt
 {
         int ret;
         prelude_option_t *opt, *popt;
-        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
+        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG;
         
         ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "pcre", "Pcre plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, pcre_activate, NULL);

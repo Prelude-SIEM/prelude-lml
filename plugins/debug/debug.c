@@ -142,7 +142,7 @@ int debug_LTX_lml_plugin_init(prelude_plugin_generic_t **pret, void *lml_root_op
 {
         int ret;
         prelude_option_t *opt;
-        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
+        int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG;
 
         *pret = (void *) &plugin;
         
