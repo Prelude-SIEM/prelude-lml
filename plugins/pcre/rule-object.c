@@ -79,23 +79,6 @@ typedef struct {
 
 
 
-static int strrncmp(const char *s1, const char *s2)
-{
-        size_t s1_len;
-        size_t s2_len;
-
-        s1_len = strlen(s1);
-        s2_len = strlen(s2);
-
-        if ( s1_len < s2_len )
-                return 1;
-
-        return strncmp(s1 + s1_len - s2_len, s2, s2_len);
-}
-
-
-
-
 static int referenced_value_add(rule_object_list_t *olist, unsigned int reference, char **value)
 {
         rule_referenced_value_t *reference_value;
@@ -278,7 +261,8 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
         
         str = prelude_string_get_string(strbuf);
 
-        if ( strrncmp(idmef_path_get_name(rule_object->object), ".port") == 0 && ! isdigit((int) *str) ) {
+        ret = strcmp(idmef_path_get_name(rule_object->object, idmef_path_get_depth(rule_object->object) - 1), "port");
+        if ( ret == 0 && ! isdigit((int) *str) ) {
                 service = getservbyname(str, NULL);
                 if ( ! service ) {
                         prelude_log(PRELUDE_LOG_WARN, "Service name '%s' could not be found in /etc/services.\n", str);
@@ -382,7 +366,7 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
 
                 if ( ret < 0 ) {
                         prelude_perror(ret, "idmef path set failed for %s",
-                                       idmef_path_get_name(rule_object->object));
+                                       idmef_path_get_name(rule_object->object, -1));
                         idmef_message_destroy(*message);
                         referenced_value_destroy_content(olist);
                         return -1;
