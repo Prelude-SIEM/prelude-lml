@@ -22,9 +22,12 @@
 # No sample log; please submit
 regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected.*; \
  class.name=Exim request rejected; \
+ class.origin=vendor-specific; \
+ id=400; \
+ revision=1; \
  impact.severity = low; \
  impact.completion=failed; \
  impact.type=other; \
  impact.description=Exim refused a request : $1 rejected; \
- target.service.protocol=smtp;
-
+ target.service.protocol=smtp; \
+ last

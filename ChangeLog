@@ -1,3 +1,10 @@
+2004-01-09  Gene Gomez  <gene@gomezbrothers.com>
+
+        * plugins/simple/ruleset:
+        id and revision tags added to all rules.  This should
+	allow for better management and revisioning of the 
+	rulesets.
+
 2004-01-08  Gene Gomez  <gene@gomezbrothers.com>
 
         * plugins/simple/ruleset:

@@ -5,6 +5,8 @@
 # No log sample; please submit
 regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
  class.name=$2 packet dropped; \
+ id=800; \
+ revision=1; \
  class.origin=vendor-specific; \ 
  impact.completion=failed; \
  impact.type=other; \
@@ -26,6 +28,8 @@ regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+);
 # No log sample; please submit
 regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
  class.name=Packet dropped by firewall; \
+ id=801; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -47,6 +51,8 @@ regex=ipfw: (\d+) Deny (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+)
 # No log sample; please submit
 regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  class.name=Packet dropped by firewall; \
+ id=802; \
+ revision=1; \
  class.origin=vendor-specific ; \
  impact.completion=failed; \
  impact.type=other; \
@@ -66,6 +72,8 @@ regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
 # No log sample; please submit
 regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  class.name=Packet dropped by firewall; \
+ id=803; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -86,6 +94,8 @@ regex=ipfw: (\d+) Deny ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
 # No log sample; please submit
 regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+); \
  class.name=Packet accepted by firewall; \
+ id=804; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -107,6 +117,8 @@ regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) in via (\w+
 # No log sample; please submit
 regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w+); \
  class.name=Packet accepted by firewall; \
+ id=805; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -128,6 +140,8 @@ regex=ipfw: (\d+) Accept (TCP|UDP) ([\d\.]+):(\d+) ([\d\.]+):([\d]+) out via (\w
 # no log sample; please submit
 regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
  class.name=Packet accepted by firewall; \
+ id=806; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -147,6 +161,8 @@ regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) in via (\w+); \
 # No log sample; please submit
 regex=ipfw: (\d+) Accept ICMP:(\d+).(\d+) ([\d\.]+) ([\d\.]+) out via (\w+); \
  class.name=Packet accepted by firewall; \
+ id=807; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \

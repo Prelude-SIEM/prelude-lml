@@ -28,6 +28,8 @@
 
 regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR tcp len \d+ \d+ -\S+ \d+ \d+ \d+ IN; \
  class.name=TCP Packet dropped; \
+ id=2000; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -50,6 +52,8 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
 
 regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR udp len \d+ \d+ IN; \
  class.name=UDP Packet dropped; \
+ id=2001; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -72,6 +76,8 @@ regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+)
 
 regex=.* ([\w\-\.]+): \d+:\d+:\d+\.\d+ lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([\d\.]+)    PR icmp len \d+ \d+ icmp (\d+)/(\d+) IN; \
  class.name=ICMP Packet dropped; \
+ id=2002; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \

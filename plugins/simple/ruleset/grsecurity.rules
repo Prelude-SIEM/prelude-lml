@@ -26,6 +26,8 @@
 # No log sample; please submit
 regex=grsec: denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted ptrace; \
+ id=600; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -47,6 +49,8 @@ regex=grsec: denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\
 # No log sample; please submit
 regex=grsec: attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted kernel read/write; \
+ id=601; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other;impact.severity=high; \
@@ -65,6 +69,8 @@ regex=grsec: attempted open of /dev/kmem by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\
 # No log sample; please submit
 regex=grsec: not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Potential tmp race; \
+ id=602; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -84,6 +90,8 @@ regex=grsec: not following symlink \(([^)]+)\) of \[(\d+:\d+)\]:(\d+) owned by (
 # No log sample; please submit
 regex=grsec: attempt to open ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted open; \
+ id=603; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -103,6 +111,8 @@ regex=grsec: attempt to open ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)
 # No log sample; please submit
 regex=grsec: attempt to open ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted open; \
+ id=604; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -122,6 +132,8 @@ regex=grsec: attempt to open ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UI
 # No log sample; please submit
 regex=grsec: attempt to open ([^ ]+) for reading appending by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted open; \
+ id=605; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -141,6 +153,8 @@ regex=grsec: attempt to open ([^ ]+) for reading appending by \(([^:]+):(\d+)\) 
 # No log sample; please submit
 regex=grsec: attempt to open ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted open; \
+ id=606; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -160,6 +174,8 @@ regex=grsec: attempt to open ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)
 # No log sample; please submit
 regex=grsec: attempt to open ([^ ]+) for appending by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted open; \
+ id=607; \
+ revision=1; \
  class.origin=vendor-specific; \ 
  impact.completion=failed; \
  impact.type=file; \
@@ -179,6 +195,8 @@ regex=grsec: attempt to open ([^ ]+) for appending by \(([^:]+):(\d+)\) UID\((\d
 # No log sample; please submit
 regex=grsec: attempt to access hidden file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted access of hidden file; \
+ id=608; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -198,6 +216,8 @@ regex=grsec: attempt to access hidden file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+
 # No log sample; please submit
 regex=grsec: denied writing FIFO \(([^)]+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Potential FIFO race; \
+ id=609; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -217,6 +237,8 @@ regex=grsec: denied writing FIFO \(([^)]+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\)
 # No log sample; please submit
 regex=grsec: refused attempt to mknod\([a-z]:(\d+:\d+)\) \(([^)]+)\) from chroot jail \[(\d+:\d+):(\d+)\] owned by (\d+) (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted mknod in chroot; \
+ id=610; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -236,6 +258,8 @@ regex=grsec: refused attempt to mknod\([a-z]:(\d+:\d+)\) \(([^)]+)\) from chroot
 # No log sample; please submit
 regex=grsec: attempt to mknod ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted mknod; \
+ id=611; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -255,6 +279,8 @@ regex=grsec: attempt to mknod ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
 # No log sample; please submit
 regex=grsec: attempt to mkdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted mkdir; \
+ id=612; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -274,6 +300,8 @@ regex=grsec: attempt to mkdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
 # No log sample; please submit
 regex=grsec: attempt to rmdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted rmdir; \
+ id=613; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -293,6 +321,8 @@ regex=grsec: attempt to rmdir ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
 # No log sample; please submit
 regex=grsec: attempt to unlink ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted delete; \
+ id=614; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -312,6 +342,8 @@ regex=grsec: attempt to unlink ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((
 # No log sample; please submit
 regex=grsec: attempt to symlink ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted symlink; \
+ id=615; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -331,6 +363,8 @@ regex=grsec: attempt to symlink ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d
 # No log sample, please submit
 regex=grsec: denied hardlink of ([^ ]+) \(owned by (\d+).(\d+)\) to ([^ ]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted hardlink; \
+ id=616; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -350,6 +384,8 @@ regex=grsec: denied hardlink of ([^ ]+) \(owned by (\d+).(\d+)\) to ([^ ]+) for 
 # No log sample, please submit
 regex=grsec: attempt to link ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted link; \
+ id=617; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -369,6 +405,8 @@ regex=grsec: attempt to link ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\
 # No log sample; please submit
 regex=grsec: attempt to rename ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted rename; \
+ id=618; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -388,6 +426,8 @@ regex=grsec: attempt to rename ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+
 # No log sample; please submit
 regex=grsec: denied ptrace of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted ptrace; \
+ id=619; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -407,6 +447,8 @@ regex=grsec: denied ptrace of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)
 # No log sample; please submit
 regex=grsec: attempt to overstep process limit by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted process limit overstep; \
+ id=620; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -426,6 +468,8 @@ regex=grsec: attempt to overstep process limit by \(([^:]+):(\d+)\) UID\((\d+)\)
 # No log sample; please submit
 regex=grsec: denying execution of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted execution; \
+ id=621; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -445,6 +489,8 @@ regex=grsec: denying execution of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
 # No log sabmple; please submit
 regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning uid (\d+) from login for (\d+) seconds; \
  class.name=Possible exploit bruteforcing; \
+ id=622; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -468,7 +514,9 @@ regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUI
 # No log sample; please submit
 regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning execution of \[(\d+:\d+):(\d+)\] for (\d+) seconds; \
  class.name=Possible exploit bruteforcing; \
- class.origin=vendor-specific; \
+ id=623; \
+ revision=1; \
+class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
  impact.severity=high; \
@@ -487,6 +535,8 @@ regex=grsec: Possible exploit bruteforcing on \(([^:]+):(\d+)\) UID\((\d+)\) EUI
 # No log sample; please submit
 regex=grsec: Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) Banning execution of \[(\d+:\d+):(\d+)\] for (\d+) seconds; \
  class.name=Possible exploit bruteforcing; \
+ id=624; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -509,6 +559,8 @@ regex=grsec: Possible exploit bruteforcing by (\d+.\d+.\d+.\d+) on \(([^:]+):(\d
 # No log sample; please submit
 regex=grsec: denied attempt to mount \(([^)]+)\) as ([^ ]+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted mount in chroot; \
+ id=625; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -528,6 +580,8 @@ regex=grsec: denied attempt to mount \(([^)]+)\) as ([^ ]+) from chroot jail \((
 # No log sample; please submit
 regex=grsec: denied attempt to pivot_root\(([^,]+),([^)]+)\) from chroot jail \[(\d+:\d+):(\d+)\] of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted pivot_root in chroot; \
+ id=626; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -547,6 +601,8 @@ regex=grsec: denied attempt to pivot_root\(([^,]+),([^)]+)\) from chroot jail \[
 # No log sample; please submit
 regex=grsec: attempted to truncate file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted truncate; \
+ id=627; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -566,6 +622,8 @@ regex=grsec: attempted to truncate file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\)
 # No log sample; please submit
 regex=grsec: attempted to change access time for file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted file time modification; \
+ id=628; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -585,6 +643,8 @@ regex=grsec: attempted to change access time for file \[(\d+:\d+):(\d+)\] by \((
 # No log sample; please submit
 regex=grsec: attempted to access file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted file access; \
+ id=629; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -604,6 +664,8 @@ regex=grsec: attempted to access file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) U
 # No log sample; please submit
 regex=grsec: Attempted to chdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted chdir; \
+ id=630; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -623,6 +685,8 @@ regex=grsec: Attempted to chdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\
 # No log sample; please submit
 regex=grsec: Attempted fchdir outside of chroot to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted fchdir out of chroot; \
+ id=631; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -642,6 +706,8 @@ regex=grsec: Attempted fchdir outside of chroot to ([^ ]+) by \(([^:]+):(\d+)\) 
 # No log sample; please submit
 regex=grsec: attempted to fchdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted fchdir; \
+ id=632; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -661,6 +727,8 @@ regex=grsec: attempted to fchdir to directory \[(\d+:\d+):(\d+)\] by \(([^:]+):(
 # No log sample; please submit
 regex=grsec: fchdir\((\d+)\) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Successful fchdir; \
+ id=633; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -680,6 +748,8 @@ regex=grsec: fchdir\((\d+)\) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\(
 # No log sample; please submit
 regex=grsec: denied attempt to chroot\(\) from \((\d+:\d+):(\d+)\) to \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted chroot in a chroot jail; \
+ id=634; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -699,6 +769,8 @@ regex=grsec: denied attempt to chroot\(\) from \((\d+:\d+):(\d+)\) to \(([^)]+)\
 # No log sample; please submit
 regex=grsec: Attempt to fchmod file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted fchmod; \
+ id=635; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -718,6 +790,8 @@ regex=grsec: Attempt to fchmod file \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID
 # No log sample; please submit
 regex=grsec: denied attempt to fchmod +s \((\d+:\d+):(\d+)\) owned by (\d+).(\d+) to mode (\d+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted fchmod +s in chroot; \
+ id=636; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -737,6 +811,8 @@ regex=grsec: denied attempt to fchmod +s \((\d+:\d+):(\d+)\) owned by (\d+).(\d+
 # No log sample; please submit
 regex=grsec: Attempt to chmod file \[(\d+:\d+):(\d+)\] ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted chmod; \
+ id=637; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -756,6 +832,8 @@ regex=grsec: Attempt to chmod file \[(\d+:\d+):(\d+)\] ([^ ]+) by \(([^:]+):(\d+
 # No log sample; please submit
 regex=grsec: denied attempt to chmod +s \((\d+:\d+):(\d+)\) \(([^)]+)\) owned by (\d+).(\d+) to mode (\d+) from chroot jail \((\d+:\d+):(\d+)\) of (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted chmod +s in chroot; \
+ id=638; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -775,6 +853,8 @@ regex=grsec: denied attempt to chmod +s \((\d+:\d+):(\d+)\) \(([^)]+)\) owned by
 # No log sample; please submit
 regex=grsec: Attempt to chown file \[(\d+:\d+):(\d+)\] to (\d+).(\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted chown; \
+ id=639; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -794,6 +874,8 @@ regex=grsec: Attempt to chown file \[(\d+:\d+):(\d+)\] to (\d+).(\d+) by \(([^:]
 # No log sample; please submit
 regex=grsec: attempt to load writable library \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempt to load a writable library; \
+ id=640; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -813,6 +895,8 @@ regex=grsec: attempt to load writable library \[(\d+:\d+):(\d+)\] by \(([^:]+):(
 # No log sample; please submit
 regex=grsec: shutdown auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system shutdown success; \
+ id=641; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -832,6 +916,8 @@ regex=grsec: shutdown auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+
 # No log sample; please submit
 regex=grsec: shutdown auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system shutdown failure; \
+ id=642; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -851,6 +937,8 @@ regex=grsec: shutdown auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+
 # No log sample; please submit
 regex=grsec: ignoring shutdown for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system shutdown ignored; \
+ id=643; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -870,6 +958,8 @@ regex=grsec: ignoring shutdown for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)
 # No log sample; please submit
 regex=grsec: segvmod auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system segvmod success; \
+ id=644; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -889,6 +979,8 @@ regex=grsec: segvmod auth success for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
 # No log sample; please submit
 regex=grsec: segvmod auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system segvmod failure; \
+ id=645; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -908,6 +1000,8 @@ regex=grsec: segvmod auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
 # No log sample; please submit
 regex=grsec: ignoring segvmod for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system segvmod ignored; \
+ id=646; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -927,6 +1021,8 @@ regex=grsec: ignoring segvmod for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\
 # No log sample; please submit
 regex=grsec: Loaded grsecurity ([0-9.]+); \
  class.name=ACL system enabled; \
+ id=647; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -937,6 +1033,8 @@ regex=grsec: Loaded grsecurity ([0-9.]+); \
 # No log sample; please submit
 regex=grsec: Unable to load grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) ACL system may already be enabled.; \
  class.name=ACL system failed to load; \
+ id=648; \
+ revision=1; \
  class.origin=vendor-specific; \ 
  impact.completion=failed; \
  impact.type=admin; \
@@ -956,6 +1054,8 @@ regex=grsec: Unable to load grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+
 # No log sample; please submit
 regex=grsec: Ignoring reload request for disabled ACL; \
  class.name=ACL reload ignored; \
+ id=649; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -966,6 +1066,8 @@ regex=grsec: Ignoring reload request for disabled ACL; \
 # No log sample; please submit
 regex=grsec: Reloaded grsecurity ([0-9.]+); \
  class.name=ACL system reloaded; \
+ id=650; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -976,6 +1078,8 @@ regex=grsec: Reloaded grsecurity ([0-9.]+); \
 #No log sample; please submit
 regex=grsec: Failed reload of grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL system failed to reload; \
+ id=651; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -995,6 +1099,8 @@ regex=grsec: Failed reload of grsecurity ([0-9.]+) for \(([^:]+):(\d+)\) UID\((\
 # No log sample; please submit
 regex=grsec: Ignoring change to admin mode for disabled acl for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL change to admin ignored; \
+ id=652; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -1014,6 +1120,8 @@ regex=grsec: Ignoring change to admin mode for disabled acl for \(([^:]+):(\d+)\
 # No log sample; please submit
 regex=grsec: successful change to admin mode by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL change to admin; \
+ id=653; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -1033,6 +1141,8 @@ regex=grsec: successful change to admin mode by \(([^:]+):(\d+)\) UID\((\d+)\) E
 # No log sample; please submit
 regex=grsec: admin mode exited by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL admin exited; \
+ id=654; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=admin; \
@@ -1052,6 +1162,8 @@ regex=grsec: admin mode exited by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
 # No log sample; please submit
 regex=grsec: admin auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL admin auth failure; \
+ id=655; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -1071,6 +1183,8 @@ regex=grsec: admin auth failure for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\)
 # No log sample; please submit
 regex=grsec: Invalid mode (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=ACL invalid mode; \
+ id=656; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -1090,6 +1204,8 @@ regex=grsec: Invalid mode (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 # No log sample; please submit
 regex=grsec: Maximum pw attempts reached \((\d+)\), locking password authentication; \
  class.name=ACL maximum pw attempts reached; \
+ id=657; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=admin; \
@@ -1100,6 +1216,8 @@ regex=grsec: Maximum pw attempts reached \((\d+)\), locking password authenticat
 # No log sample; please submit
 regex=grsec: attempted priority change of process \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted priority change in chroot; \
+ id=658; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1121,6 +1239,8 @@ regex=grsec: attempted priority change of process \(([^:]+):(\d+)\) by \(([^:]+)
 # No log sample; please submit
 regex=grsec: denied capset of \(([^:]+):(\d+)\) within chroot jail \[(\d+:\d+):(\d+)\] by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted capset in chroot; \
+ id=659; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1142,6 +1262,8 @@ regex=grsec: denied capset of \(([^:]+):(\d+)\) within chroot jail \[(\d+:\d+):(
 # No log sample; please submit
 regex=grsec: failed fork with errno (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Failed fork; \
+ id=660; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1161,6 +1283,8 @@ regex=grsec: failed fork with errno (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID
 # No log sample; please submit
 regex=grsec: attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted renice in chroot; \
+ id=661; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1180,6 +1304,8 @@ regex=grsec: attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((
 # No log sample; please submit
 regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Signal sent; \
+ id=662; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -1199,6 +1325,8 @@ regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
 # No log sample; please submit
 regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Signal sent; \
+ id=663; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -1227,6 +1355,8 @@ regex=grsec: signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
 # No log sample; please submit
 regex=grsec: Attempted send of signal (\d+) to protected task \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted signal to protected process; \
+ id=664; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1255,6 +1385,8 @@ regex=grsec: Attempted send of signal (\d+) to protected task \(([^:]+):(\d+)\) 
 # No log sample; please submit
 regex=grsec: attempt to modify grsecurity sysctl value : ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempt to modify grsecurity sysctl; \
+ id=665; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -1274,6 +1406,8 @@ regex=grsec: attempt to modify grsecurity sysctl value : ([^ ]+) by \(([^:]+):(\
 # No log sample; please submit
 regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted sysctl read; \
+ id=666; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -1293,6 +1427,8 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading by \(([^:]+):(\d+)\) UID\
 # No log sample; please submit
 regex=grsec: attempt to sysctl\(\) ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted sysctl write; \
+ id=667; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -1312,6 +1448,8 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for writing by \(([^:]+):(\d+)\) UID\
 # No log sample; please submit
 regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted sysctl read/write; \
+ id=668; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -1331,6 +1469,8 @@ regex=grsec: attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+
 # No log sample; please submit
 regex=grsec: time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=System time changed; \
+ id=669; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -1350,6 +1490,8 @@ regex=grsec: time set by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(
 # No log sample; please submit
 regex=grsec: attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted mmap executable; \
+ id=670; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \
@@ -1369,6 +1511,8 @@ regex=grsec: attempt to mmap \[(\d+:\d+):(\d+)\] ([^ ]+) executable by \(([^:]+)
 # No log sample; please submit
 regex=grsec: attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted socket use; \
+ id=671; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1388,6 +1532,8 @@ regex=grsec: attempted socket\((\d+),(\d+),(\d+)\) by \(([^:]+):(\d+)\) UID\((\d
 # No log sample; please sumbmit
 regex=grsec: attempted bind\(\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted bind; \
+ id=672; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1407,6 +1553,8 @@ regex=grsec: attempted bind\(\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 # No log sample; please submit
 regex=grsec: attempted connect\(\) to fd (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted connect; \
+ id=673; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1426,6 +1574,8 @@ regex=grsec: attempted connect\(\) to fd (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\)
 # No log sample; please submit
 regex=grsec: attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted bind; \
+ id=674; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1445,6 +1595,8 @@ regex=grsec: attempted bind to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) prot
 # No log sample; please submit
 regex=grsec: attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) protocol (\d+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Attempted connect; \
+ id=675; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -1464,6 +1616,8 @@ regex=grsec: attempted connect to (\d+.\d+.\d+.\d+) port (\d+) sock type (\d+) p
 # No log sample; please submit
 regex=grsec: exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Exec inside chroot jail; \
+ id=676; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1483,6 +1637,8 @@ regex=grsec: exec of ([^ ]+) within chroot jail \[(\d+:\d+):(\d+)\] by process \
 # No log sample; please submit
 regex=grsec: ([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Filesystem remounted; \
+ id=677; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1502,6 +1658,8 @@ regex=grsec: ([^ ]+) not raised for \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\)
 # No log sample; please submit
 regex=grsec: remount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Filesystem remounted; \
+ id=678; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1521,6 +1679,8 @@ regex=grsec: remount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 # No log sample; please submit
 regex=grsec: unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Filesystem unmounted; \
+ id=679; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1540,6 +1700,8 @@ regex=grsec: unmount of ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 # No log sample; please submit
 regex=grsec: mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Filesystem mounted; \
+ id=680; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1559,6 +1721,8 @@ regex=grsec: mount ([^ ]+) to ([^ ]+) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\
 # No log sample; please submit
 regex=grsec: chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Directory changed; \
+ id=681; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file;impact.severity=low; \
@@ -1577,6 +1741,8 @@ regex=grsec: chdir\(\"([^\"]+)\"\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
 # No log sample; please submit
 regex=grsec: exec of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Binary executed; \
+ id=682; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1596,6 +1762,8 @@ regex=grsec: exec of \[(\d+:\d+):(\d+)\] \(([^)]+)\) by \(([^:]+):(\d+)\) UID\((
 # No log sample; please submit
 regex=grsec: message queue created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Message queue created; \
+ id=683; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1615,6 +1783,8 @@ regex=grsec: message queue created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)
 # No log sample; please submit
 regex=grsec: message queue of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Message queue removed; \
+ id=684; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1641,6 +1811,8 @@ regex=grsec: message queue of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) 
 # No log sample; please submit
 regex=grsec: semaphore created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Semaphore created; \
+ id=685; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file;impact.severity=low; \
@@ -1659,6 +1831,8 @@ regex=grsec: semaphore created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), 
 # No log sample; please submit
 regex=grsec: semaphore of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Semaphore removed; \
+ id=686; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file; \
@@ -1685,6 +1859,8 @@ regex=grsec: semaphore of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\
 # No log sample; please submit
 regex=grsec: shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Shared memory created; \
+ id=688; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file;impact.severity=low; \
@@ -1703,6 +1879,8 @@ regex=grsec: shared memory of size (\d+) created by \(([^:]+):(\d+)\) UID\((\d+)
 # No log sample; please submit
 regex=grsec: shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
  class.name=Shared memory removed; \
+ id=689; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=file;impact.severity=low; \
@@ -1728,6 +1906,8 @@ regex=grsec: shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) 
 # No log sample; please submit
 regex=PAX: terminating task: ([^(]+)\(([^)]+)\):(\d+) uid/euid: (/d+)/(/d+), EIP: ([0-9A-F]+), ESP: ([0-9A-F]+); \
  class.name=Possible buffer overflow; \
+ id=690; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=file; \

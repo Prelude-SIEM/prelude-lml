@@ -26,6 +26,8 @@
 
 regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\.]+\) ([\d\.]+); \
  class.name=qpopper - invalid password for this user; \
+ id=1700; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
@@ -48,6 +50,8 @@ regex=popper\[\d+\]: \[AUTH\] Failed attempted login to (\S+) from host \([\w\-\
 
 regex=popper\[\d+\]: (\S+) at [\w\-\.]+ \(([\d\.]+)\): -ERR \[AUTH\] Password supplied for "\S+" is incorrect; \
  class.name=qpopper - invalid password for user; \
+ id=1701; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \

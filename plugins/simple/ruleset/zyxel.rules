@@ -42,6 +42,8 @@
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9A-Fa-f]+)  dpo=([0-9A-Fa-f]+).*S(\d{2})>R(\d{2})(.)(.); \
  class.name=ZyXEL ip access; \
+ id=2500; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
@@ -63,6 +65,8 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*S(\d{2})>R(\d{2})(.)(.); \
  class.name=ZyXEL ip access; \
+ id=2501; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other;\
@@ -87,6 +91,8 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*
 
 regex=ZyXEL Communications Corp.: ppp:(LCP|IPCP|CCP|BACP) (Starting|Opening|Closing); \
  class.name=ZyXEL PPP $2; \
+ id=2502; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type = other;\
  impact.severity = low; \

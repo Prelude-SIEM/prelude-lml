@@ -27,6 +27,8 @@
 
 regex=vpopmail\[\d+\]: vchkpw: vpopmail user not found (\S+):([\d\.]+); \
  class.name=vpopmail - no such user; \
+ id=2100; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
@@ -46,6 +48,8 @@ regex=vpopmail\[\d+\]: vchkpw: vpopmail user not found (\S+):([\d\.]+); \
 
 regex=vpopmail\[\d+\]: vchkpw: password fail (\S+):([\d\.]+); \
  class.name=vpopmail - bad password for this user; \
+ id=2101; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \

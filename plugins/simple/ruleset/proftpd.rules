@@ -25,6 +25,8 @@
 
 regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): Authentication failure; \
  class.name=FTP logon failed; \
+ id=1600; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
@@ -44,6 +46,8 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - PAM\(([\w\-\.]+)\): A
 
 regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)'; \
  class.name=FTP logon failed; \
+ id=1601; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \
@@ -63,6 +67,8 @@ regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - no such user '(\S+)';
 
 regex=proftpd\[\d+\]: [\w\-\.]+ \(([\d\.]+)\[[\d\.]+\]\) - USER (\S+): no such user found from [\w\-\.]+ \[[\w\-\.]+\] to ([\w\-\.]+):(\d+); \
  class.name=FTP logon failed; \
+ id=1602; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=user; \

@@ -26,6 +26,8 @@
 
 regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
  class.name=Wireless PC connected; \
+ id=2200; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.severity=low; \
@@ -42,6 +44,8 @@ regex=([\d\.]+)[\s]+Wireless PC connected[\s]+([A-Fa-f\d-]+); \
 
 regex=([\d\.]+)[\s]+Unauthorized wireless PC try to connected[\s]+([A-Fa-f\d\-]+); \
  class.name=Unauthorized wireless PC connection attempt; \
+ id=2201; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.severity=medium; \

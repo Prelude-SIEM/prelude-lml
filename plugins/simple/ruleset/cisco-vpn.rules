@@ -33,6 +33,8 @@
 #Oct 28 19:00:35 vpn 1453 10/28/2003 19:00:34.930 SEV=4 AUTH/28 RPT=22 12.34.56.78  User [gene.gomez], Group [Staff] disconnected:  Duration: 0:10:12  Bytes xmt: 2745816  Bytes rcv: 172696  Reason: User Requested
 regex=([\d\.]+)  User \[(\S+)\], Group \[\S+\] disconnected; \
  class.name=VPN user disconnected; \
+ id=300; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=low; \
  impact.description=VPN user $2 disconnected; \
@@ -46,6 +48,8 @@ regex=([\d\.]+)  User \[(\S+)\], Group \[\S+\] disconnected; \
 #Oct 29 19:18:20 vpn 1793 10/29/2003 19:18:20.190 SEV=3 AUTH/5 RPT=6 12.34.56.78  Authentication rejected: Reason = Invalid password handle = 66, server = Internal, user = gene.gomez, domain = <not specified>
 regex=([\d\.]+)  Authentication rejected: Reason = (.+) handle = \d+, server = \w+, user = (\S+),; \
  class.name=VPN user failed authentication; \
+ id=301; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=user; \
@@ -61,6 +65,8 @@ regex=([\d\.]+)  Authentication rejected: Reason = (.+) handle = \d+, server = \
 #Oct 28 18:50:21 vpn 1414 10/28/2003 18:50:21.930 SEV=4 IKE/52 RPT=22 12.34.56.78  Group [Staff] User [gene.gomez] User (gene.gomez) authenticated.
 regex=([\d\.]+)  Group \[\S+\] User \[(\S+)\] User \(\S+\) authenticated; \
  class.name=VPN user authenticated; \
+ id=302; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=user; \
@@ -76,6 +82,8 @@ regex=([\d\.]+)  Group \[\S+\] User \[(\S+)\] User \(\S+\) authenticated; \
 #Oct 29 19:53:18 vpn 1843 10/29/2003 19:53:18.680 SEV=5 AUTH/31 RPT=2  User [ admin ] Protocol [ HTTP ] attempted ADMIN logon.. Status: <REFUSED> authentication failure !
 regex=User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <REFUSED>; \
  class.name=VPN administration authentication failure; \
+ id=303; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=medium; \
  impact.type=admin; \
@@ -88,6 +96,8 @@ regex=User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <REF
 #Oct 28 12:33:48 vpn 1359 10/28/2003 12:33:48.610 SEV=5 AUTH/36 RPT=1 12.34.56.78  User [ admin ] Protocol [ HTTP ] attempted ADMIN logon.. Status: <ACCESS GRANTED> !
 regex=([\d\.]+)  User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <ACCESS GRANTED>; \
  class.name=VPN administration authentication successful; \
+ id=304; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=admin; \

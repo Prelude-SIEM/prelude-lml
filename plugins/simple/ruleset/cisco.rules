@@ -25,6 +25,8 @@
 # No log sample; please submit
 regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\).*; \
  class.name=Cisco ip access; \
+ id=500; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
@@ -45,6 +47,8 @@ regex=.*SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9
 # No log sample; please submit
 regex=.*RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+).*; \
  class.name=RSH attempt; \
+ id=501; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \

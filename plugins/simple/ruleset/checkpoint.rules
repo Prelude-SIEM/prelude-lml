@@ -48,6 +48,8 @@
 # No sample log entry; please submit
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
  class.name=Packet dropped and logged; \
+ id=100; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -69,6 +71,8 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
  class.name=Packet dropped and logged; \
+ id=101; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -89,6 +93,8 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
  class.name=Packet dropped and logged; \
+ id=102; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -110,6 +116,8 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
  class.name=Packet dropped and logged; \
+ id=103; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -133,6 +141,8 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
  class.name=Packet accepted and logged; \
+ id=104; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -154,6 +164,8 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
  class.name=Packet accepted and logged; \
+ id=105; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -174,6 +186,8 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: (\w+). rule: (\d+); \
  class.name=Packet accepted and logged; \
+ id=106; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -195,6 +209,8 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
  class.name=Packet accepted and logged; \
+ id=107; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -218,6 +234,8 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). dst: ([\d\.]+). proto: icmp. icmp-type: (\d+). icmp-code: (\d+). rule: (\d+); \
  class.name=Packet dropped and logged; \
+ id=108; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
@@ -235,6 +253,8 @@ regex=drop   ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([\d\.]+). dst: ([\d\.]+). proto: icmp. icmp-type: (\d+). icmp-code: (\d+). rule: (\d+); \
  class.name=Packet accepted and logged; \
+ id=109; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -253,6 +273,8 @@ regex=accept ([\d+\.]+) (<|>)([\w-]+) (\w+) product: VPN-1 & FireWall-1. src: ([
 # No sample log entry; please submit
 regex=product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: (\w+). rule: (\d+); \
  class.name=Packet logged; \
+ id=110; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
@@ -273,6 +295,8 @@ regex=product: VPN-1 & FireWall-1. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.
 # No sample log entry; please submit
 regex=product: VPN-1 & FireWall-1; \
  class.name=Generic alert; \
+ id=111; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -289,6 +313,8 @@ regex=product: VPN-1 & FireWall-1; \
 # No sample log entry; please submit
 regex=product: SmartDefense. dst: ([\d\.]+). attack: Port Scanning. src: ([\d\.]+); \
  class.name=Port scan detection; \
+ id=112; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=recon; \
@@ -306,6 +332,8 @@ regex=product: SmartDefense. dst: ([\d\.]+). attack: Port Scanning. src: ([\d\.]
 # No sample log entry; please submit
 regex=product: SmartDefense. attack: Successive Alerts; \
  class.name=Successive alerts; \
+ id=113; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.severity=low; \
  impact.type=other; \
@@ -317,6 +345,8 @@ regex=product: SmartDefense. attack: Successive Alerts; \
 # No sample log entry; please submit
 regex=product: SmartDefense. service: ([\w-]+|\d+). attack: Successive Multiple Connections. dst: ([\d\.]+). src: ([\d\.]+); \
  class.name=Successive multiple connections; \
+ id=114; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -335,6 +365,8 @@ regex=product: SmartDefense. service: ([\w-]+|\d+). attack: Successive Multiple 
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d). proto: ([\w-]+|\d+); \
  class.name=Bad $6 flags; \
+ id=115; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -353,6 +385,8 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
  class.name=Bad $6 flags; \
+ id=116; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -371,6 +405,8 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
  class.name=Bad $6 flags; \
+ id=117; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -389,6 +425,8 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]+). s_port: ([\w-]+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
  class.name=Bad $6 flags; \
+ id=118; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -407,6 +445,8 @@ regex=product: SmartDefense. Attack Info: (.+). attack: Bad packet. src: ([\d\.]
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: Echo request too long. attack: Large ping. src: ([\d\.]+). dst: ([\d\.]+); \
  class.name=Large ping; \
+ id=119; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -424,6 +464,8 @@ regex=product: SmartDefense. Attack Info: Echo request too long. attack: Large p
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small PMTU. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
  class.name=Small PMTU; \
+ id=120; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -442,6 +484,8 @@ regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small 
 # No sample log entry; please submit
 regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small PMTU. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
  class.name=Small PMTU; \
+ id=121; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -461,6 +505,8 @@ regex=product: SmartDefense. Attack Info: MSS (\d+) is too small. attack: Small 
 # No sample log entry; please submit
 regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP sequence. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
  class.name=Bad $6 sequence; \
+ id=122; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -479,6 +525,8 @@ regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP seque
 # No sample log entry; please submit
 regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP sequence. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
  class.name=Bad $6 sequence; \
+ id=123; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -498,6 +546,8 @@ regex=product: SmartDefense. TCP sequence validator: (.+). attack: Bad TCP seque
 # No sample log entry; please submit
 regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: (\d+). proto: ([\w-]+|\d+); \
  class.name=URL worm; \
+ id=124; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -516,6 +566,8 @@ regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm
 # No sample log entry; please submit
 regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm. src: ([\d\.]+). s_port: (\d+). dst: ([\d\.]+). service: ([\w-]+). proto: ([\w-]+|\d+); \
  class.name=URL worm; \
+ id=125; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -534,6 +586,8 @@ regex=product: SmartDefense. URL filter pattern detected: (.+). attack: URL worm
 # No sample log entry; please submit
 regex=product: SmartDefense; \
  class.name=Misc logs; \
+ id=126; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \
@@ -546,6 +600,8 @@ regex=product: SmartDefense; \
 # No sample log entry; please submit
 regex=([\d+\.]+) (<|>)\s+(\w+) System Alert message: (.+). Object: (\w+). (.+). product: System Monitor; \
  class.name=Checkpoint System Monitor; \
+ id=127; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.type=other; \
  impact.severity=low; \

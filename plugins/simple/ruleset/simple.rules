@@ -140,10 +140,13 @@ include = squid.rules;
 include = portsentry.rules;
 include = vigor.rules;
 include = ipchains.rules;
+include = wap11.rules;
 
 #Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user root by (uid=0)
 regex=session opened for user root; \
  class.name=Root login; \
+ id=1; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = succeeded; \
  impact.type = admin; \
@@ -155,6 +158,8 @@ regex=session opened for user root; \
 # No log sample; please submit
 regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
  class.name=Authentication Failure; \
+ id=2; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \
@@ -169,6 +174,8 @@ regex=(PAM|pam)_unix\[([0-9]+)\][^(]+\(uid=([0-9]+)\) -> ([^ ]+); \
 # No log sample; please submit
 regex=entered promiscuous mode; \
  class.name=Promiscuous mode detected; \
+ id=3; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = succeeded; \
  impact.type = other; \
@@ -179,6 +186,8 @@ regex=entered promiscuous mode; \
 # No log sample; please submit
 regex=no such user; \
  class.name=Invalid User; \
+ id=4; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion = failed; \
  impact.type = other; \

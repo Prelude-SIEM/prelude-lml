@@ -34,6 +34,8 @@
 
 regex=portsentry\[?(\d+)+\]?:.* attackalert: (\S+) scan from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
  class.name=PortSentry - $2 Scan; \
+ id=1500; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -56,6 +58,8 @@ regex=portsentry\[?(\d+)+\]?:.* attackalert: (\S+) scan from host: (\S+)/([\d\.]
 
 regex=portsentry\[?(\d+)+\]?:.* attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP) port: (\d+); \
  class.name=PortSentry - $4/$5 connection loggued; \
+ id=1501; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=succeeded; \
  impact.type=other; \
@@ -75,6 +79,8 @@ regex=portsentry\[?(\d+)+\]?:.* attackalert: Connect from host: (\S+)/([\d\.]+|[
 
 regex=portsentry\[?(\d+)+\]?:.* attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
  class.name=PortSentry - connection blocked \
+ id=1502; \
+ revision=1; \
  class.origin=vendor-specific; \
  impact.completion=failed; \
  impact.type=other; \
