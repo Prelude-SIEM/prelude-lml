@@ -4,17 +4,6 @@
 /* Trivial UDP server  
    Author: Pierre-Jean Turpeau */
 
-#define ETHERNET_LEN 1500
-#define ETHERNET_HEADER_LEN 14
-#define IP_HEADER_LEN 32	/* if no options in the IP datagram */
-#define UDP_HEADER_LEN 8
-
-/* we suppose we are on an ethernet network */
-#define MAX_UDP_DATA_SIZE ( ETHERNET_LEN		\
-			    - ETHERNET_HEADER_LEN	\
-			    - IP_HEADER_LEN		\
-			    - UDP_HEADER_LEN )
-
 typedef struct udp_server udp_server_t;
 
 /*

@@ -19,6 +19,8 @@
 #include "queue.h"
 #include "udp-server.h"
 
+
+
 struct udp_server {
 	int sockfd;
 	struct sockaddr_in saddr;
@@ -33,29 +35,28 @@ struct udp_server {
 
 static void udp_server_standalone(udp_server_t *server)
 {
-	int addr_len, numbytes;
+        char buf[8192];
+	int addr_len, ret;
         struct sockaddr_in addr;
-        char buf[MAX_UDP_DATA_SIZE];
 
-	while (1) {
-		addr_len = sizeof(struct sockaddr);
+	while ( 1 ) {
+                addr_len = sizeof(struct sockaddr);
 
-                numbytes = recvfrom(server->sockfd, buf, MAX_UDP_DATA_SIZE - 1, 0,
-                                    (struct sockaddr *) &addr, &addr_len);
-		buf[MAX_UDP_DATA_SIZE - 1] = '\0';
+                ret = recvfrom(server->sockfd, buf, sizeof(buf), 0,
+                               (struct sockaddr *) &addr, &addr_len);
 
-		if ( numbytes == -1 ) {
-			log(LOG_ERR, "couldn't receive on socket.\n");
-			exit(1);
-		}
-
+                if ( ret < 0 ) {
+                        log(LOG_ERR, "error receiving syslog message.\n");
+                        continue;
+                }
+                
+                buf[ret] = '\0';
+                
 		dprint("[UDP  ] on fd %d got packet from %s:%d - packet is %d bytes long\n",
-                       server->sockfd, inet_ntoa(addr.sin_addr),
-                       addr.sin_port, numbytes);
-		buf[numbytes] = '\0';
-		server->mreader(server->queue, buf, inet_ntoa(addr.sin_addr));
-	}
+                       server->sockfd, inet_ntoa(addr.sin_addr), addr.sin_port, ret);
 
+                server->mreader(server->queue, buf, inet_ntoa(addr.sin_addr));
+	}
 }
 
 

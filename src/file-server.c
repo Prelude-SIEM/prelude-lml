@@ -56,10 +56,11 @@ static int read_file(void *sdata, server_logic_client_t *client)
         monitor_fd_t *fd = (monitor_fd_t *) client;
         
         ret = prelude_io_read(fd->fd, buf, sizeof(buf));
-
-        printf("read ret %d\n", ret);
         
         if ( ret == 0 ) {
+                /*
+                 * FIXME.
+                 */
                 sleep(1);
                 return 0;
         }

@@ -1,5 +1,14 @@
 2002-03-28  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/lml-alert.c (lml_emit_alert): 
+	fill in more informations... Still many work to do.
+
+	* src/file-server.c (read_file): 
+	remove debugging printf().
+
+	* src/udp-server.c (udp_server_standalone): 
+	use a bigger buffer. We don't want to rely on ethernet stuff.
+
 	* plugins/pax/pax.c (pax_log_processing): 
 	* plugins/simple/simple.c (emit_alert): 
 	use lml_emit_alert().
