@@ -15,12 +15,10 @@
 
 # Configuration for the UDP message receiver.
 # commented out by default since most people only want to 
-# monitor files.
+# monitor files. If port is not set, the default syslog port
+# (514) is used. 
 # 
-# [Udp-Srvr]
-#
-# port = 514
-# addr = 0.0.0.0
+# udp-srvr = x.x.x.x:port
 
 
 #

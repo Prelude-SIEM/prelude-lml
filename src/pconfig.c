@@ -51,7 +51,8 @@
 #include "file-server.h"
 #include "udp-server.h"
 
-#define MAX_FD 1024
+
+#define DEFAULT_UDP_SERVER_PORT 514
 
 
 int batch_mode = 0;
@@ -203,41 +204,36 @@ static int set_file(void **context, prelude_option_t *opt, const char *arg)
 
 static int enable_udp_server(void **context, prelude_option_t *opt, const char *arg) 
 {
+        int port;
+        char *ptr;
+        const char *addr;
         regex_list_t *rlist;
 
+        port = DEFAULT_UDP_SERVER_PORT;
+
+        if ( arg ) {
+                addr = arg;
+
+                ptr = strrchr(arg, ':');
+                if ( ptr ) {
+                        *ptr = 0;
+                        port = atoi(ptr + 1);
+                }
+        }
+        
         rlist = regex_init("syslog");
         if ( ! rlist ) 
                 return prelude_option_error;
         
-        udp_srvr = udp_server_new(rlist, udp_srvr_addr, udp_srvr_port);
-        free(udp_srvr_addr);
-        
+        udp_srvr = udp_server_new(rlist, addr, port);        
         if ( ! udp_srvr )
                 return prelude_option_error;
+
+        if ( ptr )
+                *ptr = ':';
         
         return prelude_option_success;
 }
-
-
-
-static int set_udp_server_addr(void **context, prelude_option_t *opt, const char *arg) 
-{
-        udp_srvr_addr = strdup(arg);
-        if ( ! udp_srvr_addr ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                return prelude_option_error;
-        }
-
-        return prelude_option_success;
-}
-
-
-static int set_udp_server_port(void **context, prelude_option_t *opt, const char *arg) 
-{
-        udp_srvr_port = atoi(arg);
-        return prelude_option_success;
-}
-
 
 
 
@@ -317,17 +313,11 @@ int pconfig_set(int argc, char **argv)
         prelude_option_set_priority(opt, option_run_first);
         
         opt = prelude_option_add(NULL, CLI_HOOK | CFG_HOOK, 's', "udp-srvr",
-                                 "Listen syslog to UDP messages", no_argument,
-                                 enable_udp_server, NULL);
+                           "address:port pair to listen to syslog to UDP messages (default port 514)", optionnal_argument,
+                           enable_udp_server, NULL);
 
-        prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'a', "addr",
-                           "Address to listen on (default 0.0.0.0)", required_argument,
-                           set_udp_server_addr, NULL);
+        prelude_option_set_priority(opt, option_run_last);
         
-        prelude_option_add(opt, CLI_HOOK | CFG_HOOK, 'p', "port",
-                           "Port to listen on (default 514)", required_argument,
-                           set_udp_server_port, NULL);
-
         prelude_option_add(NULL, CLI_HOOK|CFG_HOOK, 'r', "rotation-interval",
                            "Specifies the maximum difference, in seconds, between the interval " \
                            "of two logfiles' rotation. If this difference is reached, a high "   \
