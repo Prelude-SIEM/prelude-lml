@@ -26,6 +26,7 @@ ruleset_DATA = \
 	vigor.rules		\
 	vpopmail.rules		\
 	wap11.rules		\
+	webmin.rules		\
 	wu-ftp.rules		\
 	zywall.rules		\
 	zyxel.rules

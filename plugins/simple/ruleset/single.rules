@@ -26,7 +26,7 @@
 # Copyright (C) 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 # All Rights Reserved
 
-# No log sample; please submit
+#Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
 regex=entered promiscuous mode; \
  classification(0).name=Promiscuous mode detected; \
  id=400; \

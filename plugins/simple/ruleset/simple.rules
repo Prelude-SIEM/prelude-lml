@@ -170,6 +170,7 @@ include = sudo.rules;
 include = vigor.rules;
 include = vpopmail.rules;
 include = wap11.rules;
+include = webmin.rules;
 include = wu-ftp.rules;
 include = zywall.rules;
 include = zyxel.rules;

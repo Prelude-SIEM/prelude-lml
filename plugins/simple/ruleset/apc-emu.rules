@@ -43,7 +43,7 @@ regex=EMU: Probe \d+ i(\'.+\') high  humidity violation, \'(\d+%); \
  last
 
 #Mar 28 04:06:27 enviro1 12.34.56.78 EMU: Probe 2 'Loc Env Probe 2' high  humidity violation cleared, '39%RH'. 0x101D
-regex=EMU: Probe (\d+) (\'.+\') high  humidity violation cleared, \'(\d+%); \
+regex=EMU: Probe \d+ (\'.+\') high  humidity violation cleared, \'(\d+%); \
  classification(0).name=Environmental Humidity Normal; \
  id=2801; \
  revision=1; \
