@@ -1,6 +1,7 @@
 ruleset_DATA = \
 	apc-emu.rules		\
 	cisco-pix.rules		\
+	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
 	grsecurity.rules	\
