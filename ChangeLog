@@ -1,4 +1,12 @@
+2004-01-16  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/ruleset/simple.rules (regex): 
+	keep classification name static, for correlation need.
+
 2004-01-15  Yoann Vandoorselaere  <yoann@prelude-ids.org>
+
+	* plugins/simple/ruleset/simple.rules (regex): 
+	better rules.
 
 	* plugins/simple/ruleset/grsecurity.rules: 
 	* plugins/simple/ruleset/ssh.rules: 
