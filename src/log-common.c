@@ -98,7 +98,7 @@ static int parse_ts(log_source_t *ls, const char *string, void **out)
          */
         tv->tv_usec = 0;
         tv->tv_sec = mktime(lt);
-        
+
         return 0;
 
  err:
@@ -119,9 +119,9 @@ static int parse_prefix(log_entry_t *log_entry)
                 int (*cb)(log_source_t *ls, const char *log, void **out);
                 void **ptr;
         } tbl[] = {
+                { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
                 { "process",   NULL,     (void **) &log_entry->target_process     },
                 { "pid",       NULL,     (void **) &log_entry->target_process_pid },
-                { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
                 { "timestamp", parse_ts, (void **) &tv                            },
                 { NULL, NULL, NULL                                                },
         };
