@@ -170,7 +170,7 @@ regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.
  assessment.impact.completion = failed; \
  assessment.impact.type = user; \
  assessment.impact.severity = high; \
- assessment.impact.description=User $1 tried to authenticate as $7 and failed;
+ assessment.impact.description=User $1 tried to authenticate as $7 and failed; \
  source(0).user.category = os-device; \
  source(0).user.userid(0).type = current-user; \
  source(0).user.userid(0).name = $1;           \
