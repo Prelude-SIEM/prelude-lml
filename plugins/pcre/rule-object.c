@@ -33,8 +33,7 @@
 #include <libprelude/prelude-inttypes.h>
 #include <libprelude/common.h>
 #include <libprelude/idmef.h>
-#include <libprelude/prelude-strbuf.h>
-#include <libprelude/prelude-getopt.h>
+#include <libprelude/prelude-string.h>
 
 #include "libmissing.h"
 #include "log-common.h"
@@ -147,7 +146,7 @@ static int add_dynamic_object_value(rule_object_list_t *olist, rule_object_t *ru
 
 
 
-static int add_fixed_object_value(rule_object_t *rule_object, prelude_strbuf_t *strbuf)
+static int add_fixed_object_value(rule_object_t *rule_object, prelude_string_t *strbuf)
 {
 	rule_object_value_t *rovalue;
 
@@ -157,8 +156,8 @@ static int add_fixed_object_value(rule_object_t *rule_object, prelude_strbuf_t *
 		return -1;
 	}
 
-	prelude_strbuf_dont_own(strbuf);
-	rovalue->value = prelude_strbuf_get_string(strbuf);
+	prelude_string_dont_own(strbuf);
+	rovalue->value = prelude_string_get_string(strbuf);
 
 	prelude_list_add_tail(&rovalue->list, &rule_object->rule_object_value_list);
 
@@ -172,7 +171,7 @@ static int parse_rule_object_value(rule_object_list_t *olist, rule_object_t *rul
         int i;
         char num[10];
 	const char *str;
-	prelude_strbuf_t *strbuf;
+	prelude_string_t *strbuf;
 
 	str = line;
 
@@ -197,7 +196,7 @@ static int parse_rule_object_value(rule_object_list_t *olist, rule_object_t *rul
 			continue;
 		}
 
-		strbuf = prelude_strbuf_new();
+		strbuf = prelude_string_new();
 		if ( ! strbuf )
 			return -1;
 
@@ -209,7 +208,7 @@ static int parse_rule_object_value(rule_object_list_t *olist, rule_object_t *rul
 					break;
 			}
 
-			if ( prelude_strbuf_ncat(strbuf, str, 1) < 0 )
+			if ( prelude_string_ncat(strbuf, str, 1) < 0 )
 				return -1;
 			str++;
 		}
@@ -217,7 +216,7 @@ static int parse_rule_object_value(rule_object_list_t *olist, rule_object_t *rul
 		if ( add_fixed_object_value(rule_object, strbuf) < 0 )
 			return -1;
 
-		prelude_strbuf_destroy(strbuf);
+		prelude_string_destroy(strbuf);
 	}
 
 	return 0;
@@ -246,10 +245,10 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
         prelude_list_t *tmp;
         idmef_value_t *value;
         struct servent *service;
-	prelude_strbuf_t *strbuf;
+	prelude_string_t *strbuf;
 	rule_object_value_t *rovalue;
                  
-	strbuf = prelude_strbuf_new();
+	strbuf = prelude_string_new();
 	if ( ! strbuf )
 		return NULL;
 
@@ -259,18 +258,18 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
                 if ( ! rovalue->value )
                         continue;
 
-                if ( prelude_strbuf_cat(strbuf, rovalue->value) < 0 ) {
-			prelude_strbuf_destroy(strbuf);
+                if ( prelude_string_cat(strbuf, rovalue->value) < 0 ) {
+			prelude_string_destroy(strbuf);
 			return NULL;
 		}
 	}
 
-        if ( prelude_strbuf_is_empty(strbuf) ) {
-                prelude_strbuf_destroy(strbuf);
+        if ( prelude_string_is_empty(strbuf) ) {
+                prelude_string_destroy(strbuf);
                 return NULL;
         }
         
-	str = prelude_strbuf_get_string(strbuf);
+	str = prelude_string_get_string(strbuf);
 
 	if ( strrncmp(idmef_object_get_name(rule_object->object), ".port") == 0 && ! isdigit((int) *str) ) {
 
@@ -286,7 +285,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 		value = idmef_value_new_for_object(rule_object->object, str);
 	}
 
-	prelude_strbuf_destroy(strbuf);
+	prelude_string_destroy(strbuf);
 	
 	return value;
 }

@@ -38,9 +38,9 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 	idmef_alert_t *alert;
 	idmef_message_t *message;
 	idmef_analyzer_t *analyzer;
-	idmef_string_t *analyzer_model, *analyzer_class;
+	prelude_string_t *analyzer_model, *analyzer_class;
 	idmef_additional_data_t *adata;
-	idmef_string_t *adata_meaning;
+	prelude_string_t *adata_meaning;
 	idmef_data_t *data;
         debug_plugin_t *plugin;
 
@@ -56,10 +56,10 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 	assert(analyzer);
 
 	analyzer_model = idmef_analyzer_new_model(analyzer);
-	idmef_string_set_constant(analyzer_model, "Prelude-LML Debug Plugin");
+	prelude_string_set_constant(analyzer_model, "Prelude-LML Debug Plugin");
 
 	analyzer_class = idmef_analyzer_new_class(analyzer);
-	idmef_string_set_constant(analyzer_class, "An alert for any log received");
+	prelude_string_set_constant(analyzer_class, "An alert for any log received");
 
 	adata = idmef_alert_new_additional_data(alert);
 	assert(adata);
@@ -67,7 +67,7 @@ static void debug_run(prelude_plugin_instance_t *pi, const log_container_t *log)
 	idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
 
 	adata_meaning = idmef_additional_data_new_meaning(adata);
-	idmef_string_set_constant(adata_meaning, "log message");
+	prelude_string_set_constant(adata_meaning, "log message");
 
 	data = idmef_additional_data_new_data(adata);
 	idmef_data_set_ref(data, log->log, strlen(log->log) + 1);

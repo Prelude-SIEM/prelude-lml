@@ -32,8 +32,6 @@
 #include <libprelude/prelude-inttypes.h>
 #include <libprelude/common.h>
 #include <libprelude/idmef.h>
-#include <libprelude/prelude-strbuf.h>
-#include <libprelude/prelude-getopt.h>
 #include <libprelude/prelude-linked-object.h>
 
 #include "libmissing.h"

@@ -62,7 +62,7 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
 {
         int ret;
         idmef_address_t *address;
-	idmef_string_t *string;
+	prelude_string_t *string;
         
         /*
          * we want to know if it's an ip address or an hostname.
@@ -73,7 +73,7 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
                  * hostname.
                  */
 		string = idmef_node_new_name(node);
-		idmef_string_set_ref(string, log->target_hostname);
+		prelude_string_set_ref(string, log->target_hostname);
 
         } else {
                 address = idmef_node_new_address(node);
@@ -81,7 +81,7 @@ static int resolve_failed_fallback(const log_container_t *log, idmef_node_t *nod
                         return -1;
 
                 string = idmef_address_new_address(address);
-		idmef_string_set_ref(string, log->target_hostname);
+		prelude_string_set_ref(string, log->target_hostname);
         }
 
         return 0;
@@ -95,13 +95,13 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
         char str[128];
         void *in_addr;
         idmef_address_t *addr;
-	idmef_string_t *string;
+	prelude_string_t *string;
 
         while ( ai ) {
-
+                
                 if ( ai->ai_flags & AI_CANONNAME ) {
 			string = idmef_node_new_name(node);
-			if ( idmef_string_set_dup(string, ai->ai_canonname) < 0 )
+			if ( prelude_string_set_dup(string, ai->ai_canonname) < 0 )
 				return -1;
 		}
                 
@@ -122,7 +122,7 @@ static int fill_target(idmef_node_t *node, prelude_addrinfo_t *ai)
                 }
 
 		string = idmef_address_new_address(addr);
-		if ( idmef_string_set_dup(string, str) < 0 )
+		if ( prelude_string_set_dup(string, str) < 0 )
 			return -1;
 
                 ai = ai->ai_next;
@@ -141,7 +141,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
         idmef_userid_t *userid;
         idmef_target_t *target;
         idmef_process_t *process;
-	idmef_string_t *process_name;
+	prelude_string_t *process_name;
 
         target = idmef_alert_get_next_target(alert, NULL);
         if ( ! target ) {
@@ -159,7 +159,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                 if ( ! userid )
                         return -1;
                 
-                idmef_string_set_ref(idmef_userid_new_name(userid), log->target_user);
+                prelude_string_set_ref(idmef_userid_new_name(userid), log->target_user);
         }
         
         if ( log->target_program && ! idmef_target_get_process(target) ) {
@@ -168,9 +168,9 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
                         return -1;
 
 		process_name = idmef_process_new_name(process);
-		idmef_string_set_ref(process_name, log->target_program);
+		prelude_string_set_ref(process_name, log->target_program);
         }
-
+        
         if ( log->target_hostname && ! idmef_target_get_node(target) ) {
                 prelude_addrinfo_t *ai, hints;
                 
@@ -202,7 +202,7 @@ static int generate_target(const log_container_t *log, idmef_alert_t *alert)
 static int generate_additional_data(idmef_alert_t *alert, const char *meaning, const char *data)
 {
 	idmef_additional_data_t *adata;
-	idmef_string_t *adata_meaning;
+	prelude_string_t *adata_meaning;
 	idmef_data_t *adata_data;
 
         adata = idmef_alert_new_additional_data(alert);
@@ -210,7 +210,7 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
 		return -1;
 
 	adata_meaning = idmef_additional_data_new_meaning(adata);
-	idmef_string_set_ref(adata_meaning, meaning);
+	prelude_string_set_ref(adata_meaning, meaning);
 
 	idmef_additional_data_set_type(adata, IDMEF_ADDITIONAL_DATA_TYPE_STRING);
 
@@ -272,7 +272,7 @@ void lml_emit_alert(const log_container_t *log, idmef_message_t *message, uint8_
 
 int lml_alert_init(prelude_client_t *lml_client) 
 {
-        idmef_string_t *string;
+        prelude_string_t *string;
         
         msgbuf = prelude_msgbuf_new(lml_client);
         if ( ! msgbuf ) {
@@ -287,16 +287,16 @@ int lml_alert_init(prelude_client_t *lml_client)
 	}
         
 	string = idmef_analyzer_new_model(idmef_analyzer);
-	idmef_string_set_constant(string, ANALYZER_MODEL);
+	prelude_string_set_constant(string, ANALYZER_MODEL);
 
 	string = idmef_analyzer_new_class(idmef_analyzer);
-	idmef_string_set_constant(string, ANALYZER_CLASS);
+	prelude_string_set_constant(string, ANALYZER_CLASS);
 
 	string = idmef_analyzer_new_manufacturer(idmef_analyzer);
-	idmef_string_set_constant(string, ANALYZER_MANUFACTURER);
+	prelude_string_set_constant(string, ANALYZER_MANUFACTURER);
 
 	string = idmef_analyzer_new_version(idmef_analyzer);
-	idmef_string_set_constant(string, VERSION);
+	prelude_string_set_constant(string, VERSION);
 
         return 0;
 }

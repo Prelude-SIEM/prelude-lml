@@ -152,7 +152,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_target_t *target;
         idmef_message_t *message;
         idmef_assessment_t *assessment;
-        idmef_string_t *string;
+        prelude_string_t *string;
         
         log = log_container_new(fd->source);
         if ( ! log )
@@ -191,11 +191,11 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         if ( ptr ) {
                 *ptr = '\0';
                 string = idmef_file_new_name(file);
-                idmef_string_set_ref(string, ptr + 1);
+                prelude_string_set_ref(string, ptr + 1);
         }
 
         string = idmef_file_new_path(file);
-        idmef_string_set_ref(string, buf);
+        prelude_string_set_ref(string, buf);
 
         time = idmef_file_new_access_time(file);
         if ( ! time )
@@ -235,8 +235,8 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
 {
         idmef_impact_t *impact;
         idmef_classification_t *classification;
-        idmef_string_t *classification_name;
-        idmef_string_t *impact_description;
+        prelude_string_t *classification_name;
+        prelude_string_t *impact_description;
         
         impact = idmef_impact_new();
         if ( ! impact )
@@ -251,14 +251,14 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
         idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
         
         classification_name = idmef_classification_new_name(classification);
-        idmef_string_set_constant(classification_name, LOGFILE_MODIFICATION_CLASS);
+        prelude_string_set_constant(classification_name, LOGFILE_MODIFICATION_CLASS);
         
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
         idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
         
         impact_description = idmef_impact_new_description(impact);
-        idmef_string_set_constant(impact_description, LOGFILE_MODIFICATION_IMPACT);
+        prelude_string_set_constant(impact_description, LOGFILE_MODIFICATION_IMPACT);
         
         logfile_alert(monitor, st, classification, impact);
 }
@@ -700,7 +700,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         const char *filename;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
-        idmef_string_t *classification_name, *impact_description;
+        prelude_string_t *classification_name, *impact_description;
 
         filename = log_source_get_name(monitor->source);
         
@@ -739,7 +739,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         
         idmef_classification_set_origin(classification, IDMEF_CLASSIFICATION_ORIGIN_UNKNOWN);
         classification_name = idmef_classification_new_name(classification);
-        idmef_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
+        prelude_string_set_constant(classification_name, LOGFILE_DELETION_CLASS);
         
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
@@ -750,7 +750,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
                 impact_description = idmef_impact_new_description(impact);
-                idmef_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
+                prelude_string_set_constant(impact_description, LOGFILE_DELETION_IMPACT);
         } else {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
                 impact_description = idmef_impact_new_description(impact);
@@ -759,7 +759,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                         "than the allowed limits: size difference=%u bytes allowed=%u bytes, time "
                         "difference=%u seconds allowed=%u seconds", soff, max_rotation_size_offset, 
                         toff, max_rotation_time_offset);
-                idmef_string_set_ref(impact_description, buf);
+                prelude_string_set_ref(impact_description, buf);
         }
 
         logfile_alert(monitor, st, classification, impact);
@@ -1036,12 +1036,14 @@ int file_server_monitor_file(regex_list_t *rlist, log_source_t *ls)
         if ( ! new )
                 return -1;
 
+#if 0
         ret = monitor_open(new);
         if ( ret < 0 ) {
                 log(LOG_ERR, "couldn't open %s for reading.\n", log_source_get_name(ls));
                 free(new);
                 return -1;
         }
+#endif
         
         new->regex_list = rlist;
         
