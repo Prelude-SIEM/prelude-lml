@@ -258,7 +258,7 @@ static int set_udp_server(void *context, prelude_option_t *opt, const char *arg)
 {
         char *ptr = NULL;
         regex_list_t *rlist;
-       
+        
         destroy_udp_server(context, opt);
         
         udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
@@ -304,7 +304,8 @@ static int set_lml_group(void *context, prelude_option_t *opt, const char *arg)
         }
 
         prelude_lml_group = grp->gr_gid;
-
+        prelude_client_profile_set_gid(prelude_client_get_profile(context), grp->gr_gid);
+        
         return 0;
 }
 
@@ -322,7 +323,7 @@ static int set_lml_user(void *context, prelude_option_t *opt, const char *arg)
         }
 
         prelude_lml_user = p->pw_uid;
-        prelude_client_set_uid(context, p->pw_uid);
+        prelude_client_profile_set_uid(prelude_client_get_profile(context), p->pw_uid);
         
         return 0;
 }
@@ -401,25 +402,32 @@ int pconfig_set(int argc, char **argv)
                                  PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
 
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
+        
+        ret = prelude_client_new(&lml_client, PRELUDE_CONNECTION_CAPABILITY_CONNECT,
+                                 "prelude-lml", PRELUDE_CONF, &argc, argv);
 
-        lml_client = prelude_client_new(PRELUDE_CLIENT_CAPABILITY_SEND_IDMEF);
-        if ( ! lml_client )
-                return -1;
-        
-        ret = lml_alert_init(lml_client);
-        if ( ret < 0 )
-                return -1;
-        
-        ret = prelude_client_init(lml_client, "prelude-lml", PRELUDE_CONF, &argc, argv);
         if ( ret < 0 ) {
-                log(LOG_INFO, "%s: error initializing prelude-client object: %s.\n",
-                    prelude_strsource(ret), prelude_strerror(ret));
-
+                prelude_perror(ret, "error creating prelude-client");
+                
                 if ( prelude_client_is_setup_needed(lml_client, ret) )
                         prelude_client_print_setup_error(lml_client);
                 
                 return -1;
         }
+        
+        ret = lml_alert_init(lml_client);
+        if ( ret < 0 )
+                return -1;
+        
+        ret = prelude_client_start(lml_client);
+        if ( ret < 0 ) {
+                prelude_perror(ret, "error starting prelude-client");
+                return -1;
+        }
+
+        ret = prelude_option_parse_arguments(lml_client, NULL, PRELUDE_CONF, &argc, argv);
+        if ( ret < 0 )
+                return -1;
         
         if ( batch_mode && udp_srvr ) {
                 log(LOG_ERR, "UDP server and batch modes can't be used together.\n");
