@@ -4,55 +4,23 @@ by Yoann Vandoorselaere <yoann@mandrakesoft.com>
 Prelude is a general-purpose hybrid intrusion detection system, 
 written entirely from scratch, in C. Prelude is divided into several parts: 
 
-* The NIDS sensor, Prelude, 
-  responssible for packet capture and analyzis,
 
-	- The signature engine,
-	  designed to be the completly generic and evolutive, it is currently
-	  able to read Snort rulesets. By simply adding parser, it should permit
-	  to load rulesets from any NIDS.
+- LICENSE ADDITION
 
-	- a series of intrusion detection plugins, 
-  	  each dedicated to a particular kind of attack started by Prelude, 
-
-	- a series of protocols plugins,
-  	  each dedicated to decoding one, high level protocol.
-
-* The report server, 
-  a server which Prelude contacts in order to report an intrusion,
-  which generate user readable report using plugins. 
-
-	- a series of reporting plugins,
-	  each dedicated to making user readable report (html, syslog, xml, ...)
-
-
-The interesting part is plugins: you can write your own, dedicated to a 
-special intrusion detection that you know of and share it with others. 
-For example, bundled with the source is a plugin to detect SYN flooding 
-attacks. There is more, and you can write more. Moreover, plugins are 
-only called when necessary. For example, Prelude won't call the 
-aforementioned plugin when it receives a TCP packet which hasn't got the 
-SYN flag set, nor will it call it if it receives an ICMP packet. 
-
-Prelude does take care of IP fragmentation. It works as follows: 
-when Prelude receives a fragmented packet, it will add it to the 
-defragmentation stack. It stores subsequent fragments of the same 
-packet in the stack until it receives the last one. The original 
-packet is then reassembled and passed on to the intrusion 
-detection plugins. 
-
-Note that all packets, at a fragmented state *and* at a 
-defragmented state will be analyzed for security problem. This 
-allows for detection of IP fragmentation attacks, for example. 
-
-Prelude also decode TCP/IP options.
-
+In addition, as a special exception, the copyright holder gives permission 
+to link the code of this program with any version of the OpenSSL library which 
+is distributed under a license identical to that listed in the included 
+COPYING.OpenSSL file, and distribute linked combinations including the two. 
+You must obey the GNU General Public License in all respects for all of the
+code used other than OpenSSL. If you modify this file, you may extend this 
+exception to your version of the file, but you are not obligated to do so. 
+If you do not wish to do so, delete this exception statement from your version.
 
 
 
 - COPYRIGHT 
 
-Copyright (C) 1998-2001 Yoann Vandoorselaere <yoann@mandrakesoft.com>
+Copyright (C) 1998-2002 Yoann Vandoorselaere <yoann@mandrakesoft.com>
 All Rights Reserved
 
 This file is part of the Prelude program.
