@@ -50,6 +50,8 @@ regex= security\[success\] 515 (.*) Logon Process Name:([\w\\]+); \
  assessment.impact.type=other; \
  assessment.impact.description=$2 has registered as a trusted logon process; \
  source(0).process.name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 1.b 528
@@ -66,8 +68,9 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
  assessment.impact.type=user; \
  assessment.impact.description=$2 successfully logged on on $7 ($3 domain) via $6; \
  source(0).user.category=os-device; \
- source(0).user.user_id(0).type=target-user; \
+ source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$1; \
+ target(0).node.name=$7; \
  last
 
 # 1.c 538
@@ -86,6 +89,8 @@ regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:(.+
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 1.d 560
@@ -105,6 +110,8 @@ regex= security\[success\] 560 (.*)  Object Open:  Object Server:([\w\s]+)  Obje
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$11; \
  target(0).process.pid=$7; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 1.e 562
@@ -121,6 +128,8 @@ regex= security\[success\] 562 (.*) Handle Closed:  Object Server:([\w\s]+)  Han
  assessment.impact.type=other; \
  assessment.impact.description=Object Handle closed on $2; \
  target(0).process.pid=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 1.f 576
@@ -139,6 +148,8 @@ regex= security\[success\] 576 (.*)  Special privileges assigned to new logon:  
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 1.g 577
@@ -157,6 +168,8 @@ regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:(.+)  Se
  source(0).user.category=os-device; \ 
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$7; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 1.h
@@ -175,6 +188,8 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 1.i 680
@@ -190,6 +205,8 @@ regex= security\[success\] 680 (.*)  Account Used for Logon by: (.+)  Account Na
  assessment.impact.type=user; \
  assessment.impact.description=Logon attempt on $4 using the $3 account; \
  target(0).node.name=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 1.j 682
@@ -209,6 +226,8 @@ regex= security\[success\] 682 (.*)  Session reconnected to winstation:  User Na
  source(0).node.address(0).address=$7; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 1.k 683
@@ -228,6 +247,8 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
  source(0).node.address(0).address=$7; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 1.l other
@@ -248,7 +269,7 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
 # 2. Failure events
 # 2.a 529 or 534
 # LOG:Dec 10 00:23:37 webbrain.itg.sac.tfs security[failure] 529 NT AUTHORITY\SYSTEM  Logon Failure:  Reason:Unknown user name or bad password  User Name:administrator  Domain:ITG  Logon Type:2  Logon Process:Advapi    Authentication Package: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Workstation Name:WEBBRAIN
-regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\w ]+)  Domain:(.+)  Logon Type:(\d+)  Logon Process:(\w+)    Authentication Package:(.+)  Workstation Name:(.+); \
+regex= security\[failure\] (529|534) (.+) Logon Failure:  Reason:(.+)  User Name:([\w ]+)  Domain:(.+)  Logon Type:(\d+)  Logon Process:(\w+)    Authentication Package:(.+)  Workstation Name:(.+); \
  classification.text=Windows Event ID [$1]: Logon failure; \
  id=1412; \
  revision=1; \
@@ -263,6 +284,8 @@ regex= security\[failure\] (\d+) (.+) Logon Failure:  Reason:(.+)  User Name:([\
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 2.b 578
@@ -280,6 +303,8 @@ regex= security\[failure\] 578 (.+) Privileged object operation:  Object Server:
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$7; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 2.c 627
@@ -300,6 +325,8 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(1).type=current-user; \
+ source(0).user.user_id(1).name=$1; \
  last
 
 # 2.d 681
@@ -319,6 +346,8 @@ regex= security\[failure\] 681 (.+)  The logon to account: (\w+)  by:(.+)  from 
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
  last
 
 # 2.e other
