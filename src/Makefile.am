@@ -7,7 +7,7 @@ AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmis
 	-DLOCALSTATEDIR=\"@localstatedir@\" @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@
 
 bin_PROGRAMS = prelude-lml
-prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@
+prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@ $(top_builddir)/libmissing/libmissing.la
 prelude_lml_LDFLAGS = -export-dynamic 				\
 	"-dlopen" $(top_builddir)/plugins/debug/debug.la   	\
 	"-dlopen" $(top_builddir)/plugins/simple/simple.la
