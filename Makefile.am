@@ -1,4 +1,4 @@
-SUBDIRS = src plugins
+SUBDIRS = plugins src
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
