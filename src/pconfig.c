@@ -52,15 +52,8 @@
 
 #define MAX_FD 1024
 
-static struct {
-        int fd;
-        const char *file;
-} fd_tbl[MAX_FD];
-
-static int fd_index = 0;
 
 udp_server_t *udp_srvr = NULL;
-
 static uint16_t udp_srvr_port = 514;
 static char *udp_srvr_addr = NULL;
 static char *pidfile = NULL;
@@ -113,29 +106,22 @@ static int set_pidfile(const char *arg)
 
 static int set_file(const char *arg) 
 {
-        int fd;
+        int fd, ret;
 
-        /*
-         * we have to store FD in a temporary table
-         * because they have to be opened as root,
-         * but the function that'll create the FD monitor
-         * may create a thread, and we want this thread to run
-         * as the specified user.
-         */        
-        if ( fd_index == MAX_FD ) {
-                log(LOG_ERR, "Too much file descriptor in the table.\n");
-                return prelude_option_error;
-        }
-        
-        fd = open(arg, O_RDONLY|O_NONBLOCK);
+        fd = open(arg, O_RDONLY);
         if ( fd < 0 ) {
                 log(LOG_ERR, "couldn't open %s for reading.\n", arg);
                 return prelude_option_success; /* do not stop */
         }
-
-        fd_tbl[fd_index].fd = fd;
-        fd_tbl[fd_index++].file = strdup(arg);
         
+        ret = file_server_monitor_file(arg, fd);
+        if ( ret < 0 ) {
+                close(fd);
+                return prelude_option_error;
+        }
+        
+        log(LOG_INFO, "- Added monitor for '%s'.\n", arg);
+
         return prelude_option_success;
 }
 
@@ -194,7 +180,7 @@ static int set_lml_user(const char *arg)
 
 int pconfig_set(int argc, char **argv)
 {
-	int ret, i;
+	int ret;
         prelude_option_t *opt;
         
 	prelude_option_add(NULL, CLI_HOOK, 'h', "help",
@@ -246,18 +232,6 @@ int pconfig_set(int argc, char **argv)
         if ( prelude_lml_user && setuid(prelude_lml_user) < 0 ) {
                 log(LOG_ERR, "couldn't set UID to %d.\n", prelude_lml_user);
                 return -1;
-        }
-
-        /*
-         * load FD in server-logic now, so that created thread
-         * are owned by the specified user.
-         */
-        for ( i = 0; i < fd_index; i++ ) {
-                ret = file_server_monitor_file(fd_tbl[i].file, fd_tbl[i].fd);
-                if ( ret < 0 )
-                        return prelude_option_error;
-                
-                log(LOG_INFO, "- Added monitor for '%s'.\n", fd_tbl[i].file);
         }
         
 	return 0;
