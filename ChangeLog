@@ -1,5 +1,33 @@
 2002-03-29  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
 
+	* src/main.c (lml_dispatch_log): 
+	new public function that should be called when we have a new log
+	line. This function handle both the case when we're threaded
+	(UDP + file monitor), or when there is no thread (file monitor only).
+
+	* src/udp-server.c (udp_server_standalone): 
+	select with a timeout of one second. Call file_server_wake_up
+	every seconds.
+
+	* src/file-server.c: 
+	stop using server-logic.c. We now have an array of FD to monitor.
+	In order to do so, we check the FDs modification time and read 
+	data if available, then we go to sleep (as tail does).
+
+	(file_server_wake_up): 
+	to be called by a working thread instead of file_server_standalone()
+	(for exemple if we also have an UDP server).
+
+	(file_server_standalone): 
+	new function for starting the file monitor.
+	
+	* src/server-logic.c:
+	Because there is no way to tell read() / select() to block on
+	EOF for regular file, server-logic.c isn't an adapted solution.
+	Removed.
+	
+2002-03-29  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
 	* src/server-logic.c (server_logic_process_requests): 
 	(child_reader): don't accept connection before the thread
 	install the signal handler for SIGUSR1.

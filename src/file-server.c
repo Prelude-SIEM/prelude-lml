@@ -6,83 +6,83 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-io.h>
 
 #include "queue.h"
+#include "regex.h"
 #include "common.h"
 #include "log-common.h"
 #include "server-logic.h"
 #include "file-server.h"
 
+#define MAX_FD 1024
 
 typedef struct {
-        SERVER_LOGIC_CLIENT_OBJECT;
+        int fd;
         char *file;
+        time_t last_modified;
 } monitor_fd_t;
 
 
-
-static server_logic_t *fserver;
-
-
-static void message_reader(queue_t *queue, const char *str, const char *from)
-{
-	time_t t;
-	log_container_t *log;
-
-        log = malloc(sizeof(*log));
-	if ( ! log ) {
-                log(LOG_ERR, "memory exhausted.\n");
-                return;
-        }
-
-	log->log = strdup(str);
-	log->source = strdup(from);
-	t = time(NULL), localtime_r(&t, &log->time_received);
-
-        dprint("[MSGRD] received <%s> from %s\n", str, from);
-
-        queue_push(queue, log);
-}
+static int fd_index = 0;
+static monitor_fd_t *fd_tbl[MAX_FD];
 
 
 
-static int read_file(void *sdata, server_logic_client_t *client) 
+static int read_file(int fd, char *buf, size_t size) 
 {
         int ret;
-        char buf[8192];
-        monitor_fd_t *fd = (monitor_fd_t *) client;
-        
-        ret = prelude_io_read(fd->fd, buf, sizeof(buf));
-        
-        if ( ret == 0 ) {
-                /*
-                 * FIXME.
-                 */
-                sleep(1);
-                return 0;
-        }
 
-        else if ( ret < 0 )
-                return -1;
+        do {
+                ret = read(fd, buf, size);
+                if ( ret < 0 && errno != EINTR ) {
+                        log(LOG_ERR, "read returned an error.\n");
+                        return -1;
+                }
 
-        message_reader(sdata, buf, fd->file);
+                buf += ret;
+                size -= ret;
+                                
+        } while ( ret != 0 );
 
-        return ret;
+        return 0;
 }
 
 
 
-static int close_file(void *sdata, server_logic_client_t *client)
-{
-        monitor_fd_t *fd = (monitor_fd_t *) client;
 
-        free(fd->file);
-        prelude_io_close(fd->fd);
-        prelude_io_destroy(fd->fd);
-        free(fd);
+
+int file_server_wake_up(regex_list_t *list, queue_t *queue) 
+{
+        int i, ret;
+        char buf[8192];
+        struct stat st;
+        monitor_fd_t *monitor;
+        
+        for ( i = 0; i < fd_index; i++ ) {
+                               
+                monitor = fd_tbl[i];
+
+                ret = fstat(monitor->fd, &st);
+                if ( ret < 0 ) {
+                        log(LOG_ERR, "couldn't fstat '%s'.\n", monitor->file);
+                        continue;
+                }
+
+                if ( st.st_mtime == monitor->last_modified )
+                        continue;
+
+                monitor->last_modified = st.st_mtime;
+                
+                ret = read_file(monitor->fd, buf, sizeof(buf));
+                if ( ret < 0 )
+                        continue;
+                
+                lml_dispatch_log(list, queue, buf, monitor->file);
+        }
 
         return 0;
 }
@@ -109,24 +109,10 @@ int file_server_monitor_file(const char *file, int fd)
                 return -1;
         }        
 
+        new->fd = fd;
+        new->last_modified = 0;
         new->file = strdup(file);
-        
-        new->fd = prelude_io_new();
-        if ( ! new->fd ) {
-                free(new);
-                close(fd);
-                return -1;
-        }
-        
-        prelude_io_set_sys_io(new->fd, fd);
-
-        ret = server_logic_process_requests(fserver, (server_logic_client_t *) new);
-        if ( ret < 0 ) {
-                free(new);
-                prelude_io_close(new->fd);
-                prelude_io_destroy(new->fd);
-                return -1;
-        }
+        fd_tbl[fd_index++] = new;
         
         return 0;
 }
@@ -134,12 +120,28 @@ int file_server_monitor_file(const char *file, int fd)
 
 
 
-int file_server_new(queue_t *queue) 
+int file_server_standalone(regex_list_t *list, queue_t *queue) 
 {
-        fserver = server_logic_new(queue, read_file, close_file);
-        if ( ! fserver )
-                return -1;
-
-        return 0;
+        /*
+         * there is no way for select / read to block on EOF
+         * for regular file, so we end up doing a sleep and
+         * comparing modification time (as tail does).
+         */
+        while ( 1 ) {
+                file_server_wake_up(list, queue);
+                sleep(1);
+        }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

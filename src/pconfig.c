@@ -46,6 +46,7 @@
 #include "config.h"
 #include "pconfig.h"
 #include "queue.h"
+#include "regex.h"
 #include "file-server.h"
 #include "udp-server.h"
 

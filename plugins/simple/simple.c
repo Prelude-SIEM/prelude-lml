@@ -463,10 +463,10 @@ static void simple_run(const log_container_t *log)
         int ret;
         simple_rule_t *rule;
         struct list_head *tmp;
-        
+
         list_for_each(tmp, &rules_list) {
                 rule = list_entry(tmp, simple_rule_t, list);
-                
+                                
                 ret = pcre_exec(rule->regex, rule->extra, log->log,
                                 strlen(log->log), 0, 0, NULL, 0);
                 if ( ret < 0 )

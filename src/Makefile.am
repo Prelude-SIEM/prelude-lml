@@ -19,7 +19,6 @@ prelude_lml_SOURCES = 			\
 	log-plugins.c			\
 	pconfig.c			\
 	file-server.c			\
-	server-logic.c			\
 	lml-alert.c
 
 
