@@ -1,0 +1,7 @@
+2002-03-22  Yoann Vandoorselaere  <yoann@mandrakesoft.com>
+
+	* AUTHORS: 
+	Pierre-Jean Turpeau, not me :-)
+	
+	* src/Makefile.am (DEFS): local include before anything else.
+

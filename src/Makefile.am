@@ -1,8 +1,6 @@
 SUBDIRS = include
 
-INCLUDES = -I$(top_srcdir)/ -I$(srcdir)/include
-
-DEFS = @defined@ -DLOG_PLUGIN_DIR=\"@log_plugin_dir@\" \
+DEFS = -I$(top_srcdir)/ -I$(srcdir)/include @defined@ -DLOG_PLUGIN_DIR=\"@log_plugin_dir@\" \
 	-DREGEX_CONF=\"@regex_conf@\" -DCONFIG_DIR=\"@configdir@\"        \
 	-DLOCALSTATEDIR=\"@localstatedir@\" @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@
 
