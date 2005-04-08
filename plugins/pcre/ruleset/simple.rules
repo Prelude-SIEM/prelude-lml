@@ -4,7 +4,7 @@
 # For more information about the fields described above and their meaning,
 # please have a look to the IDMEF Draft located at :
 #
-# http://www.silicondefense.com/idwg/draft-ietf-idwg-idmef-xml-07.txt
+# http://www.ietf.org/internet-drafts/draft-ietf-idwg-idmef-xml-14.txt
 #
 # If one of the IDMEF field you wish to add information too isn't covered in
 # the rule language, please take the 5 minutes needed to implement a simple
@@ -17,15 +17,16 @@
 #   will make your rule CPU-costly to implement.
 # - Avoid capturing variables which you don't use.  This causes unneccessary
 #   memory consumption.
-# - At a minimum, include regex, classification().name, 
-#   assessement.impact.severity, assessment.impact.type, impact.description.
+# - At a minimum, include regex, classification().text, 
+#   assessment.impact.severity, assessment.impact.type, 
+#   assessment.impact.description.
 # - If it's correct for this application, include last.
 # - Put only a single field on each line of your rules.
 # - Include a sample log entry with each rule.
 # - Gather as many pieces of data, and fill as many IDMEF fields as possible
 #   from the log entry.
 # - If a similar rule exists in another ruleset (same function, different 
-#   software), use the classification().name from the other rule.
+#   software), use the classification().text from the other rule.
 # - Use only the actual log message, none of the syslog headers (this generally
 #   includes timestamp, originating node, originating process, and pid).
 # - Submit new rulesets to the prelude-devel mailing list for consideration.
@@ -149,6 +150,28 @@
 # - source().process.pid,
 #   target().process.pid:
 #   A process number
+#
+# - id:
+#   The rule ID associated with this rule.
+#
+# - revision:
+#   The current revision number of this rule.
+#
+# - optgoto:
+#   The rules that are additionally triggered to check for matches when this 
+#   regex is triggered.
+#   TODO:  Add format for values in this directive.
+#
+# - min-optgoto-match:
+#   The number of chained regexes that must be matched to create a valid event.
+#
+# - last:
+#   Indicates to LML that if this rule is triggered, stop checking for further
+#   regex matches.
+#
+# - chained:
+#   Indicates to LML that this rule must be chained to in order to become
+#   active, and shouldn't be processed for new log entries as would be normal.
 
 include = apc-emu.rules;
 include = bigip.rules;
