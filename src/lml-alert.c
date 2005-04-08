@@ -52,7 +52,7 @@ extern lml_config_t config;
 static idmef_analyzer_t *idmef_analyzer;
 
 
-#define ANALYZER_CLASS "HIDS"
+#define ANALYZER_CLASS "Log Analyzer"
 #define ANALYZER_MODEL "Prelude LML"
 #define ANALYZER_MANUFACTURER "http://www.prelude-ids.com"
 
