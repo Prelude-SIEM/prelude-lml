@@ -27,7 +27,7 @@ regex=session opened for user (\S+) by (\S+)\(uid=(\d*)\); \
  id=1; \
  revision=1; \ 
  analyzer(0).name=PAM; \
- analyzer(0).class=OS; \
+ analyzer(0).class=Authentication; \
  assessment.impact.completion = succeeded; \
  assessment.impact.type = user; \
  assessment.impact.severity = low; \
@@ -48,7 +48,7 @@ regex=authentication failure\; logname=(.*) uid=(.*) euid=(.*) tty=(.*) ruser=(.
  id=2; \
  revision=1; \
  analyzer(0).name=PAM; \
- analyzer(0).class=OS; \
+ analyzer(0).class=Authentication; \
  assessment.impact.completion = failed; \
  assessment.impact.type = user; \
  assessment.impact.severity = high; \
@@ -68,7 +68,7 @@ regex=no such user; \
  id=3; \
  revision=1; \
  analyzer(0).name=PAM; \
- analyzer(0).class=OS; \
+ analyzer(0).class=Authentication; \
  assessment.impact.completion = failed; \
  assessment.impact.type = other; \
  assessment.impact.severity = medium; \
