@@ -27,7 +27,7 @@
 # All Rights Reserved
 
 #LOG:Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
-regex=(\S+) entered promiscuous mode; \
+regex=device (\S+) entered promiscuous mode; \
  classification.text=Promiscuous mode detected; \
  id=400; \
  revision=1; \
