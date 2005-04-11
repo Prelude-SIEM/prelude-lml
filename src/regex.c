@@ -153,9 +153,8 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
          * TBD: take care of options field
          */
         
-        prelude_log(PRELUDE_LOG_DEBUG,
-                    "[REGEX] rule found: plugin: %s - pattern: %s - options: %s\n", pname, regex, options);
-
+        prelude_log(PRELUDE_LOG_DEBUG, "[REGEX] rule found: plugin: %s - pattern: %s - options: %s\n", pname, regex, options);
+        
         return 0;
 }
 
@@ -276,7 +275,7 @@ int regex_exec(regex_list_t *list,
                 if ( count <= 0 )
                         continue;
                 
-                prelude_log(PRELUDE_LOG_DEBUG, "[REGEX] string <%s> matched - count = %d\n", str, count);
+                prelude_log_debug(10, "[REGEX] string <%s> matched - count = %d\n", str, count);
                 cb(entry->plugin, data);
         }
         
