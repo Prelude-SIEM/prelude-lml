@@ -149,8 +149,8 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
 {
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
-        
-        prelude_log(PRELUDE_LOG_DEBUG, "[LOG] %s\n", str);
+
+        prelude_log_debug(5, "[LOG] %s\n", str);
 
         log_entry = lml_log_entry_new();
         if ( ! log_entry )
