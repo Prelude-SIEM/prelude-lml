@@ -126,7 +126,7 @@ regex=syslogd (startup|shutdown) succeeded; \
 
 #LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 14:26:01 Drop TCP packet from WAN 80.231.184.68:3685  69.209.234.102:17300 Rule: Default deny
 #LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 15:08:57 Drop UDP packet from WAN 218.83.153.58:54234  69.209.234.102:1026 Rule: Default deny
-regex=Drop (\w+) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule: (.+);
+regex=Drop (\w+) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule: (.+); \
  classification.text=Packet denied; \
  id=406; \
  revision=1; \
