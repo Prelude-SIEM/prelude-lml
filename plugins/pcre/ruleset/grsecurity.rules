@@ -1346,9 +1346,8 @@ regex=attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 # (grsec2 version)
 # LOG:May  2 18:13:42 lt kernel: grsec: From 82.226.58.44: signal 11 sent to /usr/lib/paxtest/writetext[writetext:2806] uid/euid:1/2 gid/egid:3/4, parent /usr/lib/paxtest/writetext[writetext:23332] uid/euid:5/6 gid/egid:7/8
 
-regex=From (\S+): signal (\d+) sent to; goto=691; \
+regex=From (\S+): signal (\d+) sent to; id=662; goto=691; \
  classification.text=Signal $2 sent; \
- id=662; \
  revision=1; \
  analyzer(0).name=grsecurity; \
  analyzer(0).manufacturer=www.grsecurity.net; \
@@ -1527,9 +1526,8 @@ regex=attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID
 
 # grsec2 version
 # LOG:Jun 19 15:53:23 lomo kernel: grsec: time set by /sbin/hwclock[hwclock:27144] uid/euid:1/2 gid/egid:3/4, parent /sbin/rc[rc:1229] uid/euid:5/6 gid/egid:7/8
-regex=time set by; goto=691; \
+regex=time set by; id = 669; goto=691; \
  classification.text=System time changed; \
- id=669; \
  revision=1; \
  analyzer(0).name=grsecurity; \
  analyzer(0).manufacturer=www.grsecurity.net; \
@@ -1984,28 +1982,4 @@ regex=shared memory of uid:(\d+) euid:(\d+) removed by \(([^:]+):(\d+)\) UID\((\
  target(0).user.user_id(1).type=original-user; \
  target(0).user.user_id(1).number=$2; \
  assessment.impact.description=Shared memory was removed.; \
- last
-
-
-# LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
-# LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
-
-regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
- classification.text=Possible buffer overflow; \
- id=690; \
- revision=1; \
- analyzer(0).name=grsecurity; \
- analyzer(0).manufacturer=www.grsecurity.net; \
- analyzer(0).class=Kernel; \
- assessment.impact.completion=failed; \
- assessment.impact.type=file; \
- assessment.impact.severity=high; \
- source(0).process.name=$2; \
- source(0).process.pid=$3; \
- source(0).user.category=application; \
- source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).number=$4; \
- source(0).user.user_id(1).type=original-user; \
- source(0).user.user_id(1).number=$5; \
- assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
  last

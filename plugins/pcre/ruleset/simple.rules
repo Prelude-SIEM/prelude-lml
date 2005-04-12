@@ -193,6 +193,7 @@ include = netapp-ontap.rules;
 include = netfilter.rules;
 include = ntsyslog.rules;
 include = pam.rules;
+include = pax.rules;
 include = pcanywhere.rules;
 include = portsentry.rules;
 include = postfix.rules;
