@@ -124,3 +124,25 @@ regex=syslogd (startup|shutdown) succeeded; \
  assessment.impact.description=The syslogd service reported a $1; \
  last
 
+#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 14:26:01 Drop TCP packet from WAN 80.231.184.68:3685  69.209.234.102:17300 Rule: Default deny
+#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 15:08:57 Drop UDP packet from WAN 218.83.153.58:54234  69.209.234.102:1026 Rule: Default deny
+regex=Drop (\w+) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule: (.+);
+ classification.text=Packet denied; \
+ id=406; \
+ revision=1; \
+ analyzer(0).name=Wireless Router; \
+ analyzer(0).manufacturer=D-Link; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=A packet was dropped by D-Link rule "$7".; \ 
+ source(0).interface=$2; \
+ source(0).service.protocol=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ target(0).service.protocol=$1; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ last
+
