@@ -1,0 +1,121 @@
+#####
+#
+# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
+# All Rights Reserved
+#
+# This file is part of the Prelude-LML program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####
+
+#LOG:Aug  2 01:15:10 192 kernel: avc:  denied  { execute } for  pid=32440 exe=/usr/sbin/smbd path=/bin/bash dev=08:02 ino=162980 scontext=system_u:system_r:smbd_t tcontext=system_u:object_r:shell_exec_t tclass=file
+regex=denied  { ([\w\ ]+?) } for  pid=(\d+) exe=(.+?) path=.+? dev=\S+ ino=\S+ scontext=(\S+):(\S+):\S+ tcontext=(\S+):\S+:; \
+ classification.text=RBAC $1 failure; \
+ id=4000; \
+ revision=1; \
+ analyzer(0).name=SELinux; \
+ analyzer(0).manufacturer=NSA; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(1).type=current-group; \
+ source(0).user.user_id(1).name=$5; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$6; \
+ last;
+
+#LOG:Nov 18 11:43:18 new-selinux2 kernel: avc:  denied  { execute } for  pid=14500 path=/lib/libnss_files-2.3.2.so dev=03:02 ino=8503320 scontext=system_u:system_r:httpd_sys_script_process_t tcontext=system_u:object_r:var_spool_t tclass=file
+regex=denied  { ([\w\ ]+?) } for  pid=(\d+) path=.+? dev=\S+ ino=\S+ scontext=(.+?):(\S+):\S+ tcontext=(\S+):\S+:; \
+ classification.text=RBAC $1 failure; \
+ id=4001; \
+ revision=1; \
+ analyzer(0).name=SELinux; \
+ analyzer(0).manufacturer=NSA; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$3; \
+ source(0).user.user_id(1).type=current-group; \
+ source(0).user.user_id(1).name=$4; \
+ source(0).process.pid=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$5; \
+ last;
+
+#LOG:Aug  6 15:08:02 localhost kernel: avc:  denied  { dac_override } for  pid=535 exe=/usr/bin/suidperl capability=1  scontext=system_u:user_r:user_t  tcontext=system_u:user_r:user_t  tclass=capability
+regex=denied  { ([\w\ ]+?) } for  pid=(\d+) exe=(.+?) capability=\S+\s+scontext=(\S+):(\S+):\S+\s+tcontext=(\S+):\S+:; \
+ classification.text=RBAC $1 failure; \
+ id=4002; \
+ revision=1; \
+ analyzer(0).name=SELinux; \
+ analyzer(0).manufacturer=NSA; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(1).type=current-group; \
+ source(0).user.user_id(1).name=$5; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$6; \
+ last;
+
+#LOG:Nov 18 11:09:24 new-selinux2 kernel: avc:  denied  { unlink } for  pid=10667 exe=/usr/local/java/j2sdk1.4.2_02/bin/java name=.index.log dev=03:02 ino=98986 scontext=user_u:user_r:user_t tcontext=user_u:object_r:unlabeled_t tclass=file
+regex=denied  { ([\w\ ]+?) } for  pid=(\d+) exe=(.+?) name=(.+?) dev=\S+ ino=\S+ scontext=(\S+?):(\S+):\S+ tcontext=(\S+):\S+:; \
+ classification.text=RBAC $1 failure; \
+ id=4000; \
+ revision=1; \
+ analyzer(0).name=SELinux; \
+ analyzer(0).manufacturer=NSA; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(1).type=current-group; \
+ source(0).user.user_id(1).name=$5; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$6; \
+ last;
+
+#LOG:Nov 18 11:09:24 new-selinux2 kernel: avc:  denied  { unlink } for  pid=10667 exe=/usr/local/java/j2sdk1.4.2_02/bin/java name=.index.log dev=03:02 ino=98986 scontext=user_u:user_r:user_t tcontext=user_u:object_r:unlabeled_t tclass=file
+regex=denied  { ([\w\ ]+?) } for  pid=(\d+) exe=(.+?) scontext=(\S+?):(\S+):\S+ tcontext=(\S+):(\S+):; \
+ classification.text=RBAC $1 failure; \
+ id=4000; \
+ revision=1; \
+ analyzer(0).name=SELinux; \
+ analyzer(0).manufacturer=NSA; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$4; \
+ source(0).user.user_id(1).type=current-group; \
+ source(0).user.user_id(1).name=$5; \
+ source(0).process.name=$3; \
+ source(0).process.pid=$2; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=$6; \
+ last;

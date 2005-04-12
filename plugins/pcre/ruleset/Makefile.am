@@ -24,6 +24,7 @@ ruleset_DATA = \
 	postfix.rules		\
 	proftpd.rules		\
 	qpopper.rules		\
+	selinux.rules		\
 	sendmail.rules		\
 	shadow-utils.rules	\
 	simple.rules		\
