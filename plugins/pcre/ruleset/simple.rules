@@ -174,7 +174,7 @@
 #   active, and shouldn't be processed for new log entries as would be normal.
 
 include = apc-emu.rules;
-include = bigip.rules;
+include = f5-bigip.rules;
 include = cisco-pix.rules;
 include = cisco-router.rules;
 include = cisco-vpn.rules;
@@ -208,6 +208,6 @@ include = sudo.rules;
 include = tripwire.rules;
 include = vigor.rules;
 include = vpopmail.rules;
-include = wap11.rules;
+include = linksys-wap11.rules;
 include = webmin.rules;
 include = wu-ftp.rules;

@@ -1,11 +1,11 @@
 ruleset_DATA = \
 	apc-emu.rules		\
-	bigip.rules		\
 	cisco-pix.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
 	dell-om.rules		\
+	f5-bigip.rules		\
 	grsecurity.rules	\
 	honeyd.rules		\
 	ipchains.rules		\
@@ -35,7 +35,7 @@ ruleset_DATA = \
 	tripwire.rules		\
 	vigor.rules		\
 	vpopmail.rules		\
-	wap11.rules		\
+	linksys-wap11.rules	\
 	webmin.rules		\
 	wu-ftp.rules		
 
