@@ -10,8 +10,9 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # an UNIX socket.
 #
 # This entry is disabled. The default is to use the entry 
-# located in sensors-default.conf... You may overwrite the
-# default address for this sensor by uncommenting this entry.
+# located in the Prelude system wide clients.conf. You may 
+# overwrite the default address for this sensor by uncommenting 
+# this entry.
 #
 # manager-addr = 127.0.0.1
 
