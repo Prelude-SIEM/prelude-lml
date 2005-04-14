@@ -53,11 +53,12 @@ typedef struct {
 
 
 static void free_rule_container(pcre_rule_container_t *rc);
-static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd);
+static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char *filename, FILE *fd);
 
 
 
 
+static PRELUDE_LIST(chained_rule_list);
 static lml_log_plugin_t pcre_plugin;
 
 
@@ -128,35 +129,52 @@ static int parse_rule_optregex(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
 
 
 
+static pcre_rule_container_t *search_rule(prelude_list_t *head, int id)
+{
+        prelude_list_t *tmp;
+        pcre_rule_container_t *cur;
+        
+        prelude_list_for_each(head, tmp) {
+                cur = prelude_list_entry(tmp, pcre_rule_container_t, list);
+                
+                if ( cur->rule->id == id )
+                        return cur;
+                
+                cur = search_rule(&cur->rule->rule_list, id);
+                if ( cur )
+                        return cur;
+        }
+
+        return NULL;
+}
+
+
 
 static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, prelude_bool_t optional)
 {
-        prelude_list_t *tmp;
         pcre_rule_container_t *new, *cur;
-        
-        prelude_list_for_each(&plugin->rule_list, tmp) {
-                cur = prelude_list_entry(tmp, pcre_rule_container_t, list);
-                
-                if ( cur->rule->id != id )
-                        continue;
 
-                new = create_rule_container(cur->rule);
-                if ( ! new ) 
+        cur = search_rule(&chained_rule_list, id);
+        if ( ! cur ) {
+                cur = search_rule(&plugin->rule_list, id);
+                if ( ! cur ) {
+                        prelude_log(PRELUDE_LOG_WARN, "could not find a rule with ID %d.\n", id);
                         return -1;
-
-                if ( ! optional )
-                        rule->required_goto++;
-                else
-                        new->optional = TRUE;
-                
-                prelude_list_add_tail(&rule->rule_list, &new->list);
-                
-                return 0;
+                }
         }
         
-        prelude_log(PRELUDE_LOG_WARN, "couldn't find a rule with ID %d.\n", id);
-        
-        return -1;
+        new = create_rule_container(cur->rule);
+        if ( ! new ) 
+                return -1;
+
+        if ( ! optional )
+                rule->required_goto++;
+        else
+                new->optional = TRUE;
+                
+        prelude_list_add_tail(&rule->rule_list, &new->list);
+
+        return 0;
 }
 
 
@@ -243,7 +261,7 @@ static int parse_rule_chained(pcre_plugin_t *plugin, pcre_rule_t *rule, const ch
 
 
 
-static int parse_include(pcre_plugin_t *plugin, const char *value) 
+static int parse_include(pcre_rule_t *rule, pcre_plugin_t *plugin, const char *value) 
 {
         int ret;
         FILE *fd;
@@ -259,8 +277,8 @@ static int parse_include(pcre_plugin_t *plugin, const char *value)
                 prelude_log(PRELUDE_LOG_ERR, "couldn't open %s for reading.\n", filename);
                 return -1;
         }
-
-        ret = parse_ruleset(plugin, filename, fd);
+        
+        ret = parse_ruleset(rule ? &rule->rule_list : &plugin->rule_list, plugin, filename, fd);
 
         fclose(fd);
 
@@ -360,9 +378,30 @@ static char *cut_line(char *buf, char **sptr)
 
 
 
+static int parse_rule_included(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *value)
+{
+        int ret;
+        prelude_list_t *t;
+        pcre_rule_container_t tmp, *cur;
+        
+        tmp.rule = rule;
+        prelude_list_add(&plugin->rule_list, &tmp.list);
+        
+        ret = parse_include(rule, plugin, value);
+        prelude_list_del(&tmp.list);
+        
+        prelude_list_for_each(&rule->rule_list, t) {
+                cur = prelude_list_entry(t, pcre_rule_container_t, list);
+                cur->optional = 1;
+        }
+        
+        return ret;
+}
+        
+
 static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
-                                const char *filename, int line,
-                                const char *keyword, const char *value)
+                              const char *filename, int line,
+                              const char *keyword, const char *value)
 {
         int i;
         struct {
@@ -380,6 +419,7 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                 { "regex"               , parse_rule_regex              },
                 { "revision"            , parse_rule_revision           },
                 { "silent"              , parse_rule_silent             },
+                { "include"             , parse_rule_included           },
         };
 
         for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
@@ -479,7 +519,7 @@ static void free_rule_container(pcre_rule_container_t *rc)
 
 
 
-static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, int line, char *buf) 
+static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, const char *filename, int line, char *buf) 
 {
         char *in;
         char *key;
@@ -488,7 +528,7 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
         int first_directive = 1;
         pcre_rule_t *rule = NULL;
         pcre_rule_container_t *rc = NULL;
-        
+                
         while ( (in = cut_line(buf, &ptr)) ) {
                 buf = NULL;
                 
@@ -511,7 +551,7 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                 
                 if ( first_directive ) {
                         if ( strcmp(key, "include") == 0 ) {
-                                parse_include(plugin, value);
+                                parse_include(NULL, plugin, value);
                                 return 0;
                         }
                         
@@ -519,6 +559,9 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                         if ( ! rule )
                                 return -1;
                         
+                        /*
+                         * hack so that the rule is reachable.
+                         */
                         first_directive = 0;
                 }
                 
@@ -539,11 +582,14 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
                 free_rule(rule);
                 return -1;
         }
+
+        if ( rule->chained )
+                prelude_list_add(&chained_rule_list, &rc->list);
         
-        if ( plugin->last_rules_first && rule->last )
-                prelude_list_add(&plugin->rule_list, &rc->list);
+        else if ( plugin->last_rules_first && rule->last )
+                prelude_list_add(head, &rc->list);
         else
-                prelude_list_add_tail(&plugin->rule_list, &rc->list);
+                prelude_list_add_tail(head, &rc->list);
         
         plugin->rulesnum++;
 
@@ -552,7 +598,7 @@ static int parse_ruleset_directive(pcre_plugin_t *plugin, const char *filename, 
 
 
 
-static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd) 
+static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char *filename, FILE *fd) 
 {
         int line = 0;
         char buf[8192], *ptr;
@@ -574,7 +620,7 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd)
                 if ( *ptr == '\0' || *ptr == '#' )
                         continue;
 
-                parse_ruleset_directive(plugin, filename, line, ptr);
+                parse_ruleset_directive(head, plugin, filename, line, ptr);
         }
 
         return 0;
@@ -586,18 +632,23 @@ static int parse_ruleset(pcre_plugin_t *plugin, const char *filename, FILE *fd)
 static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
+        int got_last;
         prelude_list_t *tmp;
         pcre_plugin_t *plugin;
         pcre_rule_container_t *rc;
+
+        
+        prelude_log_debug(10, "\nInput = %s\n", lml_log_entry_get_message(log_entry));
         
         plugin = prelude_plugin_instance_get_plugin_data(pi);
 
         prelude_list_for_each(&plugin->rule_list, tmp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
+
+                got_last = 0;
+                ret = rule_regex_match(rc, ls, log_entry, &got_last);
                 
-                ret = rule_regex_match(rc, ls, log_entry);
-                
-                if ( ret == 0 && rc->rule->last )
+                if ( ret == 0 && (rc->rule->last || got_last) )
                         break;
         }
 }
@@ -616,14 +667,26 @@ static int set_last_first(prelude_option_t *opt, const char *optarg, prelude_str
 
 
 
+static void remove_top_chained(void)
+{
+        prelude_list_t *tmp, *bkp;
+        pcre_rule_container_t *rc;
+        
+        prelude_list_for_each_safe(&chained_rule_list, tmp, bkp) {
+                rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
+
+                if ( rc->rule->chained )
+                        free_rule_container(rc);
+        }
+}
+
+
 
 static int set_pcre_ruleset(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context) 
 {
         int ret;
         FILE *fd;
         char *ptr;
-        prelude_list_t *tmp, *bkp;
-        pcre_rule_container_t *rc;
         pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
         
         plugin->rulesetdir = strdup(optarg);
@@ -641,8 +704,8 @@ static int set_pcre_ruleset(prelude_option_t *opt, const char *optarg, prelude_s
                 prelude_string_sprintf(err, "couldn't open %s for reading", optarg);
                 return -1;
         }
-        
-        ret = parse_ruleset(plugin, optarg, fd);
+
+        ret = parse_ruleset(&plugin->rule_list, plugin, optarg, fd);
 
         fclose(fd);
         if ( plugin->rulesetdir )
@@ -652,14 +715,9 @@ static int set_pcre_ruleset(prelude_option_t *opt, const char *optarg, prelude_s
                 return -1;
 
         prelude_log(PRELUDE_LOG_INFO, "- pcre plugin added %d rules.\n", plugin->rulesnum);
+
+        remove_top_chained();
         
-        prelude_list_for_each_safe(&plugin->rule_list, tmp, bkp) {
-                rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
-
-                if ( rc->rule->chained )
-                        free_rule_container(rc);
-        }
-
         return 0;
 }
 

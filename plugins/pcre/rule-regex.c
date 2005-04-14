@@ -81,6 +81,9 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
         int cnt = 0, i;
         
         *real_ret = pcre_exec(item->regex, item->extra, subject, length, 0, 0, ovector, ovecsize);
+        
+        prelude_log_debug(9, "match %s ret %d\n", item->regex_string, *real_ret);
+        
         if ( *real_ret <= 0 && ! item->optreg )
                 return *real_ret;
         
@@ -102,17 +105,14 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         prelude_list_t *tmp;
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
-
-        prelude_log(PRELUDE_LOG_DEBUG, "\nInput = %s\n", lml_log_entry_get_message(log_entry));
-        
+                
         prelude_list_for_each(&rule->regex_list, tmp) {
                 item = prelude_linked_object_get_object(tmp);
                                 
                 ret = do_pcre_exec(item, &real_ret, lml_log_entry_get_message(log_entry),
                                    lml_log_entry_get_message_len(log_entry),
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
-                
-                prelude_log(PRELUDE_LOG_DEBUG, "match=%s ret=%d (real=%d)\n", item->regex_string, ret, real_ret);
+                prelude_log_debug(5, "id=%d match=%s ret=%d (real=%d)\n", rule->id, item->regex_string, ret, real_ret);
                 if ( ret <= 0 && ! item->optreg )
                         return -1;
                 
@@ -126,7 +126,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
                         continue;
                 
                 for ( i = 2; i < (ret * 2); i += 2 ) {
-                        prelude_log(PRELUDE_LOG_DEBUG, "assign %d-%d\n", retval * 2 + i, retval * 2 + i + 1);
+                        prelude_log_debug(10, "assign %d-%d\n", retval * 2 + i, retval * 2 + i + 1);
                         ovector[(retval * 2) + i] = tmpovector[i];
                         ovector[(retval * 2) + i + 1] = tmpovector[i + 1];
                 }
@@ -137,7 +137,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         retval++;
          
         if ( rule->min_optregex_match ) {
-                prelude_log(PRELUDE_LOG_DEBUG, "optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
+                prelude_log_debug(10, "optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
                 return (optional_match >= rule->min_optregex_match) ? retval : -1;
         }
         
@@ -167,7 +167,7 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_l
 
 
 static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
-                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
+                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry, int *got_last)
 {
         int ret;
         prelude_list_t *tmp;
@@ -175,7 +175,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
         pcre_rule_container_t *child;
                         
         ret = match_rule_single(rule, state, log_entry);
-        if ( ret < 0 && ! rc->optional )  
+        if ( ret < 0 && ! rc->optional )
                 return -1;
         
         if ( rc->optional )
@@ -183,12 +183,25 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
         else
                 state->reqmatch++;
 
-        prelude_list_for_each(&rule->rule_list, tmp) {
-                child = prelude_list_entry(tmp, pcre_rule_container_t, list);
+        if ( ret == 0 ) {
+                int gl = 0;
                 
-                ret = match_rule_list(child, state, ls, log_entry);
-                if ( ret < 0 )
-                        return -1;
+                prelude_list_for_each(&rule->rule_list, tmp) {
+                        child = prelude_list_entry(tmp, pcre_rule_container_t, list);
+
+                        /*
+                         * we ignore the return value: since it is a list of rule, we need to
+                         * match them all until one of them match and has the "last" keyword set.
+                         */
+                        match_rule_list(child, state, ls, log_entry, &gl);
+                        if ( gl ) {
+                                *got_last = 1;
+                                break;
+                        }
+                }
+                
+                if ( rule->last )
+                        *got_last = 1;
         }
         
         if ( state->reqmatch < rule->required_goto )
@@ -196,10 +209,16 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
         
         if ( state->optmatch < rule->min_optgoto_match ) 
                 return -1;
-        
+                
         if ( ! rule->silent && state->idmef ) {
+                prelude_log_debug(4, "lml alert emit (last=%d) %s\n",
+                                  rule->last, lml_log_entry_get_message(log_entry));
+
                 lml_alert_emit(ls, log_entry, state->idmef);
                 state->idmef = NULL;
+                
+                if ( rule->last )
+                        *got_last = 1;
         }
 
         return 0;
@@ -207,14 +226,15 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
 
 
 
-int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
+int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls,
+                     const lml_log_entry_t *log_entry, int *got_last)
 {
         int ret;
         pcre_state_t state;
         
         memset(&state, 0, sizeof(state));
         
-        ret = match_rule_list(root, &state, ls, log_entry);
+        ret = match_rule_list(root, &state, ls, log_entry, got_last);
         if ( ret < 0 )
                 return -1;
         
