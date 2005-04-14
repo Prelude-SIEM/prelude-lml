@@ -163,7 +163,7 @@
 
 regex=EMU;			include = apc-emu.rules;
 regex=(bigconf|kernel);		include = f5-bigip.rules;
-regex=$PIX;			include = cisco-pix.rules;
+regex=%PIX;			include = cisco-pix.rules;
 regex=%[A-Z]-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;			include = cisco-vpn.rules;
 regex=clamd;			include = clamav.rules;
