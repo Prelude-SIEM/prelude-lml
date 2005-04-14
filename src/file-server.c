@@ -50,6 +50,7 @@
 #include "log-entry.h"
 #include "file-server.h"
 #include "lml-alert.h"
+#include "lml-options.h"
 
 
 #ifndef MIN
@@ -135,6 +136,9 @@ static FAMConnection fc;
 static int batch_mode = 0;
 static int fam_initialized = 0;
 static int ignore_metadata = 0;
+extern lml_config_t config;
+
+
 static PRELUDE_LIST(active_fd_list);
 static PRELUDE_LIST(inactive_fd_list);
 static unsigned int max_rotation_size_offset = DEFAULT_MAX_ROTATION_SIZE_OFFSET;
@@ -533,15 +537,17 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
-        
+
         while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
                 eventno++;
+                config.line_processed++;
+                
                 lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf, ret);
                 file_metadata_save(monitor, st->st_size - len);
                 
                 len -= rlen;
         }
-
+        
         /*
          * if len isn't 0, it mean we got EOF before reading every new byte,
          * we want to retry reading even if st_size isn't modified then.
@@ -1162,8 +1168,6 @@ void file_server_start_monitoring(void)
          */
         if ( fam_initialized == 1 )
                 try_reopening_inactive_monitor();
-        
-        file_server_wake_up();        
 }
 
 

@@ -63,10 +63,30 @@ struct regex_data {
 };
 
 
+static struct timeval start;
 extern lml_config_t config;
 static char **global_argv;
 static prelude_option_t *lml_root_optlist;
 static volatile sig_atomic_t got_sighup = 0;
+
+
+
+static void print_stats(struct timeval *end)
+{
+        unsigned int tdiv;
+        
+        prelude_log(PRELUDE_LOG_WARN, "- Dumping stat: %d line processed in %u seconds.\n",
+                    config.line_processed, end->tv_sec - start.tv_sec);
+
+        tdiv = end->tv_sec - start.tv_sec;
+        if ( tdiv == 0 )
+                tdiv = 1;
+        
+        prelude_log(PRELUDE_LOG_WARN, "- Average %d events / seconds .\n",
+                    config.line_processed / tdiv);
+        
+        prelude_log(PRELUDE_LOG_WARN, "- %d alert issued.\n", config.alert_count);
+}
 
 
 
@@ -95,6 +115,15 @@ static void sighup_handler(int signum)
         got_sighup = 1;
 }
 
+
+
+static void sigusr1_handler(int signum)
+{
+        struct timeval end;
+
+        gettimeofday(&end, NULL);
+        print_stats(&end);
+}
 
 
 
@@ -149,6 +178,8 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
 {
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
+        
+        prelude_log_debug(5, "[LOG] %s\n", str);
 
         prelude_log_debug(5, "[LOG] %s\n", str);
 
@@ -228,10 +259,13 @@ static void wait_for_event(void)
 
 
 
-
 int main(int argc, char **argv)
 {
         int ret;
+        struct timeval end;
+
+        memset(&start, 0, sizeof(start));
+        memset(&end, 0, sizeof(end));
         
         prelude_init(&argc, argv);
         global_argv = argv;
@@ -258,7 +292,8 @@ int main(int argc, char **argv)
         signal(SIGQUIT, sig_handler);
         signal(SIGABRT, sig_handler);
         signal(SIGHUP, sighup_handler);
-
+        signal(SIGUSR1, sigusr1_handler);
+        
         file_server_start_monitoring();
 
         /*
@@ -269,23 +304,29 @@ int main(int argc, char **argv)
         if ( (config.udp_srvr || file_server_get_event_fd() > 0) && ! config.batch_mode )
                 wait_for_event();
         else {
+                gettimeofday(&start, NULL);
+                                
                 do {
                         handle_sighup_if_needed();
                         ret = file_server_wake_up();
-
+                        
                         if ( ! config.batch_mode )
                                 sleep(1);
                         
                         prelude_timer_wake_up();
                         
-                } while ( config.batch_mode == 0 || ret > 0 );
-
+                } while ( ! config.batch_mode || ret > 0 );
+                
+                gettimeofday(&end, NULL);
+                
                 /*
                  * only call prelude_client_destroy in case we are running in batch
                  * mode, causing an heartbeat to be sent to notice of a normal exit.
                  */
                 if ( ! config.dry_run )
                         prelude_client_destroy(config.lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
+
+                print_stats(&end);
         }
         
         return 0;

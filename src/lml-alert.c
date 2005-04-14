@@ -185,7 +185,7 @@ static int fill_analyzer(const lml_log_entry_t *log_entry, idmef_analyzer_t *ana
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
 
-                ret = getaddrinfo(tmp, NULL, &hints, &ai);
+                ret = getaddrinfo(tmp, NULL, &hints, &ai);                
                 if ( ret != 0 ) {
                         prelude_log(PRELUDE_LOG_WARN, "error resolving \"%s\": %s.\n", tmp, gai_strerror(ret));
                         return resolve_failed_fallback(log_entry, node);
@@ -244,7 +244,7 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
                 hints.ai_flags = AI_CANONNAME;
                 hints.ai_socktype = SOCK_STREAM;
 
-                ret = getaddrinfo(tmp, NULL, &hints, &ai);
+                ret = getaddrinfo(tmp, NULL, &hints, &ai);                
                 if ( ret != 0 ) {
                         prelude_log(PRELUDE_LOG_WARN, "error resolving \"%s\": %s.\n", tmp, gai_strerror(ret));
                         return resolve_failed_fallback(log_entry, node);
@@ -287,6 +287,8 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         idmef_time_t *time;
         idmef_alert_t *alert;
         idmef_analyzer_t *cur_analyzer;
+
+        config.alert_count++;
         
         alert = idmef_message_get_alert(message);
         if ( ! alert )
