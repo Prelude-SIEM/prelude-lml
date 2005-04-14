@@ -146,3 +146,28 @@ regex=Drop (\w+) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule: (.+
  target(0).service.port=$6; \
  last
 
+# Copyright (C) 2002 Brad Spengler <spender@grsecurity.net>
+# All Rights Reserved
+
+# LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
+# LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
+regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
+ classification.text=Possible buffer overflow; \
+ id=690; \
+ revision=1; \
+ analyzer(0).name=PAX; \
+ analyzer(0).manufacturer=www.grsecurity.net; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=file; \
+ assessment.impact.severity=high; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
+ assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
+ last
+
