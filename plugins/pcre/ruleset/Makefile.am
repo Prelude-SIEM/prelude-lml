@@ -20,6 +20,7 @@ ruleset_DATA = \
 	ntsyslog.rules		\
 	pam.rules		\
 	pcanywhere.rules	\
+	pcre.rules		\
 	portsentry.rules	\
 	postfix.rules		\
 	proftpd.rules		\
@@ -27,7 +28,6 @@ ruleset_DATA = \
 	selinux.rules		\
 	sendmail.rules		\
 	shadow-utils.rules	\
-	simple.rules		\
 	single.rules		\
 	squid.rules		\
 	ssh.rules		\

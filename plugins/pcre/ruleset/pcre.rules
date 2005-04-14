@@ -157,57 +157,46 @@
 # - revision:
 #   The current revision number of this rule.
 #
-# - optgoto:
-#   The rules that are additionally triggered to check for matches when this 
-#   regex is triggered.
-#   TODO:  Add format for values in this directive.
-#
-# - min-optgoto-match:
-#   The number of chained regexes that must be matched to create a valid event.
-#
 # - last:
 #   Indicates to LML that if this rule is triggered, stop checking for further
 #   regex matches.
-#
-# - chained:
-#   Indicates to LML that this rule must be chained to in order to become
-#   active, and shouldn't be processed for new log entries as would be normal.
 
-include = apc-emu.rules;
-include = f5-bigip.rules;
-include = cisco-pix.rules;
-include = cisco-router.rules;
-include = cisco-vpn.rules;
-include = clamav.rules;
-include = dell-om.rules
-include = grsecurity.rules;
-include = honeyd.rules;
-include = ipchains.rules;
-include = ipfw.rules;
-include = ipso.rules;
-include = linksys-wap11.rules;
-include = modsecurity.rules;
-include = ms-sql.rules;
-include = nagios.rules;
-include = navce.rules;
-include = netapp-ontap.rules;
-include = netfilter.rules;
-include = ntsyslog.rules;
-include = pam.rules;
-include = pcanywhere.rules;
-include = portsentry.rules;
-include = postfix.rules;
-include = proftpd.rules;
-include = qpopper.rules;
-include = selinux.rules;
-include = sendmail.rules;
-include = shadow-utils.rules;
+regex=EMU;			include = apc-emu.rules;
+regex=(bigconf|kernel);		include = f5-bigip.rules;
+regex=$PIX;			include = cisco-pix.rules;
+regex=%[A-Z]-\d+-[A-Z];		include = cisco-router.rules;
+regex=SEV=;			include = cisco-vpn.rules;
+regex=clamd;			include = clamav.rules;
+regex=server administrator;	include = dell-om.rules
+regex=kernel;			include = grsecurity.rules; \
+				include = netfilter.rules; \
+				include = ipchains.rules;
+regex=honeyd;			include = honeyd.rules;
+regex=ipfw;			include = ipfw.rules;
+regex=\[LOG_[^\]]*\];		include = ipso.rules;
+regex=\s[A-Fa-f\d-]+$;		include = linksys-wap11.rules;
+regex=httpd;			include = modsecurity.rules;
+regex=mssqlserver;		include = ms-sql.rules;
+regex=nagios;			include = nagios.rules;
+regex=norton;			include = navce.rules;
+regex=\[[^:]*:[^\]]*\]:;	include = netapp-ontap.rules;
+regex=security\[;		include = ntsyslog.rules;
+regex=[Pp][Aa][Mm]_;		include = pam.rules;
+regex=pcanywhere;		include = pcanywhere.rules;
+regex=portsentry;		include = portsentry.rules;
+regex=postfix/;			include = postfix.rules;
+regex=proftpd;			include = proftpd.rules;
+regex=popper;			include = qpopper.rules;
+regex=avc:;			include = selinux.rules;
+regex=sendmail;			include = sendmail.rules;
+regex=((user|group)(mod|add));	include = shadow-utils.rules;
+regex=squid;			include = squid.rules;
+regex=sshd;			include = ssh.rules;
+regex=sudo;			include = sudo.rules;
+regex=tripwire;			include = tripwire.rules;
+regex=lan @Group:;		include = vigor.rules;
+regex=vpopmail;			include = vpopmail.rules;
+regex=webmin;			include = webmin.rules;
+regex=ftpd;			include = wu-ftp.rules;
+
 include = single.rules;
-include = squid.rules;
-include = ssh.rules;
-include = sudo.rules;
-include = tripwire.rules;
-include = vigor.rules;
-include = vpopmail.rules;
-include = webmin.rules;
-include = wu-ftp.rules;

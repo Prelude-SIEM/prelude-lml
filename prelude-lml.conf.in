@@ -83,7 +83,7 @@ file = /var/log/auth.log
 
 [Pcre]
 
-ruleset=@configdir@/ruleset/simple.rules
+ruleset=@configdir@/ruleset/pcre.rules
 
 
 # [Debug]
