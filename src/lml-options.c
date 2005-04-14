@@ -340,18 +340,9 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_string_t *err;
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
-        config.pidfile = NULL;
-        config.logfile_prefix_regex = NULL;
-        config.logfile_ts_format = NULL;
-        config.lml_client = NULL;
-        config.batch_mode = FALSE;
-        config.dry_run = FALSE;
-        config.ignore_metadata = FALSE;
-        config.udp_srvr = NULL;
-        config.udp_srvr_addr = NULL;
+        memset(&config, 0, sizeof(config));
         config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
-        config.text_output_fd = NULL;
-        
+                
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);

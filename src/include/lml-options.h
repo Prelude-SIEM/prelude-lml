@@ -46,6 +46,8 @@ typedef struct {
         unsigned int udp_srvr_port;
 
         prelude_io_t *text_output_fd;
+        unsigned long alert_count;
+        unsigned long line_processed;
 } lml_config_t;
 
 #endif /* _LML_PCONFIG_H */
