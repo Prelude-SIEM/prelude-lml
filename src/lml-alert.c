@@ -174,7 +174,7 @@ static int fill_analyzer(const lml_log_entry_t *log_entry, idmef_analyzer_t *ana
         }
 
         tmp = lml_log_entry_get_target_hostname(log_entry);
-        if ( tmp && ! idmef_analyzer_get_node(analyzer) ) {
+        if ( tmp && ! idmef_analyzer_get_node(analyzer) && ! config.no_resolve ) {
                 struct addrinfo *ai, hints;
                 
                 ret = idmef_analyzer_new_node(analyzer, &node);
@@ -233,7 +233,7 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
         }
 
         tmp = lml_log_entry_get_target_hostname(log_entry);
-        if ( tmp && ! idmef_target_get_node(target) ) {
+        if ( tmp && ! idmef_target_get_node(target) && ! config.no_resolve ) {
                 struct addrinfo *ai, hints;
                 
                 ret = idmef_target_new_node(target, &node);

@@ -93,6 +93,14 @@ static int set_ignore_metadata(prelude_option_t *opt, const char *optarg, prelud
         return 0;
 }
 
+
+static int set_no_resolve(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+{
+        config.no_resolve = TRUE;
+        return 0;
+}
+
+
 static int set_rotation_time_offset(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context) 
 {
         file_server_set_max_rotation_time_offset(atoi(optarg));
@@ -407,6 +415,10 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "ignore-metadata",
                            "Tell LML not to read/write metadata", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_ignore_metadata, NULL);
+
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "no-resolve",
+                           "Do not attempt to resolve target address (useful for profiling)",
+                           PRELUDE_OPTION_ARGUMENT_NONE, set_no_resolve, NULL);
         
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            't', "time-format", "Specify the input timestamp format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
