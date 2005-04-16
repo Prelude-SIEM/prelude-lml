@@ -25,7 +25,7 @@
 
 # Cisco router support for Prelude-LML
 #LOG:Sep 23 07:30:41 gate 301270: 5d17h: %SEC-6-IPACCESSLOGP: list 101 denied tcp 1.2.3.4(1929) -> 5.6.7.8(80), 1 packet
-regex=SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+)\).*-> ([0-9\.]+)\(([0-9]+)\); \
+regex=SEC-[0-9]+-IPACCESSLOGP: list (\d+) denied (udp|tcp) ([\d\.]+)\((\d+)\).*-> ([\d\.]+)\((\d+)\); \
  classification.text=Router ip access; \
  id=500; \
  revision=1; \
@@ -47,7 +47,7 @@ regex=SEC-[0-9]+-IPACCESSLOGP: list ([0-9]+) denied ([a-z]+) ([0-9\.]+)\(([0-9]+
  last
 
 #LOG:Apr 11 20:13:49 wormhole.flash.net 2279: %RCMD-4-RSHPORTATTEMPT: Attempted to connect to RSHELL from 1.2.3.4
-regex=RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+); \
+regex=RCMD-\d+-RSHPORTATTEMPT:.* from ([\d\.]+); \
  classification.text=RSH attempt; \
  id=501; \
  revision=1; \
@@ -66,7 +66,7 @@ regex=RCMD-[0-9]+-RSHPORTATTEMPT:.* from ([0-9\.]+); \
 # All Rights Reserved
 
 #LOG:Jun  1 13:59:17 rtr-dsl-01 3972256: 5w5d: %LINEPROTO-5-UPDOWN: Line protocol on Interface BRI0:1, changed state to down
-regex=%LINEPROTO-[0-9\.]+-UPDOWN: Line protocol on Interface (\S+), changed state to (down|up); \
+regex=%LINEPROTO-[\d\.]+-UPDOWN: Line protocol on Interface (\S+), changed state to (down|up); \
  classification.text=Interface $2; \
  id=502; \ 
  revision=1; \
@@ -83,7 +83,7 @@ regex=%LINEPROTO-[0-9\.]+-UPDOWN: Line protocol on Interface (\S+), changed stat
 # Match if a host has requested an unknown key exchange
 #LOG:Jun  1 15:20:39 rtr-dsl-01 3972364: 5w5d: %CRYPTO-6-IKMP_UNK_EXCHANGE: IKE peer at 1.1.1.1      sent a message with unknown exchange 1
 
-regex=%CRYPTO-[0-9\.]+-IKMP_UNK_EXCHANGE: IKE peer at (\S+) * sent a message with unknown; \
+regex=%CRYPTO-[\d\.]+-IKMP_UNK_EXCHANGE: IKE peer at (\S+) * sent a message with unknown; \
  classification.text=Router unknown IKE key exchange request; \
  id=503; \
  revision=1; \

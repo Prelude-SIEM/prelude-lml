@@ -45,6 +45,7 @@ regex=ruleset=check_relay, arg1=([\[\]\w\-\.]+), arg2=([\d\.]+), relay=.*\[[\d\.
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \
  target(0).service.port=25; \
  last;
@@ -65,6 +66,7 @@ regex=ruleset=check_rcpt, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=550 5\
  source(0).node.address(0).address=$1; \
  source(0).node.address(1).category=ipv4-addr; \
  source(0).node.address(1).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \
  target(0).service.port=25; \
  last;
@@ -85,6 +87,7 @@ regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\
  source(0).node.address(0).address=$1; \
  source(0).node.address(1).category=ipv4-addr; \
  source(0).node.address(1).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \
  target(0).service.port=25; \
  last;
@@ -119,6 +122,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connect
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \
  target(0).service.port=25; \
  last;
@@ -135,6 +139,7 @@ regex=<(\S+@\S+)>... User unknown; \
  assessment.impact.description=Mail was sent to unknown user $1.  This could be a scan for valid email addresses, or email to an old, now invalid account.; \
  assessment.impact.type=recon; \
  assessment.impact.severity=low; \
+ source(0).service.protocol=tcp; \
  target(0).node.address(0).category=e-mail; \
  target(0).node.address(0).address=$1; \
  target(0).service.protocol=tcp; \
@@ -155,6 +160,7 @@ regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; 
  assessment.impact.severity=low; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$2; \
+ source(0).service.protocol=tcp; \
  target(0).node.name=$1; \
  target(0).node.address(0).category=e-mail; \
  target(0).node.address(0).address=$3; \
@@ -177,6 +183,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\]: VRFY (\S+) \[rejected\]; \
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).node.address(0).category=e-mail; \
  target(0).node.address(0).address=$3; \
  target(0).service.protocol=tcp; \
@@ -198,6 +205,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\]: EXPN (\S+) \[rejected\]; \
  source(0).node.name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
+ source(0).service.protocol=tcp; \
  target(0).node.address(0).category=e-mail; \
  target(0).node.address(0).address=$3; \
  target(0).service.protocol=tcp; \
