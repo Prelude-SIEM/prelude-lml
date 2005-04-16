@@ -8,6 +8,7 @@ ruleset_DATA = \
 	f5-bigip.rules		\
 	grsecurity.rules	\
 	honeyd.rules		\
+	httpd.rules		\
 	ipchains.rules		\
 	ipfw.rules		\
 	ipso.rules		\
