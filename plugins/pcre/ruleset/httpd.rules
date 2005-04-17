@@ -27,7 +27,7 @@
 #LOG:[Sat Mar 12 22:38:41 2005] [error] [client 127.0.0.1] client denied by server configuration: /var/www/sample/
 #LOG:[Sun Jan  2 22:42:47 2005] [error] [client x.x.x.x] request failed: error reading the headers
 #LOG:[Sun Jan  2 23:48:19 2005] [error] [client x.x.x.x] request failed: URI too long
-regex=\[error\] \[client ([\d\.]+)\] ([\S+\s]+): (\S+) ;\
+regex=\[error\] \[client ([\d\.]+)\] ((File|Premature|Directory|client|request)[\S+\s]+): (.+); \
  classification.text=Apache httpd error; \
  id=4100; \
  revision=1; \
@@ -37,7 +37,7 @@ regex=\[error\] \[client ([\d\.]+)\] ([\S+\s]+): (\S+) ;\
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
- assessment.impact.description=Apache httpd '$2' error: '$3';\
+ assessment.impact.description=Apache httpd '$2' error: '$4'; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
@@ -45,7 +45,7 @@ regex=\[error\] \[client ([\d\.]+)\] ([\S+\s]+): (\S+) ;\
  last;
 
 #LOG:[Sat Apr 16 14:30:12 2005] [error] [client ::1] File does not exist: /var/www/favicon.ico
-regex=\[error\] \[client ([A-Fa-f\d:]+\] ([\S+\s]+): (\S+) ;\
+regex=\[error\] \[client ([A-Fa-f\d:]+)\] ((File|Premature|Directory|client|request)[\S+\s]+): (.+); \
  classification.text=Apache httpd error; \
  id=4101; \
  revision=1; \
@@ -55,8 +55,8 @@ regex=\[error\] \[client ([A-Fa-f\d:]+\] ([\S+\s]+): (\S+) ;\
  assessment.impact.severity=low; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
- assessment.impact.description=Apache httpd '$2' error: '$3';\
- source(0).node.address(0).category=ipv6-addr; \
+ assessment.impact.description=Apache httpd '$2' error: '$4'; \
+ source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \

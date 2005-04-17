@@ -172,11 +172,11 @@ regex=kernel;			include = grsecurity.rules; \
 				include = netfilter.rules; \
 				include = ipchains.rules;
 regex=honeyd;			include = honeyd.rules;
-regex=\[error\] \[client;	include = httpd.rules;
+regex=\[error\] \[client;	include = httpd.rules; \
+				include = modsecurity.rules;
 regex=ipfw;			include = ipfw.rules;
 regex=\[LOG_[^\]]*\];		include = ipso.rules;
 regex=\s[A-Fa-f\d-]+$;		include = linksys-wap11.rules;
-regex=httpd;			include = modsecurity.rules;
 regex=mssqlserver;		include = ms-sql.rules;
 regex=nagios;			include = nagios.rules;
 regex=norton;			include = navce.rules;
