@@ -1,3 +1,18 @@
+* 2005-04-17, prelude-lml-0.9.0-rc3:
+
+	- Introduced SELinux, httpd, Dlink ruleset support.
+
+	- More rule classification work.
+
+	- Ipv6 support in sshd.rules, support more events.
+
+	- Ntsyslog ruleset consistancy work.
+
+	- Make it easier to use chained rules. Apply chained on all top
+	  inclusion. Result is ~850% performance improvement. Check:
+	  http://prelude-ids.org/pipermail/prelude-user/2005-April/000781.html
+	  
+
 * 2005-04-09, prelude-lml 0.9.0-rc2:
 
 	- Ruleset update to provide better Analyzer class definition.
