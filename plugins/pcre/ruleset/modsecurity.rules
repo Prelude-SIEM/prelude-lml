@@ -25,7 +25,7 @@
 #
 # The rules included here were developed using mod_security 1.7.6 events 
 # captured in syslog through the Apache directive 'ErrorLog syslog'.  
-# Please report any inconsistencies on other versions to Gene Gomez at the 
+# Please report any inconsistencies on other versions to Gene R Gomez at the 
 # address provided above
 #
 #####
@@ -102,7 +102,7 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
 #
 # The rules included here were developed using mod_security 1.8 events
 # captured in syslog through the Apache directive 'ErrorLog syslog'.
-# Please report any inconsistencies on other versions to Gene Gomez at the
+# Please report any inconsistencies on other versions to Gene R Gomez at the
 # address provided above
 #
 #####

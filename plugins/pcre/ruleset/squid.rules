@@ -2,9 +2,7 @@
 #
 # Copyright (C) 2003 Vincent Glaume
 # All Rights Reserved
-# Ruleset updated for 0-9 branch by Gene R Gomez
-# This ruleset is currently unmaintained.  Contact the Prelude
-# development team if you would like to maintain it.
+# Currently supported by Gene R Gomez <gene at gomezbrothers dot com>
 #
 # This file is part of the Prelude-LML program.
 #
@@ -34,7 +32,7 @@
 # starting 
 # No log sample; please submit
 regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
- classification.text=Squid started; \
+ classification.text=Proxy started; \
  id=1801; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -49,7 +47,7 @@ regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
 # accepting connections or disabled servicesa
 # No log sample; please submit
 regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification.text=Squid accepts HTTP; \
+ classification.text=Proxy accepts HTTP; \
  id=1802; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -67,7 +65,7 @@ regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
- classification.text=Squid accepts ICP; \
+ classification.text=Proxy accepts ICP; \
  id=1803; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -85,7 +83,7 @@ regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
- classification.text=Squid accepts HTCP; \
+ classification.text=Proxy accepts HTCP; \
  id=1804; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -101,7 +99,7 @@ regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
- classification.text=Squid accepts WCCP; \
+ classification.text=Proxy accepts WCCP; \
  id=1805; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -117,7 +115,7 @@ regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
 
 # No log sample; please submit
 regex=HTCP Disabled\.; \
- classification.text=Squid started without HTCP; \
+ classification.text=Proxy started without HTCP; \
  id=1806; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -130,7 +128,7 @@ regex=HTCP Disabled\.; \
 
 # No log sample; please submit
 regex=WCCP Disabled\.; \
- classification.text=Squid started without WCCP; \
+ classification.text=Proxy started without WCCP; \
  id=1807; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -143,7 +141,7 @@ regex=WCCP Disabled\.; \
 
 # No log sample; please submit
 regex=Squid Parent: child process (\d+) exited; \
- classification.text=Squid stopped; \
+ classification.text=Proxy stopped; \
  id=1808; \
  revision=1; \
  analyzer(0).name=Squid; \
@@ -163,7 +161,7 @@ regex=Squid Parent: child process (\d+) exited; \
 
 # No log sample; please submit
 regex=(\d+\.\d+\.\d+\.\d+) .*DENIED/(\d+) (.*); \
- classification.text=Squid acl violation attempt; \
+ classification.text=Proxy ACL violation attempt; \
  id=1809; \
  revision=1; \
  analyzer(0).name=Squid; \

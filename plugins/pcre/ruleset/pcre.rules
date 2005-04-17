@@ -172,7 +172,7 @@ regex=kernel;			include = grsecurity.rules; \
 				include = netfilter.rules; \
 				include = ipchains.rules;
 regex=honeyd;			include = honeyd.rules;
-regex=\[error\] \[client;	include = httpd.rules; \
+regex=(\[error\]|Pass|httpd);	include = httpd.rules; \
 				include = modsecurity.rules;
 regex=ipfw;			include = ipfw.rules;
 regex=\[LOG_[^\]]*\];		include = ipso.rules;

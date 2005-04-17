@@ -56,7 +56,7 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  target(0).service.protocol=smtp; \
  last
 
-# Copyright (C) 2004 Gene Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2004-2005 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .

@@ -28,7 +28,7 @@
 #LOG:[Sun Jan  2 22:42:47 2005] [error] [client x.x.x.x] request failed: error reading the headers
 #LOG:[Sun Jan  2 23:48:19 2005] [error] [client x.x.x.x] request failed: URI too long
 regex=\[error\] \[client ([\d\.]+)\] ((File|Premature|Directory|client|request)[\S+\s]+): (.+); \
- classification.text=Apache httpd error; \
+ classification.text=Web server error; \
  id=4100; \
  revision=1; \
  analyzer(0).name=Apache httpd; \
@@ -46,7 +46,7 @@ regex=\[error\] \[client ([\d\.]+)\] ((File|Premature|Directory|client|request)[
 
 #LOG:[Sat Apr 16 14:30:12 2005] [error] [client ::1] File does not exist: /var/www/favicon.ico
 regex=\[error\] \[client ([A-Fa-f\d:]+)\] ((File|Premature|Directory|client|request)[\S+\s]+): (.+); \
- classification.text=Apache httpd error; \
+ classification.text=Web server error; \
  id=4101; \
  revision=1; \
  analyzer(0).name=Apache httpd; \
@@ -60,4 +60,77 @@ regex=\[error\] \[client ([A-Fa-f\d:]+)\] ((File|Premature|Directory|client|requ
  source(0).node.address(0).address=$1; \
  source(0).service.protocol=tcp; \
  target(0).service.protocol=tcp; \
+ last;
+
+# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
+# All Rights Reserved
+
+#LOG:Apr 17 12:58:51 mail httpd: OK: Pass Phrase Dialog successful.
+regex=OK: Pass Phrase Dialog successful; \
+ classification.text=Web server SSL passphrase correct; \
+ id=4102; \
+ revision=1; \
+ analyzer(0).name=Apache httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache was started and an SSL passphrase was required.  This passphrase was entered correctly.; \
+ last;
+
+#LOG:Apr 17 12:58:48 mail httpd: Apache:mod_ssl:Error: Pass phrase incorrect (5 more retries permitted).
+regex=Error: Pass phrase incorrect \(; \
+ classification.text=Web server SSL passphrase incorrect; \
+ id=4103; \
+ revision=1; \
+ analyzer(0).name=Apache httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache was started and an SSL passphrase was required.  This passphrase was not entered correctly, but additional passphrase attempts will be allowed.; \
+ last;
+
+#LOG:Apr 17 14:00:48 mail httpd: Apache:mod_ssl:Error: Pass phrase incorrect.
+regex=Error: Pass phrase incorrect\.; \
+ classification.text=Web server SSL passphrase incorrect; \
+ id=4104; \
+ revision=1; \
+ analyzer(0).name=Apache httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=high; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache was started and an SSL passphrase was required.  This passphrase was not entered correctly.  No additional passphrase attempts will be allowed.; \
+ last;
+
+#LOG:Apr 17 14:02:41 mail httpd: httpd startup succeeded
+regex=httpd startup succeeded; \
+ classification.text=Web server started; \
+ id=4105; \
+ revision=1; \
+ analyzer(0).name=Apache httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache httpd was started.; \
+ last;
+
+#LOG:Apr 17 14:00:13 mail httpd: httpd shutdown succeeded
+regex=httpd shutdown succeeded; \
+ classification.text=Web server stopped; \
+ id=4106; \
+ revision=1; \
+ analyzer(0).name=Apache httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache httpd was started.; \
  last;
