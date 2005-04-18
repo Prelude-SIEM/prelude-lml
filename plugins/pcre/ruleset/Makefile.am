@@ -1,5 +1,6 @@
 ruleset_DATA = \
 	apc-emu.rules		\
+	arpwatch.rules		\
 	cisco-pix.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\

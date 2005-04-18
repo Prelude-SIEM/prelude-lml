@@ -56,13 +56,38 @@ regex=^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d (.*) rejected; \
  target(0).service.protocol=smtp; \
  last
 
+# Copyright (C) 2002 Brad Spengler <spender@grsecurity.net>
+# All Rights Reserved
+
+# LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
+# LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
+regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
+ classification.text=Possible buffer overflow; \
+ id=402; \
+ revision=1; \
+ analyzer(0).name=PAX; \
+ analyzer(0).manufacturer=www.grsecurity.net; \
+ analyzer(0).class=Memory Violation; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=file; \
+ assessment.impact.severity=high; \
+ source(0).process.name=$2; \
+ source(0).process.pid=$3; \
+ source(0).user.category=application; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$4; \
+ source(0).user.user_id(1).type=original-user; \
+ source(0).user.user_id(1).number=$5; \
+ assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
+ last
+
 # Copyright (C) 2004-2005 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
 regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMINAL: (\S+); \
  classification.text=Database audit; \
- id=402; \
+ id=403; \
  revision=1; \
  analyzer(0).name=Database; \
  analyzer(0).manufacturer=Oracle; \
@@ -80,7 +105,7 @@ regex=Audit trail: ACTION : ('.+') OSPRIV : DBA CLIENT USER: (\S+) CLIENT TERMIN
 #LOG:Apr 28 08:56:46 somehost xinetd[17300]: START: tftp pid=10590 from=12.34.56.78
 regex=START: tftp pid=(\d+) from=([\d\.]+); \
  classification.text=TFTP Session; \
- id=403; \
+ id=404; \
  revision=1; \
  analyzer(0).name=xinetd; \
  analyzer(0).class=Service; \
@@ -99,7 +124,7 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
 #LOG:Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
 regex='\S+' contains a virus \(Infection: (\S+)\); \
  classification.text=Virus found: $1; \
- id=404; \
+ id=405; \
  revision=1; \
  analyzer(0).name=P3Scan; \
  analyzer(0).manufacturer=p3scan.sourceforge.net; \
@@ -114,7 +139,7 @@ regex='\S+' contains a virus \(Infection: (\S+)\); \
 #LOG:Jun 22 12:58:55 mail syslog: syslogd startup succeeded
 regex=syslogd (startup|shutdown) succeeded; \
  classification.text=Syslog $1; \
- id=405; \
+ id=406; \
  revision=1; \
  analyzer(0).name=syslog; \
  analyzer(0).class=Logging; \
@@ -124,11 +149,11 @@ regex=syslogd (startup|shutdown) succeeded; \
  assessment.impact.description=The syslogd service reported a $1; \
  last
 
-#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 14:26:01 Drop TCP packet from WAN 80.231.184.68:3685  69.209.234.102:17300 Rule: Default deny
-#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 15:08:57 Drop UDP packet from WAN 218.83.153.58:54234  69.209.234.102:1026 Rule: Default deny
+#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 14:26:01 Drop TCP packet from WAN 80.231.184.68:3685  12.34.56.78:17300 Rule: Default deny
+#LOG:Apr 11 19:59:02 penguin dlink-syslog[28178]: Apr/11/2005 15:08:57 Drop UDP packet from WAN 218.83.153.58:54234  12.34.56.78:1026 Rule: Default deny
 regex=Drop (TCP|UDP) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule: (.+); \
  classification.text=Packet denied; \
- id=406; \
+ id=407; \
  revision=1; \
  analyzer(0).name=Wireless Router; \
  analyzer(0).manufacturer=D-Link; \
@@ -146,27 +171,35 @@ regex=Drop (TCP|UDP) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule:
  target(0).service.port=$6; \
  last
 
-# Copyright (C) 2002 Brad Spengler <spender@grsecurity.net>
-# All Rights Reserved
-
-# LOG:Sep  6 18:21:18 amoeba PAX: terminating task: /usr/X11R6/bin/glxinfo(glxinfo):7661, uid/euid: 9999/9999, PC: 25755afc, SP: 5bc95e2c
-# LOG:Oct 13 20:56:41 emma kernel: PAX: terminating task: /usr/bin/localedef(localedef):5208, uid/euid: 0/0, EIP: BFF4C330, ESP: BFF4C21C
-regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
- classification.text=Possible buffer overflow; \
- id=407; \
+#LOG:Apr 17 17:44:59 mail identd[27274]: reply to 82.96.64.2: 3937, 6667 : USERID : OTHER :[75PrAJ2FwE4EG1wv3UoKG55njQibNgOU]
+regex=reply to ([\d\.]+): \d+, \d+ : USERID : \S+ :(.+); \
+ classification.text=Ident response issued; \
+ id=408; \
  revision=1; \
- analyzer(0).name=PAX; \
- analyzer(0).manufacturer=www.grsecurity.net; \
- analyzer(0).class=Memory Violation; \
- assessment.impact.completion=failed; \
- assessment.impact.type=file; \
- assessment.impact.severity=high; \
- source(0).process.name=$2; \
- source(0).process.pid=$3; \
- source(0).user.category=application; \
+ analyzer(0).name=identd; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=identd issued a response to $1.; \
  source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).number=$4; \
- source(0).user.user_id(1).type=original-user; \
- source(0).user.user_id(1).number=$5; \
- assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
- last
+ source(0).user.user_id(0).number=$2; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$1; \
+ last;
+
+#LOG:Apr 17 05:43:08 src@sphere systrace: deny user: neonman, prog: /usr/bin/groups, pid: 27090(7)[6914], policy: /usr/bin/groups, filters: 0, syscall: native-sigaction(46), args: 12
+#LOG:Apr 17 05:43:08 src@sphere systrace: deny user: neonman, prog: /usr/bin/groups, pid: 27090(7)[6914], policy: /usr/bin/groups, filters: 0, syscall: native-kill(37), pidname: <unknown>, signame: SIGABRT
+regex=deny user: (\S+), prog: (\D+), pid: \d+\(\d+\)\[(\d+)\], policy: \S+ filters: \d+, syscall: (\S+),; \
+ classification.text=$4 attempt denied; \
+ id=409; \
+ revision=1; \
+ analyzer(0).name=systrace; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.description=systrace blocked a $4 attempt against $2.; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$1; \
+ target(0).process.pid=$3; \
+ target(0).process.name=$2; \
+ last;

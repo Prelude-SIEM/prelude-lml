@@ -58,7 +58,7 @@ regex=Directory (\S+) is getting close to the maxdirsize limit; \
  last
 
 
-#LOG:Jul 15 10:55:40 cahco3 Thu Jul 15 10:51:52 PDT [httpd_slowproc:warning]: HTTP Authentication from 10.1.74.181 to realm Administration failed
+#LOG:Jul 15 10:55:40 cahco3 Thu Jul 15 10:51:52 PDT [httpd_slowproc:warning]: HTTP Authentication from 12.34.56.78 to realm Administration failed
 regex=\[httpd_slowproc:warning\]: HTTP Authentication from ([\d\.]+) to realm \w+ failed; \
  classification.text=Web administration admin login failed; \
  id=3902; \
