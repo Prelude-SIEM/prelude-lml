@@ -21,8 +21,16 @@
 #
 #####
 
+#####
+#
+# The rules included here were developed using arpwatch-2.1a11-7.9.3.
+# Please report any inconsistencies on other versions to Gene R Gomez at the
+# address provided above
+#
+#####
+
 #LOG:Oct 14 00:47:50 hal arpwatch: new activity 12.34.56.78 0:20:a9:a:c:2a 
-regex=new (station|activity) ([\d\.]+) ([0-9a-f:]+); \
+regex=new (station|activity) ([\d\.]+) ([\da-f:]+); \
  classification.text=New ARP address detected; \
  id=4200; \
  revision=1; \
@@ -40,7 +48,7 @@ regex=new (station|activity) ([\d\.]+) ([0-9a-f:]+); \
  last;
 
 #LOG:Apr 21 23:05:00 192.168.1.35 arpwatch: flip flop 192.168.1.33 0:90:6d:f2:24:0 (8:0:20:c8:fe:15) 
-regex=(flip flop|changed ethernet address|reused old ethernet address) ([\d\.]+) ([0-9a-f:]+) \(([0-9a-f:]+)\); \
+regex=(flip flop|changed ethernet address|reused old ethernet address) ([\d\.]+) ([\da-f:]+) \(([\da-f:]+)\); \
  classification.text=Ethernet address change detected; \
  id=4201; \
  revision=1; \
@@ -60,7 +68,7 @@ regex=(flip flop|changed ethernet address|reused old ethernet address) ([\d\.]+)
  last;
 
 #16:53:59 soledad arpwatch: ethernet broadcast 100.100.100.150 0:0:0:0:0:0
-regex=(ethernet|ip) broadcast ([\d\.]+) ([0-9a-f:]+); \
+regex=(ethernet|ip) broadcast ([\d\.]+) ([\da-f:]+); \
  classification.text=$1 broadcast address detected; \
  id=4202; \
  revision=1; \
@@ -78,7 +86,7 @@ regex=(ethernet|ip) broadcast ([\d\.]+) ([0-9a-f:]+); \
  last;
 
 #LOG:Nov 18 15:57:50 fw arpwatch: bogon 169.254.189.71 0:c:f1:16:87:d9
-regex=bogon ([\d\.]+) ([0-9a-f:]+); \
+regex=bogon ([\d\.]+) ([\da-f:]+); \
  classification.text=Bogus IP address detected; \
  id=4203; \
  revision=1; \
@@ -96,7 +104,7 @@ regex=bogon ([\d\.]+) ([0-9a-f:]+); \
  last;
 
 #LOG:Feb 24 19:18:36 hal arpwatch: ethernet mismatch 195.215.178.10 0:4:c1:a7:f6:38 (0:50:4:40:c9:8f)
-regex=ethernet mismatch ([\d\.]+) ([0-9a-f:]+) \(([0-9a-f:]+)\); \
+regex=ethernet mismatch ([\d\.]+) ([\da-f:]+) \(([\da-f:]+)\); \
  classification.text=MAC address mismatch detected; \
  id=4204; \
  revision=1; \

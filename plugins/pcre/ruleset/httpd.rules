@@ -108,23 +108,10 @@ regex=Error: Pass phrase incorrect\.; \
  last;
 
 #LOG:Apr 17 14:02:41 mail httpd: httpd startup succeeded
-regex=httpd startup succeeded; \
- classification.text=Web server started; \
- id=4105; \
- revision=1; \
- analyzer(0).name=Apache httpd; \
- analyzer(0).manufacturer=www.apache.org; \
- analyzer(0).class=Service; \
- assessment.impact.severity=low; \
- assessment.impact.completion=succeeded; \
- assessment.impact.type=other; \
- assessment.impact.description=Apache httpd was started.; \
- last;
-
 #LOG:Apr 17 14:00:13 mail httpd: httpd shutdown succeeded
-regex=httpd shutdown succeeded; \
- classification.text=Web server stopped; \
- id=4106; \
+regex=httpd (startup|shutdown) succeeded; \
+ classification.text=Web server $1; \
+ id=4105; \
  revision=1; \
  analyzer(0).name=Apache httpd; \
  analyzer(0).manufacturer=www.apache.org; \
@@ -132,5 +119,5 @@ regex=httpd shutdown succeeded; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
- assessment.impact.description=Apache httpd was started.; \
+ assessment.impact.description=Apache httpd $1 seen.; \
  last;
