@@ -124,10 +124,9 @@ regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
 # Invalid (not existing) user tried to login #
 ##############################################
 
-#LOG:Dec  9 18:48:29 itguxweb2 sshd[29536]: Failed password for illegal user ROOT from 12.34.56.78 port 2886
 #LOG:Jan 20 14:10:02 blah sshd[25443]: Invalid user admin from 213.201.222.134
 
-regex=(Illegal|Invalid) user (\S+) from ([\d\.]+) port (\d+); \
+regex=(Illegal|Invalid) user (\S+) from ([\d\.]+); \
  classification.text=User login failed with an invalid user; \
  id=1904; \
  revision=1; \
@@ -140,7 +139,6 @@ regex=(Illegal|Invalid) user (\S+) from ([\d\.]+) port (\d+); \
  assessment.impact.description=Someone tried to login with the invalid user "$2" from $3; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
- source(0).service.port=$4; \
  source(0).service.protocol=tcp; \
  target(0).service.port=22; \
  target(0).service.protocol=tcp; \
@@ -282,7 +280,7 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?;
 #LOG:Jan 14 08:19:21 ras sshd[22774]: input_userauth_request: invalid user remote-mail
 # Re: Generic Message Exchange Authentication For SSH
 #               <draft-ietf-secsh-auth-kbdinteract-06.txt>
-regex=input_userauth_request: invalid user (\S+); \
+regex=input_userauth_request: (illegal|invalid) user (\S+); \
  classification.text=Invalid user in authentication request; \
  id=1910; \
  revision=1; \
@@ -323,8 +321,9 @@ regex=input_userauth_request: (.+); \
  target(0).user.category=os-device; \
  last
 
+#LOG:Dec  9 18:48:29 itguxweb2 sshd[29536]: Failed password for illegal user ROOT from 12.34.56.78 port 2886
 #LOG:Jan 14 08:19:21 ras sshd[22774]: Failed none for invalid user remote-mail from 192.168.1.22 port 65407 ssh2
-regex=Failed (\S+) for invalid user (\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=User login failed; \
  id=1912; \
  revision=1; \
@@ -347,7 +346,7 @@ regex=Failed (\S+) for invalid user (\S+) from ([\d\.]+) port (\d+)\s*(ssh2)?; \
  last
 
 #LOG:Jan 14 11:29:17 ras sshd[18163]: Failed publickey for invalid user fred from fec0:0:201::3 port 62788 ssh2
-regex=Failed (\S+) for invalid user (\S+) from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
  classification.text=SSH Remote login failed; \
  id=1913; \
  revision=1; \
