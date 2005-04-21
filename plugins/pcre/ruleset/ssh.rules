@@ -225,7 +225,7 @@ regex=ROOT LOGIN REFUSED FROM ([\d\.]+); \
  target(0).user.user_id(0).name=root; \
  last
 
-# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2005 Gene R Gomez 
 # All Rights Reserved
 
 #LOG:Jan 14 03:30:44 mail sshd[20298]: Accepted publickey for root from fec0:0:201::3 port 63018 ssh2
