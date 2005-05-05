@@ -148,7 +148,7 @@ int debug_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist
         ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
-        prelude_plugin_set_activation_option((void *) &plugin, opt, NULL);
+        prelude_plugin_set_activation_option(pe, opt, NULL);
         
         prelude_option_add(opt, NULL, hook, 's', "stderr",
                            "Output to stderr when plugin is called", PRELUDE_OPTION_ARGUMENT_NONE,
