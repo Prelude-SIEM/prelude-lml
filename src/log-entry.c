@@ -21,6 +21,12 @@
 *
 *****/
 
+/*
+ * This is required on Solaris so that multiple call to
+ * strptime() won't reset the tm structure.
+ */
+#define _STRPTIME_DONTZERO
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
