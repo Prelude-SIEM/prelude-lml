@@ -92,7 +92,7 @@ regex=attackalert: Host ($IP) has been blocked via dropped route using command: 
  source(0).node.address(0).address=$1; \
  last;
 
-# Copyright (C) 2004-2005 Gene R Gomez 
+# Copyright (C) 2004-2005 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Apr 18 10:42:51 20.0.0.3 portsentry[2549]: attackalert: Host: 2.0.0.3/2.0.0.3 is  already blocked Ignoring

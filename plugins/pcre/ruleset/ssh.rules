@@ -225,11 +225,11 @@ regex=ROOT LOGIN REFUSED FROM ([\d\.]+); \
  target(0).user.user_id(0).name=root; \
  last
 
-# Copyright (C) 2005 Gene R Gomez 
+# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Jan 14 03:30:44 mail sshd[20298]: Accepted publickey for root from fec0:0:201::3 port 63018 ssh2
-regex=Accepted (\S+) for root from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for root from ([A-Fa-f\d:\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=User login successful; \
  id=1908; \
  revision=1; \
@@ -255,7 +255,7 @@ regex=Accepted (\S+) for root from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
 # All Rights Reserved
 
 #LOG:Jan 14 03:30:44 mail sshd[20298]: Accepted publickey for john from fec0:0:201::3 port 63018 ssh2
-regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
+regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=User login successful; \
  id=1909; \
  revision=1; \
@@ -346,7 +346,7 @@ regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([\d\.]+) port (\d+)\s*
  last
 
 #LOG:Jan 14 11:29:17 ras sshd[18163]: Failed publickey for invalid user fred from fec0:0:201::3 port 62788 ssh2
-regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:]+) port (\d+)\s*(ssh2)?; \
+regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:\.]+) port (\d+)\s*(ssh2)?; \
  classification.text=SSH Remote login failed; \
  id=1913; \
  revision=1; \

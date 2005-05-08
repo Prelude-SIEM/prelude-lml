@@ -62,7 +62,7 @@ regex=\[error\] \[client ([A-Fa-f\d:]+)\] ((File|Premature|Directory|client|requ
  target(0).service.protocol=tcp; \
  last;
 
-# Copyright (C) 2005 Gene R Gomez 
+# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Apr 17 12:58:51 mail httpd: OK: Pass Phrase Dialog successful.
