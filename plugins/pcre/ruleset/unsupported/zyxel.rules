@@ -43,20 +43,17 @@
 # Jul 19 14:44:09 192.168.1.1 ZyXEL Communications Corp.: IP[Src=202.132.154.1 Dst=192.168.1.33 UDP spo=0035  dpo=05d4]}S03>R01mF
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo=([0-9A-Fa-f]+)  dpo=([0-9A-Fa-f]+).*S(\d{2})>R(\d{2})(.)(.); \
- classification(0).name=ZyXEL ip access; \
+ classification.text=ZyXEL ip access; \
  id=2500; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion = failed; \
  assessment.impact.type = other; \
  assessment.impact.severity = medium; \
  assessment.impact.description= Someone probably tried to bypass filtering : $1 ($3 $4) -> $2 ($3 $5)  ruleset $6 rule $7; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $1; \
  source(0).service.port = 0x$4; \
  source(0).service.protocol = $3; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address = $2; \
  target(0).service.port = 0x$5; \
@@ -66,19 +63,16 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+) spo
 # Jul 19 14:44:13 192.168.1.1 ZyXEL Communications Corp.: IP[Src=192.168.1.33 Dst=202.132.154.1 ICMP]}S03>R01mF
 
 regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*S(\d{2})>R(\d{2})(.)(.); \
- classification(0).name=ZyXEL ip access; \
+ classification.text=ZyXEL ip access; \
  id=2501; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion = failed; \
  assessment.impact.type = other;\
  assessment.impact.severity = medium; \
  assessment.impact.description= Someone probably tried to bypass filtering : $1 ($3) -> $2 ($3)  ruleset $4 rule $5; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $1; \
  source(0).service.protocol = $3; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address = $2; \
  target(0).service.protocol = $3; \
@@ -92,10 +86,9 @@ regex=ZyXEL Communications Corp.: IP\[Src=([0-9\.]+) Dst=([0-9\.]+) ([A-Z]+)\].*
 # Jul 19 11:44:14 192.168.1.1 ZyXEL Communications Corp.: ppp:BACP Closing
 
 regex=ZyXEL Communications Corp.: ppp:(LCP|IPCP|CCP|BACP) (Starting|Opening|Closing); \
- classification(0).name=ZyXEL PPP $2; \
+ classification.text=ZyXEL PPP $2; \
  id=2502; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.type = other;\
  assessment.impact.severity = low; \
  assessment.impact.description=$2 $1 connection; \

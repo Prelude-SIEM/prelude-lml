@@ -12,7 +12,6 @@ ruleset_DATA = \
 	httpd.rules		\
 	ipchains.rules		\
 	ipfw.rules		\
-	ipso.rules		\
 	modsecurity.rules	\
 	ms-sql.rules		\
 	nagios.rules		\
@@ -24,7 +23,6 @@ ruleset_DATA = \
 	pcanywhere.rules	\
 	pcre.rules		\
 	portsentry.rules	\
-	postfix.rules		\
 	proftpd.rules		\
 	qpopper.rules		\
 	selinux.rules		\

@@ -179,7 +179,6 @@ regex=honeyd;			include = honeyd.rules;
 regex=(\[error\]|Pass|httpd);	include = httpd.rules; \
 				include = modsecurity.rules;
 regex=ipfw;			include = ipfw.rules;
-regex=\[LOG_[^\]]*\];		include = ipso.rules;
 regex=\s[A-Fa-f\d-]+$;		include = linksys-wap11.rules;
 regex=mssqlserver;		include = ms-sql.rules;
 regex=nagios;			include = nagios.rules;
@@ -189,7 +188,6 @@ regex=security\[;		include = ntsyslog.rules;
 regex=[Pp][Aa][Mm]_;		include = pam.rules;
 regex=pcanywhere;		include = pcanywhere.rules;
 regex=portsentry;		include = portsentry.rules;
-regex=postfix/;			include = postfix.rules;
 regex=proftpd;			include = proftpd.rules;
 regex=popper;			include = qpopper.rules;
 regex=avc:;			include = selinux.rules;

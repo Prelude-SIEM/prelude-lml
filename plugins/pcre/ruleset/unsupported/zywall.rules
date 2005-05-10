@@ -34,19 +34,16 @@
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|B; \
- classification(0).name=$5 packet blocked; \
+ classification.text=$5 packet blocked; \
  id=2400; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $1; \
  source(0).service.port = $2; \
  source(0).service.protocol = $5; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address = $3; \
  target(0).service.port = $4; \
@@ -56,19 +53,16 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|F; \
- classification(0).name=$5 packet forwarded; \
+ classification.text=$5 packet forwarded; \
  id=2401; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $1; \
  source(0).service.port = $2; \
  source(0).service.protocol = $5; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address = $3; \
  target(0).service.port = $4; \
@@ -78,19 +72,16 @@ regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+
 
 # No log sample; please submit
 regex=FW (\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\-\>(\d+\.\d+\.\d+\.\d+)\s*[:]?(\d+)?\s*\|(UDP|TCP|ICMP|IGMP|GRE|ESP)(.*)\|(.*)\|N; \
- classification(0).name=$5 packet matched; \
+ classification.text=$5 packet matched; \
  id=2402; \
  revision=1; \
- classification(0).origin=vendor-specific; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
-  \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address = $1; \
  source(0).service.port = $2; \
  source(0).service.protocol = $5; \
-  \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address = $3; \
  target(0).service.port = $4; \
