@@ -1,11 +1,13 @@
-ruleset_DATA = \
-	checkpoint.rules	\
-	ipso.rules		\
-	zywall.rules		\
-	zyxel.rules		
+if ENABLE_UNSUPPORTED_RULESETS
 
+	ruleset_DATA = \
+		checkpoint.rules	\
+		ipso.rules		\
+		zywall.rules		\
+		zyxel.rules		
 
+	rulesetdir = $(configdir)/ruleset
 
-rulesetdir = $(configdir)/ruleset
+	EXTRA_DIST = $(ruleset_DATA)
 
-EXTRA_DIST = $(ruleset_DATA)
+endif
