@@ -188,6 +188,7 @@ regex=security\[;		include = ntsyslog.rules;
 regex=[Pp][Aa][Mm]_;		include = pam.rules;
 regex=pcanywhere;		include = pcanywhere.rules;
 regex=portsentry;		include = portsentry.rules;
+regex=postfix/;                 include = postfix.rules;
 regex=proftpd;			include = proftpd.rules;
 regex=popper;			include = qpopper.rules;
 regex=avc:;			include = selinux.rules;

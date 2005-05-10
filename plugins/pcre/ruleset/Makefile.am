@@ -1,3 +1,5 @@
+SUBDIRS = unsupported
+
 ruleset_DATA = \
 	apc-emu.rules		\
 	arpwatch.rules		\
@@ -23,6 +25,7 @@ ruleset_DATA = \
 	pcanywhere.rules	\
 	pcre.rules		\
 	portsentry.rules	\
+	postfix.rules		\
 	proftpd.rules		\
 	qpopper.rules		\
 	selinux.rules		\
