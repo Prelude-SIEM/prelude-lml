@@ -281,7 +281,7 @@ int main(int argc, char **argv)
                 prelude_log(PRELUDE_LOG_WARN, "error initializing logs plugins.\n");
                 return -1;
         }
-        prelude_log(PRELUDE_LOG_INFO, "- Initialized %d logs plugins.\n", ret);
+        prelude_log_debug(1, "- Initialized %d logs plugins.\n", ret);
         
         ret = lml_options_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )
