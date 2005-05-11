@@ -63,8 +63,8 @@ static int set_conf_file(prelude_option_t *opt, const char *optarg, prelude_stri
 
 static int print_version(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
-        printf("prelude-lml %s.\n", VERSION);
-        return prelude_error(PRELUDE_ERROR_EOF);
+        printf("prelude-lml-%s\n", VERSION);
+        exit(0);
 }
 
 
@@ -355,10 +355,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
         
-        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'v', "version",
                            "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
                            print_version, NULL);
-
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
+        
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
 
@@ -396,13 +397,13 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
                 
-        prelude_option_add(ropt, NULL, all_hook, 't', "max-rotation-time-offset",
+        prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
                            "severity alert will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_rotation_time_offset, get_rotation_time_offset);
         
-        prelude_option_add(ropt, NULL, all_hook, 's', "max-rotation-size-offset",
+        prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-size-offset",
                            "Specifies the maximum difference, in bytes, between two logfile "
                            "rotation. If this difference is reached, a high severity alert "
                            "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset, 
