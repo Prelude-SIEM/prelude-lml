@@ -1,3 +1,5 @@
+DISTCHECK_CONFIGURE_FLAGS = --enable-unsupported-rulesets
+
 ACLOCAL_AMFLAGS = -I m4 -I libmissing/m4
 SUBDIRS = libmissing plugins src
 
