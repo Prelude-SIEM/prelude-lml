@@ -304,7 +304,7 @@ static idmef_value_t *build_message_object_value(pcre_rule_t *rule, rule_object_
                 
                 service = getservbyname(str_tolower(value_str, tmp, sizeof(tmp)), NULL);
                 if ( ! service ) {
-                        prelude_log(PRELUDE_LOG_ERR, "could not map service '%s'.\n", tmp);
+                        prelude_log(PRELUDE_LOG_ERR, "could not map service '%s' in rule ID %d.\n", tmp, rule->id);
                         prelude_string_destroy(strbuf);
                         return NULL;
                 }
