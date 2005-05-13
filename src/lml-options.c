@@ -367,10 +367,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Debug mode", PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_debug_mode, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
         
-        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'd', "daemon",
                            "Run in daemon mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_daemon_mode, NULL);
-
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_FIRST);
+        
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
                            "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_text_output, NULL);
@@ -388,7 +389,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Write Prelude LML PID to specified pidfile",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
         
-        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_FIRST);
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
         
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
                            PRELUDE_OPTION_TYPE_WIDE, 's', "udp-srvr",
