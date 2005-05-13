@@ -85,7 +85,7 @@ regex=([\d\.]+)  Group \[(\S+)\] User \[(\S+)\] User \(\S+\) authenticated; \
  target(0).user.category=application; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$3; \
- target(0).user.user_id(1).type=target-group; \
+ target(0).user.user_id(1).type=current-group; \
  target(0).user.user_id(1).name=$2; \
  last
 
