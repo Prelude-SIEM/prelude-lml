@@ -37,8 +37,8 @@
 
 #include "libmissing.h"
 #include "prelude-lml.h"
-#include "rule-object.h"
 #include "pcre-mod.h"
+#include "rule-object.h"
 
 
 struct rule_object_list {
@@ -226,17 +226,14 @@ static void free_rule_object_value_list(rule_object_t *object)
 
 
 
-static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
+static prelude_string_t *build_message_object_value_string(rule_object_t *rule_object)
 {
         int ret;
-        const char *str;
         prelude_list_t *tmp;
-        idmef_value_t *value = NULL;
-        struct servent *service;
-        prelude_string_t *strbuf;
+        prelude_string_t *str;
         rule_object_value_t *rovalue;
-                 
-        ret = prelude_string_new(&strbuf);
+        
+        ret = prelude_string_new(&str);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-string");
                 return NULL;
@@ -248,32 +245,78 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
                 if ( ! rovalue->value )
                         continue;
 
-                if ( prelude_string_cat(strbuf, rovalue->value) < 0 ) {
-                        prelude_string_destroy(strbuf);
+                if ( prelude_string_cat(str, rovalue->value) < 0 ) {
+                        prelude_string_destroy(str);
                         return NULL;
                 }
         }
 
-        if ( prelude_string_is_empty(strbuf) ) {
-                prelude_string_destroy(strbuf);
+        if ( prelude_string_is_empty(str) ) {
+                prelude_string_destroy(str);
                 return NULL;
         }
-        
-        str = prelude_string_get_string(strbuf);
 
-        ret = strcmp(idmef_path_get_name(rule_object->object, idmef_path_get_depth(rule_object->object) - 1), "port");
-        if ( ret == 0 && ! isdigit((int) *str) ) {
-                service = getservbyname(str, NULL);
+        return str;
+}
+
+
+
+static const char *str_tolower(const char *str, char *buf, size_t size)
+{
+        unsigned int i = 0;
+
+        buf[0] = 0;
+        
+        while ( i < size ) {
+                buf[i] = tolower(str[i]);
+
+                if ( str[i] == 0 )
+                        break;
+                
+                i++;
+        }
+        
+        return buf;
+}
+
+
+static idmef_value_t *build_message_object_value(pcre_rule_t *rule, rule_object_t *rule_object)
+{
+        int ret;
+        struct servent *service;
+        prelude_string_t *strbuf;
+        const char *value_str, *str;
+        idmef_value_t *value = NULL;
+        
+        strbuf = build_message_object_value_string(rule_object);
+        if ( ! strbuf )
+                return NULL;
+        
+        value_str = prelude_string_get_string(strbuf); 
+        str = idmef_path_get_name(rule_object->object, idmef_path_get_depth(rule_object->object) - 1);
+        
+        ret = strcmp(str, "port");
+        if ( ret != 0 || (ret == 0 && isdigit((int) *value_str)) )
+                ret = idmef_value_new_from_path(&value, rule_object->object, value_str);
+
+        else {
+                char tmp[32];
+                
+                service = getservbyname(str_tolower(value_str, tmp, sizeof(tmp)), NULL);
                 if ( ! service ) {
-                        prelude_log(PRELUDE_LOG_WARN, "Service name '%s' could not be found in /etc/services.\n", str);
+                        prelude_log(PRELUDE_LOG_ERR, "could not map service '%s'.\n", tmp);
+                        prelude_string_destroy(strbuf);
                         return NULL;
                 }
 
                 ret = idmef_value_new_uint16(&value, ntohs(service->s_port));
-
         }
-
-        else ret = idmef_value_new_from_path(&value, rule_object->object, str);
+        
+        if ( ret < 0 ) {
+                prelude_perror(ret, "could not create path '%s' with value '%s' in rule ID %d",
+                               idmef_path_get_name(rule_object->object, -1), value_str, rule->id);
+                value = NULL;
+        }
 
         prelude_string_destroy(strbuf);
         
@@ -283,7 +326,7 @@ static idmef_value_t *build_message_object_value(rule_object_t *rule_object)
 
 
 
-static void resolve_referenced_value(rule_object_list_t *olist,
+static void resolve_referenced_value(pcre_rule_t *rule, rule_object_list_t *olist,
                                      const lml_log_entry_t *log_entry, int *ovector, size_t osize) 
 {
          int ret;
@@ -302,8 +345,8 @@ static void resolve_referenced_value(rule_object_list_t *olist,
                                              rval->refno);
                          
                          else if ( ret == PCRE_ERROR_NOSUBSTRING )
-                                 prelude_log(PRELUDE_LOG_WARN, "backward reference %d does not exist.\n",
-                                             rval->refno);
+                                 prelude_log(PRELUDE_LOG_WARN, "backward reference number %d does not exist in rule id %d.\n",
+                                             rval->refno, rule->id);
                          
                          else
                                  prelude_log(PRELUDE_LOG_WARN, "unknown PCRE error while getting backward reference %d.\n",
@@ -335,7 +378,7 @@ static void referenced_value_destroy_content(rule_object_list_t *olist)
 
 
 
-int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **message,
+int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idmef_message_t **message,
                               const lml_log_entry_t *log_entry, int *ovector, size_t osize)
 {
         int ret;
@@ -352,12 +395,12 @@ int rule_object_build_message(rule_object_list_t *olist, idmef_message_t **messa
                         return -1;
         }
         
-        resolve_referenced_value(olist, log_entry, ovector, osize);
+        resolve_referenced_value(rule, olist, log_entry, ovector, osize);
         
         prelude_list_for_each(&olist->rule_object_list, tmp) {
                 rule_object = prelude_list_entry(tmp, rule_object_t, list);
 
-                value = build_message_object_value(rule_object);
+                value = build_message_object_value(rule, rule_object);
                 if ( ! value )
                         continue;
                 

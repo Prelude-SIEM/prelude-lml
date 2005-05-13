@@ -37,8 +37,8 @@
 #include "libmissing.h"
 #include "prelude-lml.h"
 
-#include "rule-object.h"
 #include "pcre-mod.h"
+#include "rule-object.h"
 #include "rule-regex.h"
 
 
@@ -158,7 +158,7 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_l
          if ( ret < 0 )
                  return -1;
          
-         ret = rule_object_build_message(rule->object_list, &state->idmef, log_entry, ovector, ret);         
+         ret = rule_object_build_message(rule, rule->object_list, &state->idmef, log_entry, ovector, ret);         
          if ( ret < 0 )
                  return -1;
          
