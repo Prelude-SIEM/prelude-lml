@@ -199,7 +199,7 @@ regex=deny user: (\S+), prog: (\D+), pid: \d+\(\d+\)\[(\d+)\], policy: \S+ filte
  assessment.impact.type=other; \
  assessment.impact.description=systrace blocked a $4 attempt against $2.; \
  source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).number=$1; \
+ source(0).user.user_id(0).name=$1; \
  target(0).process.pid=$3; \
  target(0).process.name=$2; \
  last;
