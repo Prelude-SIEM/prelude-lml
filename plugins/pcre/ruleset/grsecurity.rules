@@ -26,7 +26,7 @@
 
 #
 # generic grsec2 goto rules
-regex=([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
+regex=([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
  id=691; \
  revision = 1; \
  target(0).process.path=$1; \
@@ -54,6 +54,13 @@ regex=([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent 
  target(1).user.user_id(3).number = $14; \
  chained;
 
+#
+# generic grsec2 goto rules
+regex=From (\S+):; \
+ id=692; \
+ revision = 1; \
+ source(0).node.address(0).address = $1; \
+ chained; silent;
 
 # No log sample; please submit
 regex=denied ptrace of \(([^:]+):(\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
@@ -1345,9 +1352,8 @@ regex=attempted priority change by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\),
 #
 # (grsec2 version)
 # LOG:May  2 18:13:42 lt kernel: grsec: From 82.226.58.44: signal 11 sent to /usr/lib/paxtest/writetext[writetext:2806] uid/euid:1/2 gid/egid:3/4, parent /usr/lib/paxtest/writetext[writetext:23332] uid/euid:5/6 gid/egid:7/8
-
-regex=From (\S+): signal (\d+) sent to; id=662; goto=691; \
- classification.text=Signal $2 sent; \
+regex=signal (\d+) sent to; id=662; optgoto=692; goto=691; \
+ classification.text=Signal $1 sent; \
  revision=1; \
  analyzer(0).name=grsecurity; \
  analyzer(0).manufacturer=www.grsecurity.net; \
@@ -1356,7 +1362,7 @@ regex=From (\S+): signal (\d+) sent to; id=662; goto=691; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
  source(0).node.address(0).address = $1; \
- assessment.impact.description=Signal $2 was sent to a process.; \
+ assessment.impact.description=Signal $1 was sent to a process.; \
  last
 
 #
@@ -1385,7 +1391,7 @@ regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent 
 # no log sample, please submit
 #
 regex=signal (\d+) sent to \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\) by \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\), parent \(([^:]+):(\d+)\) UID\((\d+)\) EUID\((\d+)\); \
- classification.text=Signal sent; \
+ classification.text=Signal $1 sent; \
  id=663; \
  revision=1; \
  analyzer(0).name=grsecurity; \
@@ -1526,7 +1532,8 @@ regex=attempt to sysctl\(\) ([^ ]+) for reading writing by \(([^:]+):(\d+)\) UID
 
 # grsec2 version
 # LOG:Jun 19 15:53:23 lomo kernel: grsec: time set by /sbin/hwclock[hwclock:27144] uid/euid:1/2 gid/egid:3/4, parent /sbin/rc[rc:1229] uid/euid:5/6 gid/egid:7/8
-regex=time set by; id = 669; goto=691; \
+# LOG:May  2 12:55:27 lsd kernel: grsec: From x.x.y.z: time set by /usr/bin/ntpd[ntpd:30864] uid/euid:123/123 gid/egid:123/123, parent /sbin/init[init:1] uid/euid:0/0 gid/egid:0/0
+regex=time set by; id = 669; optgoto=692; goto=691; \
  classification.text=System time changed; \
  revision=1; \
  analyzer(0).name=grsecurity; \
