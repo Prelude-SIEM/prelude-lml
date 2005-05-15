@@ -169,7 +169,7 @@ regex=%[A-Z]-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;			include = cisco-vpn.rules;
 regex=clamd;			include = clamav.rules;
 regex=server administrator;	include = dell-om.rules
-regex=kernel;			include = grsecurity.rules; \
+regex=(kernel|grsec);		include = grsecurity.rules; \
 				include = netfilter.rules; \
 				include = ipchains.rules;
 regex=honeyd;			include = honeyd.rules;
