@@ -77,7 +77,7 @@ regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP)
 #
 #LOG:Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
 #
-regex=attackalert: Host ($IP) has been blocked via dropped route using command: "([^"]+)"; \
+regex=attackalert: Host ([\d\.]+) has been blocked via dropped route using command: "([^"]+)"; \
  classification.text=Connection blocked \
  id=1502; \
  revision=1; \

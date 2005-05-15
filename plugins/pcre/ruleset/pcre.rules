@@ -165,12 +165,12 @@ regex=EMU;			include = apc-emu.rules;
 regex=arpwatch;			include = arpwatch.rules;
 regex=(bigconf|kernel);		include = f5-bigip.rules;
 regex=%PIX;			include = cisco-pix.rules;
-regex=%[A-Z]-\d+-[A-Z];		include = cisco-router.rules;
+regex=%[A-Z]+-\d+-[A-Z];	include = cisco-router.rules;
 regex=SEV=;			include = cisco-vpn.rules;
 regex=clamd;			include = clamav.rules;
 regex=server administrator;	include = dell-om.rules
-regex=(kernel|grsec);		include = grsecurity.rules; \
-				include = netfilter.rules; \
+regex=(kernel|grsec);		include = grsecurity.rules; 
+regex=kernel;			include = netfilter.rules; \
 				include = ipchains.rules;
 regex=honeyd;			include = honeyd.rules;
 # Using this somewhat complex regex instead of the simpler httpd due to the 
@@ -179,7 +179,7 @@ regex=honeyd;			include = honeyd.rules;
 regex=(\[error\]|Pass|httpd);	include = httpd.rules; \
 				include = modsecurity.rules;
 regex=ipfw;			include = ipfw.rules;
-regex=\s[A-Fa-f\d-]+$;		include = linksys-wap11.rules;
+regex=[Ww]ireless;		include = linksys-wap11.rules;
 regex=mssqlserver;		include = ms-sql.rules;
 regex=nagios;			include = nagios.rules;
 regex=norton;			include = navce.rules;

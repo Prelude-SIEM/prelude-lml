@@ -79,7 +79,7 @@ regex= security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domai
 
 # 1.c 538
 # LOG:Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
-regex= security\[success\] 538 (.*) User Logoff:  User Name:([\w ]+)  Domain:.+  Logon ID:\(.*\); \
+regex=security\[success\] 538 (.*) User Logoff:\s+User Name:([\w ]+); \
  classification.text=Logoff; \
  id=1402; \
  revision=1; \
@@ -356,7 +356,7 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
 
 # 2.d 681
 # LOG:Dec 10 08:20:07 mrfreeze.itg.sac.tfs security[failure] 681 NT AUTHORITY\SYSTEM  The logon to account: tfslegalask@itg.sac.tfs  by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  from workstation: MRFREEZE  failed. The error code was: 3221225572
-regex=security\[failure\] 681 (.+)  The logon to account: (\w+)  by:.+  from workstation: (\w+); \
+regex=security\[failure\] 681 (.+)  The logon to account: (\S+)  by:.+  from workstation: (\w+); \
  classification.text=Windows Event ID [681]: Logon failure; \
  id=1415; \
  revision=1; \
