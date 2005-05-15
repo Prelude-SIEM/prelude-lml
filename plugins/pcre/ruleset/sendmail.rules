@@ -94,7 +94,7 @@ regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\
 
 #LOG:Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
 #LOG:Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
-regex=regex=sendmail (startup|shudown) succeeded; \
+regex=sendmail (startup|shutdown) succeeded; \
  classification.text=Mail server $1 ; \
  id=3703; \
  revision=1; \
