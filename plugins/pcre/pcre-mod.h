@@ -55,3 +55,10 @@ typedef struct {
         pcre_rule_t *rule;
         prelude_bool_t optional;
 } pcre_rule_container_t;
+
+
+
+typedef enum {
+        PCRE_MATCH_FLAGS_LAST  = 0x01,
+        PCRE_MATCH_FLAGS_ALERT = 0x02
+} pcre_match_flags_t;

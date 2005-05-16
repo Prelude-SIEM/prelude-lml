@@ -47,6 +47,7 @@ typedef struct {
         char *rulesetdir;
         int last_rules_first;
         prelude_list_t rule_list;
+        prelude_bool_t dump_unmatched;
 } pcre_plugin_t;
 
 
@@ -632,11 +633,10 @@ static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char
 static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
-        int got_last;
         prelude_list_t *tmp;
         pcre_plugin_t *plugin;
         pcre_rule_container_t *rc;
-
+        pcre_match_flags_t flags, all_flags = 0;
         
         prelude_log_debug(10, "\nInput = %s\n", lml_log_entry_get_message(log_entry));
         
@@ -645,12 +645,16 @@ static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, 
         prelude_list_for_each(&plugin->rule_list, tmp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
 
-                got_last = 0;
-                ret = rule_regex_match(rc, ls, log_entry, &got_last);
+                flags = 0;
+                ret = rule_regex_match(rc, ls, log_entry, &flags);
+                all_flags |= flags;
                 
-                if ( ret == 0 && (rc->rule->last || got_last) )
+                if ( ret == 0 && (rc->rule->last || flags & PCRE_MATCH_FLAGS_LAST) )
                         break;
         }
+
+        if ( !(all_flags & PCRE_MATCH_FLAGS_ALERT) && plugin->dump_unmatched )
+                prelude_log(PRELUDE_LOG_WARN, "No alert emited for log entry \"%s\"\n", lml_log_entry_get_message(log_entry));
 }
 
 
@@ -665,6 +669,15 @@ static int set_last_first(prelude_option_t *opt, const char *optarg, prelude_str
         return 0;
 }
 
+
+static int set_dump_unmatched(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+{
+        pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
+        
+        plugin->dump_unmatched = TRUE;
+        
+        return 0;
+}
 
 
 static void remove_top_chained(void)
@@ -781,7 +794,12 @@ int pcre_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist)
         if ( ret < 0 )
                 return ret;
         prelude_option_set_priority(popt, PRELUDE_OPTION_PRIORITY_FIRST);
-        
+
+        ret = prelude_option_add(opt, &popt, PRELUDE_OPTION_TYPE_CLI, 0,
+                                 "dump-unmatched", "Dump unmatched log entry",
+                                 PRELUDE_OPTION_ARGUMENT_NONE, set_dump_unmatched, NULL);
+        if ( ret < 0 )
+                return ret;
 
         pcre_plugin.run = pcre_run;
         prelude_plugin_set_name(&pcre_plugin, "pcre");

@@ -166,75 +166,86 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_l
 }
 
 
+static void destroy_idmef_state(pcre_state_t *state)
+{
+        if ( state->idmef ) {
+                idmef_message_destroy(state->idmef);
+                state->idmef = NULL;
+        }
+}
+
+
+
 static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
-                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry, int *got_last)
+                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry,
+                           pcre_match_flags_t *match_flags)
 {
         int ret;
         prelude_list_t *tmp;
+        pcre_match_flags_t gl = 0;
         pcre_rule_t *rule = rc->rule;
         pcre_rule_container_t *child;
-                        
+        
         ret = match_rule_single(rule, state, log_entry);
-        if ( ret < 0 && ! rc->optional )
+        if ( ret < 0 )
                 return -1;
         
+        prelude_list_for_each(&rule->rule_list, tmp) {
+                child = prelude_list_entry(tmp, pcre_rule_container_t, list);
+                
+                ret = match_rule_list(child, state, ls, log_entry, &gl);
+                if ( ret < 0 && ! child->optional ) {
+                        destroy_idmef_state(state);
+                        return -1;
+                }
+
+                *match_flags |= gl;
+                if ( gl & PCRE_MATCH_FLAGS_LAST )
+                        break;
+        }
+        
+        if ( state->reqmatch < rule->required_goto ) {
+                destroy_idmef_state(state);
+                return -1;
+        }
+        
+        if ( state->optmatch < rule->min_optgoto_match ) {
+                destroy_idmef_state(state);
+                return -1;
+        }
+
         if ( rc->optional )
                 state->optmatch++;
         else
                 state->reqmatch++;
-
-        if ( ret == 0 ) {
-                int gl = 0;
                 
-                prelude_list_for_each(&rule->rule_list, tmp) {
-                        child = prelude_list_entry(tmp, pcre_rule_container_t, list);
-
-                        /*
-                         * we ignore the return value: since it is a list of rule, we need to
-                         * match them all until one of them match and has the "last" keyword set.
-                         */
-                        match_rule_list(child, state, ls, log_entry, &gl);
-                        if ( gl ) {
-                                *got_last = 1;
-                                break;
-                        }
-                }
-                
-                if ( rule->last )
-                        *got_last = 1;
-        }
-        
-        if ( state->reqmatch < rule->required_goto )
-                return -1;
-        
-        if ( state->optmatch < rule->min_optgoto_match ) 
-                return -1;
-                
-        if ( ! rule->silent && state->idmef ) {
-                prelude_log_debug(4, "lml alert emit (last=%d) %s\n",
-                                  rule->last, lml_log_entry_get_message(log_entry));
+        if ( ! rule->silent && state->idmef ) {                
+                prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
+                                  rule->id, rule->last, lml_log_entry_get_message(log_entry));
 
                 lml_alert_emit(ls, log_entry, state->idmef);
                 state->idmef = NULL;
-                
-                if ( rule->last )
-                        *got_last = 1;
-        }
 
+                *match_flags |= PCRE_MATCH_FLAGS_ALERT;
+
+                if ( rule->last )
+                        *match_flags |= PCRE_MATCH_FLAGS_LAST;
+        }
+                
         return 0;
 }
 
 
 
 int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls,
-                     const lml_log_entry_t *log_entry, int *got_last)
+                     const lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags)
 {
         int ret;
         pcre_state_t state;
         
         memset(&state, 0, sizeof(state));
         
-        ret = match_rule_list(root, &state, ls, log_entry, got_last);
+        ret = match_rule_list(root, &state, ls, log_entry, match_flags);
         if ( ret < 0 )
                 return -1;
         
