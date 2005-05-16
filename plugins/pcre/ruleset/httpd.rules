@@ -25,8 +25,8 @@
 #LOG:[Sat Mar 12 22:56:13 2005] [error] [client 127.0.0.1] Premature end of script headers: /var/www/sample/index.pl
 #LOG:[Sat Mar 12 22:48:24 2005] [error] [client 127.0.0.1] Directory index forbidden by rule: /var/www/sample/
 #LOG:[Sat Mar 12 22:38:41 2005] [error] [client 127.0.0.1] client denied by server configuration: /var/www/sample/
-#LOG:[Sun Jan  2 22:42:47 2005] [error] [client x.x.x.x] request failed: error reading the headers
-#LOG:[Sun Jan  2 23:48:19 2005] [error] [client x.x.x.x] request failed: URI too long
+#LOG:[Sun Jan  2 22:42:47 2005] [error] [client 127.0.0.1] request failed: error reading the headers
+#LOG:[Sun Jan  2 23:48:19 2005] [error] [client 127.0.0.1] request failed: URI too long
 regex=\[error\] \[client ([\d\.]+)\] ((File|Premature|Directory|client|request)[\S+\s]+): (.+); \
  classification.text=Web server error; \
  id=4100; \
