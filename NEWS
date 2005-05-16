@@ -1,3 +1,31 @@
+* 2005-05-16, prelude-lml-0.9.0-rc4:
+
+	- Added systrace, identd, arpwatch, pure-ftpd support.
+
+	- Fix a crash uppon activation of the debug plugin.
+
+	- Fix a Solaris specific issue resulting in invalid alert detect-time.
+
+	- Fix possible crash with rule referencing invalid IDMEF path.
+	  Better error reporting on invalid path/invalid value. Always include the rule ID.
+
+	- Fix a problem with generated alert possibly containing content gathered from other rules.
+
+	- Fix option namespace conflict. Correct --version option.
+
+        - Ruleset improvement and fixes.
+
+	- Decrease startup verbosity level.
+	
+	- Add --enable-unsupported-ruleset configure option enabling installation
+	  of currently unsupported ruleset. Theses ruleset need love, see 
+          http://prelude-ids.org/pipermail/prelude-user/2005-May/000861.html,
+	  and contact Gene R Gomez <gene@gomezbrothers.com> if interested.
+
+	- New '--dump-unmatched' option, useful for regression testing. Print out the log
+	  that were not matched by the current set of rules.
+	
+	 
 * 2005-04-17, prelude-lml-0.9.0-rc3:
 
 	- Introduced SELinux, httpd, Dlink ruleset support.
