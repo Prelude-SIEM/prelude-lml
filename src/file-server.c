@@ -346,13 +346,13 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 
         ret = ftruncate(fileno(monitor->metadata_fd), 0);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't truncate metadata file.\n");
+                prelude_log(PRELUDE_LOG_ERR, "could not truncate metadata file: %s.\n", strerror(errno));
                 return -1;
         }
         
         ret = fwrite(buf, 1, len, monitor->metadata_fd);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't write out metadata.\n");
+                prelude_log(PRELUDE_LOG_ERR, "could not write metadata file: %s.\n", strerror(errno));
                 return -1;
         }
         
@@ -381,7 +381,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "stat: error on file %s.\n", filename);
+                prelude_log(PRELUDE_LOG_ERR, "stat: error on file %s: %s.\n", filename, strerror(errno));
                 return -1;
         }
 
@@ -401,7 +401,8 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         
         ret = fseek(monitor->fd, offset, SEEK_SET);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "- %s: couldn't seek to byte %" PRELUDE_PRIu64 ".\n", filename, offset);
+                prelude_log(PRELUDE_LOG_ERR, "- %s: could not seek to byte %" PRELUDE_PRIu64 ": %s.\n",
+                            filename, offset, strerror(errno));
                 return -1; 
         }
 
@@ -441,13 +442,13 @@ static int file_metadata_open(monitor_fd_t *monitor)
 
         ret = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
         if ( ret < 0 && errno != EEXIST ) {
-                prelude_log(PRELUDE_LOG_ERR, "error creating %s.\n", path);
+                prelude_log(PRELUDE_LOG_ERR, "error creating %s: %s.\n", path, strerror(errno));
                 return -1;
         }
 
         monitor->metadata_fd = fdopen(ret, "r+");
         if ( ! monitor->metadata_fd ) {
-                prelude_log(PRELUDE_LOG_ERR, "fdopen failed.\n");
+                prelude_log(PRELUDE_LOG_ERR, "fdopen failed: %s.\n", strerror(errno));
                 return -1;
         }
 
@@ -854,13 +855,13 @@ static int check_fam_writev_bug(FAMConnection *fc)
 
         ret = mkstemp(buf);        
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "error creating unique temporary filename.\n");
+                prelude_log(PRELUDE_LOG_ERR, "error creating unique temporary filename: %s.\n", strerror(errno));
                 return -1;
         }
         
         fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
         if ( fd < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "error opening %s for writing.\n", buf);
+                prelude_log(PRELUDE_LOG_ERR, "error opening %s for writing: %s.\n", buf, strerror(errno));
                 return -1;
         }
         
