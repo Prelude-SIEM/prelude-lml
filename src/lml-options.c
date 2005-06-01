@@ -288,6 +288,11 @@ static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void
 
         udp_server_close(config.udp_srvr);
         config.udp_srvr = NULL;
+
+        if ( config.udp_srvr_addr ) {
+                free(config.udp_srvr_addr); 
+                config.udp_srvr_addr = NULL;
+        }
         
         return 0;
 }
@@ -396,6 +401,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "address:port pair to listen to syslog to UDP messages (default port 514)", 
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
 
+        prelude_option_set_destroy_callback(opt, destroy_udp_server);        
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
                 
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
