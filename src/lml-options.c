@@ -316,11 +316,14 @@ static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string
                 ret = prelude_parse_address(arg, &config.udp_srvr_addr, &port);
                 if ( ret < 0 )
                         return ret;
-
+                
                 config.udp_srvr_port = port ? port : DEFAULT_UDP_SERVER_PORT;
         } 
         
-        else config.udp_srvr_addr = strdup("0.0.0.0");
+        else {
+                config.udp_srvr_addr = strdup("0.0.0.0");
+                config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
+        }
         
         rlist = regex_init("syslog");
         if ( ! rlist ) {
@@ -352,7 +355,6 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
         memset(&config, 0, sizeof(config));
-        config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
                 
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
