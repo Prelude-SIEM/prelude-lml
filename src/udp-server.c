@@ -164,6 +164,8 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int
                 udp_server_close(server);
                 return NULL;
         }
-                
+
+        freeaddrinfo(ai);
+        
         return server;
 }
