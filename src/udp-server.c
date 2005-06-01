@@ -101,7 +101,9 @@ void udp_server_process_event(udp_server_t *server)
 
 void udp_server_close(udp_server_t *server)
 {
-        lml_log_source_destroy(server->ls);
+        if ( server->ls )
+                lml_log_source_destroy(server->ls);
+        
         close(server->sockfd);
         free(server);
 }
@@ -120,30 +122,11 @@ int udp_server_get_event_fd(udp_server_t *server)
 
 udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int port)
 {
-        int ret;
+        int ret, sockfd;
         udp_server_t *server;
         char buf[sizeof("65535")];
         struct addrinfo hints, *ai;
         
-        server = malloc(sizeof(*server));
-        if ( ! server ) {
-                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
-                return NULL;
-        }
-
-        server->rlist = rlist;
-        
-        server->ls = lml_log_source_new();
-        if ( ! server->ls )
-                return NULL;
-        
-        server->sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-        if ( server->sockfd < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't create socket.\n");
-                free(server);
-                return NULL;
-        }
-
         memset(&hints, 0, sizeof(hints));
         snprintf(buf, sizeof(buf), "%u", port);
         
@@ -158,14 +141,38 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int
                 return NULL;
         }
         
-        ret = bind(server->sockfd, ai->ai_addr, ai->ai_addrlen);
+        sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+        if ( sockfd < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "couldn't create socket.\n");
+                freeaddrinfo(ai);
+                return NULL;
+        }
+        
+        ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "couldn't bind to socket: %s.\n", strerror(errno));
-                udp_server_close(server);
+                freeaddrinfo(ai);
+                close(sockfd);
                 return NULL;
         }
 
         freeaddrinfo(ai);
+        
+        server = malloc(sizeof(*server));
+        if ( ! server ) {
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
+                close(sockfd);
+                return NULL;
+        }
+
+        server->rlist = rlist;
+        server->sockfd = sockfd;
+        
+        server->ls = lml_log_source_new();
+        if ( ! server->ls ) {
+                udp_server_close(server);
+                return NULL;
+        }
         
         return server;
 }
