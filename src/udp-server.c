@@ -103,6 +103,8 @@ void udp_server_close(udp_server_t *server)
 {
         if ( server->ls )
                 lml_log_source_destroy(server->ls);
+
+        regex_destroy(server->rlist);
         
         close(server->sockfd);
         free(server);
@@ -170,7 +172,8 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int
         
         server->ls = lml_log_source_new();
         if ( ! server->ls ) {
-                udp_server_close(server);
+                close(sockfd);
+                free(server);
                 return NULL;
         }
         

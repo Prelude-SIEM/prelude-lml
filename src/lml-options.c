@@ -280,17 +280,13 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
 
 static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void *context)
 {
-        if ( config.udp_srvr_addr ) {
-                free(config.udp_srvr_addr); 
-                config.udp_srvr_addr = NULL;
-        }
-
         if ( ! config.udp_srvr )
                 return 0;
                 
         prelude_log(PRELUDE_LOG_INFO, "- closing syslog server listening at %s:%d.\n",
                     config.udp_srvr_addr, config.udp_srvr_port);
 
+        free(config.udp_srvr_addr);
         udp_server_close(config.udp_srvr);
         config.udp_srvr = NULL;
                 
@@ -310,35 +306,37 @@ static int get_udp_server(prelude_option_t *opt, prelude_string_t *out, void *co
 
 static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
-        char *ptr = NULL;
         regex_list_t *rlist;
         
         destroy_udp_server(opt, err, context);
         
         if ( arg && *arg ) {
-                ptr = strrchr(arg, ':');
-                if ( ptr ) {
-                        *ptr = 0;
-                        config.udp_srvr_port = atoi(ptr + 1);
-                }
+                unsigned int ret, port = 0;
                 
-                config.udp_srvr_addr = strdup(arg);
-                
-                if ( ptr )
-                        *ptr = ':';
+                ret = prelude_parse_address(arg, &config.udp_srvr_addr, &port);
+                if ( ret < 0 )
+                        return ret;
+
+                config.udp_srvr_port = port ? port : DEFAULT_UDP_SERVER_PORT;
         } 
         
         else config.udp_srvr_addr = strdup("0.0.0.0");
         
         rlist = regex_init("syslog");
-        if ( ! rlist ) 
+        if ( ! rlist ) {
+                free(config.udp_srvr_addr);
                 return -1;
+        }
         
         config.udp_srvr = udp_server_new(rlist, config.udp_srvr_addr, config.udp_srvr_port);        
-        if ( ! config.udp_srvr )
+        if ( ! config.udp_srvr ) {
+                free(config.udp_srvr_addr);
+                regex_destroy(rlist);
                 return -1;
+        }
 
-        prelude_log(PRELUDE_LOG_INFO, "- Listening for syslog message on %s:%d.\n", config.udp_srvr_addr, config.udp_srvr_port);
+        prelude_log(PRELUDE_LOG_INFO, "- Listening for syslog message on %s:%d.\n",
+                    config.udp_srvr_addr, config.udp_srvr_port);
 
         return 0;
 }
