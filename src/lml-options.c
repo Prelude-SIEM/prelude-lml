@@ -280,6 +280,11 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
 
 static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void *context)
 {
+        if ( config.udp_srvr_addr ) {
+                free(config.udp_srvr_addr); 
+                config.udp_srvr_addr = NULL;
+        }
+
         if ( ! config.udp_srvr )
                 return 0;
                 
@@ -288,12 +293,7 @@ static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void
 
         udp_server_close(config.udp_srvr);
         config.udp_srvr = NULL;
-
-        if ( config.udp_srvr_addr ) {
-                free(config.udp_srvr_addr); 
-                config.udp_srvr_addr = NULL;
-        }
-        
+                
         return 0;
 }
 
