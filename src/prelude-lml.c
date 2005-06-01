@@ -215,7 +215,6 @@ static void wait_for_event(void)
         struct timeval tv, start, end;
         int file_event_fd, udp_event_fd;
         
-        udp_event_fd = udp_server_get_event_fd(config.udp_srvr);
         file_event_fd = file_server_get_event_fd();
 
         FD_ZERO(&fds);                
@@ -226,6 +225,8 @@ static void wait_for_event(void)
                 
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
+
+                udp_event_fd = udp_server_get_event_fd(config.udp_srvr);
                 
                 add_fd_to_set(&fds, udp_event_fd);
                 add_fd_to_set(&fds, file_event_fd);
