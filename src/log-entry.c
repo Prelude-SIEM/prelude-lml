@@ -21,6 +21,8 @@
 *
 *****/
 
+#include "config.h"
+
 /*
  * This is required on Solaris so that multiple call to
  * strptime() won't reset the tm structure.
@@ -35,14 +37,17 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <pcre.h>
 
 /*
  * glibc2 won't define strptime()
  * unless _XOPEN_SOURCE is defined.
  */
-#include <time.h>
-#include <pcre.h>
+#ifdef __linux__
+# define __USE_XOPEN
+#endif
 
+#include <time.h>
 #include <libprelude/prelude-log.h>
 
 #include "prelude-lml.h"
@@ -95,7 +100,6 @@ static int parse_ts(lml_log_source_t *ls, const char *string, void **out)
         /*
          * strptime() return a pointer to the first non matched character.
          */
-        
         end = strptime(string, lml_log_source_get_timestamp_format(ls), lt);
         if ( ! end ) 
                 goto err;
