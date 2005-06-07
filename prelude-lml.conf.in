@@ -14,7 +14,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # overwrite the default address for this sensor by uncommenting 
 # this entry.
 #
-# manager-addr = 127.0.0.1
+# server-addr = 127.0.0.1
 
 
 # Configuration for the UDP message receiver.
