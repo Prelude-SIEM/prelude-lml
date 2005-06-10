@@ -601,9 +601,9 @@ static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, 
 
 static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char *filename, FILE *fd) 
 {
-        int line = 0;
         char buf[8192], *ptr;
-
+        unsigned int line = 0;
+        
         while ( prelude_read_multiline(fd, &line, buf, sizeof(buf)) == 0 ) {
 
                 ptr = buf;
