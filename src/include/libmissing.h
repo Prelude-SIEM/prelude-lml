@@ -30,16 +30,17 @@
 #define _PRELUDE_LML_LIBMISSING_H
 
 #include "config.h"
+
 #include "getaddrinfo.h"
 #include "gettext.h"
 #include "inet_ntop.h"
 #include "minmax.h"
 #include "snprintf.h"
+#include "strdup.h"
 #include "vasnprintf.h"
 #include "xsize.h"
 #include <alloca.h>
 #include <stdbool.h>
 #include <string.h>
-
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */

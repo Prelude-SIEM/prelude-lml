@@ -39,14 +39,6 @@
 #include <unistd.h>
 #include <pcre.h>
 
-/*
- * glibc2 won't define strptime()
- * unless _XOPEN_SOURCE is defined.
- */
-#ifdef __linux__
-# define __USE_XOPEN
-#endif
-
 #include <time.h>
 #include <libprelude/prelude-log.h>
 

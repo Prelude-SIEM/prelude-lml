@@ -21,6 +21,9 @@
 *
 *****/
 
+#include "config.h"
+#include "libmissing.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -29,8 +32,6 @@
 #include <pcre.h>
 #include <netdb.h>
 #include <libprelude/prelude-log.h>
-
-#include "libmissing.h"
 
 #include "prelude-lml.h"
 #include "pcre-mod.h"

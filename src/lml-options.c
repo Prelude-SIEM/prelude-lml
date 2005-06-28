@@ -21,6 +21,9 @@
 *
 *****/
 
+#include "config.h"
+#include "libmissing.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,8 +40,6 @@
 #include <libprelude/prelude-log.h>
 #include <libprelude/daemonize.h>
 
-#include "config.h"
-#include "libmissing.h"
 #include "prelude-lml.h"
 #include "lml-options.h"
 #include "log-source.h"

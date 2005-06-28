@@ -22,6 +22,9 @@
 *
 *****/
 
+#include "config.h"
+#include "libmissing.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -35,7 +38,6 @@
 #include <libprelude/idmef.h>
 #include <libprelude/prelude-string.h>
 
-#include "libmissing.h"
 #include "prelude-lml.h"
 #include "pcre-mod.h"
 #include "rule-object.h"

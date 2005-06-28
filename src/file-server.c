@@ -21,6 +21,9 @@
 *
 *****/
 
+#include "config.h"
+#include "libmissing.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -32,9 +35,6 @@
 #include <assert.h>
 #include <time.h>
 #include <sys/uio.h>
-
-#include "config.h"
-#include "libmissing.h"
 
 #ifdef HAVE_FAM 
  #include <fam.h>

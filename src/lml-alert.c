@@ -22,6 +22,7 @@
 *****/
 
 #include "config.h"
+#include "libmissing.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -41,11 +42,9 @@
 #include <libprelude/prelude-log.h>
 #include <libprelude/idmef-message-print.h>
 
-#include "libmissing.h"
 #include "log-entry.h"
 #include "lml-alert.h"
 #include "lml-options.h"
-#include "config.h"
 
 
 extern lml_config_t config;
