@@ -11,9 +11,10 @@ AM_MAINTAINER_MODE
 
 
 dnl Checks for programs.
-gl_EARLY
 AC_PROG_CPP
 AC_PROG_CC
+gl_EARLY
+
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_C_INLINE
@@ -167,7 +168,6 @@ AC_HEADER_TIME
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-AC_CHECK_FUNCS(gettimeofday select socket strdup strerror strstr)
 
 configdir=$sysconfdir/prelude-lml
 prelude_lml_conf=$configdir/prelude-lml.conf
