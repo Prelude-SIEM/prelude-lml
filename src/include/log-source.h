@@ -50,4 +50,8 @@ const pcre *lml_log_source_get_prefix_regex(const lml_log_source_t *ls);
 
 const pcre_extra *lml_log_source_get_prefix_regex_extra(const lml_log_source_t *ls);
 
+void lml_log_source_set_warning_limit(lml_log_source_t *source, int limit);
+
+void lml_log_source_warning(lml_log_source_t *ls, const char *fmt, ...);
+
 #endif

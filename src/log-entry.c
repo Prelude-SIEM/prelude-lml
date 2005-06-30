@@ -46,13 +46,6 @@
 #include "log-entry.h"
 #include "prelude-lml.h"
 
-/*
- * default log fmt.
- */
-#define SYSLOG_TS_FMT "%b %d %H:%M:%S"
-#define SYSLOG_PREFIX_REGEX "^(?P<timestamp>.{15}) (?P<hostname>\\S+) (?:((?P<process>\\S+)(\\[(?P<pid>[0-9]+)\\])?)?: )?"
-
-
 
 struct lml_log_entry {
         char *original_log;
@@ -67,6 +60,7 @@ struct lml_log_entry {
         char *target_process;
         char *target_process_pid;
 };
+
 
 
 static int parse_ts(lml_log_source_t *ls, const char *string, void **out) 
@@ -105,8 +99,8 @@ static int parse_ts(lml_log_source_t *ls, const char *string, void **out)
         return 0;
 
  err:
-        prelude_log(PRELUDE_LOG_WARN, "couldn't format \"%s\" using \"%s\".\n",
-                    string, lml_log_source_get_timestamp_format(ls));
+        lml_log_source_warning(ls, "could not format \"%s\" using \"%s\".\n",
+                               string, lml_log_source_get_timestamp_format(ls));
         return -1;
 }
 
@@ -133,10 +127,10 @@ static int parse_prefix(lml_log_source_t *ls, lml_log_entry_t *log_entry)
         matches = pcre_exec(lml_log_source_get_prefix_regex(ls), lml_log_source_get_prefix_regex_extra(ls),
                             log_entry->original_log, log_entry->original_log_len, 0, 0, ovector,
                             sizeof(ovector) / sizeof(int));
-        
+
         if ( matches < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "couldn't match log_prefix_regex against log entry: %s.\n",
-                            log_entry->original_log);
+                lml_log_source_warning(ls, "could not match log_prefix_regex against log entry: %s.\n",
+                                       log_entry->original_log);
                 return -1;
         }
 
@@ -159,10 +153,8 @@ static int parse_prefix(lml_log_source_t *ls, lml_log_entry_t *log_entry)
                         ret = tbl[i].cb(ls, string, tbl[i].ptr);
                         free(string);
                         
-                        if ( ret < 0 ) {
-                                prelude_log(PRELUDE_LOG_WARN, "failed to parse prefix field: %s.\n", tbl[i].field);
+                        if ( ret < 0 )
                                 return -1;
-                        }
                 }
         }
 
@@ -273,7 +265,6 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
                 log_entry->target_hostname = get_hostname();
         
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "failed to parse log message prefix.\n");
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }

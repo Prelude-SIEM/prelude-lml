@@ -104,7 +104,16 @@ static int set_no_resolve(prelude_option_t *opt, const char *optarg, prelude_str
 
 static int set_rotation_time_offset(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context) 
 {
-        file_server_set_max_rotation_time_offset(atoi(optarg));
+        char *endptr;
+        unsigned long int off;
+
+        off = strtoul(optarg, &endptr, 10);
+        if ( *endptr != '\0' ) {
+                prelude_string_sprintf(err, "Invalid max rotation time offset specified: %s", optarg);
+                return -1;
+        }
+        
+        file_server_set_max_rotation_time_offset(off);
         return 0;
 }
 
@@ -118,7 +127,16 @@ static int get_rotation_time_offset(prelude_option_t *opt, prelude_string_t *out
 
 static int set_rotation_size_offset(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
-        file_server_set_max_rotation_size_offset(atoi(arg));
+        char *endptr;
+        unsigned long int off;
+
+        off = strtoul(arg, &endptr, 10);
+        if ( *endptr != '\0' ) {
+                prelude_string_sprintf(err, "Invalid max rotation size offset specified: %s", arg);
+                return -1;
+        }
+        
+        file_server_set_max_rotation_size_offset(off);
         return 0;
 }
 
@@ -244,6 +262,8 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
         if ( ! ls )
                 return prelude_error_from_errno(errno);
 
+        lml_log_source_set_warning_limit(ls, config.warning_limit);
+        
         if ( config.logfile_prefix_regex ) {
                 ret = lml_log_source_set_prefix_regex(ls, config.logfile_prefix_regex);
                 if ( ret < 0 )
@@ -347,6 +367,20 @@ static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string
 
 
 
+static int set_warning_limit(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
+{
+        char *endptr;
+        
+        config.warning_limit = strtol(arg, &endptr, 10);
+        if ( *endptr != '\0' || config.warning_limit < -1 ) {
+                prelude_string_sprintf(err, "Invalid warning limit: %s", arg);
+                return -1;
+        }
+        
+        return 0;
+}
+
+
 
 int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 {
@@ -356,7 +390,8 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
         memset(&config, 0, sizeof(config));
-                
+        config.warning_limit = -1;
+        
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
@@ -416,6 +451,12 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "rotation. If this difference is reached, a high severity alert "
                            "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset, 
                            get_rotation_size_offset);
+
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "warning-limit",
+                           "Limit the number of parse warnings reported from sources (0 suppress, "
+                           "-1 unlimited, or user defined number)", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           set_warning_limit, NULL);
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
         
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'b', "batch-mode",
                            "Tell LML to run in batch mode", PRELUDE_OPTION_ARGUMENT_NONE,

@@ -54,10 +54,11 @@
 
 
 
-
 struct lml_log_source {        
         char *name;
         char *ts_fmt;
+        int warning_limit;
+        int warning_count;
         pcre *prefix_regex;
         pcre_extra *prefix_regex_extra;
 };
@@ -90,6 +91,8 @@ lml_log_source_t *lml_log_source_new(void)
                 return NULL;
         }
 
+        new->warning_limit = -1;
+        
         if ( lml_log_source_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log timestamp format.\n");
                 return NULL;
@@ -190,4 +193,38 @@ const pcre *lml_log_source_get_prefix_regex(const lml_log_source_t *source)
 const pcre_extra *lml_log_source_get_prefix_regex_extra(const lml_log_source_t *source)
 {
         return source->prefix_regex_extra;
+}
+
+
+
+void lml_log_source_set_warning_limit(lml_log_source_t *source, int limit)
+{
+        source->warning_limit = limit;
+}
+
+
+
+void lml_log_source_warning(lml_log_source_t *ls, const char *fmt, ...)
+{
+        va_list ap;
+
+        /*
+         * If the user provided a limit and we reached it, issue a warning and return.
+         */
+        if ( ls->warning_limit > 0 && ls->warning_count == ls->warning_limit ) {
+                ls->warning_count++;
+                
+                prelude_log(PRELUDE_LOG_WARN, "Limit of %d errors for source %s reached. Further errors will be supressed.\n",
+                            ls->warning_limit, lml_log_source_get_name(ls));
+                return;
+        }
+
+        else if ( ls->warning_limit >= 0 && ls->warning_count >= ls->warning_limit )
+                return;
+
+        ls->warning_count++;
+        
+        va_start(ap, fmt);
+        prelude_log_v(PRELUDE_LOG_WARN, fmt, ap);
+        va_end(ap);
 }

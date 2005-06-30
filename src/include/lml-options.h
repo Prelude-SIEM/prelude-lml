@@ -49,6 +49,8 @@ typedef struct {
         prelude_io_t *text_output_fd;
         unsigned long alert_count;
         unsigned long line_processed;
+
+        int warning_limit;
 } lml_config_t;
 
 #endif /* _LML_PCONFIG_H */

@@ -77,6 +77,17 @@ file = /var/log/auth.log
 #max-rotation-time-offset = 300
 
 
+#
+# Maximum number of warning a given source should emit in case it can not
+# parse log entry with the provided prefix_regex and time_format. 
+#
+# -1 == unlimited number of warning
+#  0 == no warning at all 
+#  X == print at most X warnings.
+#
+# warning-limit = -1
+
+
 ####################################
 # Here start plugins configuration #
 ####################################
