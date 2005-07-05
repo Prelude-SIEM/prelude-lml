@@ -21,6 +21,8 @@
 *
 *****/
 
+#include "libmissing.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +32,6 @@
 
 #include <libprelude/prelude.h>
 
-#include "libmissing.h"
 #include "prelude-lml.h"
 
 
