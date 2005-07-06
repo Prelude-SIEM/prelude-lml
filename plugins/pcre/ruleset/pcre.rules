@@ -162,6 +162,7 @@
 #   regex matches.
 
 regex=EMU;			include = apc-emu.rules;
+regex=(anomaly|since|firstSeen)	include = arbor.rules;
 regex=arpwatch;			include = arpwatch.rules;
 regex=(bigconf|kernel);		include = f5-bigip.rules;
 regex=%PIX;			include = cisco-pix.rules;

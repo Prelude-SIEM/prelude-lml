@@ -2,6 +2,7 @@ SUBDIRS = unsupported
 
 ruleset_DATA = \
 	apc-emu.rules		\
+	arbor.rules		\
 	arpwatch.rules		\
 	cisco-pix.rules		\
 	cisco-router.rules	\
