@@ -37,10 +37,12 @@
 #include "minmax.h"
 #include "snprintf.h"
 #include "strdup.h"
+#include "time_r.h"
 #include "vasnprintf.h"
 #include "xsize.h"
 #include <alloca.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */
