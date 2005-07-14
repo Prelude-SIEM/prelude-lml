@@ -1,3 +1,18 @@
+* 2005-07-14, prelude-lml-0.9.0-rc5:
+
+	- New ruleset for Arbor Networks Peakflow system, by Herve Debar.
+
+	- Added preliminary support for PIX conduits.
+
+	- Implement the "warning-limit" option. Can be used in order to supress 
+	  reporting of prefix parser error (warning-limit 0), or to define a limit 
+	  of warning (stop reporting once the threshold is reached). -1 for no limit.	
+
+	- Improve error reporting.
+
+	- Various bugfix, minor rules update.
+
+
 * 2005-05-16, prelude-lml-0.9.0-rc4:
 
 	- Added systrace, identd, arpwatch, pure-ftpd support.
