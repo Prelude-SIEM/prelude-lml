@@ -427,7 +427,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
 
 static int file_metadata_open(monitor_fd_t *monitor) 
 {
-        int ret;
+        int fd;
         char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
 
         if ( ignore_metadata )
@@ -440,13 +440,15 @@ static int file_metadata_open(monitor_fd_t *monitor)
 
         snprintf(path, sizeof(path), "%s/%s", METADATA_DIR, file);        
 
-        ret = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
-        if ( ret < 0 && errno != EEXIST ) {
+        fd = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
+        if ( fd < 0 && errno != EEXIST ) {
                 prelude_log(PRELUDE_LOG_ERR, "error creating %s: %s.\n", path, strerror(errno));
                 return -1;
         }
 
-        monitor->metadata_fd = fdopen(ret, "r+");
+        fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+        
+        monitor->metadata_fd = fdopen(fd, "r+");
         if ( ! monitor->metadata_fd ) {
                 prelude_log(PRELUDE_LOG_ERR, "fdopen failed: %s.\n", strerror(errno));
                 return -1;
@@ -621,7 +623,7 @@ static void monitor_destroy(monitor_fd_t *monitor)
 
 static int monitor_open(monitor_fd_t *monitor) 
 {
-        int ret;
+        int ret, fd;
         const char *filename;
 
         filename = lml_log_source_get_name(monitor->source);
@@ -633,6 +635,9 @@ static int monitor_open(monitor_fd_t *monitor)
                 if ( ! monitor->fd ) 
                         return -1;
 
+                fd = fileno(monitor->fd);
+                fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+                
                 ret = file_metadata_get_position(monitor);
                 if ( ret < 0 )
                         return -1;
@@ -853,18 +858,12 @@ static int check_fam_writev_bug(FAMConnection *fc)
 
         snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
 
-        ret = mkstemp(buf);        
-        if ( ret < 0 ) {
+        fd = mkstemp(buf);        
+        if ( fd < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error creating unique temporary filename: %s.\n", strerror(errno));
                 return -1;
         }
-        
-        fd = open(buf, O_CREAT|O_WRONLY, S_IRUSR|S_IWUSR);
-        if ( fd < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "error opening %s for writing: %s.\n", buf, strerror(errno));
-                return -1;
-        }
-        
+                
         ret = FAMMonitorFile(fc, buf, &fr, NULL);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[FAMErrno]);
