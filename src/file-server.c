@@ -197,16 +197,11 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         snprintf(buf, sizeof(buf), "%s", lml_log_source_get_name(fd->source));
 
         ptr = strrchr(buf, '/');
-        if ( ptr ) {
-                *ptr = '\0';
-
-                ret = idmef_file_new_name(file, &string);
-                if ( ret < 0 )
-                        goto err;
-                
-                prelude_string_set_ref(string, ptr + 1);
-        }
-
+        ret = idmef_file_new_name(file, &string);
+        if ( ret < 0 )
+                goto err;
+        prelude_string_set_ref(string, ptr ? (ptr + 1) : buf);
+        
         ret = idmef_file_new_path(file, &string);
         if ( ret < 0 )
                 goto err;
