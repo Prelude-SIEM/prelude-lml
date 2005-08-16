@@ -92,9 +92,9 @@ static void print_stats(struct timeval *end)
 
 static void sig_handler(int signum)
 {
-        prelude_log(PRELUDE_LOG_WARN, "\n\nCaught signal %d.\n", signum);
-        
         signal(signum, SIG_DFL);
+        
+        prelude_log(PRELUDE_LOG_WARN, "\n\nCaught signal %d.\n", signum);
 
         if ( config.udp_srvr )
                 udp_server_close(config.udp_srvr);
@@ -108,6 +108,11 @@ static void sig_handler(int signum)
 static void sighup_handler(int signum) 
 {
         /*
+         * re-establish signal handler
+         */
+        signal(signum, sighup_handler);
+        
+        /*
          * We can't directly restart LML from the signal handler.
          * It'll be restarted as soon as the main loop poll the
          * got_sighup variable.
@@ -117,10 +122,15 @@ static void sighup_handler(int signum)
 
 
 
-static void sigusr1_handler(int signum)
+static void sig_stats_handler(int signum)
 {
         struct timeval end;
 
+        /*
+         * re-establish signal handler
+         */
+        signal(signum, sig_stats_handler);
+        
         gettimeofday(&end, NULL);
         print_stats(&end);
 }
@@ -293,7 +303,8 @@ int main(int argc, char **argv)
         signal(SIGQUIT, sig_handler);
         signal(SIGABRT, sig_handler);
         signal(SIGHUP, sighup_handler);
-        signal(SIGUSR1, sigusr1_handler);
+        signal(SIGUSR1, sig_stats_handler);
+        signal(SIGQUIT, sig_stats_handler);
         
         file_server_start_monitoring();
 
