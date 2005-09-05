@@ -271,7 +271,7 @@ regex=add `(\S+)' to group `(?!wheel|root)(\S+)'; \
  target(0).user.user_id(1).name=$2; \
  last
 
-#LOG:May 13 15:55:12 metatron usermod[20587]: add `bogususer' to group `slocate'
+#LOG:May 13 15:55:12 metatron usermod[20587]: add `bogususer' to group `wheel'
 regex=add `(\S+)' to group `(wheel|root)'; \
  classification.text=User Added to Group $2; \
  id=3314; \

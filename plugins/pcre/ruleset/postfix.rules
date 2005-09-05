@@ -71,7 +71,7 @@ regex=starting the Postfix mail system; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Mail server started; \
  assessment.impact.type=other; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  last;
 
 #LOG:May  4 11:43:10 exademo postfix/postfix-script: stopping the Postfix mail system
@@ -85,7 +85,7 @@ regex=stopping the Postfix mail system; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Mail server stopped; \
  assessment.impact.type=other; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=medium; \
  last;
 
 #LOG:May  4 09:26:15 exademo postfix/smtpd[8472]: lost connection after CONNECT from localhost[127.0.0.1]

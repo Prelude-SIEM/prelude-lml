@@ -92,25 +92,38 @@ regex=ruleset=check_mail, arg1=<(\S+@\S+)>, relay=.*\[([\d\.]+)\], reject=553 5\
  target(0).service.port=25; \
  last;
 
-#LOG:Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
 #LOG:Jun 22 09:23:54 mail sendmail: sendmail shutdown succeeded
-regex=sendmail (startup|shutdown) succeeded; \
- classification.text=Mail server $1 ; \
+regex=sendmail shutdown succeeded; \
+ classification.text=Mail server shutdown; \
  id=3703; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \
  analyzer(0).class=Service; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=Sendmail reported a $1; \
+ assessment.impact.description=Sendmail reported a shutdown; \
  assessment.impact.type=other; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=medium; \
+ last;
+
+#LOG:Jun 22 09:23:54 mail sendmail: sendmail startup succeeded
+regex=sendmail startup succeeded; \
+ classification.text=Mail server startup; \
+ id=3704; \
+ revision=1; \
+ analyzer(0).name=Sendmail; \
+ analyzer(0).manufacturer=www.sendmail.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Sendmail reported a startup; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=info; \
  last;
 
 #LOG:Jun 22 06:43:01 mail sendmail[5195]: i5MDgomk005195: AClermont-Ferrand-108-1-6-103.w81-49.abo.wanadoo.fr [81.49.192.103] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA
 regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connection to MTA; \
  classification.text=Mail server suspicious access; \
- id=3704; \
+ id=3705; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \
@@ -130,7 +143,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\] did not issue MAIL/EXPN/VRFY/ETRN during connect
 #LOG:Jun 25 18:59:39 mail sendmail[29873]: i5Q1xRjt029873: <boagcxwl@gomezbrothers.com>... User unknown
 regex=<(\S+@\S+)>... User unknown; \
  classification.text=Mail server unknown user; \
- id=3705; \
+ id=3706; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \
@@ -149,7 +162,7 @@ regex=<(\S+@\S+)>... User unknown; \
 #LOG:Jun  4 12:25:26 mail sendmail[21691]: i54JPQCi021691: Authentication-Warning: mail.somehost.com: apache set sender to someguy@somehost.com using -f
 regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; \
  classification.text=Mail server user obfuscation; \
- id=3706; \
+ id=3707; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \
@@ -171,7 +184,7 @@ regex=Authentication-Warning: ([\w\-\.]+): (\S+) set sender to (\S+@\S+) using; 
 #LOG:Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: VRFY somebody [rejected]
 regex=([\w\-\.]+) \[([\d\.]+)\]: VRFY (\S+) \[rejected\]; \
  classification.text=Mail server user discovery; \
- id=3707; \
+ id=3708; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \
@@ -193,7 +206,7 @@ regex=([\w\-\.]+) \[([\d\.]+)\]: VRFY (\S+) \[rejected\]; \
 #LOG:Jul  3 06:10:43 mail sendmail[17436]: i63DAajt017436: PPPa1736.tokyo-ip.dti.ne.jp [210.170.207.236]: EXPN somegroup [rejected]
 regex=([\w\-\.]+) \[([\d\.]+)\]: EXPN (\S+) \[rejected\]; \
  classification.text=Mail server group member discovery; \
- id=3708; \
+ id=3709; \
  revision=1; \
  analyzer(0).name=Sendmail; \
  analyzer(0).manufacturer=www.sendmail.org; \

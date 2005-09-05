@@ -225,7 +225,7 @@ regex=listening on (\S+):; \
  analyzer(0).class=Honeypot; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.description=Honeypot started; \
  source(0).interface=$1; \
  last

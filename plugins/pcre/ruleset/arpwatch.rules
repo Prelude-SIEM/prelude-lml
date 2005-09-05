@@ -67,7 +67,7 @@ regex=(flip flop|changed ethernet address|reused old ethernet address) ([\d\.]+)
  source(0).node.address(2).address=$4; \
  last;
 
-#16:53:59 soledad arpwatch: ethernet broadcast 100.100.100.150 0:0:0:0:0:0
+#LOG:16:53:59 soledad arpwatch: ethernet broadcast 100.100.100.150 0:0:0:0:0:0
 regex=(ethernet|ip) broadcast ([\d\.]+) ([\da-f:]+); \
  classification.text=$1 broadcast address detected; \
  id=4202; \

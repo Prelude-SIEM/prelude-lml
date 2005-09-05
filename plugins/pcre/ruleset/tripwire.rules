@@ -2,7 +2,6 @@
 #
 # Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
-#
 # Based on rules originally submitted by David Maciejak on behalf of
 # Exaprotect Technology 
 #
@@ -25,7 +24,6 @@
 #####
 
 #LOG:Jan 22 11:32:26 host tripwire[5265]: Integrity Check Complete: /usr/local/tripwire/tfs/report/host-.twr TWReport host 20040122113203 V:91 S:100 A:51 R:0 C:40 L:0 M:8 H:83
-
 regex=TWReport \S+ \d+ V:0; \
  classification.text=Integrity Check OK; \
  id=3400; \
@@ -39,7 +37,6 @@ regex=TWReport \S+ \d+ V:0; \
  assessment.impact.description=Integrity check ran successfully without warnings; \
  target(0).decoy=no; \
  last
-
 
 # No log sample; please submit
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:(?!0)(\d+); \
@@ -55,7 +52,6 @@ regex=TWReport \S+ \d+ V:\d+ S:\d+ A:(?!0)(\d+); \
  assessment.impact.description=Integrity check ran successfully, warning: $1 file(s) added; \
  target(0).decoy=no
 
-
 # No log sample; please submit
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
  classification.text=Integrity Check Warning: file(s) removed; \
@@ -69,7 +65,6 @@ regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Integrity check ran successfully, warning: $1 files removed; \
  target(0).decoy=no
-
 
 # No log sample; please submit
 regex=TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:\d+ C:(?!0)(\d+); \

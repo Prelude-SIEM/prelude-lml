@@ -107,10 +107,9 @@ regex=Error: Pass phrase incorrect\.; \
  assessment.impact.description=Apache was started and an SSL passphrase was required.  This passphrase was not entered correctly.  No additional passphrase attempts will be allowed.; \
  last;
 
-#LOG:Apr 17 14:02:41 mail httpd: httpd startup succeeded
 #LOG:Apr 17 14:00:13 mail httpd: httpd shutdown succeeded
-regex=httpd (startup|shutdown) succeeded; \
- classification.text=Web server $1; \
+regex=httpd shutdown succeeded; \
+ classification.text=Web server shutdown; \
  id=4105; \
  revision=1; \
  analyzer(0).name=httpd; \
@@ -119,5 +118,19 @@ regex=httpd (startup|shutdown) succeeded; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
- assessment.impact.description=Apache httpd $1 seen.; \
+ assessment.impact.description=Apache httpd shutdown seen.; \
+ last;
+
+#LOG:Apr 17 14:02:41 mail httpd: httpd startup succeeded
+regex=httpd startup succeeded; \
+ classification.text=Web server startup; \
+ id=4106; \
+ revision=1; \
+ analyzer(0).name=httpd; \
+ analyzer(0).manufacturer=www.apache.org; \
+ analyzer(0).class=Service; \
+ assessment.impact.severity=info; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=other; \
+ assessment.impact.description=Apache httpd startup seen.; \
  last;

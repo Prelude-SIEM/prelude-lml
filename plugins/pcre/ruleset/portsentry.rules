@@ -78,7 +78,7 @@ regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP)
 #LOG:Oct 15 13:50:07 basile portsentry[28412]: attackalert: Host 195.220.107.15 has been blocked via dropped route using command: "/sbin/ipchains -I input -s 195.220.107.15 -j DENY"
 #
 regex=attackalert: Host ([\d\.]+) has been blocked via dropped route using command: "([^"]+)"; \
- classification.text=Connection blocked \
+ classification.text=Host blocked; \
  id=1502; \
  revision=1; \
  analyzer(0).name=PortSentry; \
@@ -87,7 +87,7 @@ regex=attackalert: Host ([\d\.]+) has been blocked via dropped route using comma
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
- assessment.impact.description=PortSentry saw your firewall denied a connection via : $2; \
+ assessment.impact.description=PortSentry saw your firewall blocked a host via : $2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  last;
@@ -97,7 +97,7 @@ regex=attackalert: Host ([\d\.]+) has been blocked via dropped route using comma
 
 #LOG:Apr 18 10:42:51 20.0.0.3 portsentry[2549]: attackalert: Host: 2.0.0.3/2.0.0.3 is  already blocked Ignoring
 regex=attackalert: Host: (\S+)/([\d\.]+) is\s+already blocked; \
- classification.text=Connection blocked; \
+ classification.text=Host blocked; \
  id=1503; \
  revision=1; \
  analyzer(0).name=PortSentry; \
@@ -106,7 +106,7 @@ regex=attackalert: Host: (\S+)/([\d\.]+) is\s+already blocked; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
  assessment.impact.severity=medium; \
- assessment.impact.description=PortSentry saw your firewall denied a connection via.; \
+ assessment.impact.description=PortSentry saw your firewall blocked a host.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).node.name=$1; \

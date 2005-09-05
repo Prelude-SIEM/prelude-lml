@@ -24,7 +24,6 @@
 # 1) TCP :
 
 #LOG:Apr 27 02:55:31 81.2.127.129 r00t3r: 295:34:52.730 lan @Group:Rule=0:10 b 200.187.15.1,18775 -> 81.2.127.129,www    PR tcp len 20 48 -S 895123185 0 16384 IN
-
 regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR (tcp|udp); \
  classification.text=$5 Packet dropped; \
  id=2000; \
@@ -47,7 +46,6 @@ regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR (tcp|ud
 # 2) ICMP :
 
 #LOG:Apr 27 00:38:25 81.2.127.129 r00t3r: 293:17:47.390 lan @Group:Rule=0:10 b 66.112.44.26 -> 81.2.127.142    PR icmp len 20 28 icmp 8/0 IN
-
 regex=lan @Group:Rule=\d+:\d+ b ([\d\.]+) -> ([\d\.]+)    PR icmp len \d+ \d+ icmp (\d+)/(\d+) IN; \
  classification.text=ICMP Packet dropped; \
  id=2001; \

@@ -24,21 +24,16 @@
 
 # I. Starting / stopping squid, and associated services (informational, do not show a real attack)
 
-###
-# 2. Squid own format
-# same as previous, but using the /var/log/squid/cache.log (do not use these ones if you can use the ones above)
-###
-
 # starting 
 # No log sample; please submit
-regex=Starting Squid Cache version ([\w\.]+) for ([\w-]+)\.\.\.; \
+regex=Starting Squid Cache version ([\w\.]+); \
  classification.text=Proxy started; \
  id=1801; \
  revision=1; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid version $1 was started; \
@@ -53,7 +48,7 @@ regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming HTTP connections on $1:$2, file descriptor #$3; \
@@ -71,7 +66,7 @@ regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming ICP messages on $1:$2, file descriptor #$3; \
@@ -89,7 +84,7 @@ regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming HTCP messages on port $1, file descriptor #$2; \
@@ -105,7 +100,7 @@ regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming WCCP messages on port $1, file descriptor #$2; \
@@ -121,7 +116,7 @@ regex=HTCP Disabled\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid was invoked without the HTCP service; \
  last
@@ -134,7 +129,7 @@ regex=WCCP Disabled\.; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=info; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid was invoked without the WCCP service; \
  last
@@ -147,7 +142,7 @@ regex=Squid Parent: child process (\d+) exited; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
- assessment.impact.severity=low; \
+ assessment.impact.severity=medium; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid (pid $2) exited; \
  target(0).node.name=$1; \

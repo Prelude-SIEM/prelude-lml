@@ -26,7 +26,7 @@
 # Cisco router support for Prelude-LML
 #LOG:Sep 23 07:30:41 gate 301270: 5d17h: %SEC-6-IPACCESSLOGP: list 101 denied tcp 1.2.3.4(1929) -> 5.6.7.8(80), 1 packet
 regex=SEC-[0-9]+-IPACCESSLOGP: list (\d+) denied (udp|tcp) ([\d\.]+)\((\d+)\).*-> ([\d\.]+)\((\d+)\); \
- classification.text=Router ip access; \
+ classification.text=Packet denied; \
  id=500; \
  revision=1; \
  analyzer(0).name=Router; \
