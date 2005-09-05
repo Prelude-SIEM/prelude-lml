@@ -5,8 +5,7 @@ SUBDIRS = libmissing plugins src
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
-             AUTHORS COPYING INSTALL NEWS README \
-             prelude.spec ChangeLog
+             AUTHORS COPYING HACKING.README INSTALL NEWS README 
 
 install-data-local:
 	$(INSTALL) -m 700 -d $(DESTDIR)$(configdir)/metadata;							
