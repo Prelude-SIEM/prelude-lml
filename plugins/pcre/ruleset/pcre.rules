@@ -161,47 +161,48 @@
 #   Indicates to LML that if this rule is triggered, stop checking for further
 #   regex matches.
 
-regex=EMU;			include = apc-emu.rules;
-regex=(anomaly|since|firstSeen)	include = arbor.rules;
-regex=arpwatch;			include = arpwatch.rules;
-regex=(bigconf|kernel);		include = f5-bigip.rules;
-regex=%PIX;			include = cisco-pix.rules;
-regex=%[A-Z]+-\d+-[A-Z];	include = cisco-router.rules;
-regex=SEV=;			include = cisco-vpn.rules;
-regex=clamd;			include = clamav.rules;
-regex=server administrator;	include = dell-om.rules
-regex=(kernel|grsec);		include = grsecurity.rules; 
-regex=kernel;			include = netfilter.rules; \
-				include = ipchains.rules;
-regex=honeyd;			include = honeyd.rules;
+regex=EMU;				include = apc-emu.rules;
+regex=(anomaly|since|firstSeen);	include = arbor.rules;
+regex=arpwatch;				include = arpwatch.rules;
+regex=(bigconf|kernel);			include = f5-bigip.rules;
+regex=%PIX;				include = cisco-pix.rules;
+regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
+regex=SEV=;				include = cisco-vpn.rules;
+regex=clamd;				include = clamav.rules;
+regex=server administrator;		include = dell-om.rules
+regex=(kernel|grsec);			include = grsecurity.rules; 
+regex=kernel;				include = netfilter.rules; \
+					include = ipchains.rules;
+regex=honeyd;				include = honeyd.rules;
 # Using this somewhat complex regex instead of the simpler httpd due to the 
 # fact that we might be directly monitoring httpd logs instead of httpd syslog
 # entries (in which case we won't have the process name to match against)
-regex=(\[error\]|Pass|httpd);	include = httpd.rules; \
-				include = modsecurity.rules;
-regex=ipfw;			include = ipfw.rules;
-regex=[Ww]ireless;		include = linksys-wap11.rules;
-regex=mssqlserver;		include = ms-sql.rules;
-regex=nagios;			include = nagios.rules;
-regex=norton;			include = navce.rules;
-regex=\[[^:]*:[^\]]*\]:;	include = netapp-ontap.rules;
-regex=security\[;		include = ntsyslog.rules;
-regex=[Pp][Aa][Mm]_;		include = pam.rules;
-regex=pcanywhere;		include = pcanywhere.rules;
-regex=portsentry;		include = portsentry.rules;
-regex=postfix/;                 include = postfix.rules;
-regex=proftpd;			include = proftpd.rules;
-regex=popper;			include = qpopper.rules;
-regex=avc:;			include = selinux.rules;
-regex=sendmail;			include = sendmail.rules;
-regex=((user|group)(mod|add));	include = shadow-utils.rules;
-regex=squid;			include = squid.rules;
-regex=sshd;			include = ssh.rules;
-regex=sudo;			include = sudo.rules;
-regex=tripwire;			include = tripwire.rules;
-regex=lan @Group:;		include = vigor.rules;
-regex=vpopmail;			include = vpopmail.rules;
-regex=webmin;			include = webmin.rules;
-regex=ftpd;			include = wu-ftp.rules;
+regex=(\[error\]|Pass|httpd);		include = httpd.rules; \
+					include = modsecurity.rules;
+regex=ipfw;				include = ipfw.rules;
+regex=[Ww]ireless;			include = linksys-wap11.rules;
+regex=mssqlserver;			include = ms-sql.rules;
+regex=nagios;				include = nagios.rules;
+regex=norton;				include = navce.rules;
+regex=\[[^:]*:[^\]]*\]:;		include = netapp-ontap.rules;
+regex=system-(emergency|alert)-;	include = netscreen.rules;
+regex=security\[;			include = ntsyslog.rules;
+regex=[Pp][Aa][Mm]_;			include = pam.rules;
+regex=pcanywhere;			include = pcanywhere.rules;
+regex=portsentry;			include = portsentry.rules;
+regex=postfix/;                 	include = postfix.rules;
+regex=proftpd;				include = proftpd.rules;
+regex=popper;				include = qpopper.rules;
+regex=avc:;				include = selinux.rules;
+regex=sendmail;				include = sendmail.rules;
+regex=((user|group)(mod|add));		include = shadow-utils.rules;
+regex=squid;				include = squid.rules;
+regex=sshd;				include = ssh.rules;
+regex=sudo;				include = sudo.rules;
+regex=tripwire;				include = tripwire.rules;
+regex=lan @Group:;			include = vigor.rules;
+regex=vpopmail;				include = vpopmail.rules;
+regex=webmin;				include = webmin.rules;
+regex=ftpd;				include = wu-ftp.rules;
 
 include = single.rules;

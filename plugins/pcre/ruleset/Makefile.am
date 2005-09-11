@@ -21,6 +21,7 @@ ruleset_DATA = \
 	navce.rules		\
 	netapp-ontap.rules	\
 	netfilter.rules		\
+	netscreen.rules		\
 	ntsyslog.rules		\
 	pam.rules		\
 	pcanywhere.rules	\
