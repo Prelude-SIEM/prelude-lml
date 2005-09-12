@@ -407,7 +407,7 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 # target(0).service.port=$7; \
 # last
 
-#LOG:%PIX-2-106006: Deny inbound UDP from 9.0.1.2/10001 to 3.4.5.6/1026 on interface outside
+#LOG:Nov  2 18:03:14 pix %PIX-2-106006: Deny inbound UDP from 9.0.1.2/10001 to 3.4.5.6/1026 on interface outside
 #regex=PIX-2-106006: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) on interface (\S+); \
 # classification.text=Packet denied; \
 # id=218; \
@@ -428,7 +428,7 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 # target(0).service.port=$4; \
 # last
 
-#LOG:%PIX-2-106007: Deny inbound UDP from 7.8.9.0/53 to 1.2.3.4/33524 due to DNS Response
+#LOG:Nov  2 18:03:14 pix %PIX-2-106007: Deny inbound UDP from 7.8.9.0/53 to 1.2.3.4/33524 due to DNS Response
 regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due to DNS (Response|Query); \
  classification.text=Packet denied; \
  id=219; \
@@ -448,7 +448,7 @@ regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due
  target(0).service.port=$4; \
  last
 
-#LOG:%PIX-2-106001: Inbound TCP connection denied from 1.2.3.4/1007 to 5.6.7.8/139 flags SYN  on interface outside
+#LOG:Nov  2 18:03:14 pix %PIX-2-106001: Inbound TCP connection denied from 1.2.3.4/1007 to 5.6.7.8/139 flags SYN  on interface outside
 #regex=PIX-2-106001: Inbound TCP connection denied from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) flags (.+)  on interface (\S+); \
 # classification.text=Packet denied; \
 # id=220; \

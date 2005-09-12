@@ -743,7 +743,7 @@ classification.text=Filesystem $1ed; \
 #######
 #define GR_CHDIR_AUDIT_MSG "chdir to %.980s by "
 #
-#LOG: grsec: From 192.168.1.25: chdir to /home/client/test by /bin/bash[bash:2532] uid/euid:1000/1000 gid/egid:2000/2000, parent /usr/sbin/sshd[sshd:2531] uid/euid:1000/1000 gid/egid:2000/2000
+#LOG: Jan 13 12:08:42 gw kernel: grsec: From 192.168.1.25: chdir to /home/client/test by /bin/bash[bash:2532] uid/euid:1000/1000 gid/egid:2000/2000, parent /usr/sbin/sshd[sshd:2531] uid/euid:1000/1000 gid/egid:2000/2000
 #
 regex=chdir to ([^ ]+) by ; goto=692; optgoto=693-694; \
  classification.text=Attempted chdir; \
