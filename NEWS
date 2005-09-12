@@ -1,3 +1,23 @@
+* 2005-09-12, prelude-lml-0.9.0-rc6:
+
+	- Netscreen support.
+
+	- Nagios rules update.
+
+	- grsecurity rules update.
+
+	- File path logging according to IDMEF v14.
+
+	- Update for gentoo system. Log tty on authentication failure.
+
+	- Fix file descriptor leak. Set close-on-exec.
+
+	- Log messages for services being turned off are now all 'medium' 
+	  severity, while services being turned on are now all 'info' severity.
+
+	- Re-establish signal handler for older *nix. Print statistics on SIGQUIT.
+
+
 * 2005-07-14, prelude-lml-0.9.0-rc5:
 
 	- New ruleset for Arbor Networks Peakflow system, by Herve Debar.
