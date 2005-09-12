@@ -1,5 +1,6 @@
 GNULIB_TOOL=`which gnulib-tool 2> /dev/null`
 if test -n "$GNULIB_TOOL"; then
+	echo "Running gnulib-tool..."
         $GNULIB_TOOL --import > /dev/null
 fi
 
