@@ -68,7 +68,7 @@ regex=anomaly ([a-zA-Z_-]+) id (\d+) status (\w+) severity (\d+) src ([\d\./]+) 
      additional_data(5).type=string; \
      additional_data(5).meaning=Protocol flags; \
      additional_data(5).data=$13; \
-     additional_data(6).type=url; \
+     additional_data(6).type=string; \
      additional_data(6).meaning=Detailed information; \
      additional_data(6).data=$14; \
      last
