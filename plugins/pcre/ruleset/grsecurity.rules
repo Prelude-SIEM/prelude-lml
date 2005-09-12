@@ -31,32 +31,32 @@
 
 #
 # generic grsec2 goto rules
-regex=to|on|against ([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
+regex=(to|on|against) ([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
  id=691; \
  revision = 1; \
- target(0).process.path=$1; \
- target(0).process.name=$2; \
- target(0).process.pid=$3; \
+ target(0).process.path=$2; \
+ target(0).process.name=$3; \
+ target(0).process.pid=$4; \
  target(0).user.category=application; \
  target(0).user.user_id(0).type=current-user; \
- target(0).user.user_id(0).number=$4; \
+ target(0).user.user_id(0).number=$5; \
  target(0).user.user_id(1).type=user-privs; \
- target(0).user.user_id(1).number=$5; \
+ target(0).user.user_id(1).number=$6; \
  target(0).user.user_id(2).type=current-group; \
- target(0).user.user_id(2).number=$6; \
+ target(0).user.user_id(2).number=$7; \
  target(0).user.user_id(3).type=group-privs; \
- target(0).user.user_id(3).number=$7; \
-# target(1).process.path = $8; \
-# target(1).process.name = $9; \
-# target(1).process.pid = $10; \
+ target(0).user.user_id(3).number=$8; \
+# target(1).process.path = $9; \
+# target(1).process.name = $10; \
+# target(1).process.pid = $11; \
 # target(1).user.user_id(0).type = current-user; \
-# target(1).user.user_id(0).number = $11; \
+# target(1).user.user_id(0).number = $12; \
 # target(1).user.user_id(1).type = user-privs; \
-# target(1).user.user_id(1).number = $12; \
+# target(1).user.user_id(1).number = $13; \
 # target(1).user.user_id(2).type = current-group; \
-# target(1).user.user_id(2).number = $13; \
+# target(1).user.user_id(2).number = $14; \
 # target(1).user.user_id(3).type = group-privs; \
-# target(1).user.user_id(3).number = $14; \
+# target(1).user.user_id(3).number = $15; \
  chained; silent;
 
 regex=(by|for) (IP:(.*) )?([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
