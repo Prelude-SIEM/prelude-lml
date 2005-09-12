@@ -106,7 +106,7 @@ typedef struct {
         time_t last_rotation_time;
         time_t last_rotation_time_interval;
         
-        int index;
+        size_t index;
         char buf[1024];
 
         off_t need_more_read;
@@ -465,8 +465,9 @@ static int file_metadata_open(monitor_fd_t *monitor)
  */
 static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen) 
 {
-        int ret, len, i = 0;
-
+        int ret;
+        size_t len, i = 0;
+        
         if ( available == 0 ) {
                 *rlen = 0;
                 return -1;
