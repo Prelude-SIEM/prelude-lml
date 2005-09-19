@@ -114,9 +114,9 @@
 #   target().service.port:
 #   The port number being used.
 #
-# - source().service.protocol,
-#   target().service.protocol:
-#   The protocol being used.
+# - source().service.iana_protocol_name,
+#   target().service.iana_protocol_name:
+#   The IANA protocol being used (tcp/udp/icmp/etc)
 #
 # - source().service.portlist,
 #   target().service.portlist:

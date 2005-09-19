@@ -39,11 +39,11 @@ regex=SEC-[0-9]+-IPACCESSLOGP: list (\d+) denied (udp|tcp) ([\d\.]+)\((\d+)\).*-
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=$2; \
+ source(0).service.iana_protocol_name=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=$2; \
+ target(0).service.iana_protocol_name=$2; \
  last
 
 #LOG:Apr 11 20:13:49 wormhole.flash.net 2279: %RCMD-4-RSHPORTATTEMPT: Attempted to connect to RSHELL from 1.2.3.4
@@ -60,6 +60,7 @@ regex=RCMD-\d+-RSHPORTATTEMPT:.* from ([\d\.]+); \
  assessment.impact.description=Someone tried to connect to rshell; \
  source(0).node.address(0).category=ipv4-addr; \ 
  source(0).node.address(0).address=$1; \
+ target(0).service.name=rsh; \
  last
 
 # Copyright (C) 2004 Dennis Hadderingh <dennis.hadderingh@is-company.nl>
@@ -96,5 +97,6 @@ regex=%CRYPTO-[\d\.]+-IKMP_UNK_EXCHANGE: IKE peer at (\S+) * sent a message with
  assessment.impact.description=An unknown Internet Key Exchange request has been received from host: $1 ; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- target(0).service.port = 500; \
+ target(0).service.port=500; \
+ target(0).service.name=isakmp; \
  last

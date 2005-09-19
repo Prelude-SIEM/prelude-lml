@@ -43,8 +43,8 @@ regex=attackalert:.*?(\S+) scan from\s+host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (T
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).node.name=$2; \
- source(0).service.protocol=$4; \
- target(0).service.protocol=$4; \
+ source(0).service.iana_protocol_name=$4; \
+ target(0).service.iana_protocol_name=$4; \
  source(0).service.port=$5; \
  last;
 
@@ -68,8 +68,8 @@ regex=attackalert: Connect from host: (\S+)/([\d\.]+|[\dA-Fa-f\:]+) to (TCP|UDP)
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).node.name=$1; \
- source(0).service.protocol=$3; \
- target(0).service.protocol=$3; \
+ source(0).service.iana_protocol_name=$3; \
+ target(0).service.iana_protocol_name=$3; \
  target(0).service.port=$4; \
  last;
 

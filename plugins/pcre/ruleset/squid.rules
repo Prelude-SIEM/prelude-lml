@@ -55,7 +55,7 @@ regex=Accepting HTTP connections at ([\d\.]+), port (\d+), FD (\d+)\.; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$1; \
  target(0).service.port=$2; \
- target(0).service.protocol=HTTP; \
+ target(0).service.name=HTTP; \
  last
 
 # No log sample; please submit
@@ -73,7 +73,7 @@ regex=Accepting ICP messages at ([\d\.]+), port (\d+), FD (\d+)\.; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$1; \
  target(0).service.port=$2; \
- target(0).service.protocol=ICP; \
+ target(0).service.name=ICP; \
  last
 
 # No log sample; please submit
@@ -89,7 +89,7 @@ regex=Accepting HTCP messages on port (\d+), FD (\d+)\.; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming HTCP messages on port $1, file descriptor #$2; \
  target(0).service.port=$1; \
- target(0).service.protocol=HTCP; \
+ target(0).service.name=HTCP; \
  last
 
 # No log sample; please submit
@@ -99,13 +99,13 @@ regex=Accepting WCCP messages on port (\d+), FD (\d+)\.; \
  revision=1; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
- analyzer(0).class=Proxy; \
+ analyzer(0).class=Prox/y; \
  assessment.impact.severity=info; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Squid listens for incoming WCCP messages on port $1, file descriptor #$2; \
  target(0).service.port=$1; \
- target(0).service.protocol=WCCP; \
+ target(0).service.name=WCCP; \
  last
 
 # No log sample; please submit

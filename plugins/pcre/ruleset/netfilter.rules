@@ -65,12 +65,14 @@ regex=Accept IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
  source(0).service.port=$18; \
- source(0).service.protocol=TCP; \
+ source(0).service.iana_protocol_name=TCP; \
+ source(0).service.iana_protocol_number=17; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
  target(0).service.port=$19; \
- target(0).service.protocol=TCP; \
+ target(0).service.iana_protocol_name=TCP; \
+ target(0).service.iana_protocol_number=17; \
  last
 
 # No log sample; please submit
@@ -88,12 +90,14 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$5; \
  source(0).service.port=$18; \
- source(0).service.protocol=TCP; \
+ source(0).service.iana_protocol_name=TCP; \
+ source(0).service.iana_protocol_number=17; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
  target(0).service.port=$19; \
- target(0).service.protocol=TCP; \
+ target(0).service.iana_protocol_name=TCP; \
+ target(0).service.iana_protocol_number=17; \
  last
 
 # Netfilter UDP Matching 
@@ -112,12 +116,14 @@ regex=Accept IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$5; \
  source(0).service.port=$18; \
- source(0).service.protocol=UDP; \
+ source(0).service.iana_protocol_name=UDP; \
+ source(0).service.iana_protocol_number=6; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
  target(0).service.port=$19; \
- target(0).service.protocol=UDP; \
+ target(0).service.iana_protocol_name=UDP; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 # No log sample; please submit
@@ -135,12 +141,14 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$5; \
  source(0).service.port=$18; \
- source(0).service.protocol=UDP; \
+ source(0).service.iana_protocol_name=UDP; \
+ source(0).service.iana_protocol_number=6; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
  target(0).service.port=$19; \
- target(0).service.protocol=UDP; \
+ target(0).service.iana_protocol_name=UDP; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 # Netfilter ICMP Matching 
@@ -158,11 +166,13 @@ regex=Accept IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN
  assessment.impact.description=Netfilter accepted an ICMP packet $5 -> $6 type=$18 code=$19 on interface $1$2 [TTL=$10]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
+ source(0).service.iana_protocol_name=ICMP; \
+ source(0).service.iana_protocol_number=1; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
- target(0).service.protocol=ICMP; \
+ target(0).service.iana_protocol_name=ICMP; \
+ target(0).service.iana_protocol_number=1; \
  last
 
 # No log sample; please submit
@@ -179,11 +189,13 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
  assessment.impact.description=Netfilter dropped an ICMP packet $5 -> $6 type=$18 code=$19 on interface $1$2 [TTL=$10]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$4; \
- source(0).service.protocol=ICMP; \
+ source(0).service.iana_protocol_name=ICMP; \
+ source(0).service.iana_protocol_number=1; \
  target(0).interface=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
- target(0).service.protocol=ICMP; \
+ target(0).service.iana_protocol_name=ICMP; \
+ target(0).service.iana_protocol_number=1; \
  last
 
 #
@@ -213,12 +225,14 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$5; \
 # source(0).service.port=$18; \
-# source(0).service.protocol=TCP; \
+# source(0).service.iana_protocol_name=TCP; \
+# source(0).service.iana_protocol_number=17; \
 # target(0).interface=$2; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
 # target(0).service.port=$19; \
-# target(0).service.protocol=TCP; \
+# target(0).service.iana_protocol_name=TCP; \
+# target(0).service.iana_protocol_number=17; \
 # last
 
 # Netfilter UDP Matching 
@@ -238,12 +252,14 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$5; \
 # source(0).service.port=$18; \
-# source(0).service.protocol=UDP; \
+# source(0).service.iana_protocol_name=UDP; \
+# source(0).service.iana_protocol_number=6; \
 # target(0).interface=$2; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
 # target(0).service.port=$19; \
-# target(0).service.protocol=UDP; \
+# target(0).service.iana_protocol_name=UDP; \
+# target(0).service.iana_protocol_number=6; \
 # last
 
 # Netfilter ICMP Matching 
@@ -262,11 +278,13 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
 # source(0).interface=$1; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$5; \
-# source(0).service.protocol=ICMP; \
+# source(0).service.iana_protocol_name=ICMP; \
+# source(0).service.iana_protocol_number=1; \
 # target(0).interface=$2; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
-# target(0).service.protocol=ICMP; \
+# target(0).service.iana_protocol_name=ICMP; \
+# target(0).service.iana_protocol_number=1; \
 # last
 
 # Netfilter AH and ESP Matching for IPSEC
@@ -285,11 +303,11 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
 # source(0).interface=$1; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$5; \
-# source(0).service.protocol=$17; \
+# source(0).service.iana_protocol_name=$17; \
 # target(0).interface=$2; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
-# target(0).service.protocol=$17; \
+# target(0).service.iana_protocol_name=$17; \
 # last
 
 # Other protocols matched by Netfilter
@@ -307,11 +325,11 @@ regex=Drop IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(
 # source(0).interface=$1; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$5; \
-# source(0).service.protocol=$17; \
+# source(0).service.iana_protocol_name=$17; \
 # target(0).interface=$2; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
-# target(0).service.protocol=$17; \
+# target(0).service.iana_protocol_name=$17; \
 # last
 
 #

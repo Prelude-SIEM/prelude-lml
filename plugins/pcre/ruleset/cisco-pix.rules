@@ -143,7 +143,7 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  target(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$4; \
- target(0).service.port=$5; \
+ target(0).service.name=$5; \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$6; \
@@ -181,10 +181,13 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" di
  source(0).interface=$2; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- source(0).service.protocol=tcp; \
+ source(0).service.iana_protocol_name=tcp; \
+ source(0).service.iana_protocol_number=6; \
  target(0).interface=$2; \
  target(0).service.port=22; \
- target(0).service.protocol=tcp; \
+ target(0).service.name=ssh; \
+ target(0).service.iana_protocol_name=tcp; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 #LOG:Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.34.56.78(90.12.34.56)/80 on interface outside
@@ -203,13 +206,15 @@ regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. 
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.port=$2; \
- source(0).service.protocol=tcp; \
+ source(0).service.iana_protocol_name=tcp; \
+ source(0).service.iana_protocol_number=6; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  target(0).node.address(1).category=ipv4-addr; \
  target(0).node.address(1).address=$4; \
  target(0).service.port=$5; \
- target(0).service.protocol=tcp; \
+ target(0).service.iana_protocol_name=tcp; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 #LOG:Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
@@ -226,10 +231,12 @@ regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  assessment.impact.description=An IP packet was seen with IP options.  Because IP options are considered a security risk, the packet was discarded.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- source(0).service.protocol=tcp; \
+ source(0).service.iana_protocol_name=tcp; \
+ source(0).service.iana_protocol_number=6; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
- target(0).service.protocol=tcp; \
+ target(0).service.iana_protocol_name=tcp; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 #LOG:Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging
@@ -248,10 +255,10 @@ regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on
  source(0).spoofed=yes; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
- source(0).service.protocol=$1; \
+ source(0).service.iana_protocol_name=$1; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
- target(0).service.protocol=$1; \
+ target(0).service.iana_protocol_name=$1; \
  last
 
 #LOG:Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 12.34.56.78, dest = 90.12.34.56, proto = icmp, id = 48130
@@ -268,10 +275,10 @@ regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), d
  assessment.impact.description=The IP fragement database limit has been exceeded.  A DoS attack may be in progress.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- source(0).service.protocol=$3; \
+ source(0).service.iana_protocol_name=$3; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
- target(0).service.protocol=$3; \
+ target(0).service.iana_protocol_name=$3; \
  last
 
 #LOG:Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
@@ -331,11 +338,12 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.port=$3; \
- source(0).service.protocol=$1; \
+ source(0).service.iana_protocol_name=$1; \
  source(0).interface=$4; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
+ target(0).service.iana_protocol_name=$1; \
  target(0).interface=$4; \
  last
 
@@ -354,12 +362,12 @@ regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed 
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=$1; \
+ source(0).service.iana_protocol_name=$1; \
  source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$6; \
  target(0).service.port=$7; \
- target(0).service.protocol=$1; \
+ target(0).service.iana_protocol_name=$1; \
  target(0).interface=$5; \
  last
 
@@ -377,11 +385,13 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
  assessment.impact.description=The destination for the ICMP error message is different than the source of the IP packet that induced the ICMP error message.  This could be an active network probe, an attempt to use the ICMP error message as a covert channel, or a misbehaving IP host.; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- source(0).service.protocol=icmp; \
+ source(0).service.iana_protocol_name=icmp; \
+ source(0).service.iana_protocol_number=1; \
  source(0).interface=$3; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
- target(0).service.protocol=icmp; \
+ target(0).service.iana_protocol_name=icmp; \
+ target(0).service.iana_protocol_number=1; \
  last
 
 #LOG:Dec 30 03:10:48 12.34.56.78 Dec 30 2003 02:13:28: %PIX-4-106023: Deny icmp src outside:64.89.17.26 dst inside:90.12.34.56 (type 3, code 3) by access-group "outside"
@@ -396,12 +406,12 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 # assessment.impact.severity=medium; \
 # assessment.impact.description=A packet was dropped by PIX access-group "$8".; \
 # source(0).interface=$2; \
-# source(0).service.protocol=$1; \
+# source(0).service.iana_protocol_name=$1; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$3; \
 # source(0).service.port=$4; \
 # target(0).interface=$5; \
-# target(0).service.protocol=$1; \
+# target(0).service.iana_protocol_name=$1; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
 # target(0).service.port=$7; \
@@ -418,11 +428,13 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 # assessment.impact.severity=medium; \
 # assessment.impact.description=This is a connection-related message. This message is logged if an inbound UDP packet is denied by your security policy.; \
 # source(0).interface=$5; \
-# source(0).service.protocol=UDP; \
+# source(0).service.iana_protocol_name=UDP; \
+# source(0).service.iana_protocol_number=17; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$1; \
 # source(0).service.port=$2; \
-# target(0).service.protocol=UDP; \
+# target(0).service.iana_protocol_name=UDP; \
+# target(0).service.iana_protocol_number=17; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$3; \
 # target(0).service.port=$4; \
@@ -438,11 +450,13 @@ regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due
  analyzer(0).class=Firewall; \
  assessment.impact.severity=medium; \
  assessment.impact.description=This is a connection-related message. This message is logged if a UDP packet containing a DNS $5 is denied.; \
- source(0).service.protocol=UDP; \
+ source(0).service.iana_protocol_name=UDP; \
+ source(0).service.iana_protocol_number=17; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  source(0).service.port=$2; \
- target(0).service.protocol=UDP; \
+ target(0).service.iana_protocol_name=UDP; \
+ target(0).service.iana_protocol_number=17; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$3; \
  target(0).service.port=$4; \
@@ -459,11 +473,13 @@ regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due
 # assessment.impact.severity=medium; \
 # assessment.impact.description=This is a connection-related message. This message occurs when an attempt to connect to an inside address is denied by your security policy.  The flags on this packet were $5.; \
 # source(0).interface=$6; \
-# source(0).service.protocol=TCP; \
+# source(0).service.iana_protocol_name=TCP; \
+# source(0).service.iana_protocol_number=6; \
 # source(0).node.address(0).category=ipv4-addr; \
 # source(0).node.address(0).address=$1; \
 # source(0).service.port=$2; \
-# target(0).service.protocol=TCP; \
+# target(0).service.iana_protocol_name=TCP; \
+# target(0).service.iana_protocol_number=6; \
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$3; \
 # target(0).service.port=$4; \

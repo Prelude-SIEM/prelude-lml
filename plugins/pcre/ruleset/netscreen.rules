@@ -37,11 +37,11 @@ regex=system-emergency-\d+: (.+)! From ([\d\.]+)?:?(\d+) to ([\d\.]+)?:?(\d+), p
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.port=$3; \
- source(0).service.protocol=$6; \
+ source(0).service.iana_protocol_name=$6; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$4; \
  target(0).service.port=$5; \
- target(0).service.protocol=$6; \
+ target(0).service.iana_protocol_name=$6; \
  last
 
 #LOG:Apr 28 08:45:38 2.0.0.2 ns5gt: NetScreen device_id=ns5gt  [Root]system-alert-00016: Port scan! From 1.2.3.4:5 to 6.7.8.9:10, proto TCP (zone Untrust, int untrust). Occurred 11 times.
@@ -59,9 +59,9 @@ regex=system-alert-\d+: (.+)! From ([\d\.]+)?:?(\d+) to ([\d\.]+)?:?(\d+), proto
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  source(0).service.port=$3; \
- source(0).service.protocol=$6; \
+ source(0).service.iana_protocol_name=$6; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$4; \
  target(0).service.port=$5; \
- target(0).service.protocol=$6; \
+ target(0).service.iana_protocol_name=$6; \
  last

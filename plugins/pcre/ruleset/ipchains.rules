@@ -21,12 +21,14 @@ regex=Packet log: ([\w-]+) DENY (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=tcp; \
+ source(0).service.iana_protocol_name=tcp; \
+ source(0).service.iana_protocol_number=6; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=tcp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=tcp; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 # UDP
@@ -45,12 +47,14 @@ regex=Packet log: ([\w-]+) DENY (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+); 
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=udp; \
+ source(0).service.iana_protocol_name=udp; \
+ source(0).service.iana_protocol_number=17; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=udp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=udp; \
+ target(0).service.iana_protocol_number=17; \
  last
 
 # ICMP
@@ -69,12 +73,14 @@ regex=Packet log: ([\w-]+) DENY (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+); \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=icmp; \
+ source(0).service.iana_protocol_name=icmp; \
+ source(0).service.iana_protocol_number=1; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=icmp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=icmp; \
+ target(0).service.iana_protocol_number=1; \
  last
 
 #
@@ -98,12 +104,14 @@ regex=Packet log: ([\w-]+) ACCEPT (\w+) PROTO=6 ([\d\.]+):(\d+) ([\d\.]+):(\d+);
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=tcp; \
+ source(0).service.iana_protocol_name=tcp; \
+ source(0).service.iana_protocol_number=6; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=tcp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=tcp; \
+ target(0).service.iana_protocol_number=6; \
  last
 
 # UDP
@@ -122,12 +130,14 @@ regex=Packet log: ([\w-]+) ACCEPT (\w+) PROTO=17 ([\d\.]+):(\d+) ([\d\.]+):(\d+)
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=udp; \
+ source(0).service.iana_protocol_name=udp; \
+ source(0).service.iana_protocol_number=17; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=udp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=udp; \
+ target(0).service.iana_protocol_number=17; \
  last
 
 # ICMP
@@ -146,10 +156,12 @@ regex=Packet log: ([\w-]+) ACCEPT (\w+) PROTO=1 ([\d\.]+):(\d+) ([\d\.]+):(\d+);
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$3; \
  source(0).service.port=$4; \
- source(0).service.protocol=icmp; \
+ source(0).service.iana_protocol_name=icmp; \
+ source(0).service.iana_protocol_number=1; \
+ source(0).interface=$2; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$5; \
  target(0).service.port=$6; \
- target(0).service.protocol=icmp; \
- source(0).interface=$2; \
+ target(0).service.iana_protocol_name=icmp; \
+ target(0).service.iana_protocol_number=1; \
  last

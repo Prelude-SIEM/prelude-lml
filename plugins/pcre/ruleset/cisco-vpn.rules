@@ -104,7 +104,7 @@ regex=User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. Status: <REF
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$1; \
- target(0).service.port=$2; \
+ target(0).service.name=$2; \
  last
 
 #LOG:Oct 28 12:33:48 vpn 1359 10/28/2003 12:33:48.610 SEV=5 AUTH/36 RPT=1 12.34.56.78  User [ admin ] Protocol [ HTTP ] attempted ADMIN logon.. Status: <ACCESS GRANTED> !
@@ -124,4 +124,5 @@ regex=([\d\.]+)  User \[ (\S+) \] Protocol \[ (\S+) \] attempted ADMIN logon.. S
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=current-user; \
  target(0).user.user_id(0).name=$2; \
+ target(0).service.name=$3; \
  last
