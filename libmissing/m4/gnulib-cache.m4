@@ -21,9 +21,8 @@ gl_MODULES([extensions getaddrinfo inet_ntop memset mktime snprintf strdup])
 gl_AVOID([])
 gl_SOURCE_BASE([libmissing])
 gl_M4_BASE([libmissing/m4])
+gl_TESTS_BASE([libmissing/tests])
 gl_LIB([libmissing])
 gl_LGPL
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
-
-# gnulib-cache.m4 ends here
