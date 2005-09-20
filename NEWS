@@ -1,3 +1,11 @@
+* 2005-09-20, prelude-lml-0.9.0:
+
+	- 0.9.0 final.
+
+	- Standardized usage of service.iana_protocol_name / 
+	  service.iana_protocol_number over service.protocol.
+
+
 * 2005-09-12, prelude-lml-0.9.0-rc6:
 
 	- Netscreen support.
