@@ -106,7 +106,7 @@ static int fill_target(idmef_node_t *node, struct addrinfo *ai)
         prelude_string_t *string;
 
         while ( ai ) {
-                if ( ai->ai_flags & AI_CANONNAME ) {
+                if ( ai->ai_canonname ) {
                         ret = idmef_node_new_name(node, &string);
                         if ( ret < 0 )
                                 return -1;
