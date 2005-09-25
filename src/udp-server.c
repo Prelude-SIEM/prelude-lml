@@ -67,6 +67,24 @@ struct udp_server {
 
 
 
+
+static char *my_strnchr(char *input, char wanted, size_t size)
+{        
+        while ( *input && size-- ) {
+                if ( *input == 0 )
+                        break;
+                
+                if ( *input == wanted )
+                        return input;
+
+                input++;
+        }
+
+        return NULL;
+}
+
+
+
 void udp_server_process_event(udp_server_t *server)
 {
         ssize_t ret;
@@ -98,7 +116,7 @@ void udp_server_process_event(udp_server_t *server)
          * - If the 3rd, 4th, or 5th character is not a right angle bracket character: no valid PRI.
          */
         if ( buf[0] == '<' && ret > 2 ) {
-                ptr = memchr(buf + 2, '>', MIN(ret - 2, 3));
+                ptr = my_strnchr(buf + 2, '>', MIN(ret - 2, 3));
                 if ( ptr ) {
                         ptr++;
                         ret -= (ptr - buf);
