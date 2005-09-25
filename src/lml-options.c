@@ -484,10 +484,13 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         
         ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {
+                if ( prelude_error_get_code(ret) == PRELUDE_ERROR_EOF )
+                        return -1;
+                
                 if ( err )
                         prelude_log(PRELUDE_LOG_WARN, "%s.\n", prelude_string_get_string(err));
                 else
-                        prelude_perror(ret, "failed parsing LML options");
+                        prelude_perror(ret, "error processing options");
                 
                 return -1;
         }
