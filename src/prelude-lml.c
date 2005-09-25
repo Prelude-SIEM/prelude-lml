@@ -210,7 +210,7 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
 
 static void add_fd_to_set(fd_set *fds, int fd) 
 {
-        if ( fd > 0 )
+        if ( fd >= 0 )
                 FD_SET(fd, fds);
 }
 
@@ -238,7 +238,7 @@ static void wait_for_event(void)
                 
                 add_fd_to_set(&fds, udp_event_fd);
                 add_fd_to_set(&fds, file_event_fd);
-
+                
                 ret = select(MAX(file_event_fd, udp_event_fd) + 1, &fds, NULL, NULL, &tv);
                 if ( ret < 0 ) {
                         if ( errno == EINTR )
