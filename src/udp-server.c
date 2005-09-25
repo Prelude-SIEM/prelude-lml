@@ -43,6 +43,10 @@
 #include "log-source.h"
 #include "udp-server.h"
 
+#ifndef MIN
+# define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+
 
 /*
  * From RFC 3164, section 4.1:
@@ -69,7 +73,7 @@ void udp_server_process_event(udp_server_t *server)
         socklen_t len;
         char src[512];
         struct sockaddr_in addr;
-        char buf[SYSLOG_MSG_MAX_SIZE], *ptr;
+        char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL;
         
         len = sizeof(struct sockaddr);
 
@@ -79,23 +83,29 @@ void udp_server_process_event(udp_server_t *server)
                 return;
         }
 
+        if ( ret == 0 )
+                return;
+        
         buf[ret] = '\0';
         
         snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);        
         lml_log_source_set_name(server->ls, src);
 
         /*
-         * we don't care about syslog priority / facility.
+         * We don't care about syslog priority / facility. From RFC 3164:
+         *
+         * - If the first character is not a less-than sign: no valid PRI.
+         * - If the 3rd, 4th, or 5th character is not a right angle bracket character: no valid PRI.
          */
-        ptr = strchr(buf, '>');
-        if ( ! ptr )
-                ptr = buf;
-        else {
-                ret--;
-                ptr++;
+        if ( buf[0] == '<' && ret > 2 ) {
+                ptr = memchr(buf + 2, '>', MIN(ret - 2, 3));
+                if ( ptr ) {
+                        ptr++;
+                        ret -= (ptr - buf);
+                }
         }
         
-        lml_dispatch_log(server->rlist, server->ls, ptr, ret);
+        lml_dispatch_log(server->rlist, server->ls, ptr ? ptr : buf, ret);
 }
 
 
