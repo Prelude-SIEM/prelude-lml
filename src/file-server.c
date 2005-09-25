@@ -228,10 +228,6 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         
         lml_alert_emit(fd->source, log_entry, message);
         
-        lml_log_entry_destroy(log_entry);
-        
-        return;
-        
  err:
         lml_log_entry_destroy(log_entry);
         idmef_message_destroy(message);

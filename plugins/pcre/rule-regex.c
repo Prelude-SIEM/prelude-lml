@@ -225,6 +225,7 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
                                   rule->id, rule->last, lml_log_entry_get_message(log_entry));
 
                 lml_alert_emit(ls, log_entry, state->idmef);
+                idmef_message_destroy(state->idmef);
                 state->idmef = NULL;
 
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;

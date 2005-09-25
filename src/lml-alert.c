@@ -291,16 +291,16 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         
         alert = idmef_message_get_alert(message);
         if ( ! alert )
-                goto error;
+                return;
         
         ret = idmef_time_new_from_gettimeofday(&time);
         if ( ret < 0 )
-                goto error;
+                return;
         idmef_alert_set_create_time(alert, time);
         
         ret = idmef_alert_new_detect_time(alert, &time);
         if ( ret < 0 )
-                goto error;
+                return;
 
         idmef_time_set_from_timeval(time, lml_log_entry_get_timeval(log));
         
@@ -308,10 +308,10 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         
         if ( lml_log_entry_get_target_hostname(log) || lml_log_entry_get_target_process(log) ) {
                 if ( generate_target(log, alert) < 0 )
-                        goto error;
+                        return;
 
                 if ( cur_analyzer && fill_analyzer(log, cur_analyzer) < 0 )
-                        goto error;
+                        return;
         }
 
         if ( idmef_analyzer )
@@ -319,12 +319,12 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         
         source = lml_log_source_get_name(ls);
         if ( generate_additional_data(alert, "Log received from", source) < 0 )
-                goto error;
+                return;
 
         ptr = lml_log_entry_get_original_log(log);
         if ( ptr ) {
                 if ( generate_additional_data(alert, "Original Log", ptr) < 0 )
-                        goto error;
+                        return;
         }
 
         if ( config.text_output_fd )
@@ -332,9 +332,6 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         
         if ( ! config.dry_run ) 
                 prelude_client_send_idmef(config.lml_client, message);
-                
- error:
-        idmef_message_destroy(message);
 }
 
 
