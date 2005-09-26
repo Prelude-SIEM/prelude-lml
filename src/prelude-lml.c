@@ -258,10 +258,10 @@ static void wait_for_event(void)
                                 file_server_wake_up();
                 }
                 
-                if ( udp_event_fd > 0 && FD_ISSET(udp_event_fd, &fds) ) 
+                if ( udp_event_fd >= 0 && FD_ISSET(udp_event_fd, &fds) ) 
                         udp_server_process_event(config.udp_srvr);
                 
-                if ( file_event_fd > 0 && FD_ISSET(file_event_fd, &fds) )
+                if ( file_event_fd >= 0 && FD_ISSET(file_event_fd, &fds) )
                         file_server_wake_up();
         }
 }
