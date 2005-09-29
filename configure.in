@@ -64,9 +64,11 @@ dnl **************************************************
 dnl * Check for PCRE                                 *
 dnl **************************************************
 
-AC_PATH_PROG(PCRE_CONFIG, pcre-config,
- AC_MSG_ERROR(PCRE 4.1 or higher is required to build Prelude-LML. Get it from http://www.pcre.org .)
-)
+AC_PATH_PROG(PCRE_CONFIG, pcre-config, no)
+
+if test x$PCRE_CONFIG = xno; then
+   AC_MSG_ERROR(PCRE 4.1 or higher is required to build Prelude-LML. Get it from http://www.pcre.org .)
+fi
 
 PCRE_LIBS=`$PCRE_CONFIG --libs`
 PCRE_CFLAGS=`$PCRE_CONFIG --cflags`
