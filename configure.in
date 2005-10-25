@@ -174,7 +174,7 @@ AC_TYPE_SIGNAL
 configdir=$sysconfdir/prelude-lml
 prelude_lml_conf=$configdir/prelude-lml.conf
 regex_conf=$configdir/plugins.rules
-
+metadata_dir=$localstatedir/lib/prelude-lml
 plugindir=$libdir/prelude-lml
 log_plugin_dir=$plugindir
 
@@ -189,6 +189,7 @@ AC_SUBST(prelude_lml_conf)
 AC_SUBST(regex_conf)
 AC_SUBST(log_plugin_dir)
 AC_SUBST(LIBWRAP_LIBS)
+AC_SUBST(metadata_dir)
 
 AX_CFLAGS_GCC_OPTION(-Wall)
 AX_CFLAGS_GCC_OPTION(-Wstrict-prototypes)

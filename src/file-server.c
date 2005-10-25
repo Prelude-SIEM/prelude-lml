@@ -77,7 +77,6 @@
  * Logfile metadata stuff.
  */
 #define METADATA_MAXSIZE 8192
-#define METADATA_DIR     CONFIG_DIR"/metadata"
 
 
 #define LOGFILE_DELETION_CLASS "Logfile deletion"

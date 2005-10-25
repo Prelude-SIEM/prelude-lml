@@ -8,7 +8,7 @@ EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
              AUTHORS COPYING HACKING.README INSTALL NEWS README 
 
 install-data-local:
-	$(INSTALL) -m 700 -d $(DESTDIR)$(configdir)/metadata;							
+	$(INSTALL) -m 700 -d $(DESTDIR)$(metadata_dir)
 	@if test -f $(DESTDIR)$(configdir)/prelude-lml.conf; then         					\
 		echo "********************************************************************************"; 	\
                 echo;                                                                                    	\
