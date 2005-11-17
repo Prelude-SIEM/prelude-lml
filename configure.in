@@ -25,9 +25,6 @@ AM_PROG_LIBTOOL
 AM_PROG_LEX
 AC_PROG_YACC
 
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
-
 if test "x$prefix" = "xNONE"; then
    prefix="/usr/local"
 fi
@@ -109,32 +106,38 @@ AC_ARG_ENABLE(fam, [  --enable-fam  Enable support for realtime file notificatio
 		   enable_fam="$enableval", enable_fam="$enableval")
 
 AC_ARG_WITH(fam, [  --with-fam=DIR          use DIR where fam is installed.],
-            [FAM_CFLAGS="-I$withval/include"; FAM_LIBS="-L$withval/lib"])
+            [FAM_CFLAGS="-I$withval/include"; FAM_LDFLAGS="-L$withval/lib"])
 
 if test x$enable_fam = xyes; then
+   old_LIBS=$LIBS
    old_LDFLAGS=$LDFLAGS
    old_CPPFLAGS=$CPPFLAGS
-   LDFLAGS="$LDFLAGS $FAM_LIBS"
+
+   LDFLAGS="$LDFLAGS $FAM_LDFLAGS"
    CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
    
    AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
    AC_CHECK_LIB(fam, FAMOpen, , fam_lib_ok="no")
 
+   LIBS="$old_LIBS"
    LDFLAGS="$old_LDFLAGS"
    CPPFLAGS="$old_CPPFLAGS"
 
    if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then 
         FAM_LIBS=""
 	FAM_CFLAGS=""
+	FAM_LDFLAGS=""
       	enable_fam=no;
    else
 	enable_fam=yes;
+	FAM_LIBS="-lfam"
 	AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
    fi
 fi
 
 AC_SUBST(FAM_LIBS)
 AC_SUBST(FAM_CFLAGS)
+AC_SUBST(FAM_LDFLAGS)
 AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
 
 
