@@ -57,14 +57,11 @@ static idmef_analyzer_t *idmef_analyzer;
 
 
 
-static int resolve_failed_fallback(const lml_log_entry_t *log_entry, idmef_node_t *node)
+static int resolve_failed_fallback(idmef_node_t *node, const char *hostname)
 {
         int ret;
-        const char *hostname;
         idmef_address_t *address;
         prelude_string_t *string;
-
-        hostname = lml_log_entry_get_target_hostname(log_entry);
         
         /*
          * we want to know if it's an ip address or an hostname.
@@ -76,17 +73,17 @@ static int resolve_failed_fallback(const lml_log_entry_t *log_entry, idmef_node_
                  */
                 ret = idmef_node_new_name(node, &string);
                 if ( ret < 0 )
-                        return -1;
+                        return ret;
                 
                 prelude_string_set_ref(string, hostname);
         } else {
                 ret = idmef_node_new_address(node, &address, -1);
                 if ( ret < 0 ) 
-                        return -1;
+                        return ret;
 
                 ret = idmef_address_new_address(address, &string);
                 if ( ret < 0 )
-                        return -1;
+                        return ret;
                 
                 prelude_string_set_ref(string, hostname);
         }
@@ -97,7 +94,7 @@ static int resolve_failed_fallback(const lml_log_entry_t *log_entry, idmef_node_
 
 
 
-static int fill_target(idmef_node_t *node, struct addrinfo *ai) 
+static int fill_target_node_from_addrinfo(idmef_node_t *node, struct addrinfo *ai) 
 {
         int ret;
         char str[128];
@@ -146,9 +143,37 @@ static int fill_target(idmef_node_t *node, struct addrinfo *ai)
 }
 
 
-static int fill_analyzer(const lml_log_entry_t *log_entry, idmef_analyzer_t *analyzer)
+
+static int fill_target_node(idmef_node_t *node, const char *host)
 {
         int ret;
+        struct addrinfo *ai, hints;
+        
+        if ( config.no_resolve )
+                ret = resolve_failed_fallback(node, host);
+        else {                
+                memset(&hints, 0, sizeof(hints));
+                hints.ai_flags = AI_CANONNAME;
+                hints.ai_socktype = SOCK_STREAM;
+                
+                ret = getaddrinfo(host, NULL, &hints, &ai);                
+                if ( ret != 0 ) {
+                        prelude_log(PRELUDE_LOG_WARN, "error resolving \"%s\": %s.\n", host, gai_strerror(ret));
+                        return resolve_failed_fallback(node, host);
+                }
+
+                ret = fill_target_node_from_addrinfo(node, ai);
+                freeaddrinfo(ai);
+        }
+
+        return ret;
+}
+
+
+
+static int fill_analyzer(const lml_log_entry_t *log_entry, idmef_analyzer_t *analyzer)
+{
+        int ret = 0;
         const char *tmp;
         idmef_node_t *node;
         prelude_string_t *str;
@@ -173,34 +198,22 @@ static int fill_analyzer(const lml_log_entry_t *log_entry, idmef_analyzer_t *ana
         }
 
         tmp = lml_log_entry_get_target_hostname(log_entry);
-        if ( tmp && ! idmef_analyzer_get_node(analyzer) && ! config.no_resolve ) {
-                struct addrinfo *ai, hints;
-                
+        if ( tmp && ! idmef_analyzer_get_node(analyzer) ) {                
+
                 ret = idmef_analyzer_new_node(analyzer, &node);
                 if ( ret < 0 ) 
                         return -1;
 
-                memset(&hints, 0, sizeof(hints));
-                hints.ai_flags = AI_CANONNAME;
-                hints.ai_socktype = SOCK_STREAM;
-
-                ret = getaddrinfo(tmp, NULL, &hints, &ai);                
-                if ( ret != 0 ) {
-                        prelude_log(PRELUDE_LOG_WARN, "error resolving \"%s\": %s.\n", tmp, gai_strerror(ret));
-                        return resolve_failed_fallback(log_entry, node);
-                }
-
-                fill_target(node, ai);
-                freeaddrinfo(ai);
+                ret = fill_target_node(node, tmp);
         }
 
-        return 0;
+        return ret;
 }
 
 
 static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *alert) 
 {
-        int ret;
+        int ret = 0;
         const char *tmp;
         idmef_node_t *node;
         prelude_string_t *str;
@@ -232,28 +245,15 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
         }
 
         tmp = lml_log_entry_get_target_hostname(log_entry);
-        if ( tmp && ! idmef_target_get_node(target) && ! config.no_resolve ) {
-                struct addrinfo *ai, hints;
-                
+        if ( tmp && ! idmef_target_get_node(target) ) {
                 ret = idmef_target_new_node(target, &node);
                 if ( ret < 0 ) 
                         return ret;
 
-                memset(&hints, 0, sizeof(hints));
-                hints.ai_flags = AI_CANONNAME;
-                hints.ai_socktype = SOCK_STREAM;
-
-                ret = getaddrinfo(tmp, NULL, &hints, &ai);                
-                if ( ret != 0 ) {
-                        prelude_log(PRELUDE_LOG_WARN, "error resolving \"%s\": %s.\n", tmp, gai_strerror(ret));
-                        return resolve_failed_fallback(log_entry, node);
-                }
-
-                fill_target(node, ai);
-                freeaddrinfo(ai);
+                ret = fill_target_node(node, tmp);
         }
 
-        return 0;
+        return ret;
 }
 
 
