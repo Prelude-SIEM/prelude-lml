@@ -26,6 +26,7 @@ AC_DEFUN([gl_EARLY],
 # "Check for header files, types and library functions".
 AC_DEFUN([gl_INIT],
 [
+AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_FUNC_ALLOCA
   dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GETADDRINFO
@@ -36,6 +37,7 @@ AC_DEFUN([gl_INIT],
   gl_C_RESTRICT
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
+  gl_SOCKLEN_T
   AM_STDBOOL_H
   gl_FUNC_STRDUP
   gl_TIME_R
@@ -89,6 +91,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/signed.m4
   m4/size_max.m4
   m4/snprintf.m4
+  m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
   m4/stdint_h.m4
