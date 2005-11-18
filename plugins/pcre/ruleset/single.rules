@@ -129,7 +129,7 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
 regex='\S+' contains a virus \((Infection: )?(\S+)\); \
  classification.text=Virus found: $1; \
  id=405; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=P3Scan; \
  analyzer(0).manufacturer=p3scan.sourceforge.net; \
  analyzer(0).class=Antivirus; \
