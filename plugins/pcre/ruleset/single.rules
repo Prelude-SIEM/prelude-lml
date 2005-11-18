@@ -81,7 +81,7 @@ regex=terminating task: ([^(]+)\(([^)]+)\):(\d+), uid/euid: (\d+)/(\d+); \
  assessment.impact.description=A possible buffer overflow occured in $1.  You should consider this an attack against your system.; \
  last
 
-# Copyright (C) 2004-2005 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2004-2005 G Ramon Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Apr 13 11:31:55 12.34.56.78 oracle.pr[info] 34  Audit trail: ACTION : 'connect internal' OSPRIV : DBA CLIENT USER: linc CLIENT TERMINAL: DB3  STATUS: SUCCEEDED ( 0 )  .
@@ -125,7 +125,8 @@ regex=START: tftp pid=(\d+) from=([\d\.]+); \
  last
 
 #LOG:Jun 14 05:38:52 oahu p3scan[5973]: '/var/spool/p3scan/children/5973/p3scan.Pu3u8g' contains a virus (Infection: W32/Zafi.B@mm)!
-regex='\S+' contains a virus \(Infection: (\S+)\); \
+#LOG:Jul 13 19:44:44 localhost p3scan[529]: '/var/spool/p3scan/children/529/p3scan.ASA1Cl' contains a virus (Worm.Mytob.GH)!
+regex='\S+' contains a virus \((Infection: )?(\S+)\); \
  classification.text=Virus found: $1; \
  id=405; \
  revision=1; \

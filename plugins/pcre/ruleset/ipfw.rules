@@ -1,5 +1,4 @@
 # Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>: FreeBSD IPFW support
-# Ruleset updated for 0-9 branch by Gene R Gomez
 # 1. Deny rules
 
 #Feb  3 16:02:18 lhotse /kernel: ipfw: 65000 Deny UDP 200.65.7.49:1033 12.34.56.78:137 in via tun0

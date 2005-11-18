@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2004 G Ramon Gomez <gene at gomezbrothers dot com>
 # Tyco Fire and Security GTS (www.tycofireandsecurity.com)
 # All Rights Reserved
 #
@@ -25,7 +25,7 @@
 #####
 #
 # The rules included here were developed using sudo-1.6.6-3 on Linux.
-# Please report any inconsistencies on other versions to Gene R Gomez at the 
+# Please report any inconsistencies on other versions to G Ramon Gomez at the 
 # address provided above
 #
 #####

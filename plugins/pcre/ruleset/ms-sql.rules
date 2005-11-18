@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2003 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2003 G Ramon Gomez <gene at gomezbrothers dot com>
 # Tyco Fire and Security GTS (www.tycofireandsecurity.com)
 # All Rights Reserved
 #
@@ -26,7 +26,7 @@
 #
 # The rules included here were developed using Microsoft SQL Server 2000 SP3a 
 # events collected using NTSysLog.  Please report any inconsistencies on other 
-# versions to Gene R Gomez at the address provided above
+# versions to G Ramon Gomez at the address provided above
 #
 #####
 

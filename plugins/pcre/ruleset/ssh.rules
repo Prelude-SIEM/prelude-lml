@@ -2,7 +2,6 @@
 #
 # Copyright (C) 2002,2004 Nicolas Delon <nicolas@prelude-ids.org>
 # All Rights Reserved
-# Ruleset updated for 0-9 branch by Gene R Gomez
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by 
@@ -249,7 +248,7 @@ regex=ROOT LOGIN REFUSED FROM ([\d\.]+); \
  target(0).user.user_id(0).name=root; \
  last
 
-# Copyright (C) 2005 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2005 G Ramon Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
 #LOG:Jan 14 03:30:44 mail sshd[20298]: Accepted publickey for root from fec0:0:201::3 port 63018 ssh2

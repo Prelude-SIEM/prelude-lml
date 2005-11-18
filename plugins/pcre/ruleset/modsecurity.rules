@@ -1,6 +1,6 @@
 #####
 #
-# Copyright (C) 2004 Gene R Gomez <gene at gomezbrothers dot com>
+# Copyright (C) 2004 G Ramon Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 #
 # This file is part of the Prelude-LML program.
@@ -25,7 +25,7 @@
 #
 # The rules included here were developed using mod_security 1.7.6 events 
 # captured in syslog through the Apache directive 'ErrorLog syslog'.  
-# Please report any inconsistencies on other versions to Gene R Gomez at the 
+# Please report any inconsistencies on other versions to G Ramon Gomez at the 
 # address provided above
 #
 #####
@@ -114,7 +114,7 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
 #
 # The rules included here were developed using mod_security 1.8 events
 # captured in syslog through the Apache directive 'ErrorLog syslog'.
-# Please report any inconsistencies on other versions to Gene R Gomez at the
+# Please report any inconsistencies on other versions to G Ramon Gomez at the
 # address provided above
 #
 #####
