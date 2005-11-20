@@ -1,23 +1,13 @@
 ##
-# filename should be one of:
+# source should be one of:
 #
-# - "*"      meaning any monitored logfile data is sent to the plugin.
-# - "syslog" meaning any data coming from syslog is sent to the plugin.
-# - "/path/to/logfile" any data coming from this logfile is sent to the plugin.
+# - "*"      		Data from any source (logfile, UDP listener, etc) is sent to this plugin.
+# - "address:port/udp" 	Data received from this listener is sent to the configured plugin.
+# - "/path/to/logfile" 	Data from this logfile is sent to the configured plugin.
 #
 #
-# filename	plugin-name-list      pcre-options	regex
+# source	plugin-name-list      pcre-options	regex
 #
 # *		Debug		      -			.*
   * 		Pcre		      -			.*
 
-#
-# plugin-name-list is a coma separated list of plugins
-# (list is not supported yet, specify only a single name)
-#
-# pcre-options (not implemented yet)
-#
-# x        exclusive
-# i        case insensitive
-# - no options
-#

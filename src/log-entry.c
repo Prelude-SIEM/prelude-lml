@@ -63,12 +63,33 @@ struct lml_log_entry {
 
 
 
-static int parse_ts(lml_log_source_t *ls, const char *string, void **out) 
+static void lml_log_entry_destroy_substring(lml_log_entry_t *log_entry)
+{
+        if ( log_entry->target_hostname ) {
+                free(log_entry->target_hostname);
+                log_entry->target_hostname = NULL;
+        }
+        
+        if ( log_entry->target_process ) {
+                free(log_entry->target_process);
+                log_entry->target_process = NULL;
+        }
+        
+        if ( log_entry->target_process_pid ) {
+                free(log_entry->target_process_pid);
+                log_entry->target_process_pid = NULL;
+        }
+}
+
+
+
+static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *string, void **out) 
 {
         time_t now;
         struct tm *lt;
         const char *end;
         struct timeval *tv = *out;
+        const char *ts_fmt = lml_log_format_get_ts_fmt(format);
         
         /*
          * We first get the localtime from this system,
@@ -86,7 +107,7 @@ static int parse_ts(lml_log_source_t *ls, const char *string, void **out)
         /*
          * strptime() return a pointer to the first non matched character.
          */
-        end = strptime(string, lml_log_source_get_timestamp_format(ls), lt);
+        end = strptime(string, ts_fmt, lt);
         if ( ! end ) 
                 goto err;
 
@@ -99,22 +120,22 @@ static int parse_ts(lml_log_source_t *ls, const char *string, void **out)
         return 0;
 
  err:
-        lml_log_source_warning(ls, "could not format \"%s\" using \"%s\".\n",
-                               string, lml_log_source_get_timestamp_format(ls));
+        lml_log_source_warning(ls, "could not format \"%s\" using \"%s\".\n", string, ts_fmt);
         return -1;
 }
 
 
 
-static int parse_prefix(lml_log_source_t *ls, lml_log_entry_t *log_entry)
+static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_entry_t *log_entry)
 {
         char *string;
         int ovector[5 * 3];
         int i, ret, matches = 0;
         void *tv = &log_entry->tv;
+        const pcre *prefix_regex = lml_log_format_get_prefix_regex(format);
         struct {
                 const char *field;
-                int (*cb)(lml_log_source_t *ls, const char *log, void **out);
+                int (*cb)(lml_log_format_t *format, lml_log_source_t *ls, const char *log, void **out);
                 void **ptr;
         } tbl[] = {
                 { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
@@ -123,19 +144,15 @@ static int parse_prefix(lml_log_source_t *ls, lml_log_entry_t *log_entry)
                 { "timestamp", parse_ts, (void **) &tv                            },
                 { NULL, NULL, NULL                                                },
         };
-
-        matches = pcre_exec(lml_log_source_get_prefix_regex(ls), lml_log_source_get_prefix_regex_extra(ls),
+        
+        matches = pcre_exec(prefix_regex, lml_log_format_get_prefix_regex_extra(format),
                             log_entry->original_log, log_entry->original_log_len, 0, 0, ovector,
                             sizeof(ovector) / sizeof(int));
-
-        if ( matches < 0 ) {
-                lml_log_source_warning(ls, "could not match log_prefix_regex against log entry: %s.\n",
-                                       log_entry->original_log);
+        if ( matches < 0 )
                 return -1;
-        }
 
         for ( i = 0; tbl[i].field != NULL; i++ ) {
-                ret = pcre_get_named_substring(lml_log_source_get_prefix_regex(ls), log_entry->original_log,
+                ret = pcre_get_named_substring(prefix_regex, log_entry->original_log,
                                                ovector, matches, tbl[i].field, (const char **) &string);
                 
                 if ( ret == PCRE_ERROR_NOSUBSTRING )
@@ -150,7 +167,7 @@ static int parse_prefix(lml_log_source_t *ls, lml_log_entry_t *log_entry)
                         *tbl[i].ptr = string;
                 
                 else {
-                        ret = tbl[i].cb(ls, string, tbl[i].ptr);
+                        ret = tbl[i].cb(format, ls, string, tbl[i].ptr);
                         free(string);
                         
                         if ( ret < 0 )
@@ -246,7 +263,9 @@ lml_log_entry_t *lml_log_entry_new(void)
 
 int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, const char *entry, size_t size) 
 {
-        int ret;
+        int ret = -1;
+        prelude_list_t *tmp;
+        lml_log_format_container_t *fc;
         
         log_entry->original_log_len = size;
         
@@ -259,12 +278,21 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
         log_entry->message = log_entry->original_log;
         log_entry->message_len = log_entry->original_log_len;
         
-        ret = parse_prefix(ls, log_entry);
+        prelude_list_for_each(lml_log_source_get_format_list(ls), tmp) {
+                fc = prelude_linked_object_get_object(tmp);
+                
+                ret = parse_prefix(lml_log_format_container_get_format(fc), ls, log_entry);
+                if ( ret == 0 )
+                        break;
+
+                lml_log_entry_destroy_substring(log_entry);
+        }
         
         if ( ! log_entry->target_hostname )
                 log_entry->target_hostname = get_hostname();
         
-        if ( ret < 0 ) {
+        if ( ret != 0 ) {
+                lml_log_source_warning(ls, "could not match prefix against log entry: %s.\n", log_entry->original_log);
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }
@@ -274,21 +302,13 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
 
 
 
-
 void lml_log_entry_destroy(lml_log_entry_t *log_entry)
 {
-        if ( log_entry->target_hostname )
-                free(log_entry->target_hostname);
-
-        if ( log_entry->target_process )
-                free(log_entry->target_process);
-
-        if ( log_entry->target_process_pid )
-                free(log_entry->target_process_pid);
-
         if ( log_entry->original_log )
                 free(log_entry->original_log);
         
+        lml_log_entry_destroy_substring(log_entry);
+
         free(log_entry);
 }
 

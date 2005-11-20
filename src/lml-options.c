@@ -52,6 +52,7 @@
 
 
 lml_config_t config;
+static PRELUDE_LIST(source_list);
 static const char *config_file = PRELUDE_LML_CONF;
 
 
@@ -184,28 +185,16 @@ static int set_pidfile(prelude_option_t *opt, const char *arg, prelude_string_t 
         return 0;
 }
 
-
-
 static int set_logfile_prefix_regex(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
-{        
-        if ( config.logfile_prefix_regex )
-                free(config.logfile_prefix_regex);
-        
-        config.logfile_prefix_regex = strdup(arg);
-
-        return 0;
+{
+        return lml_log_format_set_prefix_regex(context, arg);
 }
 
 
 
 static int set_logfile_ts_format(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
-{        
-        if ( config.logfile_ts_format )
-                free(config.logfile_ts_format);
-        
-        config.logfile_ts_format = strdup(arg);
-                
-        return 0;
+{
+        return lml_log_format_set_ts_fmt(context, arg);
 }
 
 
@@ -256,112 +245,80 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
 {
         int ret;
         lml_log_source_t *ls;
-        regex_list_t *rlist;
-        
-        ls = lml_log_source_new();
-        if ( ! ls )
-                return prelude_error_from_errno(errno);
-
-        lml_log_source_set_warning_limit(ls, config.warning_limit);
-        
-        if ( config.logfile_prefix_regex ) {
-                ret = lml_log_source_set_prefix_regex(ls, config.logfile_prefix_regex);
-                if ( ret < 0 )
-                        return ret;
-        }
-
-        if ( config.logfile_ts_format ) {
-                ret = lml_log_source_set_ts_fmt(ls, config.logfile_ts_format);
-                if ( ret < 0 )
-                        return ret;
-        }
 
         ret = access(arg, R_OK);
         if ( ret < 0 ) {
-                prelude_string_sprintf(err, "%s does not exist or have wrong permissions", arg);
-                return -1;
+                prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist or have wrong permissions.\n", arg);
+                return 0;
         }
-        
-        ret = lml_log_source_set_name(ls, arg);
+
+        ret = lml_log_source_new(&ls, context, arg);
+        if ( ret < 0 )
+                return prelude_error_from_errno(errno);
+
+        if ( ret == 1 ) 
+                return 0;
+                
+        ret = file_server_monitor_file(ls);
         if ( ret < 0 ) 
                 return ret;
+                
+        return 0;
+}
 
-        rlist = regex_init(arg);
-        if ( ! rlist )
+
+
+static int add_server(lml_log_source_t *ls, const char *addr, unsigned int port)
+{
+        config.udp_nserver++;
+
+        config.udp_server = _prelude_realloc(config.udp_server, sizeof(*config.udp_server) * config.udp_nserver);        
+        if ( ! config.udp_server )
                 return -1;
         
-        ret = file_server_monitor_file(rlist, ls);
-        if ( ret < 0 ) 
-                return ret;
+        config.udp_server[config.udp_nserver - 1] = udp_server_new(ls, addr, port);        
+        if ( ! config.udp_server[config.udp_nserver - 1] )
+                return -1;
                 
         return 0;
 }
 
-
-
-static int destroy_udp_server(prelude_option_t *opt, prelude_string_t *err, void *context)
-{
-        if ( ! config.udp_srvr )
-                return 0;
-                
-        prelude_log(PRELUDE_LOG_INFO, "- closing syslog server listening at %s:%d.\n",
-                    config.udp_srvr_addr, config.udp_srvr_port);
-
-        free(config.udp_srvr_addr);
-        udp_server_close(config.udp_srvr);
-        config.udp_srvr = NULL;
-                
-        return 0;
-}
-
-
-
-static int get_udp_server(prelude_option_t *opt, prelude_string_t *out, void *context)
-{
-        if ( ! config.udp_srvr )
-                return 0;
-        
-        return prelude_string_sprintf(out, "%s:%u", config.udp_srvr_addr, config.udp_srvr_port);
-}
 
 
 static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
-        regex_list_t *rlist;
+        int ret;
+        unsigned int port;
+        lml_log_source_t *ls;
+        char *addr, source[512];
         
-        destroy_udp_server(opt, err, context);
-        
-        if ( arg && *arg ) {
-                unsigned int ret, port = 0;
-                
-                ret = prelude_parse_address(arg, &config.udp_srvr_addr, &port);
+        if ( arg && *arg ) {                
+                ret = prelude_parse_address(arg, &addr, &port);
                 if ( ret < 0 )
                         return ret;
-                
-                config.udp_srvr_port = port ? port : DEFAULT_UDP_SERVER_PORT;
-        } 
-        
-        else {
-                config.udp_srvr_addr = strdup("0.0.0.0");
-                config.udp_srvr_port = DEFAULT_UDP_SERVER_PORT;
-        }
-        
-        rlist = regex_init("syslog");
-        if ( ! rlist ) {
-                free(config.udp_srvr_addr);
-                return -1;
-        }
-        
-        config.udp_srvr = udp_server_new(rlist, config.udp_srvr_addr, config.udp_srvr_port);        
-        if ( ! config.udp_srvr ) {
-                free(config.udp_srvr_addr);
-                regex_destroy(rlist);
-                return -1;
+
+                port = port ? port : DEFAULT_UDP_SERVER_PORT;
+        } else {
+                addr = strdup("0.0.0.0");
+                port = DEFAULT_UDP_SERVER_PORT;
         }
 
-        prelude_log(PRELUDE_LOG_INFO, "- Listening for syslog message on %s:%d.\n",
-                    config.udp_srvr_addr, config.udp_srvr_port);
+        snprintf(source, sizeof(source), "%s:%u/udp", addr, port);
+        
+        ret = lml_log_source_new(&ls, context, source);
+        if ( ret < 0 || ret == 1 ) {
+                free(addr);
+                return ret;
+        }
+        
+        ret = add_server(ls, addr, port);
+        free(addr);
+        
+        if ( ret < 0 )
+                return -1;
 
+        prelude_log(PRELUDE_LOG_INFO, "- Listening for syslog message on %s.\n", source);
+        
         return 0;
 }
 
@@ -380,6 +337,18 @@ static int set_warning_limit(prelude_option_t *opt, const char *arg, prelude_str
         return 0;
 }
 
+
+static int set_format(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
+{
+        lml_log_format_t *format;
+        prelude_option_context_t *octx;
+        
+        format = lml_log_format_new(arg);
+        if ( ! format )
+                return -1;
+        
+        return prelude_option_new_context(opt, &octx, arg, format);
+}
 
 
 int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
@@ -431,15 +400,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
         
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
-        
-        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|
-                           PRELUDE_OPTION_TYPE_WIDE, 's', "udp-srvr",
-                           "address:port pair to listen to syslog to UDP messages (default port 514)", 
-                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, get_udp_server);
-
-        prelude_option_set_destroy_callback(opt, destroy_udp_server);        
-        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
-                
+                        
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
@@ -469,18 +430,25 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "no-resolve",
                            "Do not attempt to resolve target address (useful for profiling)",
                            PRELUDE_OPTION_ARGUMENT_NONE, set_no_resolve, NULL);
+
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "format", NULL, PRELUDE_OPTION_ARGUMENT_REQUIRED, set_format, NULL);
         
-        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            't', "time-format", "Specify the input timestamp format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_ts_format, NULL);
         
-        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            'p', "prefix-regex", "Specify the input prefix format", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_logfile_prefix_regex, NULL);
         
-        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
+        
+        prelude_option_add(opt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-srvr",
+                           "address:port pair to listen to syslog to UDP messages (default port 514)", 
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
         
         ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {
@@ -494,8 +462,8 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                 
                 return -1;
         }
-        
-        if ( config.batch_mode && config.udp_srvr ) {
+
+        if ( config.batch_mode && config.udp_nserver ) {
                 prelude_log(PRELUDE_LOG_WARN, "UDP server and batch modes can't be used together.\n");
                 return -1;
         }

@@ -92,12 +92,14 @@ static void print_stats(struct timeval *end)
 
 static void sig_handler(int signum)
 {
+        size_t i;
+        
         signal(signum, SIG_DFL);
         
         prelude_log(PRELUDE_LOG_WARN, "\n\nCaught signal %d.\n", signum);
 
-        if ( config.udp_srvr )
-                udp_server_close(config.udp_srvr);
+        for ( i = 0; i < config.udp_nserver; i++ )
+                udp_server_close(config.udp_server[i]);
         
         exit(2);
 }
@@ -140,18 +142,19 @@ static void sig_stats_handler(int signum)
 static void handle_sighup_if_needed(void) 
 {
         int ret;
-
+        size_t i;
+        
         if ( ! got_sighup )
                 return;
         
         prelude_log(PRELUDE_LOG_WARN, "- Restarting Prelude LML (%s).\n", global_argv[0]);
 
-        if ( config.udp_srvr )
-                /*
-                 * close the UDP server, so that we can bind the port again.
-                 */
-                udp_server_close(config.udp_srvr);
-
+        /*
+         * close the UDP server, so that we can bind the port again.
+         */
+        for ( i = 0; i < config.udp_nserver; i++ )
+                udp_server_close(config.udp_server[i]);
+        
         /*
          * Here we go !
          */
@@ -184,7 +187,7 @@ static void regex_match_cb(void *plugin, void *data)
  * This function is to be called by module reading log devices.
  * It will take appropriate action.
  */
-void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str, size_t size)
+void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
 {
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
@@ -200,7 +203,7 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
         rdata.log_source = ls;
         rdata.log_entry = log_entry;
         
-        regex_exec(list, &regex_match_cb, &rdata,
+        regex_exec(lml_log_source_get_regex_list(ls), &regex_match_cb, &rdata,
                    lml_log_entry_get_message(log_entry), lml_log_entry_get_message_len(log_entry));
 
         lml_log_entry_destroy(log_entry);
@@ -208,24 +211,29 @@ void lml_dispatch_log(regex_list_t *list, lml_log_source_t *ls, const char *str,
 
 
 
-static void add_fd_to_set(fd_set *fds, int fd) 
-{
-        if ( fd >= 0 )
-                FD_SET(fd, fds);
-}
-
-
-
 static void wait_for_event(void) 
 {
         int ret;
+        size_t i;
         fd_set fds;
         struct timeval tv, start, end;
-        int file_event_fd, udp_event_fd;
+        int file_event_fd, udp_event_fd, max = 0;
         
-        file_event_fd = file_server_get_event_fd();
+        FD_ZERO(&fds);
 
-        FD_ZERO(&fds);                
+        file_event_fd = file_server_get_event_fd();
+        if ( file_event_fd >= 0 ) {
+                max = file_event_fd;
+                FD_SET(file_event_fd, &fds);
+        }
+        
+        for ( i = 0; i < config.udp_nserver; i++ ) {
+                udp_event_fd = udp_server_get_event_fd(config.udp_server[i]);
+                
+                FD_SET(udp_event_fd, &fds);
+                max = MAX(max, udp_event_fd);
+        }
+        
         gettimeofday(&start, NULL);
         
         while ( 1 ) {
@@ -234,18 +242,13 @@ static void wait_for_event(void)
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
 
-                udp_event_fd = udp_server_get_event_fd(config.udp_srvr);
-                
-                add_fd_to_set(&fds, udp_event_fd);
-                add_fd_to_set(&fds, file_event_fd);
-                
-                ret = select(MAX(file_event_fd, udp_event_fd) + 1, &fds, NULL, NULL, &tv);
+                ret = select(max + 1, &fds, NULL, NULL, &tv);
                 if ( ret < 0 ) {
                         if ( errno == EINTR )
                                 continue;
                         
-                        prelude_log(PRELUDE_LOG_ERR, "select returned an error.\n");
-                        return;
+                        prelude_log(PRELUDE_LOG_ERR, "select returned an error: %s.\n", strerror(errno));
+                        break;
                 }
                 
                 gettimeofday(&end, NULL);
@@ -257,12 +260,23 @@ static void wait_for_event(void)
                         if ( file_event_fd < 0 )
                                 file_server_wake_up();
                 }
+
+                for ( i = 0; i < config.udp_nserver; i++ ) {
+                        udp_event_fd = udp_server_get_event_fd(config.udp_server[i]);
+                        
+                        if ( FD_ISSET(udp_event_fd, &fds) ) 
+                                udp_server_process_event(config.udp_server[i]);
+                        else
+                                FD_SET(udp_event_fd, &fds);
+                }
+
+                if ( file_event_fd < 0 )
+                        continue;
                 
-                if ( udp_event_fd >= 0 && FD_ISSET(udp_event_fd, &fds) ) 
-                        udp_server_process_event(config.udp_srvr);
-                
-                if ( file_event_fd >= 0 && FD_ISSET(file_event_fd, &fds) )
+                if ( FD_ISSET(file_event_fd, &fds) )
                         file_server_wake_up();
+                else
+                        FD_SET(file_event_fd, &fds);
         }
 }
 
@@ -311,7 +325,7 @@ int main(int argc, char **argv)
          * if there are data available for reading. if batch_mode is set,
          * then we revert to reading every data at once.
          */
-        if ( (config.udp_srvr || file_server_get_event_fd() > 0) && ! config.batch_mode )
+        if ( (config.udp_nserver || file_server_get_event_fd() > 0) && ! config.batch_mode )
                 wait_for_event();
         else {
                 gettimeofday(&start, NULL);

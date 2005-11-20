@@ -42,6 +42,7 @@
 #include "regex.h"
 #include "log-source.h"
 #include "udp-server.h"
+#include "lml-options.h"
 
 #ifndef MIN
 # define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -62,9 +63,13 @@
 struct udp_server {
         int sockfd;
         lml_log_source_t *ls;
-        regex_list_t *rlist;
+        char *addr;
+        unsigned int port;
 };
 
+
+
+extern lml_config_t config;
 
 
 
@@ -123,22 +128,32 @@ void udp_server_process_event(udp_server_t *server)
                 }
         }
         
-        lml_dispatch_log(server->rlist, server->ls, ptr ? ptr : buf, ret);
+        lml_dispatch_log(server->ls, ptr ? ptr : buf, ret);
 }
 
 
 
 void udp_server_close(udp_server_t *server)
-{
-        if ( server->ls )
-                lml_log_source_destroy(server->ls);
+{        
+        lml_log_source_destroy(server->ls);
 
-        regex_destroy(server->rlist);
-        
         close(server->sockfd);
+
+        free(server->addr);
         free(server);
 }
 
+
+const char *udp_server_get_addr(udp_server_t *server)
+{
+        return server->addr;
+}
+
+
+unsigned int udp_server_get_port(udp_server_t *server)
+{
+        return server->port;
+}
 
 
 int udp_server_get_event_fd(udp_server_t *server) 
@@ -151,7 +166,7 @@ int udp_server_get_event_fd(udp_server_t *server)
 
 
 
-udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int port)
+udp_server_t *udp_server_new(lml_log_source_t *ls,  const char *addr, unsigned int port)
 {
         int ret, sockfd;
         udp_server_t *server;
@@ -196,15 +211,10 @@ udp_server_t *udp_server_new(regex_list_t *rlist, const char *addr, unsigned int
                 return NULL;
         }
 
-        server->rlist = rlist;
+        server->addr = strdup(addr);
+        server->port = port;
         server->sockfd = sockfd;
-        
-        server->ls = lml_log_source_new();
-        if ( ! server->ls ) {
-                close(sockfd);
-                free(server);
-                return NULL;
-        }
+        server->ls = ls;
         
         return server;
 }

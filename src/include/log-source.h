@@ -26,32 +26,49 @@
 
 #include <pcre.h>
 #include <sys/time.h>
+#include "regex.h"
 
+typedef struct lml_log_format lml_log_format_t;
+typedef struct lml_log_format_container lml_log_format_container_t;
 
-lml_log_source_t *lml_log_source_new(void);
+/*
+ * format
+ */
+lml_log_format_t *lml_log_format_container_get_format(lml_log_format_container_t *fc);
 
-void lml_log_source_destroy(lml_log_source_t *source);
+lml_log_format_t *lml_log_format_new(const char *name);
 
+const char *lml_log_format_get_name(lml_log_format_t *lf);
+
+int lml_log_format_set_prefix_regex(lml_log_format_t *ls, const char *regex);
+
+const pcre *lml_log_format_get_prefix_regex(const lml_log_format_t *ls);
+
+const pcre_extra *lml_log_format_get_prefix_regex_extra(const lml_log_format_t *ls);
+
+int lml_log_format_set_ts_fmt(lml_log_format_t *lf, const char *fmt);
+
+const char *lml_log_format_get_ts_fmt(const lml_log_format_t *ls);
+
+/*
+ *
+ */
 const char *lml_log_source_get_format(lml_log_source_t *ls);
 
 const char *lml_log_source_get_source(lml_log_source_t *ls);
 
 const char *lml_log_source_get_name(const lml_log_source_t *ls);
 
+regex_list_t *lml_log_source_get_regex_list(lml_log_source_t *ls);
+
+int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const char *name);
+
+void lml_log_source_destroy(lml_log_source_t *source);
+
 int lml_log_source_set_name(lml_log_source_t *ls, const char *name);
 
-int lml_log_source_set_prefix_regex(lml_log_source_t *ls, const char *regex);
-
-int lml_log_source_set_ts_fmt(lml_log_source_t *lf, const char *fmt);
-
-const char *lml_log_source_get_timestamp_format(const lml_log_source_t *ls);
-
-const pcre *lml_log_source_get_prefix_regex(const lml_log_source_t *ls);
-
-const pcre_extra *lml_log_source_get_prefix_regex_extra(const lml_log_source_t *ls);
-
-void lml_log_source_set_warning_limit(lml_log_source_t *source, int limit);
-
 void lml_log_source_warning(lml_log_source_t *ls, const char *fmt, ...);
+
+prelude_list_t *lml_log_source_get_format_list(lml_log_source_t *source);
 
 #endif

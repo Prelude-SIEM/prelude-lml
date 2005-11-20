@@ -116,8 +116,6 @@ typedef struct {
 #ifdef HAVE_FAM
         FAMRequest fam_request;
 #endif
-
-        regex_list_t *regex_list;
 } monitor_fd_t;
 
 
@@ -536,7 +534,7 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
                 eventno++;
                 config.line_processed++;
                 
-                lml_dispatch_log(monitor->regex_list, monitor->source, monitor->buf, ret);
+                lml_dispatch_log(monitor->source, monitor->buf, ret);
                 file_metadata_save(monitor, st->st_size - len);
                 
                 len -= rlen;
@@ -910,17 +908,14 @@ static int initialize_fam(void)
                 return -1;
         }
 
-        prelude_log(PRELUDE_LOG_INFO, "- Checking for FAM writev() bug...\n");
-        
         ret = check_fam_writev_bug(&fc);
         if ( ret < 0 ) {
-                FAMClose(&fc);
-                
-                prelude_log(PRELUDE_LOG_INFO, "- An OS bug prevent FAM from monitoring writev() file modification: disabling FAM.\n");
+                FAMClose(&fc);        
+                prelude_log(PRELUDE_LOG_INFO, "- Checking for FAM writev() bug: disabling FAM.\n");
                 return -1;
         }
 
-        prelude_log(PRELUDE_LOG_INFO, "- FAM working nicely, enabling.\n");
+        prelude_log(PRELUDE_LOG_INFO, "- Checking for FAM writev() bug: FAM working nicely, enabling.\n");
         
         fam_initialized = 1;
 
@@ -1051,7 +1046,7 @@ static int process_file_event(monitor_fd_t *monitor)
 
 
 
-int file_server_monitor_file(regex_list_t *rlist, lml_log_source_t *ls) 
+int file_server_monitor_file(lml_log_source_t *ls) 
 {
         monitor_fd_t *new;
         
@@ -1073,8 +1068,6 @@ int file_server_monitor_file(regex_list_t *rlist, lml_log_source_t *ls)
                 return -1;
         }
 #endif
-        
-        new->regex_list = rlist;
         
         return 0;
 }

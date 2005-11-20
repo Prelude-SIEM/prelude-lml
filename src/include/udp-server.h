@@ -29,10 +29,14 @@ typedef struct udp_server udp_server_t;
 
 void udp_server_process_event(udp_server_t *server);
 
-udp_server_t *udp_server_new(regex_list_t *list, const char *addr, unsigned int port);
+udp_server_t *udp_server_new(lml_log_source_t *ls, const char *addr, unsigned int port);
 
 void udp_server_close(udp_server_t *server);
 
 int udp_server_get_event_fd(udp_server_t *srvr);
 
-#endif				/* UDP_SERVER_H */
+const char *udp_server_get_addr(udp_server_t *server);
+
+unsigned int udp_server_get_port(udp_server_t *server);
+
+#endif /* UDP_SERVER_H */

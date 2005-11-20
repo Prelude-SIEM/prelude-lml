@@ -41,11 +41,10 @@ typedef struct {
         prelude_bool_t dry_run;
         prelude_bool_t ignore_metadata;
         prelude_bool_t no_resolve;
-        
-        udp_server_t *udp_srvr;
-        char *udp_srvr_addr;
-        unsigned int udp_srvr_port;
 
+        size_t udp_nserver;
+        udp_server_t **udp_server;
+        
         prelude_io_t *text_output_fd;
         unsigned long alert_count;
         unsigned long line_processed;

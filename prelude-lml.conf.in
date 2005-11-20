@@ -25,48 +25,58 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # udp-srvr = x.x.x.x:port
 
 
+
 #
 # Files to monitor
 #
-# You should define the log message prefix regex and log timestamp format
-# before you define a file to monitor. If not specified, syslog format is used.
+# You should define the log message prefix-regex and time-format within a
+# [format] section. If not specified, the default syslog format will be used.
 #
-# The prefix regex should contain pcre named subpatterns to pick out the
+# The prefix-regex should contain PCRE named subpatterns to pick out the
 # information available in your syslog's prefix.
 #
 # The available field names are:
-#   hostname
-#   program
-#   pid
-#   timestamp
+#   - hostname
+#   - program
+#   - pid
+#   - timestamp
 #
 # Please see pcrepattern(3) manpage for help writing the prefix-regex
-#
-# In order to set time-fmt, please have a look at the strptime(3) manpage.
+# In order to set the time-format, please have a look at the strptime(3) manpage.
 #
 # Example configuration for syslog output:
 #
+# Each [format] section might have several file entry.
+# Each [format] section might have several udp-server entry.
+#
+# The same file entry / udp-server entry might be duplicated accross
+# differents formats.
+
+[format=syslog]
 time-format = "%b %d %H:%M:%S" 
 prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])?: )?"
-
 file = /var/log/messages
-file = /var/log/auth.log
+# udp-server = 0.0.0.0
+
 
 #
 # Example configuration for metalog output:
 #
-# prefix-regex = "^(?P<timestamp>.{15}) \[(?P<program>\S+)\] "
-# time-format = "%b %d %H:%M:%S" 
+[format=metalog]
+prefix-regex = "^(?P<timestamp>.{15}) \[(?P<program>\S+)\] "
+time-format = "%b %d %H:%M:%S" 
+file = /var/log/everything/current
+# udp-server = 0.0.0.0
+
+
 #
-# file = /var/log/everything/current
-
-
 # Example configuration for apache output:
 #
-# prefix-regex = "^(?P<hostname>\S+) - - \[(?P<timestamp>.{20}) \+.{4}\] "
-# time-format = "%d/%b/%Y:%H:%M:%S"
-#
-# file = /var/log/apache2/access_log
+[format=apache]
+time-format = "%d/%b/%Y:%H:%M:%S"
+prefix-regex = "^(?P<hostname>\S+) - - \[(?P<timestamp>.{20}) \+.{4}\] "
+file = /var/log/apache2/access_log
+
 
 #
 # Specifies the maximum difference, in seconds, between
