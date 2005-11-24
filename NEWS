@@ -1,3 +1,35 @@
+* 2005-11-24, prelude-lml-0.9.1:
+
+	- Fixed bad mssql chain regex.
+
+	- Added analyzer name and manufacturer to linksys-wap11 rules.
+
+	- Added rules ID 1914 and 1915 for Suse specific PAM log format (#73).
+
+	- Updated p3scan rule (id 405) for newer version log format.
+
+	- Rework Netfilter ruleset resulting in simpler and faster ruleset
+	  matching a wider range of Netfilter log entry. The new implementation 
+	  remove part of the Netfilter rules that had to be manually enabled depending 
+	  on your Netfilter configuration. This is now handled automatically.
+
+	- Implement the ability to have multiple logfile format per source (#107).
+
+	- Implement the ability to start multiple UDP server and to filter on any server instance.
+
+	- Fix issue with Target.node remaining empty on configuration using no-resolve (#108).
+
+	- Fix static compilation (#109).
+
+	- Fix a possible bug where LML file descriptor were not monitored in daemon mode.
+
+	- Fix crash if we could not retrieve the machine canonical name (#100).
+
+	- Fix debug plugin crash.
+
+	- Various bugfix.
+
+
 * 2005-09-20, prelude-lml-0.9.0:
 
 	- 0.9.0 final.
