@@ -168,7 +168,9 @@ regex=(bigconf|kernel);			include = f5-bigip.rules;
 regex=%PIX;				include = cisco-pix.rules;
 regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;				include = cisco-vpn.rules;
-regex=clamd;				include = clamav.rules;
+# Using this regex rather than clamd to handle events from clamav logging
+# format
+regex=(FOUND|virus);			include = clamav.rules;
 regex=server administrator;		include = dell-om.rules
 regex=(kernel|grsec);			include = grsecurity.rules; 
 regex=kernel;				include = netfilter.rules; \
