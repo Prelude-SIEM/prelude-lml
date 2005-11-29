@@ -17,15 +17,6 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # server-addr = 127.0.0.1
 
 
-# Configuration for the UDP message receiver.
-# commented out by default since most people only want to 
-# monitor files. If port is not set, the default syslog port
-# (514) is used. 
-# 
-# udp-srvr = x.x.x.x:port
-
-
-
 #
 # Files to monitor
 #
@@ -51,6 +42,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #
 # The same file entry / udp-server entry might be duplicated accross
 # differents formats.
+
 
 [format=syslog]
 time-format = "%b %d %H:%M:%S" 
