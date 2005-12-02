@@ -41,10 +41,10 @@ regex=PIX-4-(4000\d\d): IDS:(\d+) (.+) from ([\d\.]+) to ([\d\.]+) on interface 
  classification.reference(1).meaning=pix_severity; \
  classification.reference(1).name=4; \
  classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
- classification.reference(0).origin=vendor-specific; \
- classification.reference(0).meaning=csids_id; \
- classification.reference(0).name=$1; \
- classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(2).origin=vendor-specific; \
+ classification.reference(2).meaning=csids_id; \
+ classification.reference(2).name=$1; \
+ classification.reference(2).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=200; \
  revision=2; \
  analyzer(0).name=PIX; \
@@ -342,6 +342,9 @@ regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  target(0).node.address(0).address=$2; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=IP options; \
+ additional_data(0).data=$3; \
  last
 
 #LOG:Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging

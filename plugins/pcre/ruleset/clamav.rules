@@ -30,10 +30,10 @@
 #####
 
 #LOG:May 10 15:19:28 mail clamd[14292]: /usr/share/doc/clamav-0.70/test/test2.badext: ClamAV-Test-Signature FOUND
-regex=\S+: (\S+) FOUND; \
- classification.text=Virus found: $1; \
+regex=(\S+): (\S+) FOUND; \
+ classification.text=Virus found: $2; \
  id=3200; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Clam Antivirus; \
  analyzer(0).manufacturer=www.clamav.net; \
  analyzer(0).class=Antivirus; \
@@ -41,6 +41,12 @@ regex=\S+: (\S+) FOUND; \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=A virus has been identified by ClamAV; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=File location; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Malware name; \
+ additional_data(1).data=$1; \
  last
 
 #LOG:May 10 15:18:56 mail clamd[14292]: Database correctly reloaded (21517 viruses)
