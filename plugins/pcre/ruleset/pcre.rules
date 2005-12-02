@@ -189,6 +189,9 @@ regex=norton;				include = navce.rules;
 regex=\[[^:]*:[^\]]*\]:;		include = netapp-ontap.rules;
 regex=system-(emergency|alert)-;	include = netscreen.rules;
 regex=security\[;			include = ntsyslog.rules;
+# This next regex isn't specific enough for my liking, but there doesn't seem
+# to be a better solution based on the log samples
+regex=[a-z0-9]+:;			include = openhostapd.rules;
 regex=[Pp][Aa][Mm]_;			include = pam.rules;
 regex=pcanywhere;			include = pcanywhere.rules;
 regex=portsentry;			include = portsentry.rules;

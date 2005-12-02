@@ -31,28 +31,48 @@
 #####
 
 #LOG:Nov  2 18:03:14 pix %PIX-4-400024: IDS:2151 Large ICMP packet from 200.36.129.18 to 12.34.56.78 on interface outside
-regex=PIX-4-4000\d\d: IDS:\d+ (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
- classification.text=$1; \
+regex=PIX-4-(4000\d\d): IDS:(\d+) (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
+ classification.text=$3; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=$1; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=csids_id; \
+ classification.reference(0).name=$1; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=200; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.description=Messages 400000 through 400051 - Cisco Intrusion Detection System signature messages; \
- source(0).interface=$4; \
+ source(0).interface=$6; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$2; \
+ source(0).node.address(0).address=$4; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$3; \
+ target(0).node.address(0).address=$5; \
  last
 
 #LOG:Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification.text=Firewall user login successful; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=605005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=6; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=201; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -76,8 +96,16 @@ regex=PIX-6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\
 #LOG:Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
  classification.text=Firewall admin login successful; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=111008; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=5; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=202; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -96,8 +124,16 @@ regex=PIX-5-111008: User '(\S+)' executed the 'enable' command; \
 #LOG:Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  classification.text=Firewall configuration written to $2; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=111001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=5; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=203; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -105,13 +141,27 @@ regex=PIX-5-111001: Begin configuration: (\S+) writing to (\S+); \
  assessment.impact.type=admin; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Configuration was stored on $2, and the command was executed from $1.; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Source device; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Destination device; \
+ additional_data(1).data=$2; \
  last
 
 #LOG:Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
 regex=PIX-5-611103: User logged out: Uname: (\S+); \
  classification.text=Firewall logout; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=611103; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=5; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=204; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -127,8 +177,16 @@ regex=PIX-5-611103: User logged out: Uname: (\S+); \
 #LOG:Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
  classification.text=Firewall user login failed; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=605004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=6; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=205; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -150,27 +208,52 @@ regex=PIX-6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+)
  last
 
 #LOG:Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
-regex=PIX-6-308001: PIX (\S+) enable password incorrect for \d+ tries \(from (.+)\); \
+regex=PIX-6-308001: PIX (\S+) enable password incorrect for (\d+) tries \(from (.+)\); \
  classification.text=Firewall admin login failed; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=308001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=6; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=206; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
  assessment.impact.severity=medium; \
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
- assessment.impact.description=PIX enable password attempt on the $1 failed from $2; \
+ assessment.impact.description=PIX enable password attempt on the $1 failed from $3; \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=enable_15; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Destination device; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=integer; \
+ additional_data(1).meaning=Attempts; \
+ additional_data(1).data=$2; \
+ additional_data(2).type=string; \
+ additional_data(2).meaning=Source device; \
+ additional_data(2).data=$3; \
  last
 
 #LOG:Nov 17 11:29:27 pix %PIX-6-315011: SSH session from 12.34.56.78 on interface dmz for user "" disconnected by SSH server, reason: "Invalid format in version string" (0x05)
 regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconnected by SSH server, reason: "Invalid format in version string"; \
  classification.text=SSH server recognition; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=315001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=6; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=207; \
- revision=1; \ 
+ revision=2; \ 
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -191,37 +274,59 @@ regex=PIX-6-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" di
  last
 
 #LOG:Dec 22 15:55:33 pix %PIX-4-407002: Embryonic limit for through connections exceeded 243/100. 208.252.69.162/55452 to 12.34.56.78(90.12.34.56)/80 on interface outside
-regex=PIX-4-407002: Embryonic limit for through connections exceeded \d+\/\d+\. ([\d\.]+)\/(\d+) to ([\d\.]+)\(([\d\.]+)\)\/(\d+) on interface (\S+); \
+regex=PIX-4-407002: Embryonic limit for through connections exceeded (\d+)\/(\d+)\. ([\d\.]+)\/(\d+) to ([\d\.]+)\(([\d\.]+)\)\/(\d+) on interface (\S+); \
  classification.text=Embryonic connection limit exceeded; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=407002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=208; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
  assessment.impact.severity = medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=other; \
- assessment.impact.description=The number of connections from $1 over $3 to $4 has exceeded the maximum embryonic limit for that static.; \
- source(0).interface=$6; \
+ assessment.impact.description=The number of connections from $3 over $5 to $6 has exceeded the maximum embryonic limit for that static.; \
+ source(0).interface=$8; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$1; \
- source(0).service.port=$2; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$3; \
+ target(0).node.address(0).address=$5; \
  target(0).node.address(1).category=ipv4-addr; \
- target(0).node.address(1).address=$4; \
- target(0).service.port=$5; \
+ target(0).node.address(1).address=$6; \
+ target(0).service.port=$7; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=Connections; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=integer; \
+ additional_data(1).meaning=Connection limit; \
+ additional_data(1).data=$2; \
  last
 
 #LOG:Feb  1 00:48:50 pix %PIX-6-106012: Deny IP from 12.34.56.78 to 90.12.34.56, IP options: "Loose Src Routing"
 regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
  classification.text=IP options: $3; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=106012; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=6; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=209; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -242,8 +347,16 @@ regex=PIX-6-106012: Deny IP from ([\d\.]+) to ([\d\.]+), IP options: "(.+)"; \
 #LOG:Jan 27 14:51:43 pix %PIX-1-106021: Deny udp reverse path check from 12.34.56.78 to 90.12.34.56 on interface staging
 regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
  classification.text=Reverse path check failure; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=106021; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=1; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=210; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -262,10 +375,18 @@ regex=PIX-1-106021: Deny (\w+) reverse path check from ([\d\.]+) to ([\d\.]+) on
  last
 
 #LOG:Feb  1 01:01:28 pix %PIX-4-209003: Fragment database limit of 200 exceeded:  src = 12.34.56.78, dest = 90.12.34.56, proto = icmp, id = 48130
-regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), dest = ([\d\.]+), proto = (\w+); \
+regex=PIX-4-209003: Fragment database limit of (\d+) exceeded:  src = ([\d\.]+), dest = ([\d\.]+), proto = (\w+); \
  classification.text=Fragment database limit exceeded; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=209003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=211; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -274,18 +395,29 @@ regex=PIX-4-209003: Fragment database limit of \d+ exceeded:  src = ([\d\.]+), d
  assessment.impact.type=other; \
  assessment.impact.description=The IP fragement database limit has been exceeded.  A DoS attack may be in progress.; \
  source(0).node.address(0).category=ipv4-addr; \
- source(0).node.address(0).address=$1; \
- source(0).service.iana_protocol_name=$3; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.iana_protocol_name=$4; \
  target(0).node.address(0).category=ipv4-addr; \
- target(0).node.address(0).address=$2; \
- target(0).service.iana_protocol_name=$3; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.iana_protocol_name=$4; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=Connections; \
+ additional_data(0).data=$1; \
  last
 
 #LOG:Feb  1 18:16:27 pix %PIX-4-500004: Invalid transport field for protocol=6, from 12.34.56.78/13798 to 90.12.34.56/0
 regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\d+) to ([\d\.]+)\/(\d+); \
  classification.text=Source or destination port 0; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=500004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=212; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -304,8 +436,16 @@ regex=PIX-4-500004: Invalid transport field for protocol=\d+, from ([\d\.]+)\/(\
 #LOG:Feb  3 01:47:37 pix %PIX-4-405001: Received ARP response collision from 12.34.56.78/000b.bf5b.9408 on interface outside
 regex=PIX-4-405001: Received ARP (request|response) collision from ([\d\.]+)\/([A-Fa-f\d\.]+) on interface (\S+); \
  classification.text=ARP $1 mismatch; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=405001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=213; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -326,8 +466,16 @@ regex=PIX-4-405001: Received ARP (request|response) collision from ([\d\.]+)\/([
 #LOG:Jan 25 14:59:33 pix %PIX-3-710003: TCP access denied by ACL from 148.208.247.3/2984 to outside:12.40.199.252/ssh
 regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+); \
  classification.text=Unauthorized admin session attempt; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=710003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=3; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=214; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -350,8 +498,16 @@ regex=PIX-3-710003: (TCP|UDP) access denied by ACL from ([\d\.]+)\/(\d+) to (\S+
 #LOG:Mar 15 20:55:18 gtsprodpix %PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for tcp src prod:10.100.17.27/1586 dst inside:10.100.16.255/445
 regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed for (tcp|udp) src (\S+):([\d\.]+)/(\S+) dst (\S+):([\d\.]+)/(\S+); \
  classification.text=Broadcast address translation request; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=305006; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=3; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=215; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -372,10 +528,18 @@ regex=PIX-3-305006: Dst IP is network/broadcast IP, translation creation failed 
  last
 
 #LOG:Mar 24 09:19:42 gtsprodpix %PIX-4-313003: Invalid destination for ICMP error message: ICMP source 12.34.56.78 destination 90.12.34.56 (type 3, code 1) on outside interface.  Original IP payload: ICMP source 1.1.1.1 destination 1.1.1.1 (type 1, code 1).
-regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+) destination ([\d\.]+) \(type \d+, code \d+\) on (\S+) interface.; \
+regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+) destination ([\d\.]+) \(type (\d+), code (\d+)\) on (\S+) interface.; \
  classification.text=ICMP destination/source mismatch; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=313003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=4; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=216; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -387,19 +551,33 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
  source(0).node.address(0).address=$1; \
  source(0).service.iana_protocol_name=icmp; \
  source(0).service.iana_protocol_number=1; \
- source(0).interface=$3; \
+ source(0).interface=$5; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
  target(0).service.iana_protocol_name=icmp; \
  target(0).service.iana_protocol_number=1; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=ICMP type; \
+ additional_data(0).data=$3; \
+ additional_data(1).type=integer; \
+ additional_data(1).meaning=ICMP code; \
+ additional_data(1).data=$4; \
  last
 
 #LOG:Dec 30 03:10:48 12.34.56.78 Dec 30 2003 02:13:28: %PIX-4-106023: Deny icmp src outside:64.89.17.26 dst inside:90.12.34.56 (type 3, code 3) by access-group "outside"
 #LOG:Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:12.34.56.78/18378 dst outside:90.12.34.56/12685 by access-group "acl_in"
 #regex=PIX-4-106023: Deny (\w+) src (\S+):([\d\.]+)(/(\d+))? dst (\S+):([\d\.]+)(/(\d+))?.*by access-group "(\S+)"; \
 # classification.text=Packet denied; \
+# classification.reference(0).origin=vendor-specific; \
+# classification.reference(0).meaning=pix_id; \
+# classification.reference(0).name=106023; \
+# classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+# classification.reference(1).origin=vendor-specific; \
+# classification.reference(1).meaning=pix_severity; \
+# classification.reference(1).name=4; \
+# classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
 # id=217; \
-# revision=1; \
+# revision=2; \
 # analyzer(0).name=PIX; \
 # analyzer(0).manufacturer=Cisco; \
 # analyzer(0).class=Firewall; \
@@ -415,13 +593,24 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$6; \
 # target(0).service.port=$7; \
+# additional_data(0).type=string; \
+# additional_data(0).meaning=access-group; \
+# additional_data(0).data=$8; \
 # last
 
 #LOG:Nov  2 18:03:14 pix %PIX-2-106006: Deny inbound UDP from 9.0.1.2/10001 to 3.4.5.6/1026 on interface outside
 #regex=PIX-2-106006: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) on interface (\S+); \
 # classification.text=Packet denied; \
+# classification.reference(0).origin=vendor-specific; \
+# classification.reference(0).meaning=pix_id; \
+# classification.reference(0).name=106006; \
+# classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+# classification.reference(1).origin=vendor-specific; \
+# classification.reference(1).meaning=pix_severity; \
+# classification.reference(1).name=2; \
+# classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
 # id=218; \
-# revision=1; \
+# revision=2; \
 # analyzer(0).name=PIX; \
 # analyzer(0).manufacturer=Cisco; \
 # analyzer(0).class=Firewall; \
@@ -443,8 +632,16 @@ regex=PIX-4-313003: Invalid destination for ICMP error message: ICMP source ([\d
 #LOG:Nov  2 18:03:14 pix %PIX-2-106007: Deny inbound UDP from 7.8.9.0/53 to 1.2.3.4/33524 due to DNS Response
 regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due to DNS (Response|Query); \
  classification.text=Packet denied; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=pix_id; \
+ classification.reference(0).name=106007; \
+ classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+ classification.reference(1).origin=vendor-specific; \
+ classification.reference(1).meaning=pix_severity; \
+ classification.reference(1).name=2; \
+ classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
  id=219; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PIX; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -465,8 +662,16 @@ regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due
 #LOG:Nov  2 18:03:14 pix %PIX-2-106001: Inbound TCP connection denied from 1.2.3.4/1007 to 5.6.7.8/139 flags SYN  on interface outside
 #regex=PIX-2-106001: Inbound TCP connection denied from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) flags (.+)  on interface (\S+); \
 # classification.text=Packet denied; \
+# classification.reference(0).origin=vendor-specific; \
+# classification.reference(0).meaning=pix_id; \
+# classification.reference(0).name=106001; \
+# classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
+# classification.reference(1).origin=vendor-specific; \
+# classification.reference(1).meaning=pix_severity; \
+# classification.reference(1).name=2; \
+# classification.reference(1).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0ca.html; \
 # id=220; \
-# revision=1; \
+# revision=2; \
 # analyzer(0).name=PIX; \
 # analyzer(0).manufacturer=Cisco; \
 # analyzer(0).class=Firewall; \
@@ -483,6 +688,9 @@ regex=PIX-2-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due
 # target(0).node.address(0).category=ipv4-addr; \
 # target(0).node.address(0).address=$3; \
 # target(0).service.port=$4; \
+# additional_data(0).type=string; \
+# additional_data(0).meaning=TCP flags; \
+# additional_data(0).data=$5; \
 # last
 
 # Events taken from the Cisco System Log Messages List that will need rules

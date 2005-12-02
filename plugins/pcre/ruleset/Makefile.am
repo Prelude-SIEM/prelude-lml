@@ -23,6 +23,7 @@ ruleset_DATA = \
 	netfilter.rules		\
 	netscreen.rules		\
 	ntsyslog.rules		\
+	openhostapd.rules	\
 	pam.rules		\
 	pcanywhere.rules	\
 	pcre.rules		\
