@@ -62,10 +62,10 @@ regex=new group: name=(\S+), gid=0; \
  last
 
 #LOG:May 10 16:37:57 somehost useradd[621]: new user: name=clamav, uid=46, gid=46, home=/tmp, shell=/sbin/nologin
-regex=new user: name=(\S+), uid=(?!0)(\d+), gid=(?!0)(\d+); \
+regex=new user: name=(\S+), uid=(?!0)(\d+), gid=(?!0)(\d+), home=(\S+), shell=(\S+); \
  classification.text=User Created; \
  id=3302; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=shadow-utils; \
  analyzer(0).class=Administration; \
  assessment.impact.severity=low; \
@@ -77,13 +77,19 @@ regex=new user: name=(\S+), uid=(?!0)(\d+), gid=(?!0)(\d+); \
  target(0).user.user_id(0).number=$2; \
  target(0).user.user_id(1).type=current-group; \
  target(0).user.user_id(1).number=$3; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Home directory; \
+ additional_data(0).data=$4; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Shell; \
+ additional_data(1).data=$5; \
  last
 
 #LOG:May 10 16:37:57 somehost useradd[621]: new user: name=someuser, uid=0, gid=46, home=/tmp, shell=/sbin/nologin
-regex=new user: name=(\S+), uid=0, gid=(?!0)(\d+); \
+regex=new user: name=(\S+), uid=0, gid=(?!0)(\d+), home=(\S+), shell=(\S+); \
  classification.text=User Created with UID 0; \
  id=3303; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=shadow-utils; \
  analyzer(0).class=Administration; \
  assessment.impact.severity=high; \
@@ -95,13 +101,19 @@ regex=new user: name=(\S+), uid=0, gid=(?!0)(\d+); \
  target(0).user.user_id(0).number=0; \
  target(0).user.user_id(1).type=current-group; \
  target(0).user.user_id(1).number=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Home directory; \
+ additional_data(0).data=$3; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Shell; \
+ additional_data(1).data=$4; \
  last
 
 #LOG:May 10 16:37:57 somehost useradd[621]: new user: name=someuser, uid=46, gid=0, home=/tmp, shell=/sbin/nologin
-regex=new user: name=(\S+), uid=(?!0)(\d+), gid=0; \
+regex=new user: name=(\S+), uid=(?!0)(\d+), gid=0, home=(\S+), shell=(\S+); \
  classification.text=User Created with GID 0; \
  id=3304; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=shadow-utils; \
  analyzer(0).class=Administration; \
  assessment.impact.severity=high; \
@@ -113,13 +125,19 @@ regex=new user: name=(\S+), uid=(?!0)(\d+), gid=0; \
  target(0).user.user_id(0).number=$2; \
  target(0).user.user_id(1).type=current-group; \
  target(0).user.user_id(1).number=0; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Home directory; \
+ additional_data(0).data=$3; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Shell; \
+ additional_data(1).data=$4; \
  last
 
 #LOG:May 10 16:37:57 somehost useradd[621]: new user: name=someuser, uid=0, gid=0, home=/tmp, shell=/sbin/nologin
-regex=new user: name=(\S+), uid=0, gid=0; \
+regex=new user: name=(\S+), uid=0, gid=0, home=(\S+), shell=(\S+); \
  classification.text=User Created with UID/GID 0; \
  id=3305; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=shadow-utils; \
  analyzer(0).class=Administration; \
  assessment.impact.severity=high; \
@@ -131,6 +149,12 @@ regex=new user: name=(\S+), uid=0, gid=0; \
  target(0).user.user_id(0).number=0; \
  target(0).user.user_id(1).type=current-group; \
  target(0).user.user_id(1).number=0; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Home directory; \
+ additional_data(0).data=$2; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Shell; \
+ additional_data(1).data=$3; \
  last
 
 #LOG:May 12 16:16:34 metatron usermod[14432]: change user name `bogususer' to `nonbogususer'

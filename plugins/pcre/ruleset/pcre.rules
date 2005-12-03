@@ -168,8 +168,8 @@ regex=(bigconf|kernel);			include = f5-bigip.rules;
 regex=%PIX;				include = cisco-pix.rules;
 regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;				include = cisco-vpn.rules;
-# Using this regex rather than clamd to handle events from clamav logging
-# format
+# Using this regex rather than simpler clamd to handle events from clamav 
+# logging format
 regex=(FOUND|virus);			include = clamav.rules;
 regex=server administrator;		include = dell-om.rules
 regex=(kernel|grsec);			include = grsecurity.rules; 
@@ -201,7 +201,8 @@ regex=popper;				include = qpopper.rules;
 regex=avc:;				include = selinux.rules;
 regex=sendmail;				include = sendmail.rules;
 regex=(user|group)(mod|add);		include = shadow-utils.rules;
-regex=squid;				include = squid.rules;
+# More complex regex to handle data coming directly from Squid log files
+regex=(Acceptin|Squid|Disabled|DENIED);	include = squid.rules;
 regex=sshd;				include = ssh.rules;
 regex=sudo;				include = sudo.rules;
 regex=tripwire;				include = tripwire.rules;
