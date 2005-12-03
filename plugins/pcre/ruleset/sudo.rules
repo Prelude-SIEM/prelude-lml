@@ -31,37 +31,55 @@
 #####
 
 #LOG:Feb 11 06:52:09 12.34.56.78 sudo:   cpatel : TTY=pts/0 ; PWD=/etc/rc.d/init.d ; USER=root ; COMMAND=./resin start
-regex=(\S+) : TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
+regex=(\S+) : TTY=(\S+) \; PWD=(.+) \; USER=(\S+) \; COMMAND=(.+); \
  classification.text=SUDO Command Executed; \
  id=2700; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sudo; \
  assessment.impact.completion=succeeded; \
  assessment.impact.type=user; \
  assessment.impact.severity=low; \
- assessment.impact.description=User $1 successfully executed the command '$3' as $2.; \
+ assessment.impact.description=User $1 successfully executed the command '$5' as $4.; \
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=original-user; \
  source(0).user.user_id(0).name=$1;  \
  target(0).user.category = os-device; \
  target(0).user.user_id(0).type=current-user; \
- target(0).user.user_id(0).name=$2; \
+ target(0).user.user_id(0).name=$4; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Source device; \
+ additional_data(0).data=$2; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Working directory; \
+ additional_data(1).data=$3; \
+ additional_data(2).type=string; \
+ additional_data(2).meaning=Command executed; \
+ additional_data(2).data=$5; \
  last
 
 #LOG:Jan 15 09:53:11 12.34.56.78 sudo:   ekwong : user NOT in sudoers ; TTY=pts/2 ; PWD=/ ; USER=root ; COMMAND=/bin/ls
-regex=(\S+) : user NOT in sudoers . TTY=\S+ . PWD=.+ . USER=(\S+) . COMMAND=(.+); \
+regex=(\S+) : user NOT in sudoers \; TTY=(\S+) \; PWD=(.+) \; USER=(\S+) \; COMMAND=(.+); \
  classification.text=SUDO from Unauthorized User; \
  id=2701; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sudo; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
  assessment.impact.severity=medium; \
- assessment.impact.description=Unauthorized user $1 tried to execute the command '$3' as $2.;\
+ assessment.impact.description=Unauthorized user $1 tried to execute the command '$5' as $4.;\
  source(0).user.category=os-device; \
  source(0).user.user_id(0).type=original-user; \
  source(0).user.user_id(0).name=$1;  \
  target(0).user.category = os-device; \
  target(0).user.user_id(0).type=target-user; \
- target(0).user.user_id(0).name=$2; \
+ target(0).user.user_id(0).name=$4; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Source device; \
+ additional_data(0).data=$2; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Working directory; \
+ additional_data(1).data=$3; \
+ additional_data(2).type=string; \
+ additional_data(2).meaning=Command executed; \
+ additional_data(2).data=$5; \
  last
