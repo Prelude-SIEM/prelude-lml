@@ -25,7 +25,7 @@
 #LOG:Feb 24 13:19:49 c vpopmail[9505]: vchkpw: vpopmail user not found temp@alexus.org:66.181.160.250
 #LOG:Jan 14 17:30:13 spotk vpopmail[28425]: vchkpw: vpopmail user not found toto@:192.168.100.50
 regex=vchkpw: vpopmail user not found (\S+):([\d\.]+); \
- classification.text=vpopmail - no such user; \
+ classification.text=Mail server unknown user; \
  id=2100; \
  revision=1; \
  analyzer(0).name=vpopmail; \
@@ -49,9 +49,9 @@ regex=vchkpw: vpopmail user not found (\S+):([\d\.]+); \
 
 #LOG:Jan 14 17:24:54 spotk vpopmail[28359]: vchkpw: password fail xxx@spotk.net:127.0.0.1
 regex=vchkpw: password fail (\S+):([\d\.]+); \
- classification.text=vpopmail - bad password for this user; \
+ classification.text=Mail server user login failed; \
  id=2101; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=vpopmail; \
  analyzer(0).manufacturer=inter7; \
  analyzer(0).class=Administration; \

@@ -27,7 +27,7 @@
 regex=Accepted (\S+) for root from ([\d\.]+) port (\d+); \
  classification.text=Admin login successful; \
  id=1900; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -47,13 +47,16 @@ regex=Accepted (\S+) for root from ([\d\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=root; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last;
 
 #LOG:Dec 10 10:33:19 itguxweb2 sshd[29738]: Accepted password for ekwong from 12.34.56.78 port 39852 ssh2
 regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+); \
  classification.text=User login successful; \
  id=1901; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -73,6 +76,9 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last
 
 ################
@@ -83,7 +89,7 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+); \
 regex=Failed (\S+) for root from ([\d\.]+) port (\d+); \
  classification.text=Admin login failed; \
  id=1902; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -103,13 +109,16 @@ regex=Failed (\S+) for root from ([\d\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=root; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last
 
 #LOG:Dec  9 21:29:56 devel5 sshd[17554]: Failed password for akarade from 12.34.56.78 port 4214
 regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+); \
  classification.text=User login failed; \
  id=1903; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -129,6 +138,9 @@ regex=Failed (\S+) for (?!root)(\S+) from ([\d\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last
 
 ##############################################
@@ -169,7 +181,7 @@ regex=(Illegal|Invalid) user (\S+) from ([\d\.]+); \
 regex=User (\S+) not allowed because (.*)listed in (\w+); \
  classification.text=User login failed with a denied user; \
  id=1905; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -186,6 +198,12 @@ regex=User (\S+) not allowed because (.*)listed in (\w+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$1; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=ACL; \
+ additional_data(0).data=$3; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Failure reason; \
+ additional_data(1).data=$2 listed in $3; \
  last
 
 ##################################################################
@@ -198,7 +216,7 @@ regex=User (\S+) not allowed because (.*)listed in (\w+); \
 regex=Did not receive identification string from ([\d\.]+); \
  classification.text=Server recognition; \
  id=1906; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -214,6 +232,9 @@ regex=Did not receive identification string from ([\d\.]+); \
  target(0).service.name=ssh; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Failure reason; \
+ additional_data(0).data=Did not receive identification string; \
  last
 
 #########################################################################
@@ -255,7 +276,7 @@ regex=ROOT LOGIN REFUSED FROM ([\d\.]+); \
 regex=Accepted (\S+) for root from ([A-Fa-f\d:\.]+) port (\d+); \
  classification.text=User login successful; \
  id=1908; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -275,6 +296,9 @@ regex=Accepted (\S+) for root from ([A-Fa-f\d:\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=root; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last;
 
 # Copyright (C) 2005 John R Shannon <john@johnrshannon.com>
@@ -284,7 +308,7 @@ regex=Accepted (\S+) for root from ([A-Fa-f\d:\.]+) port (\d+); \
 regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:\.]+) port (\d+); \
  classification.text=User login successful; \
  id=1909; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -304,6 +328,9 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=root; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
  last;
 
 #LOG:Jan 14 08:19:21 ras sshd[22774]: input_userauth_request: invalid user remote-mail
@@ -312,14 +339,14 @@ regex=Accepted (\S+) for (?!root)(\S+) from ([A-Fa-f\d:\.]+) port (\d+); \
 regex=input_userauth_request: (illegal|invalid) user (\S+); \
  classification.text=Invalid user in authentication request; \
  id=1910; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.type=user; \
- assessment.impact.description=General purpose authentication request was blocked. Reason: invalid user $1; \
+ assessment.impact.description=General purpose authentication request was blocked. Reason: invalid user $2; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  target(0).service.port=22; \
@@ -328,7 +355,10 @@ regex=input_userauth_request: (illegal|invalid) user (\S+); \
  target(0).service.iana_protocol_number=6; \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
- target(0).user.user_id(0).name=$1; \
+ target(0).user.user_id(0).name=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Failure reason; \
+ additional_data(0).data=$1 user; \
  last
 
 #No log sample; please submit
@@ -361,7 +391,7 @@ regex=input_userauth_request: (.+); \
 regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([\d\.]+) port (\d+); \
  classification.text=User login failed; \
  id=1912; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -381,13 +411,19 @@ regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([\d\.]+) port (\d+); \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$3; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Failure reason; \
+ additional_data(1).data=$2 user; \
  last
 
 #LOG:Jan 14 11:29:17 ras sshd[18163]: Failed publickey for invalid user fred from fec0:0:201::3 port 62788 ssh2
 regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:\.]+) port (\d+); \
  classification.text=SSH Remote login failed; \
  id=1913; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=sshd; \
  analyzer(0).manufacturer=OpenSSH; \
  analyzer(0).class=Remote Login; \
@@ -407,6 +443,12 @@ regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:\.]+) port (
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Authentication method; \
+ additional_data(0).data=$1; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Failure reason; \
+ additional_data(1).data=$2 user; \
  last
 
 # Copyright (C) 2005 G Ramon Gomez <gene at gomezbrothers dot com>
