@@ -181,3 +181,5 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to \[(\S+)\
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
  last
+
+#LOG:Dec  6 22:06:26 mail httpd[10812]: [error] [client 202.58.85.8] mod_security: Access denied with code 403. Error parsing POST parameters: Error normalizing parameter value: Invalid URL encoding detected: invalid characters used [hostname "www.gomezbros.com"] [uri "/modules.php"] [unique_id 87ZxND-IXCYAACo8LCYAAAAP]

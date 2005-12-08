@@ -206,7 +206,7 @@ regex=(Acceptin|Squid|Disabled|DENIED);	include = squid.rules;
 regex=sshd;				include = ssh.rules;
 regex=sudo;				include = sudo.rules;
 regex=tripwire;				include = tripwire.rules;
-regex=lan @Group:;			include = vigor.rules;
+regex=[wl]an @Group:;			include = vigor.rules;
 regex=vpopmail;				include = vpopmail.rules;
 regex=webmin;				include = webmin.rules;
 regex=ftpd;				include = wu-ftp.rules;

@@ -71,7 +71,6 @@ regex=([wl]an) @Group:Rule=(\d+:\d+) b ([\d\.]+),(\w+) -> ([\d\.]+),(\w+)    PR 
 # 2) ICMP :
 
 #LOG:Apr 27 00:38:25 81.2.127.129 r00t3r: 293:17:47.390 lan @Group:Rule=0:10 b 66.112.44.26 -> 81.2.127.142    PR icmp len 20 28 icmp 8/0 IN
-# I suspect that $7 and $8 are ICMP code and type...can anyone confirm?
 regex=([wl]an) @Group:Rule=(\d+:\d+) b ([\d\.]+) -> ([\d\.]+)    PR icmp len (\d+) (\d+) icmp (\d+)/(\d+) (IN|OUT); \
  classification.text=ICMP Packet dropped; \
  id=2001; \
@@ -99,7 +98,13 @@ regex=([wl]an) @Group:Rule=(\d+:\d+) b ([\d\.]+) -> ([\d\.]+)    PR icmp len (\d
  additional_data(2).type=integer; \
  additional_data(2).meaning=Payload size (Kb); \
  additional_data(2).data=$6; \
- additional_data(7).type=string; \
- additional_data(7).meaning=Direction; \
- additional_data(7).data=$9; \
+ additional_data(3).type=integer; \
+ additional_data(3).meaning=ICMP type; \
+ additional_data(3).data=$7; \
+ additional_data(4).type=integer; \
+ additional_data(4).meaning=ICMP code; \
+ additional_data(4).data=$8; \
+ additional_data(5).type=string; \
+ additional_data(5).meaning=Direction; \
+ additional_data(5).data=$9; \
  last;
