@@ -53,13 +53,13 @@ regex=(\S+) TWReport \S+ \d+ V:\d+ S:\d+ A:(?!0)(\d+); \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Integrity check ran successfully, warning: $2 file(s) added; \
- target(0).decoy=no
+ target(0).decoy=no; \
  additional_data(0).type=string; \
  additional_data(0).meaning=Report file; \
  additional_data(0).data=$1; \
  additional_data(1).type=integer; \
  additional_data(1).meaning=Files added; \
- additional_data(1).data=$2; \
+ additional_data(1).data=$2; 
 
 # No log sample; please submit
 regex=(\S+) TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
@@ -73,13 +73,13 @@ regex=(\S+) TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:(?!0)(\d+); \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Integrity check ran successfully, warning: $2 files removed; \
- target(0).decoy=no
+ target(0).decoy=no; \
  additional_data(0).type=string; \
  additional_data(0).meaning=Report file; \
  additional_data(0).data=$1; \
  additional_data(1).type=integer; \
  additional_data(1).meaning=Files deleted; \
- additional_data(1).data=$2; \
+ additional_data(1).data=$2; 
 
 # No log sample; please submit
 regex=(\S+) TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:\d+ C:(?!0)(\d+); \
@@ -93,10 +93,10 @@ regex=(\S+) TWReport \S+ \d+ V:\d+ S:\d+ A:\d+ R:\d+ C:(?!0)(\d+); \
  assessment.impact.type=file; \
  assessment.impact.completion=succeeded; \
  assessment.impact.description=Integrity check ran, warning: $2 files modified; \
- target(0).decoy=no
+ target(0).decoy=no; \
  additional_data(0).type=string; \
  additional_data(0).meaning=Report file; \
  additional_data(0).data=$1; \
  additional_data(1).type=integer; \
  additional_data(1).meaning=Files modified; \
- additional_data(1).data=$2; \
+ additional_data(1).data=$2; 
