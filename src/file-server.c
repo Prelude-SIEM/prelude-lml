@@ -77,6 +77,7 @@
  * Logfile metadata stuff.
  */
 #define METADATA_MAXSIZE 8192
+#define LOG_LINE_MAXSIZE 65535
 
 
 #define LOGFILE_DELETION_CLASS "Logfile deletion"
@@ -105,9 +106,8 @@ typedef struct {
         time_t last_rotation_time;
         time_t last_rotation_time_interval;
         
-        size_t index;
-        char buf[1024];
-
+        prelude_string_t *buf;
+        
         off_t need_more_read;
         off_t last_size;
 
@@ -326,7 +326,7 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
         if ( ignore_metadata )
                 return 0;
         
-        len = snprintf(buf, sizeof(buf), "%" PRELUDE_PRIu64 ":%s\n", offset, monitor->buf);
+        len = snprintf(buf, sizeof(buf), "%" PRELUDE_PRIu64 ":%s\n", offset, prelude_string_get_string(monitor->buf));
         if ( len >= sizeof(buf) || len < 0 )
                 return -1;
         
@@ -449,66 +449,52 @@ static int file_metadata_open(monitor_fd_t *monitor)
 
 
 /*
- * This function return -1 if it couldn't read a full syslog line.
+ * This function return -1 if it couldn't read a full syslog line,
+ * or if an error occured.
  *
  * The size of the whole syslog line is returned otherwise (not only what
  * has been read uppon this call).
- *
- * rlen is always updated to reflect how many byte has been read.
  */
-static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen) 
+static off_t read_logfile(monitor_fd_t *fd, off_t available) 
 {
         int ret;
-        size_t len, i = 0;
+        size_t i = 0;
+        prelude_bool_t ignore_remaining = FALSE;
         
-        if ( available == 0 ) {
-                *rlen = 0;
+        if ( available == 0 )
                 return -1;
-        }
-        
-        len = fd->index;
-        
+                
         while ( 1 ) {
-                /*
-                 * check if our buffer isn't big enough,
-                 * and truncate if it is.
-                 */
-                if ( fd->index == sizeof(fd->buf) ) {
-                        fd->buf[fd->index - 1] = '\0';
-                        prelude_log(PRELUDE_LOG_WARN, "line too long (syslog specify 1024 characters max).\n");
-                        break;
+                if ( i == LOG_LINE_MAXSIZE ) {
+                        prelude_log(PRELUDE_LOG_WARN, "line too long (internal limit of %u characters).\n",
+                                    LOG_LINE_MAXSIZE);
+                        ignore_remaining = TRUE;
                 }
-
-                ret = getc(fd->fd);
+                
+                ret = getc(fd->fd);                
                 if ( ret == EOF ) {
-                        *rlen = i;
                         clearerr(fd->fd);
                         return -1;
                 }
 
                 i++;
-                len++;
                 
-                if ( ret == '\n' ) {
-                        fd->buf[fd->index] = '\0';
+                if ( ret == '\n' )
                         break;
+
+                if ( ! ignore_remaining ) {
+                        ret = prelude_string_ncat(fd->buf, (char *) &ret, 1);
+                        if ( ret < 0 ) {
+                                prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
+                                return -1;
+                        }
                 }
                 
-                fd->buf[fd->index++] = (char) ret;
-                
-                if ( i == available ) {
-                        *rlen = i;
+                if ( i == available )
                         return -1;
-                }
         }
 
-        /*
-         * sucess.
-         */
-        *rlen = i;
-        fd->index = 0;
-        
-        return len;        
+        return i;       
 }
 
 
@@ -516,8 +502,8 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available, off_t *rlen)
 
 static int check_logfile_data(monitor_fd_t *monitor, struct stat *st) 
 {
+        off_t len, ret;
         int eventno = 0;
-        off_t len, ret, rlen;
         
         if ( ! monitor->need_more_read && st->st_size == monitor->last_size ) 
                 return 0;
@@ -529,32 +515,27 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
-
-        while ( (ret = read_logfile(monitor, len, &rlen)) != -1 ) {
+        
+        while ( (ret = read_logfile(monitor, len)) != -1 ) {
+                                
                 eventno++;
                 config.line_processed++;
-                
-                lml_dispatch_log(monitor->source, monitor->buf, ret);
+
+                lml_dispatch_log(monitor->source,
+                                 prelude_string_get_string(monitor->buf),
+                                 prelude_string_get_len(monitor->buf));
+
                 file_metadata_save(monitor, st->st_size - len);
+                len -= prelude_string_get_len(monitor->buf) + 1;
                 
-                len -= rlen;
+                prelude_string_clear(monitor->buf);
         }
         
         /*
          * if len isn't 0, it mean we got EOF before reading every new byte,
          * we want to retry reading even if st_size isn't modified then.
          */
-        monitor->need_more_read = len - rlen;
-        
-        if ( monitor->need_more_read ) {
-                prelude_log(PRELUDE_LOG_WARN,
-                            "If you hit this point, please contact the Prelude mailing list\n"            \
-                            "and include the following information in your report: st_size=%" PRELUDE_PRIu64 "\n" \
-                            "remaining=%" PRELUDE_PRIu64 ", rlen=%" PRELUDE_PRIu64 ", len=%" PRELUDE_PRIu64 "\n",
-                            st->st_size, monitor->need_more_read, rlen, len);
-
-                abort();
-        }
+        monitor->need_more_read = len;
 
         return eventno;
 }
@@ -575,16 +556,26 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 
         new->source = ls;
 
-        ret = file_metadata_open(new);
+        ret = prelude_string_new(&new->buf);
         if ( ret < 0 ) {
                 free(new);
                 return NULL;
         }
-    
+
+        ret = file_metadata_open(new);
+        if ( ret < 0 ) {
+                prelude_string_destroy(new->buf);
+                free(new);
+                return NULL;
+        }
+                
 #ifdef HAVE_FAM
         ret = fam_setup_monitor(new);
-        if ( ret < 0 )
+        if ( ret < 0 ) {
+                prelude_string_destroy(new->buf);
+                free(new);
                 return NULL;
+        }
 #endif
             
         prelude_list_add(&inactive_fd_list, &new->list);
@@ -632,7 +623,6 @@ static int monitor_open(monitor_fd_t *monitor)
                         return -1;
         }
         
-        monitor->index = 0;
         monitor->need_more_read = 0;
         
         prelude_list_del(&monitor->list);
