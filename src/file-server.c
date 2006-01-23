@@ -556,15 +556,8 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 
         new->source = ls;
 
-        ret = prelude_string_new(&new->buf);
-        if ( ret < 0 ) {
-                free(new);
-                return NULL;
-        }
-
         ret = file_metadata_open(new);
         if ( ret < 0 ) {
-                prelude_string_destroy(new->buf);
                 free(new);
                 return NULL;
         }
@@ -572,7 +565,6 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 #ifdef HAVE_FAM
         ret = fam_setup_monitor(new);
         if ( ret < 0 ) {
-                prelude_string_destroy(new->buf);
                 free(new);
                 return NULL;
         }
@@ -622,6 +614,12 @@ static int monitor_open(monitor_fd_t *monitor)
                 if ( ret < 0 )
                         return -1;
         }
+
+        ret = prelude_string_new(&monitor->buf);
+        if ( ret < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "could not create string object: %s.\n", prelude_strerror(ret));
+                return ret;
+        }
         
         monitor->need_more_read = 0;
         
@@ -635,8 +633,11 @@ static int monitor_open(monitor_fd_t *monitor)
 
 static void monitor_close(monitor_fd_t *monitor)
 {
+        prelude_string_destroy(monitor->buf);
+
         fclose(monitor->fd);
         monitor->fd = NULL;
+
         prelude_list_del(&monitor->list);
         prelude_list_add_tail(&inactive_fd_list, &monitor->list);
 }
