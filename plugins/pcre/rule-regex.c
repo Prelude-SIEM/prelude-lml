@@ -188,8 +188,10 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
         pcre_rule_container_t *child;
         
         ret = match_rule_single(rule, state, log_entry);
-        if ( ret < 0 )
+        if ( ret < 0 ) {
+                destroy_idmef_state(state);
                 return -1;
+        }
         
         prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
