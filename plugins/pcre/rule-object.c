@@ -412,7 +412,6 @@ int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idme
                 if ( ret < 0 ) {
                         prelude_perror(ret, "idmef path set failed for %s",
                                        idmef_path_get_name(rule_object->object, -1));
-                        idmef_message_destroy(*message);
                         referenced_value_destroy_content(olist);
                         return -1;
                 }
