@@ -16,6 +16,7 @@ noinst_LTLIBRARIES = libmissing.la
 
 libmissing_la_SOURCES =
 libmissing_la_LIBADD = @LTLIBOBJS@
+noinst_HEADERS =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -88,6 +89,24 @@ MOSTLYCLEANFILES += stdbool.h stdbool.h-t
 
 ## end   gnulib module stdbool
 
+## begin gnulib module sys_socket
+
+BUILT_SOURCES += $(SYS_SOCKET_H)
+EXTRA_DIST += socket_.h
+
+# We need the following in order to create <sys/socket.h> when the system
+# doesn't have one that works with the given compiler.
+sys/socket.h: socket_.h
+	test -d sys || mkdir sys
+	cp $(srcdir)/socket_.h $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += sys/socket.h sys/socket.h-t
+
+mostlyclean-local:
+	-rmdir sys 2>/dev/null
+
+## end   gnulib module sys_socket
+
 ## begin gnulib module time_r
 
 libmissing_la_SOURCES += time_r.h
@@ -105,6 +124,12 @@ libmissing_la_SOURCES += printf-args.h printf-parse.h vasnprintf.h
 libmissing_la_SOURCES += xsize.h
 
 ## end   gnulib module xsize
+
+## begin gnulib module dummy
+
+libmissing_la_SOURCES += dummy.c
+
+## end   gnulib module dummy
 
 
 # Makefile.am ends here

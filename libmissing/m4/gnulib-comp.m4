@@ -18,6 +18,7 @@
 # any checks for libraries, header files, types and library functions.
 AC_DEFUN([gl_EARLY],
 [
+  AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([AC_GNU_SOURCE])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
 ])
@@ -26,7 +27,7 @@ AC_DEFUN([gl_EARLY],
 # "Check for header files, types and library functions".
 AC_DEFUN([gl_INIT],
 [
-AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
+  AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_FUNC_ALLOCA
   dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   gl_GETADDRINFO
@@ -37,9 +38,10 @@ AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
   gl_C_RESTRICT
   gl_SIZE_MAX
   gl_FUNC_SNPRINTF
-  gl_SOCKLEN_T
+  gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_FUNC_STRDUP
+  gl_HEADER_SYS_SOCKET
   gl_TIME_R
   gl_FUNC_VASNPRINTF
   gl_XSIZE
@@ -50,6 +52,7 @@ AM_CONDITIONAL([GL_COND_LIBTOOL], [true])
 AC_DEFUN([gl_FILE_LIST], [
   lib/alloca_.h
   lib/asnprintf.c
+  lib/dummy.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getaddrinfo.h
@@ -66,6 +69,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/size_max.h
   lib/snprintf.c
   lib/snprintf.h
+  lib/socket_.h
   lib/stdbool_.h
   lib/strdup.c
   lib/strdup.h
@@ -96,6 +100,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdbool.m4
   m4/stdint_h.m4
   m4/strdup.m4
+  m4/sys_socket_h.m4
   m4/time_r.m4
   m4/vasnprintf.m4
   m4/wchar_t.m4
