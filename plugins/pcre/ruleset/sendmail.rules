@@ -311,3 +311,5 @@ regex=(\S+): ([\w\-\.]+) \[([\d\.]+)\]: EXPN (\S+) \[rejected\]; \
  additional_data(0).meaning=Session ID; \
  additional_data(0).data=$1; \
  last;
+
+#LOG:Dec  8 12:42:37 mail sendmail[21997]: jB8KgaTJ021997: Authentication-Warning: mail.gomezbrothers.com: saraht owned process doing -bs

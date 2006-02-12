@@ -37,7 +37,7 @@ regex=device (\S+) entered promiscuous mode; \
  assessment.impact.type=other; \
  assessment.impact.severity=low; \
  assessment.impact.description=A sniffer is probably running on this machine; \
- target(0).interface = $1; \
+ target(0).interface=$1; \
  last
 
 # Copyright (C) 2003 Laurent Oudot <oudot.laurent@wanadoo.fr>

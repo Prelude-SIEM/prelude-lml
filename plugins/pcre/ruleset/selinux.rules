@@ -21,6 +21,13 @@
 #
 #####
 
+#####
+#
+# The rules included here are EXPERIMENTAL.
+#
+#####
+
+
 #LOG:Nov 18 10:12:08 new-selinux2 kernel: avc:  denied  { relabelto } for  pid=12296 exe=/usr/bin/chcon name=shadow dev=03:02 ino=230036 scontext=takeuchi:user_r:user_t tcontext=system_u:object_r:shadow_t tclass=file
 regex=denied  { ([\w\ ]+) } for  pid=(\d+) exe=(\S+) name=(shadow|passwd|group) dev=\S+ ino=\S+ scontext=(\S+):(\S+):\S+ tcontext=(\S+):\S+:; \
  classification.text=RBAC authentication file $1 failure; \
