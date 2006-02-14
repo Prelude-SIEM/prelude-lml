@@ -169,7 +169,6 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_l
 
 static void destroy_idmef_state(pcre_state_t *state)
 {
-        printf("DESTROY ST\n");
         if ( state->idmef ) {
                 idmef_message_destroy(state->idmef);
                 state->idmef = NULL;
