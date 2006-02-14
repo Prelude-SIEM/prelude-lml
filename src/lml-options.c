@@ -446,7 +446,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
         
-        prelude_option_add(opt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-srvr",
+        prelude_option_add(opt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-server",
                            "address:port pair to listen to syslog to UDP messages (default port 514)", 
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
         
