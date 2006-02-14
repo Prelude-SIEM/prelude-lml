@@ -52,15 +52,17 @@ regex=[Dd][Rr][Oo][Pp].*PROTO=(UDP|TCP|ICMP|AH|ESP); id=1310; \
 	classification.text = $1 packet dropped;   \
 	assessment.impact.completion = failed; \
  	assessment.impact.type = other; \
-	assessment.impact.severity = medium; silent;
+	assessment.impact.severity = medium; chained; silent;
 
 regex=[Aa][Cc][Cc][Ee][Pp][Tt].*PROTO=(UDP|TCP|ICMP|AH|ESP); id=1311; \
 	classification.text = $1 packet accepted; \
 	assessment.impact.completion = succeeded; \
  	assessment.impact.type = other; \
-	assessment.impact.severity = low; silent;
+	assessment.impact.severity = low; chained; silent;
 
 
+
+#LOG: Feb 14 19:00:36 awale kernel: Drop IN=eth0 OUT= MAC=ff:ff:ff:ff:ff:ff:00:30:48:85:40:bd:08:00 SRC=194.246.101.184 DST=194.246.101.255 LEN=78 TOS=0x00 PREC=0x00 TTL=128 ID=46899 PROTO=UDP SPT=137 DPT=137 LEN=58
 
 #LOG: Oct 16 11:16:51 blah kernel: Drop IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=48 TOS=0x00 PREC=0x00 TTL=113 ID=12776 DF PROTO=TCP SPT=3979 DPT=139 WINDOW=65535 RES=0x00 SYN URGP=0
 
