@@ -169,6 +169,7 @@ static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_l
 
 static void destroy_idmef_state(pcre_state_t *state)
 {
+        printf("DESTROY ST\n");
         if ( state->idmef ) {
                 idmef_message_destroy(state->idmef);
                 state->idmef = NULL;
@@ -188,10 +189,8 @@ static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
         pcre_rule_container_t *child;
         
         ret = match_rule_single(rule, state, log_entry);
-        if ( ret < 0 ) {
-                destroy_idmef_state(state);
+        if ( ret < 0 )
                 return -1;
-        }
         
         prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
@@ -250,13 +249,11 @@ int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls,
         memset(&state, 0, sizeof(state));
         
         ret = match_rule_list(root, &state, ls, log_entry, match_flags);
-        if ( ret < 0 )
-                return -1;
-        
+                
         if ( state.idmef )
                 idmef_message_destroy(state.idmef);
 
-        return 0;
+        return ret;
 }
 
 
