@@ -457,6 +457,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
  */
 static off_t read_logfile(monitor_fd_t *fd, off_t available) 
 {
+        char c;
         int ret;
         size_t i = 0;
         prelude_bool_t ignore_remaining = FALSE;
@@ -483,7 +484,9 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
                         break;
 
                 if ( ! ignore_remaining ) {
-                        ret = prelude_string_ncat(fd->buf, (char *) &ret, 1);
+                        c = (char) ret;
+                        
+                        ret = prelude_string_ncat(fd->buf, &c, 1);
                         if ( ret < 0 ) {
                                 prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
                                 return -1;
