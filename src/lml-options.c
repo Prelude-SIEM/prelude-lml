@@ -217,13 +217,8 @@ static int set_text_output(prelude_option_t *opt, const char *arg, prelude_strin
         if ( ret < 0 )
                 return ret;
 
-        if ( strcmp(arg, "stdout") == 0 ) {
+        if ( strcmp(arg, "-") == 0 ) {
                 prelude_io_set_file_io(config.text_output_fd, stdout);
-                return 0;
-        }
-
-        else if ( strcmp(arg, "stderr") == 0 ) {
-                prelude_io_set_file_io(config.text_output_fd, stderr);
                 return 0;
         }
 
