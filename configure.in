@@ -24,6 +24,7 @@ AM_PROG_LIBTOOL
 
 AM_PROG_LEX
 AC_PROG_YACC
+AC_SYS_LARGEFILE
 
 if test "x$prefix" = "xNONE"; then
    prefix="/usr/local"
