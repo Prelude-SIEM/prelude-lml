@@ -70,7 +70,7 @@ static struct timeval start;
 extern lml_config_t config;
 static char **global_argv;
 static prelude_option_t *lml_root_optlist;
-static volatile sig_atomic_t got_sighup = 0;
+static volatile sig_atomic_t got_signal = 0;
 
 
 
@@ -95,12 +95,14 @@ static void print_stats(struct timeval *end)
 
 static void sig_handler(int signum)
 {
+        got_signal = signum;      
+}
+
+
+static void handle_signal(void)
+{
         size_t i;
         
-        signal(signum, SIG_DFL);
-        
-        prelude_log(PRELUDE_LOG_WARN, "\n\nCaught signal %d.\n", signum);
-
         for ( i = 0; i < config.udp_nserver; i++ )
                 udp_server_close(config.udp_server[i]);
         
@@ -109,32 +111,9 @@ static void sig_handler(int signum)
 
 
 
-
-static void sighup_handler(int signum) 
-{
-        /*
-         * re-establish signal handler
-         */
-        signal(signum, sighup_handler);
-        
-        /*
-         * We can't directly restart LML from the signal handler.
-         * It'll be restarted as soon as the main loop poll the
-         * got_sighup variable.
-         */
-        got_sighup = 1;
-}
-
-
-
-static void sig_stats_handler(int signum)
+static void handle_sigquit(void)
 {
         struct timeval end;
-
-        /*
-         * re-establish signal handler
-         */
-        signal(signum, sig_stats_handler);
         
         gettimeofday(&end, NULL);
         print_stats(&end);
@@ -142,14 +121,11 @@ static void sig_stats_handler(int signum)
 
 
 
-static void handle_sighup_if_needed(void) 
+static void handle_sighup(void) 
 {
         int ret;
         size_t i;
-        
-        if ( ! got_sighup )
-                return;
-        
+
         prelude_log(PRELUDE_LOG_WARN, "- Restarting Prelude LML (%s).\n", global_argv[0]);
 
         /*
@@ -166,6 +142,26 @@ static void handle_sighup_if_needed(void)
                 prelude_log(PRELUDE_LOG_ERR, "error re-executing lml\n");
                 return;
         }
+}
+
+
+
+static void handle_signal_if_needed(void)
+{
+        if ( ! got_signal )
+                return;
+
+        if ( got_signal == SIGQUIT || got_signal == SIGUSR1 )
+                handle_sigquit();
+        
+        prelude_log(PRELUDE_LOG_WARN, "signal %d received, %s prelude-lml.\n", got_signal,
+                    got_signal == SIGHUP ? "will restart" : "terminating");
+        
+        if ( got_signal == SIGHUP )
+                handle_sighup();
+        
+        handle_signal();
+        got_signal = 0;
 }
 
 
@@ -219,7 +215,7 @@ static void wait_for_event(void)
         int ret;
         size_t i;
         fd_set fds;
-        struct timeval tv, start, end;
+        struct timeval tv, lstart, end;
         int file_event_fd, udp_event_fd, max = 0;
         
         FD_ZERO(&fds);
@@ -236,11 +232,12 @@ static void wait_for_event(void)
                 FD_SET(udp_event_fd, &fds);
                 max = MAX(max, udp_event_fd);
         }
-        
+
         gettimeofday(&start, NULL);
+        gettimeofday(&lstart, NULL);
         
         while ( 1 ) {
-                handle_sighup_if_needed();
+                handle_signal_if_needed();
                 
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
@@ -256,8 +253,8 @@ static void wait_for_event(void)
                 
                 gettimeofday(&end, NULL);
                 
-                if ( ret == 0 || end.tv_sec - start.tv_sec >= 1 ) {
-                        gettimeofday(&start, NULL);
+                if ( ret == 0 || end.tv_sec - lstart.tv_sec >= 1 ) {
+                        gettimeofday(&lstart, NULL);
                         prelude_timer_wake_up();
 
                         if ( file_event_fd < 0 )
@@ -289,7 +286,16 @@ int main(int argc, char **argv)
 {
         int ret;
         struct timeval end;
-
+        struct sigaction action;
+        
+        /*
+         * make sure we ignore sighup until acceptable.
+         */
+        action.sa_flags = 0;
+        action.sa_handler = SIG_IGN;
+        sigemptyset(&action.sa_mask);
+        sigaction(SIGHUP, &action, NULL);
+        
         memset(&start, 0, sizeof(start));
         memset(&end, 0, sizeof(end));
         
@@ -312,14 +318,25 @@ int main(int argc, char **argv)
         ret = lml_options_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )
                 exit(1);
+
+        /*
+         * setup signal handling
+         */
+        action.sa_flags = 0;
+        sigemptyset(&action.sa_mask);
+        action.sa_handler = sig_handler;
         
-        signal(SIGTERM, sig_handler);
-        signal(SIGINT, sig_handler);
-        signal(SIGQUIT, sig_handler);
-        signal(SIGABRT, sig_handler);
-        signal(SIGHUP, sighup_handler);
-        signal(SIGUSR1, sig_stats_handler);
-        signal(SIGQUIT, sig_stats_handler);
+#ifdef SA_INTERRUPT
+        action.sa_flags |= SA_INTERRUPT;
+#endif
+
+        sigaction(SIGTERM, &action, NULL);
+        sigaction(SIGINT, &action, NULL);
+        sigaction(SIGQUIT, &action, NULL);
+        sigaction(SIGABRT, &action, NULL);
+        sigaction(SIGUSR1, &action, NULL);
+        sigaction(SIGQUIT, &action, NULL);
+        sigaction(SIGHUP, &action, NULL);
         
         file_server_start_monitoring();
 
@@ -334,7 +351,7 @@ int main(int argc, char **argv)
                 gettimeofday(&start, NULL);
                                 
                 do {
-                        handle_sighup_if_needed();
+                        handle_signal_if_needed();
                         ret = file_server_wake_up();
                         
                         if ( ! config.batch_mode )
