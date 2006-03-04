@@ -124,7 +124,7 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
         const char *errptr;
         regex_entry_t *entry;
         prelude_plugin_generic_t *plugin;
-        
+
         compiled = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! compiled ) {
                 prelude_log(PRELUDE_LOG_WARN, "%s:%d : unable to compile: %s.\n", REGEX_CONF, line, errptr);
@@ -167,6 +167,7 @@ static int regex_create_entry(regex_list_t *list, int line, const char *source,
 regex_list_t *regex_init(const char *source)
 {
         FILE *fd;
+        size_t len;
         char buf[1024];
         int line = 1, ret;
         regex_list_t *conf;
@@ -224,6 +225,9 @@ regex_list_t *regex_init(const char *source)
                         continue;
                 }
 
+                for ( len = strlen(regex); len && regex[len - 1] == ' '; len--)
+                        regex[len - 1] = 0;                
+                
                 ret = regex_create_entry(conf, line, source, name, regex, options);
                 if ( ret < 0 )
                         continue;
