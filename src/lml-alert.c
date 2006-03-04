@@ -77,7 +77,7 @@ static int resolve_failed_fallback(idmef_node_t *node, const char *hostname)
                 
                 prelude_string_set_ref(string, hostname);
         } else {
-                ret = idmef_node_new_address(node, &address, -1);
+                ret = idmef_node_new_address(node, &address, IDMEF_LIST_APPEND);
                 if ( ret < 0 ) 
                         return ret;
 
@@ -112,7 +112,7 @@ static int fill_target_node_from_addrinfo(idmef_node_t *node, struct addrinfo *a
                                 return -1;
                 }
                 
-                ret = idmef_node_new_address(node, &addr, -1);
+                ret = idmef_node_new_address(node, &addr, IDMEF_LIST_APPEND);
                 if ( ret < 0 )
                         return -1;
 
@@ -222,7 +222,7 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
 
         target = idmef_alert_get_next_target(alert, NULL);
         if ( ! target ) {
-                ret = idmef_alert_new_target(alert, &target, -1);
+                ret = idmef_alert_new_target(alert, &target, IDMEF_LIST_APPEND);
                 if ( ret < 0 ) 
                         return ret;
         }
@@ -264,7 +264,7 @@ static int generate_additional_data(idmef_alert_t *alert, const char *meaning, c
         prelude_string_t *str;
         idmef_additional_data_t *adata;
 
-        ret = idmef_alert_new_additional_data(alert, &adata, -1);
+        ret = idmef_alert_new_additional_data(alert, &adata, IDMEF_LIST_APPEND);
         if ( ret < 0 )
                 return ret;
 
@@ -315,7 +315,7 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         }
 
         if ( idmef_analyzer )
-                idmef_alert_set_analyzer(alert, idmef_analyzer_ref(idmef_analyzer), 0);
+                idmef_alert_set_analyzer(alert, idmef_analyzer_ref(idmef_analyzer), IDMEF_LIST_PREPEND);
         
         source = lml_log_source_get_name(ls);
         if ( generate_additional_data(alert, "Log received from", source) < 0 )
