@@ -50,6 +50,8 @@ typedef struct {
         unsigned long line_processed;
 
         int warning_limit;
+        uid_t wanted_uid;
+        gid_t wanted_gid;
 } lml_config_t;
 
 #endif /* _LML_PCONFIG_H */

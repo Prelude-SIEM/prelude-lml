@@ -25,6 +25,7 @@
 #include "libmissing.h"
 
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -54,6 +55,78 @@
 lml_config_t config;
 static PRELUDE_LIST(source_list);
 static const char *config_file = PRELUDE_LML_CONF;
+
+
+
+static int drop_privilege(void)
+{
+        int ret;
+
+        if ( config.wanted_gid ) {
+                ret = setgid(config.wanted_gid);
+                if ( ret < 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "change to GID %d failed: %s.\n",
+                                    (int) config.wanted_gid, strerror(errno));
+                        return ret;
+                }
+                
+                ret = setgroups(1, &config.wanted_gid);
+                if ( ret < 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "removal of ancillary groups failed: %s.\n", strerror(errno));
+                        return ret;
+                }
+        }
+
+        
+        if ( config.wanted_uid ) {
+                ret = setuid(config.wanted_uid);
+                if ( ret < 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "change to UID %d failed: %s.\n",
+                                    (int) config.wanted_uid, strerror(errno));
+                        return ret;
+                }
+        }
+        
+        return 0;
+}
+
+
+
+
+static int check_file_access(const char *filename)
+{
+        int ret;
+        struct stat st;
+
+        ret = stat(filename, &st);
+        if ( ret < 0 ) {
+                if ( errno == ENOENT )
+                        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist.\n", filename);
+                else
+                        prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
+
+                return -1;
+        }
+
+        if ( ! config.wanted_uid && getuid() == 0 )
+                /* the user started LML as root using --user root */
+                return 0;
+        
+        if ( st.st_uid == config.wanted_uid && st.st_mode & S_IRUSR )
+                return 0;
+
+        if ( st.st_gid == config.wanted_gid && st.st_mode & S_IRGRP )
+                return 0;
+
+        if ( st.st_mode & S_IROTH )
+                return 0;
+
+        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading using to uid %d/gid %d.\n",
+                    filename, config.wanted_uid, config.wanted_gid);
+
+        return -1;
+}
+
 
 
 static int set_conf_file(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
@@ -247,6 +320,10 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
                 return 0;
         }
 
+        ret = check_file_access(arg);
+        if ( ret < 0 )
+                return 0;
+        
         ret = lml_log_source_new(&ls, context, arg);
         if ( ret < 0 )
                 return prelude_error_from_errno(errno);
@@ -346,6 +423,60 @@ static int set_format(prelude_option_t *opt, const char *arg, prelude_string_t *
 }
 
 
+
+static int set_user(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+{
+        uid_t uid;
+        const char *p;
+        struct passwd *pw;
+
+        for ( p = optarg; isdigit((int) *p); p++ );
+        
+        if ( *p == 0 )
+                uid = atoi(optarg);
+        else {
+                pw = getpwnam(optarg);
+                if ( ! pw ) {
+                        prelude_log(PRELUDE_LOG_ERR, "could not lookup user '%s'.\n", optarg);
+                        return -1;
+                }
+
+                uid = pw->pw_uid;
+        }
+
+        config.wanted_uid = uid;
+        
+        return 0;
+}
+
+
+static int set_group(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+{
+        gid_t gid;
+        const char *p;
+        struct group *grp;
+
+        for ( p = optarg; isdigit((int) *p); p++ );
+
+        if ( *p == 0 )
+                gid = atoi(optarg);
+        else {
+                grp = getgrnam(optarg);
+                if ( ! grp ) {
+                        prelude_log(PRELUDE_LOG_ERR, "could not lookup group '%s'.\n", optarg);
+                        return -1;
+                }
+
+                gid = grp->gr_gid;
+        }
+
+        config.wanted_gid = gid;
+        
+        return 0;
+}
+
+
+
 int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 {
         int ret;
@@ -364,6 +495,14 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Print version number", PRELUDE_OPTION_ARGUMENT_NONE,
                            print_version, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
+
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_CLI, 0, "user",
+                           "Set the user ID used by prelude-lml", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_user, NULL);
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
+        
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_CLI, 0, "group",
+                           "Set the group ID used by prelude-lml", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_group, NULL);
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
         
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
@@ -378,6 +517,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            set_daemon_mode, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_FIRST);
         
+        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
+                           "Write Prelude LML PID to specified file",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
+        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
+
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
                            "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_text_output, NULL);
@@ -390,13 +534,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Configuration file to use", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_conf_file, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
-        
-        prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'P', "pidfile",
-                           "Write Prelude LML PID to specified pidfile",
-                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_pidfile, NULL);
-        
-        prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
-                        
+                                
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
@@ -442,7 +580,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
         
-        prelude_option_add(opt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-server",
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-server",
                            "address:port pair to listen to syslog to UDP messages (default port 514)", 
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
         
@@ -459,11 +597,23 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
 
+        while ( ret < argc )
+                prelude_log(PRELUDE_LOG_WARN, "Unhandled command line argument: '%s'.\n", argv[ret++]);
+        
         if ( config.batch_mode && config.udp_nserver ) {
                 prelude_log(PRELUDE_LOG_WARN, "UDP server and batch modes can't be used together.\n");
                 return -1;
         }
 
+        if ( config.ignore_metadata && ! config.batch_mode ) {
+                prelude_log(PRELUDE_LOG_WARN, "--ignore-metadata is only supported in batch mode.\n");
+                return -1;
+        }
+
+        ret = drop_privilege();
+        if ( ret < 0 )
+                return -1;
+        
         if ( config.dry_run )
                 return 0;
         
