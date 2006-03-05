@@ -66,6 +66,9 @@ struct regex_data {
 };
 
 
+void _lml_handle_signal_if_needed(void);
+
+
 static struct timeval start;
 extern lml_config_t config;
 static char **global_argv;
@@ -146,7 +149,7 @@ static void handle_sighup(void)
 
 
 
-static void handle_signal_if_needed(void)
+void _lml_handle_signal_if_needed(void)
 {
         if ( ! got_signal )
                 return;
@@ -220,7 +223,7 @@ static void wait_for_event(void)
         
         FD_ZERO(&fds);
 
-        file_event_fd = file_server_get_event_fd();
+        file_event_fd = file_server_get_event_fd();        
         if ( file_event_fd >= 0 ) {
                 max = file_event_fd;
                 FD_SET(file_event_fd, &fds);
@@ -237,11 +240,11 @@ static void wait_for_event(void)
         gettimeofday(&lstart, NULL);
         
         while ( 1 ) {
-                handle_signal_if_needed();
+                _lml_handle_signal_if_needed();
                 
                 tv.tv_sec = 1;
                 tv.tv_usec = 0;
-
+                
                 ret = select(max + 1, &fds, NULL, NULL, &tv);
                 if ( ret < 0 ) {
                         if ( errno == EINTR )
@@ -256,7 +259,7 @@ static void wait_for_event(void)
                 if ( ret == 0 || end.tv_sec - lstart.tv_sec >= 1 ) {
                         gettimeofday(&lstart, NULL);
                         prelude_timer_wake_up();
-
+                        
                         if ( file_event_fd < 0 )
                                 file_server_wake_up();
                 }
@@ -349,9 +352,9 @@ int main(int argc, char **argv)
                 wait_for_event();
         else {
                 gettimeofday(&start, NULL);
-                                
+                
                 do {
-                        handle_signal_if_needed();
+                        _lml_handle_signal_if_needed();
                         ret = file_server_wake_up();
                         
                         if ( ! config.batch_mode )

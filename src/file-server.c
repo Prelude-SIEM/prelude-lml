@@ -120,6 +120,8 @@ typedef struct {
 
 
 
+void _lml_handle_signal_if_needed(void);
+
 
 #ifdef HAVE_FAM
 
@@ -532,6 +534,7 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
                 len -= prelude_string_get_len(monitor->buf) + 1;
                 
                 prelude_string_clear(monitor->buf);
+                _lml_handle_signal_if_needed();
         }
         
         /*
