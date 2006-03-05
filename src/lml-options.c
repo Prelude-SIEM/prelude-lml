@@ -53,7 +53,7 @@
 
 
 lml_config_t config;
-static PRELUDE_LIST(source_list);
+static prelude_bool_t have_file = FALSE;
 static const char *config_file = PRELUDE_LML_CONF;
 
 
@@ -121,7 +121,7 @@ static int check_file_access(const char *filename)
         if ( st.st_mode & S_IROTH )
                 return 0;
 
-        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading using to uid %d/gid %d.\n",
+        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading to uid %d/gid %d.\n",
                     filename, config.wanted_uid, config.wanted_gid);
 
         return -1;
@@ -314,15 +314,9 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
         int ret;
         lml_log_source_t *ls;
 
-        ret = access(arg, R_OK);
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist or have wrong permissions.\n", arg);
-                return 0;
-        }
-
         ret = check_file_access(arg);
         if ( ret < 0 )
-                return 0;
+                return 0; /* ignore error */
         
         ret = lml_log_source_new(&ls, context, arg);
         if ( ret < 0 )
@@ -334,7 +328,9 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
         ret = file_server_monitor_file(ls);
         if ( ret < 0 ) 
                 return ret;
-                
+
+        have_file = TRUE;
+        
         return 0;
 }
 
@@ -608,6 +604,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         if ( config.ignore_metadata && ! config.batch_mode ) {
                 prelude_log(PRELUDE_LOG_WARN, "--ignore-metadata is only supported in batch mode.\n");
+                return -1;
+        }
+
+        if ( ! have_file && ! config.udp_nserver ) {
+                prelude_log(PRELUDE_LOG_WARN, "No file or UDP server available for monitoring: terminating.\n");
                 return -1;
         }
         
