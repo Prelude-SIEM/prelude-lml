@@ -609,13 +609,9 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                 prelude_log(PRELUDE_LOG_WARN, "--ignore-metadata is only supported in batch mode.\n");
                 return -1;
         }
-
-        ret = drop_privilege();
-        if ( ret < 0 )
-                return -1;
         
         if ( config.dry_run )
-                return 0;
+                goto out;
         
         ret = prelude_client_new(&config.lml_client, "prelude-lml");
         if ( ret < 0 ) {
@@ -638,6 +634,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
                 return -1;
         }
-                
+
+ out:
+        ret = drop_privilege();
+        if ( ret < 0 )
+                return -1;
+        
         return 0;
 }
