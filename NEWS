@@ -1,3 +1,21 @@
+* 2006-03-06, prelude-lml-0.9.4:
+
+	- Remove trailing space from regex we get from plugins.rules (this fix 
+	  a match problem on log entry that didn't contain any space). 
+
+	- Add --user / --group option to drop privilege. However, make sure it is 
+	  not allowed to open file that the target user can not read, because it 
+	  would lead to failure when trying to re-open the logfile after a rotation.
+
+	- Signal handling improvement.
+
+	- Fix priority for --quiet option.
+
+	- Use newer libprelude IDMEF_LIST_APPEND/IDMEF_LIST_PREPEND addition.
+
+	- Add unhandled arguments warning. 
+
+
 * 2006-02-21, prelude-lml-0.9.3:
 
 	- Fix a byte ordering issue, resulting in non working LML on some 
