@@ -62,23 +62,23 @@ static int drop_privilege(void)
 {
         int ret;
 
-        if ( config.wanted_gid ) {
+        if ( config.wanted_gid != getgid() ) {
                 ret = setgid(config.wanted_gid);
                 if ( ret < 0 ) {
                         prelude_log(PRELUDE_LOG_ERR, "change to GID %d failed: %s.\n",
                                     (int) config.wanted_gid, strerror(errno));
                         return ret;
                 }
-                
+
                 ret = setgroups(1, &config.wanted_gid);
                 if ( ret < 0 ) {
                         prelude_log(PRELUDE_LOG_ERR, "removal of ancillary groups failed: %s.\n", strerror(errno));
                         return ret;
-                }
+                }                
         }
 
         
-        if ( config.wanted_uid ) {
+        if ( config.wanted_uid != getuid() ) {
                 ret = setuid(config.wanted_uid);
                 if ( ret < 0 ) {
                         prelude_log(PRELUDE_LOG_ERR, "change to UID %d failed: %s.\n",
@@ -102,14 +102,16 @@ static int check_file_access(const char *filename)
         if ( ret < 0 ) {
                 if ( errno == ENOENT )
                         prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist.\n", filename);
-                else
-                        prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
+
+                else if ( errno == EACCES )
+                        goto out;
+
+                else prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
 
                 return -1;
         }
 
-        if ( ! config.wanted_uid && getuid() == 0 )
-                /* the user started LML as root using --user root */
+        if ( config.wanted_uid == 0 )
                 return 0;
         
         if ( st.st_uid == config.wanted_uid && st.st_mode & S_IRUSR )
@@ -121,6 +123,7 @@ static int check_file_access(const char *filename)
         if ( st.st_mode & S_IROTH )
                 return 0;
 
+ out:
         prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading to uid %d/gid %d.\n",
                     filename, config.wanted_uid, config.wanted_gid);
 
@@ -482,6 +485,8 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         memset(&config, 0, sizeof(config));
         config.warning_limit = -1;
+        config.wanted_uid = getuid();
+        config.wanted_gid = getgid();
         
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
