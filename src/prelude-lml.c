@@ -77,21 +77,14 @@ static volatile sig_atomic_t got_signal = 0;
 
 
 
-static void print_stats(struct timeval *end)
+static void print_stats(const char *prefix, struct timeval *end)
 {
-        unsigned int tdiv;
-        
-        prelude_log(PRELUDE_LOG_WARN, "- Dumping stat: %d line processed in %u seconds.\n",
-                    config.line_processed, end->tv_sec - start.tv_sec);
+        double tdiv;
 
-        tdiv = end->tv_sec - start.tv_sec;
-        if ( tdiv == 0 )
-                tdiv = 1;
-        
-        prelude_log(PRELUDE_LOG_WARN, "- Average %d events / seconds .\n",
-                    config.line_processed / tdiv);
-        
-        prelude_log(PRELUDE_LOG_WARN, "- %d alert issued.\n", config.alert_count);
+        tdiv = (end->tv_sec + (double) end->tv_usec / 1000000) - (start.tv_sec + (double) start.tv_usec / 1000000);
+                
+        prelude_log(PRELUDE_LOG_WARN, "%s%u line processed in %.2f seconds (%.2f EPS), %d alert emited.\n",
+                    prefix, config.line_processed, tdiv, config.line_processed / tdiv, config.alert_count);
 }
 
 
@@ -119,17 +112,36 @@ static void handle_sigquit(void)
         struct timeval end;
         
         gettimeofday(&end, NULL);
-        print_stats(&end);
+        print_stats("statistics signal received: ", &end);
 }
 
+
+
+static const char *get_restart_string(void)
+{
+        int ret;
+        size_t i;
+        prelude_string_t *buf;
+        
+        ret = prelude_string_new(&buf);
+        if ( ret < 0 )
+                return global_argv[0];
+        
+        for ( i = 0; global_argv[i] != NULL; i++ ) {
+                if ( ! prelude_string_is_empty(buf) )
+                        prelude_string_cat(buf, " ");
+                        
+                prelude_string_cat(buf, global_argv[i]);
+        }
+
+        return prelude_string_get_string(buf);
+}
 
 
 static void handle_sighup(void) 
 {
         int ret;
         size_t i;
-
-        prelude_log(PRELUDE_LOG_WARN, "- Restarting Prelude LML (%s).\n", global_argv[0]);
 
         /*
          * close the UDP server, so that we can bind the port again.
@@ -151,20 +163,26 @@ static void handle_sighup(void)
 
 void _lml_handle_signal_if_needed(void)
 {
+        int signo;
+        
         if ( ! got_signal )
                 return;
 
-        if ( got_signal == SIGQUIT || got_signal == SIGUSR1 )
-                handle_sigquit();
-        
-        prelude_log(PRELUDE_LOG_WARN, "signal %d received, %s prelude-lml.\n", got_signal,
-                    got_signal == SIGHUP ? "will restart" : "terminating");
-        
-        if ( got_signal == SIGHUP )
-                handle_sighup();
-        
-        handle_signal();
+        signo = got_signal;
         got_signal = 0;
+
+        if ( signo == SIGHUP ) {
+                prelude_log(PRELUDE_LOG_WARN, "signal %d received, restarting (%s).\n", signo, get_restart_string());
+                handle_sighup();
+        }
+        
+        if ( signo == SIGQUIT || signo == SIGUSR1 ) {
+                handle_sigquit();
+                return;
+        }
+        
+        prelude_log(PRELUDE_LOG_WARN, "signal %d received, terminating prelude-lml.\n", signo);
+        handle_signal();
 }
 
 
@@ -363,7 +381,7 @@ int main(int argc, char **argv)
                         prelude_timer_wake_up();
                         
                 } while ( ! config.batch_mode || ret > 0 );
-                
+
                 gettimeofday(&end, NULL);
                 
                 /*
@@ -373,7 +391,7 @@ int main(int argc, char **argv)
                 if ( ! config.dry_run )
                         prelude_client_destroy(config.lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
 
-                print_stats(&end);
+                print_stats("- ", &end);
         }
         
         return 0;
