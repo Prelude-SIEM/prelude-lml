@@ -292,8 +292,8 @@ static int set_text_output(prelude_option_t *opt, const char *arg, prelude_strin
         ret = prelude_io_new(&(config.text_output_fd));
         if ( ret < 0 )
                 return ret;
-
-        if ( strcmp(arg, "-") == 0 ) {
+        
+        if ( ! arg || strcmp(arg, "-") == 0 ) {
                 prelude_io_set_file_io(config.text_output_fd, stdout);
                 return 0;
         }
@@ -524,7 +524,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
 
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "text-output",
-                           "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           "Dump alert to stdout, or to the specified file", PRELUDE_OPTION_ARGUMENT_OPTIONAL,
                            set_text_output, NULL);
         
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI, 0, "dry-run",
