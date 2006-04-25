@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 PreludeIDS Technologies. All Rights Reserved.
 * Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
 * This file is part of the Prelude-LML program.
@@ -34,6 +34,7 @@
 #include <libprelude/prelude-log.h>
 
 #include "prelude-lml.h"
+#include "log-entry.h"
 #include "pcre-mod.h"
 #include "rule-object.h"
 #include "rule-regex.h"
@@ -43,14 +44,27 @@ int pcre_LTX_prelude_plugin_version(void);
 int pcre_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *data);
 
 
-typedef struct {
+struct pcre_plugin {
         int rulesnum;
         char *rulesetdir;
         int last_rules_first;
-        prelude_list_t rule_list;
         prelude_bool_t dump_unmatched;
-} pcre_plugin_t;
+        
+        prelude_list_t rule_list;
+        prelude_list_t context_list;
+};
 
+
+
+struct pcre_context {
+        prelude_list_t list;
+        
+        char *name;
+        prelude_timer_t timer;
+        pcre_context_setting_t *setting;
+        
+        idmef_message_t *idmef;
+};
 
 
 
@@ -169,9 +183,7 @@ static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, pre
         if ( ! new ) 
                 return -1;
 
-        if ( ! optional )
-                rule->required_goto++;
-        else
+        if ( optional )
                 new->optional = TRUE;
                 
         prelude_list_add_tail(&rule->rule_list, &new->list);
@@ -238,8 +250,7 @@ static int parse_rule_min_optregex_match(pcre_plugin_t *plugin, pcre_rule_t *rul
 
 static int parse_rule_last(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
-        rule->last = TRUE;
-
+        rule->flags |= PCRE_RULE_FLAGS_LAST;
         return 0;
 }
 
@@ -248,17 +259,119 @@ static int parse_rule_last(pcre_plugin_t *plugin, pcre_rule_t *rule, const char 
 
 static int parse_rule_silent(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
-        rule->silent = TRUE;
-
+        rule->flags |= PCRE_RULE_FLAGS_SILENT;
         return 0;
 }
 
 
 static int parse_rule_chained(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
 {
-        rule->chained = TRUE;
+        rule->flags |= PCRE_RULE_FLAGS_CHAINED;
+        return 0;
+}
+
+
+static int parse_require_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return value_container_new(&rule->required_context, arg);
+}
+
+
+
+static int parse_optional_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return value_container_new(&rule->optional_context, arg);
+}
+
+
+
+static int add_value_to_list(prelude_list_t *head, const char *arg, void *data)
+{
+        int ret;
+        value_container_t *vcont;
+
+        ret = value_container_new(&vcont, arg);
+        if ( ret < 0 )
+                return ret;
+
+        value_container_set_data(vcont, data);
+        prelude_linked_object_add_tail(head, (prelude_linked_object_t *) vcont);
 
         return 0;
+}
+
+
+static int _parse_create_context(pcre_rule_t *rule, const char *arg, pcre_context_setting_flags_t flags)
+{
+        char *ptr, *eptr = NULL;
+        const char *tmp = arg;
+        pcre_context_setting_t *pcs;
+
+        pcs = calloc(1, sizeof(*pcs));
+        if ( ! pcs )
+                return -1;
+
+        pcs->timeout = 60;
+        pcs->flags = flags;
+        
+        while ( (ptr = strchr(tmp, ',')) ) {                
+                (*ptr++) = 0;
+                
+                ptr += strspn(ptr, " \t");
+                if ( strncmp(ptr, "alert_on_destroy", 16) == 0 )
+                        pcs->flags |= PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY;
+
+                else if ( strncmp(ptr, "alert_on_expire", 15) == 0 )
+                        pcs->flags |= PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE;
+                
+                else pcs->timeout = strtoul(ptr, &eptr, 0);
+
+                if ( eptr == ptr )
+                        return -1;
+                
+                tmp = ptr;
+        }
+        
+        return add_value_to_list(&rule->create_context_list, arg, pcs);
+}
+
+
+static int parse_create_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return _parse_create_context(rule, arg, 0);
+}
+
+
+static int parse_set_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return _parse_create_context(rule, arg, PCRE_CONTEXT_SETTING_FLAGS_OVERWRITE);
+}
+
+
+static int parse_add_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return _parse_create_context(rule, arg, PCRE_CONTEXT_SETTING_FLAGS_QUEUE);
+}
+
+
+static int parse_not_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        int ret;
+        value_container_t *vcont;
+        
+        ret = value_container_new(&vcont, arg);
+        if ( ret < 0 )
+                return ret;
+
+        prelude_linked_object_add_tail(&rule->not_context_list, (prelude_linked_object_t *) vcont);
+
+        return 0;
+}
+
+
+static int parse_destroy_context(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *arg)
+{
+        return add_value_to_list(&rule->destroy_context_list, arg, NULL);
 }
 
 
@@ -422,6 +535,13 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                 { "revision"            , parse_rule_revision           },
                 { "silent"              , parse_rule_silent             },
                 { "include"             , parse_rule_included           },
+                { "new_context"         , parse_create_context          },
+                { "set_context"         , parse_set_context             },
+                { "add_context"         , parse_add_context             },
+                { "not_context"         , parse_not_context             },
+                { "destroy_context"     , parse_destroy_context         },
+                { "require_context"     , parse_require_context         },
+                { "optional_context"    , parse_optional_context        }
         };
 
         for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
@@ -481,7 +601,10 @@ static pcre_rule_t *create_rule(void)
         
         prelude_list_init(&rule->rule_list);
         prelude_list_init(&rule->regex_list);
-
+        prelude_list_init(&rule->not_context_list);
+        prelude_list_init(&rule->create_context_list);
+        prelude_list_init(&rule->destroy_context_list);
+                
         return rule;
 }
 
@@ -585,10 +708,10 @@ static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, 
                 return -1;
         }
 
-        if ( rule->chained )
+        if ( rule->flags & PCRE_RULE_FLAGS_CHAINED )
                 prelude_list_add(&chained_rule_list, &rc->list);
         
-        else if ( plugin->last_rules_first && rule->last )
+        else if ( plugin->last_rules_first && rule->flags & PCRE_RULE_FLAGS_LAST )
                 prelude_list_add(head, &rc->list);
         else
                 prelude_list_add_tail(head, &rc->list);
@@ -606,15 +729,16 @@ static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char
         unsigned int line = 0;
         
         while ( prelude_read_multiline(fd, &line, buf, sizeof(buf)) == 0 ) {
+                
 
-                ptr = buf;
-                buf[strlen(buf) - 1] = '\0'; /* strip \n */
-
-                 /*
-                  * filter space and tab at the begining of the line.
-                  */
-                while ( (*ptr == ' ' || *ptr == '\t') && *ptr != '\0' )
-                        ptr++;
+                ptr = buf + strlen(buf) - 1;
+                if ( *ptr == '\n' )
+                        *ptr = '\0'; /* strip \n */
+                
+                /*
+                 * filter space and tab at the begining of the line.
+                 */
+                for ( ptr = buf; (*ptr == ' ' || *ptr == '\t') && *ptr != '\0'; ptr++ );
 
                 /*
                  * empty line or comment. 
@@ -627,7 +751,6 @@ static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char
 
         return 0;
 }
-
 
 
 
@@ -647,15 +770,16 @@ static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, 
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
 
                 flags = 0;
-                ret = rule_regex_match(rc, ls, log_entry, &flags);
+                ret = rule_regex_match(plugin, rc, ls, log_entry, &flags);
                 all_flags |= flags;
                 
-                if ( ret == 0 && (rc->rule->last || flags & PCRE_MATCH_FLAGS_LAST) )
+                if ( ret == 0 && (rc->rule->flags & PCRE_RULE_FLAGS_LAST || flags & PCRE_MATCH_FLAGS_LAST) )
                         break;
         }
 
         if ( !(all_flags & PCRE_MATCH_FLAGS_ALERT) && plugin->dump_unmatched )
-                prelude_log(PRELUDE_LOG_WARN, "No alert emited for log entry \"%s\"\n", lml_log_entry_get_message(log_entry));
+                prelude_log(PRELUDE_LOG_WARN, "No alert emited for log entry \"%s\"\n",
+                            lml_log_entry_get_message(log_entry));
 }
 
 
@@ -689,7 +813,7 @@ static void remove_top_chained(void)
         prelude_list_for_each_safe(&chained_rule_list, tmp, bkp) {
                 rc = prelude_list_entry(tmp, pcre_rule_container_t, list);
 
-                if ( rc->rule->chained )
+                if ( rc->rule->flags & PCRE_RULE_FLAGS_CHAINED )
                         free_rule_container(rc);
         }
 }
@@ -746,6 +870,8 @@ static int pcre_activate(prelude_option_t *opt, const char *optarg, prelude_stri
                 return prelude_error_from_errno(errno);
 
         prelude_list_init(&new->rule_list);
+        prelude_list_init(&new->context_list);
+        
         prelude_plugin_instance_set_plugin_data(context, new);
         
         return 0;
@@ -768,6 +894,122 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
         free(plugin);
 }
 
+
+static void _pcre_context_destroy(pcre_context_t *ctx)
+{        
+        prelude_log_debug(1, "[%s]: destroying context.\n", ctx->name);
+        
+        if ( ctx->idmef )
+                idmef_message_destroy(ctx->idmef);
+        
+        prelude_timer_destroy(&ctx->timer);
+        prelude_list_del(&ctx->list);
+
+        free(ctx->name);
+        free(ctx);
+}
+
+
+
+void pcre_context_destroy(pcre_context_t *ctx)
+{        
+        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY && ctx->idmef ) {
+                prelude_log_debug(1, "[%s]: emit alert on destroy.\n", ctx->name);
+                lml_alert_emit(NULL, NULL, ctx->idmef);
+        }
+        
+        _pcre_context_destroy(ctx);
+}
+
+
+
+static void pcre_context_expire(void *data)
+{
+        pcre_context_t *ctx = data;
+        
+        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE && ctx->idmef ) {
+                prelude_log_debug(1, "[%s]: emit alert on expire.\n", ctx->name);
+                lml_alert_emit(NULL, NULL, ctx->idmef);
+        }
+        
+        _pcre_context_destroy(ctx);
+}
+
+
+
+idmef_message_t *pcre_context_get_idmef(pcre_context_t *ctx)
+{
+        return ctx->idmef;
+}
+
+
+
+int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *idmef, pcre_context_setting_t *setting)
+{
+        pcre_context_t *ctx;
+
+        if ( ! (setting->flags & PCRE_CONTEXT_SETTING_FLAGS_QUEUE) ) {
+                ctx = pcre_context_search(plugin, name);
+                if ( ctx ) {
+                        if ( setting->flags & PCRE_CONTEXT_SETTING_FLAGS_OVERWRITE ) {
+                                prelude_log_debug(1, "[%s]: destroying on create (overwrite).\n", name);
+                                pcre_context_destroy(ctx);
+                        } else {
+                                prelude_log_debug(1, "[%s]: already exist, create only specified.\n", name);
+                                return 0;
+                        }
+                }
+        }
+        
+        prelude_log_debug(1, "[%s]: creating context (expire=%ds).\n", name, setting->timeout);
+        
+        ctx = calloc(1, sizeof(*ctx));
+        if ( ! ctx ) {
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        ctx->name = strdup(name);
+        if ( ! ctx->name ) {
+                free(ctx);
+                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
+                return -1;
+        }
+
+        ctx->setting = setting;
+        prelude_timer_init_list(&ctx->timer);
+                
+        if ( setting->timeout > 0 ) {
+                prelude_timer_set_data(&ctx->timer, ctx);
+                prelude_timer_set_expire(&ctx->timer, setting->timeout);
+                prelude_timer_set_callback(&ctx->timer, pcre_context_expire);
+                prelude_timer_init(&ctx->timer);
+        }
+
+        if ( idmef )
+                ctx->idmef = idmef_message_ref(idmef);
+        
+        prelude_list_add_tail(&plugin->context_list, &ctx->list);
+        
+        return 0;
+}
+
+
+
+pcre_context_t *pcre_context_search(pcre_plugin_t *plugin, const char *name)
+{
+        pcre_context_t *ctx;
+        prelude_list_t *tmp;
+
+        prelude_list_for_each(&plugin->context_list, tmp) {
+                ctx = prelude_list_entry(tmp, pcre_context_t, list);
+
+                if ( strcmp(ctx->name, name) == 0 )
+                        return ctx;
+        }
+        
+        return NULL;
+}
 
 
 

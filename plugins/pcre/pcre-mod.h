@@ -21,31 +21,54 @@
 *
 *****/
 
+typedef struct pcre_rule pcre_rule_t;
+#include "value-container.h"
+
+
 /*
  * we can store up to 64 reference value in a rule
  * it should be large enough
  */
 #define MAX_REFERENCE_PER_RULE 64
 
+typedef struct pcre_plugin pcre_plugin_t;
+typedef struct pcre_context pcre_context_t;
 
-typedef struct {
+typedef enum {
+        PCRE_RULE_FLAGS_LAST    = 0x01,
+        PCRE_RULE_FLAGS_CHAINED = 0x02,
+        PCRE_RULE_FLAGS_SILENT  = 0x04,
+} pcre_rule_flags_t;
+
+struct pcre_rule {
+        /**/
         unsigned int id;
-        unsigned int revision;
+                
+        /**/
+        uint8_t revision;
+        uint8_t refcount;
+        uint8_t min_optgoto_match;
+        uint8_t min_optregex_match;
 
-        prelude_bool_t last;
-        prelude_bool_t chained;
-        prelude_bool_t silent;
-        unsigned int required_goto;
-        unsigned int refcount;
+        unsigned int event_threshold;
+        unsigned int threshold;
+        
+        /**/
+        pcre_rule_flags_t flags;
 
-        unsigned int min_optgoto_match;
-        unsigned int min_optregex_match;
+        
+        prelude_list_t create_context_list;
+        prelude_list_t destroy_context_list;
+        prelude_list_t not_context_list;
+        
+        value_container_t *required_context;
+        value_container_t *optional_context;
         
         prelude_list_t rule_list;
         prelude_list_t regex_list;
-        
+
         struct rule_object_list *object_list;
-} pcre_rule_t;
+};
 
 
 
@@ -62,3 +85,28 @@ typedef enum {
         PCRE_MATCH_FLAGS_LAST  = 0x01,
         PCRE_MATCH_FLAGS_ALERT = 0x02
 } pcre_match_flags_t;
+
+
+
+typedef enum {
+        PCRE_CONTEXT_SETTING_FLAGS_OVERWRITE     = 0x01,
+        PCRE_CONTEXT_SETTING_FLAGS_QUEUE         = 0x02,
+        PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE  = 0x04,
+        PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY = 0x08
+} pcre_context_setting_flags_t;
+
+
+typedef struct {
+        int timeout;
+        pcre_context_setting_flags_t flags;
+} pcre_context_setting_t;
+
+
+
+pcre_context_t *pcre_context_search(pcre_plugin_t *plugin, const char *name);
+
+int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *idmef, pcre_context_setting_t *setting);
+
+void pcre_context_destroy(pcre_context_t *ctx);
+
+idmef_message_t *pcre_context_get_idmef(pcre_context_t *ctx);

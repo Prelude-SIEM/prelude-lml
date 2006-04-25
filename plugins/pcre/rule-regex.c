@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 PreludeIDS Technologies. All Rights Reserved.
 * Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
 * This file is part of the Prelude-LML program.
@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <pcre.h>
 #include <netdb.h>
+#include <assert.h>
 
 #include <libprelude/prelude-inttypes.h>
 #include <libprelude/common.h>
@@ -41,6 +42,7 @@
 #include "pcre-mod.h"
 #include "rule-object.h"
 #include "rule-regex.h"
+
 
 
 #ifndef MIN
@@ -63,9 +65,8 @@ struct rule_regex {
 
 
 typedef struct {
-        int reqmatch;
-        int optmatch;
         idmef_message_t *idmef;
+        prelude_bool_t log_added;
 } pcre_state_t;
 
 
@@ -83,7 +84,7 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
         
         *real_ret = pcre_exec(item->regex, item->extra, subject, length, 0, 0, ovector, ovecsize);
         
-        prelude_log_debug(9, "match %s ret %d\n", item->regex_string, *real_ret);
+        prelude_log_debug(1, "match %s ret %d\n", item->regex_string, *real_ret);
         
         if ( *real_ret <= 0 && ! item->optreg )
                 return *real_ret;
@@ -106,7 +107,7 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         prelude_list_t *tmp;
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
-                
+        
         prelude_list_for_each(&rule->regex_list, tmp) {
                 item = prelude_linked_object_get_object(tmp);
                                 
@@ -147,24 +148,71 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
 
 
 
-static int match_rule_single(pcre_rule_t *rule, pcre_state_t *state, const lml_log_entry_t *log_entry)
+static pcre_context_t *lookup_context(value_container_t *vcont, pcre_plugin_t *plugin,
+                                      pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *ovector, size_t osize)
 {
-         int ret;
-         int ovector[MAX_REFERENCE_PER_RULE * 3];
-
-         ovector[0] = 0x7fffffff;
-         ovector[1] = 0;
-         
-         ret = exec_regex(rule, log_entry, ovector, sizeof(ovector) / sizeof(int));
-         if ( ret < 0 )
-                 return -1;
-         
-         ret = rule_object_build_message(rule, rule->object_list, &state->idmef, log_entry, ovector, ret);         
-         if ( ret < 0 )
-                 return -1;
-         
-         return 0;
+        pcre_context_t *ctx;
+        prelude_string_t *str;
+        
+        str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
+        if ( ! str )
+                return NULL;
+                                
+        ctx = pcre_context_search(plugin, prelude_string_get_string(str));        
+        prelude_string_destroy(str);
+                
+        return ctx;
 }
+
+
+
+static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
+                             const lml_log_source_t *ls, const lml_log_entry_t *log_entry, int *ovector, int *osize)
+{
+        int ret;
+        prelude_list_t *tmp;
+        pcre_context_t *ctx;
+        value_container_t *vcont;
+        
+        ovector[0] = 0x7fffffff;
+        ovector[1] = 0;
+        
+        *osize = exec_regex(rule, log_entry, ovector, (size_t) *osize);
+        if ( *osize < 0 )
+                return -1;
+
+        prelude_list_for_each(&rule->not_context_list, tmp) {
+                vcont = prelude_linked_object_get_object(tmp);
+                if ( lookup_context(vcont, plugin, rule, log_entry, ovector, *osize) )
+                        return -1;
+        }
+        
+        if ( rule->required_context ) {
+                ctx = lookup_context(rule->required_context, plugin, rule, log_entry, ovector, *osize);
+                if ( ! ctx )
+                        return -1;
+
+                state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
+        }
+
+        if ( rule->optional_context ) {
+                ctx = lookup_context(rule->optional_context, plugin, rule, log_entry, ovector, *osize);
+                if ( ctx )                
+                        state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
+        }
+        
+        ret = rule_object_build_message(rule, rule->object_list, &state->idmef, log_entry, ovector, *osize);
+        if ( ret < 0 )
+                return ret;
+
+        if ( state->idmef && ! state->log_added ) {
+                state->log_added = TRUE;
+                lml_alert_prepare(state->idmef, ls, log_entry);
+        }
+
+        return ret;
+}
+
 
 
 static void destroy_idmef_state(pcre_state_t *state)
@@ -172,83 +220,133 @@ static void destroy_idmef_state(pcre_state_t *state)
         if ( state->idmef ) {
                 idmef_message_destroy(state->idmef);
                 state->idmef = NULL;
+                state->log_added = FALSE;
         }
 }
 
 
 
-static int match_rule_list(pcre_rule_container_t *rc, pcre_state_t *state,
+static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
+                                     const lml_log_entry_t *log_entry, int *ovector, int osize)
+{
+        prelude_list_t *tmp;
+        prelude_string_t *str;
+        value_container_t *vcont;
+        pcre_context_setting_t *pcs;
+        
+        prelude_list_for_each(&rule->create_context_list, tmp) {
+                vcont = prelude_linked_object_get_object(tmp);
+                        
+                str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
+                if ( ! str )
+                        continue;
+
+                pcs = value_container_get_data(vcont);
+                        
+                pcre_context_new(plugin, prelude_string_get_string(str), state->idmef, pcs);
+                prelude_string_destroy(str);
+        }
+}
+
+
+static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
+                                      const lml_log_entry_t *log_entry, int *ovector, int osize)
+{
+        pcre_context_t *ctx;
+        prelude_list_t *tmp;
+        prelude_string_t *str;
+        value_container_t *vcont;
+        
+        prelude_list_for_each(&rule->destroy_context_list, tmp) {
+                vcont = prelude_linked_object_get_object(tmp);
+                
+                str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
+                if ( ! str )
+                        continue;
+
+                ctx = pcre_context_search(plugin, prelude_string_get_string(str));
+                if ( ! ctx )
+                        continue;
+                
+                pcre_context_destroy(ctx);
+                prelude_string_destroy(str);
+        }
+}
+
+
+
+static int match_rule_list(pcre_plugin_t *plugin,
+                           pcre_rule_container_t *rc, pcre_state_t *state,
                            const lml_log_source_t *ls, const lml_log_entry_t *log_entry,
                            pcre_match_flags_t *match_flags)
 {
-        int ret;
         prelude_list_t *tmp;
+        int ret, optmatch = 0;
         pcre_match_flags_t gl = 0;
         pcre_rule_t *rule = rc->rule;
         pcre_rule_container_t *child;
-        
-        ret = match_rule_single(rule, state, log_entry);
+        int ovector[MAX_REFERENCE_PER_RULE * 3], osize = sizeof(ovector) / sizeof(int);;
+
+        ret = match_rule_single(plugin, rule, state, ls, log_entry, ovector, &osize);
         if ( ret < 0 )
                 return -1;
-        
+                
         prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 
-                ret = match_rule_list(child, state, ls, log_entry, &gl);
+                ret = match_rule_list(plugin, child, state, ls, log_entry, &gl);                
                 if ( ret < 0 && ! child->optional ) {
                         destroy_idmef_state(state);
                         return -1;
                 }
 
+                if ( child->optional )
+                        optmatch++;
+                                
                 *match_flags |= gl;
                 if ( gl & PCRE_MATCH_FLAGS_LAST )
                         break;
-        }
-        
-        if ( state->reqmatch < rule->required_goto ) {
-                destroy_idmef_state(state);
-                return -1;
-        }
-        
-        if ( state->optmatch < rule->min_optgoto_match ) {
-                destroy_idmef_state(state);
-                return -1;
+
         }
 
-        if ( rc->optional )
-                state->optmatch++;
-        else
-                state->reqmatch++;
-                
-        if ( ! rule->silent && state->idmef ) {                
+        if ( optmatch < rule->min_optgoto_match ) {
+                destroy_idmef_state(state);
+                return -1;
+        }
+        
+        create_context_if_needed(plugin, rule, state, log_entry, ovector, osize);
+        
+        if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) && state->idmef ) {                
                 prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
-                                  rule->id, rule->last, lml_log_entry_get_message(log_entry));
-
-                lml_alert_emit(ls, log_entry, state->idmef);
-                idmef_message_destroy(state->idmef);
-                state->idmef = NULL;
-
+                                  rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
+                                  lml_log_entry_get_message(log_entry));
+                
+                lml_alert_emit(NULL, NULL, state->idmef);
+                destroy_idmef_state(state);
+                
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
-
-                if ( rule->last )
+                
+                if ( rule->flags & PCRE_RULE_FLAGS_LAST )
                         *match_flags |= PCRE_MATCH_FLAGS_LAST;
         }
+        
+        destroy_context_if_needed(plugin, rule, log_entry, ovector, osize);
                 
         return 0;
 }
 
 
 
-int rule_regex_match(pcre_rule_container_t *root, const lml_log_source_t *ls,
-                     const lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags)
+int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
+                     const lml_log_source_t *ls, const lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags)
 {
         int ret;
         pcre_state_t state;
         
         memset(&state, 0, sizeof(state));
         
-        ret = match_rule_list(root, &state, ls, log_entry, match_flags);
-                
+        ret = match_rule_list(plugin, rc, &state, ls, log_entry, match_flags);
+        
         if ( state.idmef )
                 idmef_message_destroy(state.idmef);
 
@@ -286,7 +384,7 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 
         new->optreg = optional;
         new->extra = pcre_study(new->regex, 0, &err_ptr);
-
+        
         return new;
 }
 
