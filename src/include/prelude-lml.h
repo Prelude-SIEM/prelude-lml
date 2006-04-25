@@ -59,4 +59,6 @@ const char *lml_log_entry_get_target_process_pid(const lml_log_entry_t *log_entr
  */
 void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idmef_message_t *msg);
 
+int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, const lml_log_entry_t *log);
+
 #endif
