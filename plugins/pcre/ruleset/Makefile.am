@@ -35,6 +35,7 @@ ruleset_DATA = \
 	sendmail.rules		\
 	shadow-utils.rules	\
 	single.rules		\
+	spamassassin.rules	\
 	squid.rules		\
 	ssh.rules		\
 	sudo.rules		\
