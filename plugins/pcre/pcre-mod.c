@@ -79,6 +79,84 @@ static lml_log_plugin_t pcre_plugin;
 
 
 
+
+static int parse_key_and_value(char *input, char **key, char **value) 
+{
+        char *ptr, *tmp;
+
+        *value = NULL;
+        
+        /*
+         * filter space at the begining of the line.
+         */
+        while ( (*input == ' ' || *input == '\t') && *input != '\0' )
+                input++;
+
+        if ( *input == '\0' )
+                return 0;
+        
+        *key = input;
+
+        /*
+         * search first '=' in the input,
+         * corresponding to the key = value separator.
+         */
+        tmp = ptr = input + strcspn(input, "=:");
+        
+        /*
+         * strip whitespace at the tail of the key.
+         */
+        while ( tmp && (*tmp == '=' || *tmp == ':' || *tmp == ';' || isspace((int) *tmp)) )
+                *tmp-- = '\0';
+
+        if ( ! ptr )
+                /* key without value */
+                return 0; 
+        
+        /*
+         * strip whitespace at the begining of the value.
+         */
+        ptr++;
+        while ( *ptr != '\0' && isspace((int) *ptr) )
+                ptr++;
+
+        *value = ptr;
+
+        /*
+         * strip whitespace at the end of the value.
+         */
+        ptr = ptr + strlen(ptr) - 1;
+        while ( isspace((int) *ptr) )
+                *ptr-- = '\0';
+
+        if ( *ptr == ';' )
+                *ptr = 0;
+        
+        return 0;
+}
+
+
+
+static int parse_multiple_key_and_value(const char **input, char **key, char **value)
+{
+        int ret;
+        char *ptr;
+        union { char **rw; const char **ro; } val;
+
+        val.ro = input;
+        
+        ptr = strsep(val.rw, ",");
+        if ( ! ptr )
+                return 0;
+
+        ret = parse_key_and_value(ptr, key, value);
+        if ( ret < 0 )
+                return ret;
+
+        return 1;
+}
+
+
 static pcre_rule_container_t *create_rule_container(pcre_rule_t *rule)
 {
         pcre_rule_container_t *rc;
@@ -301,38 +379,49 @@ static int add_value_to_list(prelude_list_t *head, const char *arg, void *data)
 }
 
 
+
 static int _parse_create_context(pcre_rule_t *rule, const char *arg, pcre_context_setting_flags_t flags)
 {
-        char *ptr, *eptr = NULL;
-        const char *tmp = arg;
+        int ret;
+        char *key, *value;
+        const char *cname = NULL;
         pcre_context_setting_t *pcs;
-
+        
         pcs = calloc(1, sizeof(*pcs));
         if ( ! pcs )
                 return -1;
 
         pcs->timeout = 60;
         pcs->flags = flags;
-        
-        while ( (ptr = strchr(tmp, ',')) ) {                
-                (*ptr++) = 0;
-                
-                ptr += strspn(ptr, " \t");
-                if ( strncmp(ptr, "alert_on_destroy", 16) == 0 )
-                        pcs->flags |= PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY;
 
-                else if ( strncmp(ptr, "alert_on_expire", 15) == 0 )
+        while ( (ret = parse_multiple_key_and_value(&arg, &key, &value)) == 1 ) {                
+                
+                if ( ! cname )
+                        cname = key;
+                
+                else if ( strcmp(key, "alert_on_destroy") == 0 )
+                        pcs->flags |= PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY;
+                
+                else if ( strcmp(key, "alert_on_expire") == 0 )
                         pcs->flags |= PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE;
                 
-                else pcs->timeout = strtoul(ptr, &eptr, 0);
-
-                if ( eptr == ptr )
-                        return -1;
+                else if ( strcmp(key, "expire") == 0 )
+                        pcs->timeout = atoi(value);
                 
-                tmp = ptr;
+                else {
+                        free(pcs);
+                        prelude_log(PRELUDE_LOG_WARN, "Unknown context creation argument: '%s'.\n", key);
+                        return -1;
+                }
         }
+
+        if ( ret == 0 )
+                ret = add_value_to_list(&rule->create_context_list, cname, pcs);
+
+        if ( ret < 0 )
+                free(pcs);
         
-        return add_value_to_list(&rule->create_context_list, arg, pcs);
+        return ret;
 }
 
 
@@ -398,61 +487,6 @@ static int parse_include(pcre_rule_t *rule, pcre_plugin_t *plugin, const char *v
         fclose(fd);
 
         return ret;
-}
-
-
-
-static int parse_key_and_value(char *input, char **key, char **value) 
-{
-        char *ptr, *tmp;
-
-        *value = NULL;
-        
-        /*
-         * filter space at the begining of the line.
-         */
-        while ( (*input == ' ' || *input == '\t') && *input != '\0' )
-                input++;
-
-        if ( *input == '\0' )
-                return 0;
-        
-        *key = input;
-
-        /*
-         * search first '=' in the input,
-         * corresponding to the key = value separator.
-         */
-        tmp = ptr = strchr(input, '=');
-        
-
-        /*
-         * strip whitespace at the tail of the key.
-         */
-        while ( tmp && (*tmp == '=' || isspace((int) *tmp)) )
-                *tmp-- = '\0';
-
-        if ( ! ptr )
-                /* key without value */
-                return 0; 
-        
-        /*
-         * strip whitespace at the begining of the value.
-         */
-        ptr++;
-        while ( *ptr != '\0' && isspace((int) *ptr) )
-                ptr++;
-
-        *value = ptr;
-
-        /*
-         * strip whitespace at the end of the value.
-         */
-        ptr = ptr + strlen(ptr) - 1;
-        while ( isspace((int) *ptr) )
-                *ptr-- = '\0';
-        
-        return 0;
 }
 
 
@@ -543,7 +577,7 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                 { "require_context"     , parse_require_context         },
                 { "optional_context"    , parse_optional_context        }
         };
-
+        
         for ( i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++ ) {
                 if ( strcmp(keyword, keywords[i].keyword) != 0 )
                         continue;
