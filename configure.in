@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT
 AC_PREREQ(2.50)
 AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE(prelude-lml, 0.9.4)
+AM_INIT_AUTOMAKE(prelude-lml, 0.9.5)
 AM_CONFIG_HEADER(config.h)
 AM_DISABLE_STATIC
 
@@ -92,8 +92,7 @@ dnl **************************************************
 dnl * Check for unsupported ruleset install request  *
 dnl **************************************************
 
-AC_ARG_ENABLE(unsupported-rulesets, [  --enable-unsupported-rulesets  Enable install of unsupported rulesets [default=no]],
-                   enable_unsupported_rulesets="$enableval", enable_unsupported_rulesets="$enableval")
+AC_ARG_ENABLE(unsupported-rulesets, AC_HELP_STRING(--enable-unsupported-rulesets, Enable install of unsupported rulesets [default=no]), enable_unsupported_rulesets="$enableval", enable_unsupported_rulesets="$enableval")
 
 AM_CONDITIONAL(ENABLE_UNSUPPORTED_RULESETS, test x$enable_unsupported_rulesets = xyes)
 
@@ -103,19 +102,20 @@ dnl **************************************************
 dnl * Check for FAM.                                 *
 dnl **************************************************
 
-AC_ARG_ENABLE(fam, [  --enable-fam  Enable support for realtime file notification using FAM [default=auto]], 
-		   enable_fam="$enableval", enable_fam="$enableval")
+AC_ARG_WITH(fam, AC_HELP_STRING(--with-fam@<:@=PATH@:>@, Path where FAM is installed @<:@default=auto@:>@), 
+            fam_required=true, with_fam=yes)
 
-AC_ARG_WITH(fam, [  --with-fam=DIR          use DIR where fam is installed.],
-            [FAM_CFLAGS="-I$withval/include"; FAM_LDFLAGS="-L$withval/lib"])
-
-if test x$enable_fam = xyes; then
+if test x$with_fam != xno; then
    old_LIBS=$LIBS
    old_LDFLAGS=$LDFLAGS
    old_CPPFLAGS=$CPPFLAGS
 
-   LDFLAGS="$LDFLAGS $FAM_LDFLAGS"
-   CPPFLAGS="$CPPFLAGS $FAM_CFLAGS"
+   if test x$with_fam != xyes; then 
+      FAM_LIBS="-L$with_fam/lib"
+      FAM_CFLAGS="-I$with_fam/include"
+      LDFLAGS="$LDFLAGS -L$with_fam/lib"
+      CPPFLAGS="$CPPFLAGS -I$with_fam/include"
+   fi
    
    AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
    AC_CHECK_LIB(fam, FAMOpen, , fam_lib_ok="no")
@@ -128,9 +128,9 @@ if test x$enable_fam = xyes; then
         FAM_LIBS=""
 	FAM_CFLAGS=""
 	FAM_LDFLAGS=""
-      	enable_fam=no;
+      	with_fam=no;
    else
-	enable_fam=yes;
+	with_fam=yes;
 	FAM_LIBS="-lfam"
 	AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
    fi
@@ -139,7 +139,7 @@ fi
 AC_SUBST(FAM_LIBS)
 AC_SUBST(FAM_CFLAGS)
 AC_SUBST(FAM_LDFLAGS)
-AM_CONDITIONAL(HAVE_FAM, test x$enable_fam = xyes)
+AM_CONDITIONAL(HAVE_FAM, test x$with_fam = xyes)
 
 
 dnl **************************************************
@@ -232,5 +232,5 @@ AC_OUTPUT
 
 echo
 echo "*** Dumping configuration ***"
-echo "    - Enable FAM support     		: $enable_fam"
+echo "    - Enable FAM support     		: $with_fam"
 echo "    - Enable unsupported rulesets:	: $enable_unsupported_rulesets"
