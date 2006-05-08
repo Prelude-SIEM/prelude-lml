@@ -25,6 +25,8 @@ CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
+AM_CPPFLAGS =
+
 ## begin gnulib module alloca-opt
 
 BUILT_SOURCES += $(ALLOCA_H)
@@ -106,12 +108,6 @@ mostlyclean-local:
 	-rmdir sys 2>/dev/null
 
 ## end   gnulib module sys_socket
-
-## begin gnulib module time_r
-
-libmissing_la_SOURCES += time_r.h
-
-## end   gnulib module time_r
 
 ## begin gnulib module vasnprintf
 
