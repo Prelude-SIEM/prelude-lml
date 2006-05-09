@@ -23,20 +23,11 @@
 
 #####
 #
-# Each supported MTA should have a rule here that creates a context to
+# Each supported MTA should have a rule that creates a context to
 # be used by the spamd rule to match up originator information.
 #
 #####
 
-#LOG:Apr 5 16:59:43 vm-mail sendmail[1821]: k35NxhZA001821: from=ccook@xxx.com, size=357, class=0, nrcpts=1, msgid=<443459EF.mail1EK1XC3LT@xxx.com>, relay=root@localhost
-regex=from=(\S+), size=(\d+), class=\d+, nrcpts=\d+, msgid=<(\S+@\S+)>; \
- new_context=SPAMASSASSIN_$3,expire:10; \
- source(0).node.address(0).category=e-mail; \
- source(0).node.address(0).address=$1; \
- additional_data(0).type=integer; \
- additional_data(0).meaning=Size; \
- additional_data(0).data=$2; \
- silent;
 
 #####
 #
