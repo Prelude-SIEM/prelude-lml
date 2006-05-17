@@ -1,3 +1,24 @@
+* 2006-05-17, prelude-lml-0.9.5:
+
+	- Experimental context support (ala SEC): we now handle 
+	  multiline log matching.
+
+	- Update PAX rules so that it use the new context feature. 
+
+	- Don't exit on statistics signal, improve statistics precision,
+	  make them easier to read.
+
+	- Fix some problem with user & group options.
+
+	- text-output argument is optional.
+
+	- New experimental ruleset: Sonicwall and Spamassassin. These
+	  need to be manually hooked to pcre.rules if you plan to use
+	  them.
+
+	- Fix FAM activation switches.
+
+
 * 2006-03-06, prelude-lml-0.9.4:
 
 	- Remove trailing space from regex we get from plugins.rules (this fix 
