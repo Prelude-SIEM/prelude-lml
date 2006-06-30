@@ -198,7 +198,7 @@ regex=fw=([\d\.]+) pri=(\d) c=(\d+) m=(\d+) msg="Possible SYN Flood on IF (\S+) 
  classification.reference(1).meaning=priority-id; \
  classification.reference(1).name=$2; \            
  classification.reference(1).url=http://www.sonicwall.com/support/pdfs/SonicOS_Log_Event_Reference_Guide.pdf; \
- id=4604 \
+ id=4604; \
  revision=1; \
  analyzer(0).name=SonicWall; \
  analyzer(0).manufacturer=SonicGuard; \
