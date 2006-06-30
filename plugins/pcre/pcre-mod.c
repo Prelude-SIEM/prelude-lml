@@ -533,6 +533,8 @@ static int parse_rule_included(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
         prelude_list_t *t;
         pcre_rule_container_t tmp, *cur;
         
+        rule->flags |= PCRE_RULE_FLAGS_SILENT;
+        
         tmp.rule = rule;
         prelude_list_add(&plugin->rule_list, &tmp.list);
         
