@@ -210,5 +210,7 @@ regex=[wl]an @Group:;			include = vigor.rules;
 regex=vpopmail;				include = vpopmail.rules;
 regex=webmin;				include = webmin.rules;
 regex=ftpd;				include = wu-ftp.rules;
+regex=id=firewall;			include = sonicwall.rules;
+regex=spamd;				include = spamassassin.rules;
 
 include = single.rules;
