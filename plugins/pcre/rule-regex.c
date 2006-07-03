@@ -84,7 +84,7 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
         
         *real_ret = pcre_exec(item->regex, item->extra, subject, length, 0, 0, ovector, ovecsize);
         
-        prelude_log_debug(1, "match %s ret %d\n", item->regex_string, *real_ret);
+        prelude_log_debug(5, "match %s ret %d\n", item->regex_string, *real_ret);
         
         if ( *real_ret <= 0 && ! item->optreg )
                 return *real_ret;
