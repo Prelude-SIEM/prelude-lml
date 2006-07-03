@@ -28,7 +28,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #
 # The available field names are:
 #   - hostname
-#   - program
+#   - process
 #   - pid
 #   - timestamp
 #
@@ -55,7 +55,7 @@ file = /var/log/messages
 # Example configuration for metalog output:
 #
 [format=metalog]
-prefix-regex = "^(?P<timestamp>.{15}) \[(?P<program>\S+)\] "
+prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
 time-format = "%b %d %H:%M:%S" 
 file = /var/log/everything/current
 # udp-server = 0.0.0.0
