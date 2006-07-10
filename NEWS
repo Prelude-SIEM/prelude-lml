@@ -1,3 +1,16 @@
+* 2006-06-10, prelude-lml-0.9.6:
+
+	- Fix a bug where some rules marked silent would trigger an alert.
+
+	- Load Sonicwall and Spamassassin ruleset by default.
+
+	- Fix rule syntax problem in Sonicwall ruleset.
+
+	- Fix rule indexing problem in Squid ruleset.
+
+	- Postfix rule consistency fix.
+
+
 * 2006-05-17, prelude-lml-0.9.5:
 
 	- Experimental context support (ala SEC): we now handle 
