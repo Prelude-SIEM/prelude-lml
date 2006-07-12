@@ -4,7 +4,7 @@ ruleset_DATA = \
 	apc-emu.rules		\
 	arbor.rules		\
 	arpwatch.rules		\
-	cisco-pix.rules		\
+	cisco-asa.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
