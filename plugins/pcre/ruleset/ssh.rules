@@ -454,7 +454,7 @@ regex=Failed (\S+) for (illegal|invalid) user (\S+) from ([A-Fa-f\d:\.]+) port (
 # Copyright (C) 2005 G Ramon Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 
-#LOG:Oct 2 14:40:05 suse-9.2 sshd[18725]: error: PAM: Authentication failure for root from unknown.anywhere.net
+#LOG:Oct  2 14:40:05 suse-9.2 sshd[18725]: error: PAM: Authentication failure for root from unknown.anywhere.net
 regex=error: PAM: Authentication failure for root from (\S+); \
  classification.text=Admin login failed; \
  id=1914; \
@@ -478,7 +478,7 @@ regex=error: PAM: Authentication failure for root from (\S+); \
  target(0).user.user_id(0).name=root; \
  last
 
-#LOG:Oct 2 14:46:52 suse-9.2 sshd[18804]: error: PAM: Authentication failure for foobar from unknown.anywhere.net
+#LOG:Oct  2 14:46:52 suse-9.2 sshd[18804]: error: PAM: Authentication failure for foobar from unknown.anywhere.net
 regex=error: PAM: Authentication failure for (?!root)(\S+) from (\S+); \
  classification.text=User login failed; \
  id=1915; \
