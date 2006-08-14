@@ -720,7 +720,6 @@ regex=2-106017: Deny IP due to Land Attack from ([\d\.]+) to ([\d\.]+); \
  assessment.impact.severity=medium; \
  assessment.impact.completion=failed; \
  assessment.impact.description=The Cisco ASA received a packet with the IP source address equal to the IP destination, and the destination port equal to the source port. This message indicates a spoofed packet that is designed to attack systems. This attack is referred to as a Land Attack.; \
- source(0).interface=$6; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
  target(0).node.address(0).category=ipv4-addr; \
