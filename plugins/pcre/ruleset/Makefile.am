@@ -4,6 +4,7 @@ ruleset_DATA = \
 	apc-emu.rules		\
 	arbor.rules		\
 	arpwatch.rules		\
+	checkpoint.rules	\
 	cisco-asa.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\

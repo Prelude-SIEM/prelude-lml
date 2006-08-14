@@ -165,6 +165,7 @@ regex=EMU;				include = apc-emu.rules;
 regex=(anomaly|since|firstSeen);	include = arbor.rules;
 regex=arpwatch;				include = arpwatch.rules;
 regex=(bigconf|kernel);			include = f5-bigip.rules;
+regex=product:;				include = checkpoint.rules;
 regex=%(PIX|ASA);			include = cisco-asa.rules;
 regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;				include = cisco-vpn.rules;
