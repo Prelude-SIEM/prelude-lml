@@ -6,6 +6,7 @@ ruleset_DATA = \
 	arpwatch.rules		\
 	checkpoint.rules	\
 	cisco-asa.rules		\
+	cisco-css.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\

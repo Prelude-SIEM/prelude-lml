@@ -167,6 +167,7 @@ regex=arpwatch;				include = arpwatch.rules;
 regex=(bigconf|kernel);			include = f5-bigip.rules;
 regex=product:;				include = checkpoint.rules;
 regex=%(PIX|ASA);			include = cisco-asa.rules;
+regex=(SSHD|NETMAN)-\d+;		include = cisco-css.rules;
 regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;				include = cisco-vpn.rules;
 # Using this regex rather than simpler clamd to handle events from clamav 

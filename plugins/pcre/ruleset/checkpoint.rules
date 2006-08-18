@@ -521,3 +521,5 @@ regex=([\d+\.]+) (<|>)\s+(\w+) System Alert message: (.+). Object: (\w+). (.+). 
  assessment.impact.severity=low; \
  assessment.impact.description=System alert reported a $4; \
  last
+
+#TODO:  Audit (and probably re-write) all SmartDefense events

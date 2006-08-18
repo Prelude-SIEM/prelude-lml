@@ -1,7 +1,6 @@
 if ENABLE_UNSUPPORTED_RULESETS
 
 ruleset_DATA = \
-	checkpoint.rules	\
 	ipso.rules		\
 	zywall.rules		\
 	zyxel.rules		
