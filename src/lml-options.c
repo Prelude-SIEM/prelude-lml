@@ -102,7 +102,7 @@ static int check_file_access(const char *filename)
         if ( ret < 0 ) {
                 if ( errno == ENOENT )
                         prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist.\n", filename);
-
+                
                 else if ( errno == EACCES )
                         goto out;
 
@@ -317,9 +317,11 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
         int ret;
         lml_log_source_t *ls;
 
-        ret = check_file_access(arg);
-        if ( ret < 0 )
-                return 0; /* ignore error */
+        if ( *arg != '-' ) {
+                ret = check_file_access(arg);
+                if ( ret < 0 )
+                        return 0; /* ignore error */
+        }
         
         ret = lml_log_source_new(&ls, context, arg);
         if ( ret < 0 )
