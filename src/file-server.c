@@ -463,10 +463,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
         int ret;
         size_t i = 0;
         prelude_bool_t ignore_remaining = FALSE;
-        
-        if ( available == 0 )
-                return -1;
-                
+
         while ( 1 ) {
                 if ( i == LOG_LINE_MAXSIZE ) {
                         prelude_log(PRELUDE_LOG_WARN, "line too long (internal limit of %u characters).\n",
@@ -510,9 +507,9 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         off_t len, ret;
         int eventno = 0;
         
-        if ( ! monitor->need_more_read && st->st_size == monitor->last_size ) 
+        if ( monitor->fd != stdin && ! monitor->need_more_read && st->st_size == monitor->last_size ) 
                 return 0;
-
+        
         if ( st->st_size < monitor->last_size ) {
                 monitor->last_size = 0;
                 rewind(monitor->fd);
@@ -1018,16 +1015,18 @@ static int process_file_event(monitor_fd_t *monitor)
 {
         int ret;
         struct stat st;
-
+        
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
                 return -1;
         }
-        
-        ret = is_file_already_used(monitor, &st);
-        if ( ret < 0 )
-                return -1;
+
+        if ( monitor->fd != stdin ) {
+                ret = is_file_already_used(monitor, &st);        
+                if ( ret < 0 )
+                        return -1;
+        }
         
         /*
          * check mtime consistency.
