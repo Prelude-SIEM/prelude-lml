@@ -62,7 +62,7 @@ regex=4-(4000\d\d): IDS:(\d+) (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+
 
 #LOG:Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=Firewall user login successful; \
+ classification.text=User login successful; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605005; \
@@ -95,7 +95,7 @@ regex=6-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) 
 
 #LOG:Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=5-111008: User '(\S+)' executed the 'enable' command; \
- classification.text=Firewall admin login successful; \
+ classification.text=Admin login successful; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=111008; \
@@ -123,7 +123,7 @@ regex=5-111008: User '(\S+)' executed the 'enable' command; \
 
 #LOG:Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=5-111001: Begin configuration: (\S+) writing to (\S+); \
- classification.text=Firewall configuration written to $2; \
+ classification.text=Configuration written to $2; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=111001; \
@@ -152,7 +152,7 @@ regex=5-111001: Begin configuration: (\S+) writing to (\S+); \
 #LOG:Nov  2 11:17:26 pix %PIX-5-611103: User logged out: Uname: enable_1
 #LOG:Jul 10 21:29:38 somehost.smf.ragingwire.net 12.34.56.78/90.12.34.56 :Jul 10 14:24:56 PDT: %ASA-vpnc-5-611103: User logged out: Uname: neteng
 regex=5-611103: User logged out: Uname: (\S+); \
- classification.text=Firewall logout; \
+ classification.text=User logout; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=611103; \
@@ -177,7 +177,7 @@ regex=5-611103: User logged out: Uname: (\S+); \
 
 #LOG:Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=Firewall user login failed; \
+ classification.text=User login failed; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605004; \
@@ -210,7 +210,7 @@ regex=6-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for
 
 #LOG:Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=6-308001: PIX (\S+) enable password incorrect for (\d+) tries \(from (.+)\); \
- classification.text=Firewall admin login failed; \
+ classification.text=Admin login failed; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=308001; \

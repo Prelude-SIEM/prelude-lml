@@ -167,7 +167,7 @@ regex=arpwatch;				include = arpwatch.rules;
 regex=(bigconf|kernel);			include = f5-bigip.rules;
 regex=product:;				include = checkpoint.rules;
 regex=%(PIX|ASA);			include = cisco-asa.rules;
-regex=(SSHD|NETMAN)-\d+;		include = cisco-css.rules;
+regex=(IPV4|SSHD|NETMAN)-\d+;		include = cisco-css.rules;
 regex=%[A-Z]+-\d+-[A-Z];		include = cisco-router.rules;
 regex=SEV=;				include = cisco-vpn.rules;
 # Using this regex rather than simpler clamd to handle events from clamav 
@@ -193,7 +193,7 @@ regex=system-(emergency|alert)-;	include = netscreen.rules;
 regex=security\[;			include = ntsyslog.rules;
 # This next regex isn't specific enough for my liking, but there doesn't seem
 # to be a better solution based on the log samples
-regex=[a-z0-9]+:;			include = openhostapd.rules;
+regex=[a-z\d]+:;			include = openhostapd.rules;
 regex=[Pp][Aa][Mm]_;			include = pam.rules;
 regex=pcanywhere;			include = pcanywhere.rules;
 regex=portsentry;			include = portsentry.rules;
