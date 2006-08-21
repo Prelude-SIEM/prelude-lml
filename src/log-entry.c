@@ -106,7 +106,7 @@ static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *
 
         /*
          * strptime() return a pointer to the first non matched character.
-         */
+         */        
         end = strptime(string, ts_fmt, lt);
         if ( ! end ) 
                 goto err;
@@ -120,7 +120,7 @@ static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *
         return 0;
 
  err:
-        lml_log_source_warning(ls, "could not format \"%s\" using \"%s\".\n", string, ts_fmt);
+        prelude_log_debug(4, "could not format \"%s\" using \"%s\".\n", string, ts_fmt);
         return -1;
 }
 
