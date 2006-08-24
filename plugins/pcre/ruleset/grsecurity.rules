@@ -29,6 +29,18 @@
 
 # /sbin/gradm[gradm:1182] uid/euid:0/0 gid/egid:0/0, parent /bin/bash[bash:23506] uid/euid:0/0 gid/egid:0/0"
 
+regex=uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent; id=693; \
+ source(0).user.category=application; \ 
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).number=$1; \
+ source(0).user.user_id(1).type=user-privs; \
+ source(0).user.user_id(1).number=$2; \
+ source(0).user.user_id(2).type=current-group; \
+ source(0).user.user_id(2).number=$3; \
+ source(0).user.user_id(3).type=group-privs; \
+ source(0).user.user_id(3).number=$4; \
+ chained; silent;
+
 #
 # generic grsec2 goto rules
 regex=(to|on|against) ([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
@@ -59,33 +71,13 @@ regex=(to|on|against) ([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d
 # target(1).user.user_id(3).number = $15; \
  chained; silent;
 
-regex=(by|for) (IP:(.*) )?([^[ ]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+), parent ([^[]+)\[([^:]+):(\d+)] uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+); \
+regex=(by|for) (IP:([^ ]+) )?([^[ ]+)\[([^:]+):(\d+)]( uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+))?, parent ([^[]+)\[([^:]+):(\d+)]( uid/euid:(\d+)/(\d+) gid/egid:(\d+)/(\d+))?; optgoto=693; \
  id=692; \
  revision = 1; \
  source(0).node.address(0).address = $3; \
  source(0).process.path=$4; \
  source(0).process.name=$5; \
  source(0).process.pid=$6; \
- source(0).user.category=application; \
- source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).number=$7; \
- source(0).user.user_id(1).type=user-privs; \
- source(0).user.user_id(1).number=$8; \
- source(0).user.user_id(2).type=current-group; \
- source(0).user.user_id(2).number=$9; \
- source(0).user.user_id(3).type=group-privs; \
- source(0).user.user_id(3).number=$10; \
-# target(1).process.path = $11; \
-# target(1).process.name = $12; \
-# target(1).process.pid = $13; \
-# target(1).user.user_id(0).type = current-user; \
-# target(1).user.user_id(0).number = $14; \
-# target(1).user.user_id(1).type = user-privs; \
-# target(1).user.user_id(1).number = $15; \
-# target(1).user.user_id(2).type = current-group; \
-# target(1).user.user_id(2).number = $16; \
-# target(1).user.user_id(3).type = group-privs; \
-# target(1).user.user_id(3).number = $17; \
  chained; silent;
 
 
@@ -287,7 +279,8 @@ classification.text=Attempted UNIX connect; \
 #
 #LOG: Jan 11 01:35:04 gw kernel: grsec: terminal being sniffed by IP:0.0.0.0 /usr/bin/vmnet-natd[vmnet-natd:574], parent /sbin/init[init:1] against /sbin/gradm[gradm:1182] uid/euid:0/0 gid/egid:0/0, parent /bin/bash[bash:23506] uid/euid:0/0 gid/egid:0/0
 #
-regex=terminal being sniffed by (IP:(.*) )?([^[ ]+)\[([^:]+):(\d+)], parent ([^[]+)\[([^:]+):(\d+)]; goto=691; \
+regex=terminal being sniffed by; \
+ goto=691; goto=692;\
  classification.text=Terminal sniffed; \
  id=675; \
  revision=1; \
@@ -296,11 +289,6 @@ regex=terminal being sniffed by (IP:(.*) )?([^[ ]+)\[([^:]+):(\d+)], parent ([^[
  analyzer(0).class=Kernel; \
  assessment.impact.type=other; \
  assessment.impact.severity=high; \
- source(0).node.address(0).address = $2; \
- source(0).process.path=$3; \
- source(0).process.name=$4; \
- source(0).process.pid=$5; \
- source(0).user.category=application; \
  last;
 
 
@@ -558,6 +546,20 @@ goto=692; optgoto=693-695; \
 #define GR_FAILFORK_MSG "failed fork with errno %d by "
 #
 #LOG: Mar 15 16:14:35 sysadmin kernel: grsec: From 192.168.1.25: failed fork with errno -11 by /root/test/fork-bomb[fork-bomb:4362] uid/euid:0/0 gid/egid:0/0, parent /root/test/fork-bomb[fork-bomb:4009] uid/euid:0/0 gid/egid:0/0
+
+regex=failed fork with errno (-?\d+) by ([^[]+); \
+optgoto=691; optgoto=692-695; \
+ classification.text=Fork failure; \
+ revision=1; \
+ analyzer(0).name=grsecurity; \
+ analyzer(0).manufacturer=www.grsecurity.net; \
+ analyzer(0).class=Kernel; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=other; \
+ assessment.impact.severity=high; \
+ assessment.impact.description=Program $2 tried to fork and failed with errno $1.; \
+ last
+
 
 #define GR_NICE_CHROOT_MSG "denied priority change by "
 
