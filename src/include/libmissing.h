@@ -31,14 +31,6 @@
 
 #include "config.h"
 
-#include <alloca.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <time.h>
 #include "getaddrinfo.h"
 #include "gettext.h"
 #include "inet_ntop.h"
