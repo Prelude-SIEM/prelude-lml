@@ -31,18 +31,23 @@
 
 #include "config.h"
 
+#include <alloca.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <time.h>
 #include "getaddrinfo.h"
 #include "gettext.h"
 #include "inet_ntop.h"
-#include "minmax.h"
+#include "size_max.h"
 #include "snprintf.h"
 #include "strdup.h"
 #include "time_r.h"
 #include "vasnprintf.h"
 #include "xsize.h"
-#include <alloca.h>
-#include <stdbool.h>
-#include <string.h>
-#include <time.h>
+
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */

@@ -1,3 +1,22 @@
+* 2006-09-11, prelude-lml-0.9.7:
+
+	- Fix reading from standard input.
+
+	- Fix OpenBSD getaddrinfo() problem.
+
+	- Add Cisco-CSS support.
+
+	- Add Cisco-Router IDS module support.
+
+	- Checkpoint ruleset is supported again.
+
+	- Support 'fork failure' grsecurity warning, fix 'terminal being sniffed' match.
+
+	- NTsyslog ruleset audit.
+
+	- Fix WAP11 ruleset.
+
+
 * 2006-06-10, prelude-lml-0.9.6:
 
 	- Fix a bug where some rules marked silent would trigger an alert.
