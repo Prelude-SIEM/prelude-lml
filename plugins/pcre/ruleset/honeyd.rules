@@ -188,7 +188,7 @@ regex=switching to polling mode; \
 # Subsystem \"%s\" died
 # Subsystem "<script name>" died
 regex=Subsystem \"(.*)\" died; \
- classification.text=Honeypot virtual service died; \
+ classification.text=Virtual service died; \
  id=2608; \
  revision=1; \
  analyzer(0).name=honeyd; \
@@ -203,7 +203,7 @@ regex=Subsystem \"(.*)\" died; \
 # Subsystem %s on %s attempts illegal bind %s:%d
 # Subsystem <script name> on <honeyd template> attempts illegal bind <address(0).:<port>
 regex=Subsystem (.*) on (.*) attempts illegal bind ([\d\.]+):(\d+); \
- classification.text=Honeypot virtual service attempts illegal bind; \
+ classification.text=Virtual service attempts illegal bind; \
  id=2609; \
  revision=1; \
  analyzer(0).name=honeyd; \
@@ -215,11 +215,11 @@ regex=Subsystem (.*) on (.*) attempts illegal bind ([\d\.]+):(\d+); \
  assessment.impact.description=Honeypot virtual service attempted an illigal bind; \
  last
 
-#Dec 30 20:08:24 hacklab honeyd[5711]: listening on eth0: ip  and not ether src 00:10:5a:7a:6c:47
+#LOG:Dec 30 20:08:24 hacklab honeyd[5711]: listening on eth0: ip  and not ether src 00:10:5a:7a:6c:47
 #LOG:Dec 30 20:12:21 hacklab honeyd[5752]: listening on eth0: ip and (dst 192.168.1.20) and not ether src 00:10:5a:7a:6c:47
-#Dec 30 20:15:53 hacklab honeyd[5779]: listening on lo: ip and (dst 192.168.1.20)
+#LOG:Dec 30 20:15:53 hacklab honeyd[5779]: listening on lo: ip and (dst 192.168.1.20)
 regex=listening on (\S+):; \
- classification.text=Honeypot starting up; \
+ classification.text=Honeypot starting; \
  id=2610; \
  revision=1; \
  analyzer(0).name=honeyd; \
@@ -230,4 +230,178 @@ regex=listening on (\S+):; \
  assessment.impact.severity=info; \
  assessment.impact.description=Honeypot started; \
  source(0).interface=$1; \
+ last
+
+# Copyright (C) 2006 Bjoern Weiland <bjoern-dot-weiland-at-web-dot-de>
+# All Rights Reserved
+
+# Rules for honeyd version 1.5 (and probably later, NOT TESTED with later!)
+# The rules should apply since honeyd version 0.7 or 0.8
+
+#LOG:2006-08-18-12:21:12.1239 honeyd log started ------
+ regex=honeyd log (started|stopped) ------; \
+ classification.text=Honeypot log $1; \
+ id=2611; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=file; \
+ assessment.impact.severity=info; \
+ assessment.impact.description=Honeyd has $1 to write to its logfile; \
+ last
+
+#LOG:2006-08-18-12:21:12.1239 icmp(1) - 11.11.11.11 22.22.22.22: 8(0): 84 [SunOS 4.1 ]
+ regex=icmp\(1\) - ([\d\.]+) ([\d\.]+): (\d+)\((\d+)\): (\d*) \[(.*)\]; \
+ classification.text=ICMP connection; \
+ id=2612; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.iana_protocol_name=ICMP; \
+ source(0).service.iana_protocol_number=1; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ target(0).service.iana_protocol_name=ICMP; \
+ target(0).service.iana_protocol_number=1; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=Your honeypot *probably* replied to an echo request (PING), see additional data for details; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=ICMP type; \
+ additional_data(0).data=$3; \
+ additional_data(1).type=integer; \
+ additional_data(1).meaning=ICMP code; \
+ additional_data(1).data=$4; \
+ additional_data(2).type=integer; \
+ additional_data(2).meaning=Packet size; \
+ additional_data(2).data=$5; \
+ additional_data(2).type=string; \
+ additional_data(2).meaning=Target OS; \
+ additional_data(2).data=$6; \
+ last
+
+#LOG:2006-08-18-12:21:12.1239 tcp(6) - 11.11.11.11 53952 22.22.22.22 10078: 44 S [Linux 2.6 ]
+ regex=tcp\(6\) - ([\d\.]+) (\d+) ([\d\.]+) (\d+): (\d+) (\S*) \[(.*)\]; \
+ classification.text=TCP connection to closed port; \
+ id=2613; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.port=$2; \
+ source(0).service.iana_protocol_name=TCP; \
+ source(0).service.iana_protocol_number=6; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
+ target(0).service.iana_protocol_name=TCP; \
+ target(0).service.iana_protocol_number=6; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Someone tried to connect to a closed port on your honeypot; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=Packet size; \
+ additional_data(0).data=$5; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=TCP flags; \
+ additional_data(1).data=$6; \
+ additional_data(2).type=string; \
+ additional_data(2).meaning=Target OS; \
+ additional_data(2).data=$7; \
+ last
+
+#LOG:2006-08-18-12:21:12.1239 udp(17) - 11.11.11.11 36722 22.22.22.22 545: 28 [Linux 2.6 ]
+ regex=udp\(17\) - ([\d\.]+) (\d+) ([\d\.]+) (\d+): (\d+) \[(.*)\]; \
+ classification.text=UDP connection to closed port; \
+ id=2614; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ source(0).service.port=$2; \
+ source(0).service.iana_protocol_name=UDP; \
+ source(0).service.iana_protocol_number=17; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$3; \
+ target(0).service.port=$4; \
+ target(0).service.iana_protocol_name=UDP; \
+ target(0).service.iana_protocol_number=17; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Someone tried to connect to a closed port on your honeypot; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=Packet size; \
+ additional_data(0).data=$5; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Target OS; \
+ additional_data(1).data=$6; \
+ last
+
+#LOG:2006-08-18-12:21:12.1239 udp(17) E 11.11.11.11 43569 22.22.22.22 135: 280 0
+ regex=(udp|tcp)\((\d+)\) E ([\d\.]+) (\d+) ([\d\.]+) (\d+): (\d+) (\d+); \
+ classification.text=End of connection; \
+ id=2615; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.iana_protocol_name=$1; \
+ source(0).service.iana_protocol_number=$2; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.iana_protocol_name=$1; \
+ target(0).service.iana_protocol_number=$2; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=$1 connection to your honeypot has been closed; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=Data received; \
+ additional_data(0).data=$7; \
+ additional_data(1).type=integer; \
+ additional_data(1).meaning=Data sent; \
+ additional_data(1).data=$8; \
+ last
+
+#LOG:2006-08-18-12:21:12.1239 tcp(6) S 11.11.11.11 48877 22.22.22.22 2778 [Linux 2.6 ]
+ regex=(udp|tcp)\((\d+)\) S ([\d\.]+) (\d+) ([\d\.]+) (\d+) \[(.*)\]; \
+ classification.text=Start of connection; \
+ id=2616; \
+ revision=1; \
+ analyzer(0).name=honeyd; \
+ analyzer(0).manufacturer=www.honeyd.org; \
+ analyzer(0).class=Honeypot; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ source(0).service.port=$4; \
+ source(0).service.iana_protocol_name=$1; \
+ source(0).service.iana_protocol_number=$2; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ target(0).service.iana_protocol_name=$1; \
+ target(0).service.iana_protocol_number=$2; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=recon; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=$1 connection to your honeypot has been opened; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Target OS; \
+ additional_data(0).data=$7; \
  last
