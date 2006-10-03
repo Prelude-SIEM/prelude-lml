@@ -164,7 +164,7 @@
 regex=EMU;				include = apc-emu.rules;
 regex=(anomaly|since|firstSeen);	include = arbor.rules;
 regex=arpwatch;				include = arpwatch.rules;
-regex=(bigconf|kernel);			include = f5-bigip.rules;
+regex=CactiTholdLog;			include = cacti-thold.rules;
 regex=product:;				include = checkpoint.rules;
 regex=%(PIX|ASA);			include = cisco-asa.rules;
 regex=(IPV4|SSHD|NETMAN)-\d+;		include = cisco-css.rules;
@@ -175,14 +175,15 @@ regex=SEV=;				include = cisco-vpn.rules;
 regex=(FOUND|virus);			include = clamav.rules;
 regex=server administrator;		include = dell-om.rules
 regex=(kernel|grsec);			include = grsecurity.rules; 
-regex=kernel;				include = netfilter.rules; \
-					include = ipchains.rules;
+regex=(bigconf|kernel);                 include = f5-bigip.rules;
 regex=(honeyd|icmp|tcp|udp);		include = honeyd.rules;
 # Using this somewhat complex regex instead of the simpler httpd due to the 
 # fact that we might be directly monitoring httpd logs instead of httpd syslog
 # entries (in which case we won't have the process name to match against)
 regex=(\[error\]|Pass|httpd);		include = httpd.rules; \
 					include = modsecurity.rules;
+regex=kernel;                           include = ipchains.rules; \
+                                        include = netfilter.rules;
 regex=ipfw;				include = ipfw.rules;
 regex=[Ww]ireless;			include = linksys-wap11.rules;
 regex=mssql;				include = ms-sql.rules;
@@ -203,6 +204,8 @@ regex=popper;				include = qpopper.rules;
 regex=avc:;				include = selinux.rules;
 regex=sendmail;				include = sendmail.rules;
 regex=(user|group)(mod|add);		include = shadow-utils.rules;
+regex=id=firewall;                      include = sonicwall.rules;
+regex=spamd;                            include = spamassassin.rules;
 # More complex regex to handle data coming directly from Squid log files
 regex=(Acceptin|Squid|Disabled|DENIED);	include = squid.rules;
 regex=sshd;				include = ssh.rules;
@@ -212,7 +215,5 @@ regex=[wl]an @Group:;			include = vigor.rules;
 regex=vpopmail;				include = vpopmail.rules;
 regex=webmin;				include = webmin.rules;
 regex=ftpd;				include = wu-ftp.rules;
-regex=id=firewall;			include = sonicwall.rules;
-regex=spamd;				include = spamassassin.rules;
 
 include = single.rules;

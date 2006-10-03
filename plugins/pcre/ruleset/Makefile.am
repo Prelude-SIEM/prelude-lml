@@ -4,6 +4,7 @@ ruleset_DATA = \
 	apc-emu.rules		\
 	arbor.rules		\
 	arpwatch.rules		\
+	cacti-thold.rules	\
 	checkpoint.rules	\
 	cisco-asa.rules		\
 	cisco-css.rules		\
