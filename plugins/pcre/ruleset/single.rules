@@ -248,7 +248,7 @@ regex=deny user: (\S+), prog: (\D+), pid: \d+\(\d+\)\[(\d+)\], policy: (\S+) fil
 # Copyright (C) 2005 M LeBlanc <mleblanc at cpan dot org>
 # All Rights Reserved
 
-#May 10 15:24:21 mighty pure-ftpd: (?@127.0.0.1) [WARNING] Authentication failed for user [asdfasdf]
+#LOG:May 10 15:24:21 mighty pure-ftpd: (?@127.0.0.1) [WARNING] Authentication failed for user [asdfasdf]
 regex=([\d\.]+)\) \[WARNING\] Authentication failed for user \[(.+)\]; \
  classification.text=FTP logon failed; \
  id=410; \
@@ -270,4 +270,28 @@ regex=([\d\.]+)\) \[WARNING\] Authentication failed for user \[(.+)\]; \
  target(0).service.iana_protocol_number=6; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=$2; \
+ last;
+
+# Copyright (C) 2006 G Ramon Gomez <gene at gomezbrothers dot com>
+# All Rights Reserved
+
+#LOG:Oct 19 16:44:12 localhost yum: Installed: mysql-server.i386 4.1.20-1.RHEL4.1
+#LOG:Oct 20 09:03:55 localhost yum: Updated: tzdata.noarch 2006m-2.el4
+regex=(Installed|Updated): (\S+) (\S+); \
+ classification.text=Package $1; \
+ id=411; \
+ revision=1; \
+ analyzer(0).name=yum; \
+ analyzer(0).manufacturer=http://linux.duke.edu/projects/yum/; \
+ analyzer(0).class=Patch Management; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=file; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=The package $2 was $1 to version $3.; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Package; \
+ additional_data(0).data=$2; \
+ additional_data(1).type=string; \
+ additional_data(1).meaning=Package version; \
+ additional_data(1).data=$3; \
  last;

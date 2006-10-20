@@ -1,14 +1,10 @@
 #
 # Rule format :
 #
-# For more information about the fields described above and their meaning,
-# please have a look to the IDMEF Draft located at :
+# For information about the fields and their meanings, please have a look at
+#  the IDMEF Draft located at :
 #
-# http://www.ietf.org/internet-drafts/draft-ietf-idwg-idmef-xml-14.txt
-#
-# If one of the IDMEF field you wish to add information too isn't covered in
-# the rule language, please take the 5 minutes needed to implement a simple
-# parsing function to the simple.c plugin distributed with Prelude LML.
+# http://www.ietf.org/internet-drafts/draft-ietf-idwg-idmef-xml-16.txt
 #
 # CREATING AND CONTRIBUTING RULES:
 # Rulesets that you contribute to the Prelude-LML maintainer should follow 
@@ -31,132 +27,23 @@
 #   includes timestamp, originating node, originating process, and pid).
 # - Submit new rulesets to the prelude-devel mailing list for consideration.
 #
+# See the existing rulesets for examples.
 #
-# Below you will find a listing of most of the IDMEF fields Prelude-LML 
-# accepts.  Where you see an item listed with (), it means that item is 
-# indexed.  Indexing starts at 0, so, for example, an event with multiple 
-# targets would have the first target listed as target(0), followed by whatever
-# IDMEF fields you use.  See the existing rulesets for examples.
+# LML-specific fields:
 #
 # - regex:
-#   A PCRE regex that should be matched to trigger the alert.
-#
-# - classification.text: 
-#   The name of the alert, from one of the origins listed below.
-#
-# - classification.url:
-#   A URL at which the manager (or the human
-#   operator of the manager) can find additional information about the
-#   alert.  The document pointed to by the URL may include an in-depth
-#   description of the attack, appropriate countermeasures, or other
-#   information deemed relevant by the vendor.
-# 
-# - assessment.impact.severity:
-#   An estimate of the relative severity of the event.
-#   Possible values are: low, medium, high.
-#
-# - assessment.impact.completion:
-#   An indication of whether the analyzer believes the attempt that
-#   the event describes was successful or not.
-#   The permitted values are: failed, succeeded.
-#
-# - assessment.impact.type:
-#   The type of attempt represented by this event, in relatively broad
-#   categories.
-#   The permitted values are: admin, dos, file, recon, user, other.
-#
-# - assessment.impact.description:
-#   May contain a textual description of the impact, if the analyzer
-#   is able to provide additional details.
-#
-# - source().node.address().address,
-#   target().node.address().address:
-#   Address that has been attacked/Address that issued the attack.
-#   There can be more than one.
-#
-# - source().node.address().category
-#   target().node.address().category
-#   The type of address provided.
-#   Possible values: unknown, atm, e-mail, lotus-notes, mac, sna, vm, 
-#   ipv4-addr, ipv4-addr-hex, ipv6-addr, ipv6-addr-hex, ipv6-net, ipv6-net-mask
-# 
-# - source().node.name,
-#   target().node.name:
-#   The name of the equipment. This information MUST be provided if no Address
-#   information is given.
-#
-# - source().node.category,
-#   target().node.category:
-#   The domain from which the name information was obtained.
-#   Possible values are: unknown, ads, afs, coda, dfs, dns, hosts, kerberos,
-#   nds, nis, nisplus, nt, wfw
-#
-# - source().node.location,
-#   target().node.location:
-#   The location of the equipment.
-#
-# - source().spoofed,
-#   target().decoy:
-#   An indication of wheter the source/target is a decoy.
-#   The permitted values are: unknown, yes, no.
-#
-# - source().interface,
-#   target().interface:
-#   May be used by a network-based analyzer with multiple interfaces to
-#   indicate which interfaces this source/target was seen on.
-#
-# - source().service.name,
-#   target().service.name:
-#   The name of the service. Whenever possible, the name from the IANA list
-#   of well-known ports SHOULD be used.
-#
-# - source().service.port,
-#   target().service.port:
-#   The port number being used.
-#
-# - source().service.iana_protocol_name,
-#   target().service.iana_protocol_name:
-#   The IANA protocol being used (tcp/udp/icmp/etc)
-#
-# - source().service.portlist,
-#   target().service.portlist:
-#   A list of port numbers beeing used.
-#
-# - source().user.category,
-#   target().user.category:
-#   The type of user represented (unknown, application, os-device).
-#
-# - source().user.userid().
-#   target().user.userid().
-#   Create a new UserId inside an User object (that may contain several UserId).
-#
-# - source().user.userid().type,
-#   target().user.userid().type:
-#   The type of user information represented (current-user, original-user, 
-#   target-user, user-privs, current-group, group-privs, other-privs).
-#
-# - source().user.userid().name,
-#   target().user.userid().name:
-#   A user or group name.
-#
-# - source().user.userid().number,
-#   target().user.userid().number:
-#   A user or group number.
-# 
-# - source().process.name,
-#   target().process.name:
-#   A process name
-# 
-# - source().process.pid,
-#   target().process.pid:
-#   A process number
+#   A perl regex instruction to the rule on the correct way to parse the log
+#   entry concerned.
 #
 # - id:
-#   The rule ID associated with this rule.
+#   A unique number identifying this rule in the Prelude-LML ruleset.  Rulesets
+#   are assigned IDs in blocks of 100, so if the first rule in a ruleset is
+#   2300, all of the rules in that ruleset will be 23xx.
 #
 # - revision:
-#   The current revision number of this rule.
-#
+#   The current revision of the rule.  Higher numbers indicate more recent
+#   versions.
+# 
 # - last:
 #   Indicates to LML that if this rule is triggered, stop checking for further
 #   regex matches.
@@ -216,4 +103,5 @@ regex=vpopmail;				include = vpopmail.rules;
 regex=webmin;				include = webmin.rules;
 regex=ftpd;				include = wu-ftp.rules;
 
+# All rules that are standalone/not part of a ruleset go into single.rules
 include = single.rules;
