@@ -179,9 +179,8 @@ regex=security\[success\] 562 (.*) Handle Closed:  Object Server:[\w\s]+  Handle
  last
 
 # 1.g 577
-# Currently broken on Windows 2003; verify against older Windows
 #LOG:Jul 11 15:09:21 somehost.ragingwire.net smf-eng-srobins/smf-eng-srobins security[success] 577 NT AUTHORITY\SYSTEM  Privileged Service Called:  Server: NT Local Security Authority / Authentication Service  Service:LsaRegisterLogonProcess()  Primary User Name:SMF-ENG-GGOMEZ$  Primary Domain:RES  Primary Logon ID:(0x0,0x3E7)  Client User Name:SMF-ENG-GGOMEZ$  Client Domain:RES  Client Logon ID:(0x0,0x3E7)  Privileges:SeTcbPrivilege
-regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:.+  Service:(.*)  Primary User Name:([\w ]+)  Primary Domain:.+  Primary Logon ID:\(.*\)  Client User Name:(.+)  Client Domain:.+  Client Logon ID:.+  Privileges:(.+); \
+regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:.+  Service:(.*)  Primary User Name:(.+)  Primary Domain:.+  Primary Logon ID:\(.*\)  Client User Name:(.+)  Client Domain:.+  Client Logon ID:.+  Privileges:(.+); \
  classification.text=User privilege exercised; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
@@ -233,8 +232,8 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
  last
 
 # 1.i 680
-# No log sample; please submit
-regex= security\[success\] 680 (.*)  Account Used for Logon by: .+  Account Name: (.+)  Workstation: (.+); \
+#LOG:Oct 22 20:57:03 smf-syslog-02 smf-dc-01/smf-dc-01 security[success] Account Used for Logon by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Account Name:  DRankin  Workstation:   SMF-HLP-16
+regex= security\[success\].*Account Used for Logon by: (.+)  Account Name: (.+)  Workstation: (.+); \
  classification.text=Login successful; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
@@ -251,10 +250,9 @@ regex= security\[success\] 680 (.*)  Account Used for Logon by: .+  Account Name
  source(0).node.address(0).category=unknown; \
  source(0).node.address(0).address=$3; \
  source(0).node.name=$3; \
+ source(0).process.name=$1; \
  source(0).user.user_id(0).type=current-user; \
- source(0).user.user_id(0).name=$1; \
- source(0).user.user_id(1).type=current-user; \
- source(0).user.user_id(1).name=$2; \
+ source(0).user.user_id(0).name=$2; \
  last
 
 # 1.j 682
