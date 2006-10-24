@@ -19,6 +19,7 @@ ruleset_DATA = \
 	ipchains.rules		\
 	ipfw.rules		\
 	modsecurity.rules	\
+	ms-cluster.rules	\
 	ms-sql.rules		\
 	nagios.rules		\
 	navce.rules		\

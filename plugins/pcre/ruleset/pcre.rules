@@ -73,6 +73,7 @@ regex=kernel;                           include = ipchains.rules; \
                                         include = netfilter.rules;
 regex=ipfw;				include = ipfw.rules;
 regex=[Ww]ireless;			include = linksys-wap11.rules;
+regex=clussvc;				include = ms-cluster.rules; 
 regex=mssql;				include = ms-sql.rules;
 regex=nagios;				include = nagios.rules;
 regex=norton;				include = navce.rules;
