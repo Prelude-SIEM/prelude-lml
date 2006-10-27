@@ -51,9 +51,9 @@ regex=(\S+): (\S+) FOUND; \
 
 #LOG:May 10 15:18:56 mail clamd[14292]: Database correctly reloaded (21517 viruses)
 regex=Database correctly reloaded \(\d+ viruses\); \
- classification.text=Virus definitions updated; \
+ classification.text=Virus definition update; \
  id=3201; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Clam Antivirus; \
  analyzer(0).manufacturer=www.clamav.net; \
  analyzer(0).class=Antivirus; \
