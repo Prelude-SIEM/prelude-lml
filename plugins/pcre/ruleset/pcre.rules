@@ -48,6 +48,13 @@
 #   Indicates to LML that if this rule is triggered, stop checking for further
 #   regex matches.
 
+# Prevent LML from matching its own output and creating a logging loop in case
+# of odd syslog configurations
+
+regex=could not match prefix against log entry; \
+  silent; \
+  last
+
 regex=EMU;				include = apc-emu.rules;
 regex=(anomaly|since|firstSeen);	include = arbor.rules;
 regex=arpwatch;				include = arpwatch.rules;
