@@ -8,6 +8,7 @@ ruleset_DATA = \
 	checkpoint.rules	\
 	cisco-asa.rules		\
 	cisco-css.rules		\
+	cisco-ips.rules		\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
