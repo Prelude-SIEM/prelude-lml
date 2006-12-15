@@ -15,11 +15,11 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --aux-dir=. --lgpl --libtool --macro-prefix=gl extensions getaddrinfo inet_ntop memset mktime snprintf strdup
+#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --aux-dir=. --lgpl --libtool --macro-prefix=gl getaddrinfo inet_ntop memset mktime snprintf strdup
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
-gl_MODULES([extensions getaddrinfo inet_ntop memset mktime snprintf strdup])
+gl_MODULES([getaddrinfo inet_ntop memset mktime snprintf strdup])
 gl_AVOID([])
 gl_SOURCE_BASE([libmissing])
 gl_M4_BASE([libmissing/m4])

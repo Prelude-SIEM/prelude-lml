@@ -31,15 +31,11 @@
 
 #include "config.h"
 
+#include <string.h>
+#include <time.h>
 #include "getaddrinfo.h"
-#include "gettext.h"
 #include "inet_ntop.h"
-#include "size_max.h"
 #include "snprintf.h"
 #include "strdup.h"
-#include "time_r.h"
-#include "vasnprintf.h"
-#include "xsize.h"
-
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */

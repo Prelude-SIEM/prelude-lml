@@ -22,9 +22,7 @@
 # define _GNU_SOURCE    1
 #endif
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 #ifndef IN_LIBINTL
 # include <alloca.h>
 #endif
@@ -250,7 +248,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		  case TYPE_COUNT_LONGINT_POINTER:
 		    *a.arg[dp->arg_index].a.a_count_longint_pointer = length;
 		    break;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
 		  case TYPE_COUNT_LONGLONGINT_POINTER:
 		    *a.arg[dp->arg_index].a.a_count_longlongint_pointer = length;
 		    break;
@@ -324,7 +322,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    {
 
 		    case 'd': case 'i': case 'u':
-# ifdef HAVE_LONG_LONG
+# ifdef HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -354,7 +352,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 'o':
-# ifdef HAVE_LONG_LONG
+# ifdef HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -382,7 +380,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 'x': case 'X':
-# ifdef HAVE_LONG_LONG
+# ifdef HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -529,7 +527,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 
 		switch (type)
 		  {
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
 		  case TYPE_LONGLONGINT:
 		  case TYPE_ULONGLONGINT:
 		    *p++ = 'l';
@@ -683,7 +681,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			  SNPRINTF_BUF (arg);
 			}
 			break;
-#ifdef HAVE_LONG_LONG
+#ifdef HAVE_LONG_LONG_INT
 		      case TYPE_LONGLONGINT:
 			{
 			  long long int arg = a.arg[dp->arg_index].a.a_longlongint;
