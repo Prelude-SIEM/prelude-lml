@@ -152,20 +152,18 @@ regex=WCCP Disabled\.; \
  assessment.impact.description=Squid was invoked without the WCCP service; \
  last
 
-# No log sample; please submit
-regex=Squid Parent: child process (\d+) exited; \
- classification.text=Proxy stopped; \
+#LOG:2005/11/28 06:00:44| Squid Parent: child process 10216 exited due to signal 6
+regex=Squid Parent: child process (\d+) exited due to signal (\d+); \
+ classification.text=Proxy child process stopped; \
  id=1808; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Squid; \
  analyzer(0).manufacturer=www.squid-cache.org; \
  analyzer(0).class=Proxy; \
  assessment.impact.severity=medium; \
  assessment.impact.type=other; \
- assessment.impact.description=Squid (pid $2) exited; \
- target(0).node.name=$1; \
- target(0).process.name=squid; \
- target(0).process.pid=$2; \
+ assessment.impact.description=A Squid child process (pid $1) exited after receiving the signal $2; \
+ target(0).process.pid=$1; \
  last
 
 
