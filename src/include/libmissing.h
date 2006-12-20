@@ -32,6 +32,8 @@
 #include "config.h"
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <time.h>
 #include "getaddrinfo.h"
 #include "inet_ntop.h"
