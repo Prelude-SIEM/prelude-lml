@@ -1,3 +1,10 @@
+* 2006-12-20, prelude-lml-0.9.8.1:
+
+        - Compile / run under OS X.
+        
+        - Various portability fixes.
+        
+        
 * 2006-12-15, prelude-lml-0.9.8:
 
         - Introduce Cisco ASA IPS module support.
