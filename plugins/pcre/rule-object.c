@@ -29,7 +29,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <pcre.h>
 #include <netdb.h>
 

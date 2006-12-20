@@ -28,8 +28,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <assert.h>
-#include <sys/time.h>
-
 #include <libprelude/prelude.h>
 
 #include "prelude-lml.h"
