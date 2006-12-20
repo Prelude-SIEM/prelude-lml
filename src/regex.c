@@ -28,7 +28,6 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <sys/time.h>
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>

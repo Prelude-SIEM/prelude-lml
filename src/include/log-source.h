@@ -25,7 +25,6 @@
 #define LOG_COMMON_H
 
 #include <pcre.h>
-#include <sys/time.h>
 #include "regex.h"
 
 typedef struct lml_log_format lml_log_format_t;

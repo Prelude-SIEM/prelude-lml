@@ -30,8 +30,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>                /* for NAME_MAX */
-#include <sys/time.h>
-#include <time.h>
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>

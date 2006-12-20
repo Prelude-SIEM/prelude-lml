@@ -33,11 +33,21 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#if TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# if HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
@@ -89,7 +99,7 @@ static void print_stats(const char *prefix, struct timeval *end)
 
 
 
-static void sig_handler(int signum)
+static RETSIGTYPE sig_handler(int signum)
 {
         got_signal = signum;      
 }
