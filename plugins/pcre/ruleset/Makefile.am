@@ -7,6 +7,7 @@ ruleset_DATA = \
 	cacti-thold.rules	\
 	checkpoint.rules	\
 	cisco-asa.rules		\
+	cisco-common.rules	\
 	cisco-css.rules		\
 	cisco-ips.rules		\
 	cisco-router.rules	\
