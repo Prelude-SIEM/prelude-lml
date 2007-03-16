@@ -34,7 +34,7 @@
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\.; \
  classification.text=HTTP $3 "$2"; \
  id=3100; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
@@ -49,24 +49,23 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+)\
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
  additional_data(0).type=string; \
- additional_data(0).meaning=Action reason; \
- additional_data(0).data=$2; \
- additional_data(1).type=string; \
- additional_data(1).meaning=HTTP object; \
- additional_data(1).data=$3; \
+ additional_data(0).meaning=HTTP object; \
+ additional_data(0).data=$3; \
  last
 
 #LOG:May 10 08:36:43 somehost httpd[24776]: [error] [client 12.34.56.78] mod_security: Access denied with code 403. Pattern match "/support/common\.php" at THE_REQUEST.
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+)\.; \
  classification.text=HTTP $4 "$3" Blocked; \
  id=3101; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.; \
+ assessment.action(0).category = block-installed; \
+ assessment.action(0).description = Access was blocked with HTTP response code $2; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -78,24 +77,23 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern
  additional_data(0).meaning=HTTP code returned; \
  additional_data(0).data=$2; \
  additional_data(1).type=string; \
- additional_data(1).meaning=Action reason; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=HTTP object; \
- additional_data(2).data=$4; \
+ additional_data(1).meaning=HTTP object; \
+ additional_data(1).data=$4; \
  last
 
 #No log sample; please submit
 regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. Pattern match "(\S+)" at (\S+)\.; \
  classification.text=HTTP $4 "$3" Redirected; \
  id=3102; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.;\
+ assessment.action(0).category = block-installed; \
+ assessment.action(0).description = Access was redirected to $2.; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -107,18 +105,15 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to (\S+)\. 
  additional_data(0).meaning=Redirected to; \
  additional_data(0).data=$2; \
  additional_data(1).type=string; \
- additional_data(1).meaning=Action reason; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=HTTP object; \
- additional_data(2).data=$4; \
+ additional_data(1).meaning=HTTP object; \
+ additional_data(1).data=$4; \
  last
 
 #LOG:May 10 08:36:43 somehost httpd[24776]: [client 200.105.93.115] mod_security: Invalid URL encoding #2 detected.
 regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
  classification.text=HTTP Invalid $2; \
  id=3103; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
@@ -132,9 +127,6 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
- additional_data(0).type=string; \
- additional_data(0).meaning=Action reason; \
- additional_data(0).data=$2; \
  last
 
 #####
@@ -148,15 +140,16 @@ regex=\[client ([\d\.]+)\] mod_security: Invalid (.+)\.; \
 
 #LOG:Jun 16 08:42:23 metatron httpd[10837]: [error] [client 127.0.0.1] mod_security: Warning. Pattern match "/cgforum\\.cgi" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/cgforum.cgi"] [unique_id Kxq9XgoBSmsAACpVN4MAAAAE]
 regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\] \[uri "(.+)"\] \[unique_id (\S+)\]; \
- classification.text=HTTP $3 "$2"; \
  id=3104; \
- revision=2; \
+ revision=3; \
+ classification.ident = $6; \
+ classification.text=HTTP $3 "$2"; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=medium; \
  assessment.impact.completion=succeeded; \
- assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3.  No reactive action taken.; \
+ assessment.impact.description=mod_security found pattern match "$2" in HTTP object $3. No reactive action taken.; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -165,67 +158,59 @@ regex=\[client ([\d\.]+)\] mod_security: Warning. Pattern match "(.+)" at (\S+) 
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
+ target(0).service.web_service.url = $5; \
  additional_data(0).type=string; \
- additional_data(0).meaning=Action reason; \
- additional_data(0).data=$2; \
- additional_data(1).type=string; \
- additional_data(1).meaning=HTTP object; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=URI; \
- additional_data(2).data=$5; \
- additional_data(3).type=string; \
- additional_data(3).meaning=Event ID; \
- additional_data(3).data=$6; \
+ additional_data(0).meaning=HTTP object; \
+ additional_data(0).data=$3; \
  last
 
+
+#LOG:Feb 14 13:51:28 metatron httpd[6168]: [error] [client 192.168.1.1] mod_security: Access denied with code 500. Pattern match "cmd.exe" at REQUEST_URI [severity "EMERGENCY"] [hostname "www.connectionreset.it"] [uri "/cmd.exe"] [unique_id "M380ssCoDAIAABgYi0QAAAAA"]
 #LOG:Jun 16 08:42:23 metatron httpd[10833]: [error] [client 127.0.0.1] mod_security: Access denied with code 403. Pattern match "/bb-replog\\.sh" at THE_REQUEST [hostname "localhost.localdomain"] [uri "/cgi-bin/bb-replog.sh"] [unique_id KxpIRgoBSmsAACpRNmAAAAAD]
-regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+) \[hostname "(\S+)"\] \[uri "(.+)"\] \[unique_id (\S+)\]; \
- classification.text=HTTP $4 "$3" Blocked; \
+regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. Pattern match "(.+)" at (\S+) (\[severity "(\S+)"\] )?\[hostname "(\S+)"\] \[uri "(.+)"\] \[unique_id (\S+)\]; \
  id=3105; \
- revision=2; \
+ revision=3; \
+ classification.ident = $9; \
+ classification.text=HTTP $4 "$3" Blocked; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was blocked with HTTP response code $2; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.; \
+ assessment.action(0).category = block-installed; \
+ assessment.action(0).description = Access was blocked with HTTP response code $2.; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$1; \
- target(0).node.name=$5; \
+ target(0).node.name=$7; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
+ target(0).service.web_service.url = $8; \
  additional_data(0).type=integer; \
  additional_data(0).meaning=HTTP code returned; \
  additional_data(0).data=$2; \
  additional_data(1).type=string; \
- additional_data(1).meaning=Action reason; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=HTTP object; \
- additional_data(2).data=$4; \
- additional_data(3).type=string; \
- additional_data(3).meaning=URI; \
- additional_data(3).data=$6; \
- additional_data(4).type=string; \
- additional_data(4).meaning=Event ID; \
- additional_data(4).data=$7; \
+ additional_data(1).meaning=HTTP object; \
+ additional_data(1).data=$4; \
  last
 
 #No log sample; please submit
 regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to \[(\S+)\]\. Pattern match "(\S+)" at (\S+) \[hostname "(\S+)"\] \[uri "(.+)"\] \[unique_id (\S+)\]; \
- classification.text=HTTP $4 "$3" Redirected; \
  id=3106; \
- revision=2; \
+ revision=3; \
+ classification.ident = $7; \
+ classification.text=HTTP $4 "$3" Redirected; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.  Access was redirected to $2.; \
+ assessment.impact.description=mod_security found pattern match "$3" in HTTP object $4.; \
+ assessment.action(0).category = block-installed; \
+ assessment.action(0).description = Access was redirected to $2.; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -234,34 +219,29 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with redirect to \[(\S+)\
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
+ target(0).service.web_service.url = $6; \
  additional_data(0).type=string; \
  additional_data(0).meaning=Redirected to; \
  additional_data(0).data=$2; \
  additional_data(1).type=string; \
- additional_data(1).meaning=Action reason; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=HTTP object; \
- additional_data(2).data=$4; \
- additional_data(3).type=string; \
- additional_data(3).meaning=URI; \
- additional_data(3).data=$6; \
- additional_data(4).type=string; \
- additional_data(4).meaning=Event ID; \
- additional_data(4).data=$7; \
+ additional_data(1).meaning=HTTP object; \
+ additional_data(1).data=$4; \
  last
 
 #LOG:Dec  6 22:06:26 mail httpd[10812]: [error] [client 202.58.85.8] mod_security: Access denied with code 403. Error parsing POST parameters: Error normalizing parameter value: Invalid URL encoding detected: invalid characters used [hostname "www.gomezbros.com"] [uri "/modules.php"] [unique_id 87ZxND-IXCYAACo8LCYAAAAP]
 regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. (Error .+) \[hostname "(\S+)"\] \[uri "(.+)"\] \[unique_id (\S+)\]; \
- classification.text=HTTP Blocked; \
  id=3107; \
- revision=1; \
+ revision=2; \
+ classification.ident = $6; \
+ classification.text=HTTP Blocked; \
  analyzer(0).name=mod_security; \
  analyzer(0).manufacturer=www.modsecurity.org; \
  analyzer(0).class=HIDS; \
  assessment.impact.severity=high; \
  assessment.impact.completion=failed; \
- assessment.impact.description=mod_security encountered an error: "$3".  Access was blocked with HTTP response code $2; \
+ assessment.impact.description=mod_security encountered an error: "$3".; \
+ assessment.action(0).category = block-installed; \
+ assessment.action(0).description = Access was blocked with HTTP response code $2; \
  source(0).service.iana_protocol_name=tcp; \
  source(0).service.iana_protocol_number=6; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -270,16 +250,8 @@ regex=\[client ([\d\.]+)\] mod_security: Access denied with code (\d+)\. (Error 
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
+ target(0).service.web_service.url = $5; \
  additional_data(0).type=integer; \
  additional_data(0).meaning=HTTP code returned; \
  additional_data(0).data=$2; \
- additional_data(1).type=string; \
- additional_data(1).meaning=Action reason; \
- additional_data(1).data=$3; \
- additional_data(2).type=string; \
- additional_data(2).meaning=URI; \
- additional_data(2).data=$5; \
- additional_data(3).type=string; \
- additional_data(3).meaning=Event ID; \
- additional_data(3).data=$6; \
  last
