@@ -30,16 +30,13 @@
 #####
 
 #LOG:AUG 14 08:31:13 smf-custlog-02 1/1 88 NETMAN-2: Generic:LINK DOWN for e3
-regex=NETMAN-2: Generic:LINK DOWN for (\S+); \
+regex=NETMAN-\d: Generic:LINK DOWN for (\S+); \
  classification.text=Interface down; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=2; \
  id=4700; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -55,16 +52,13 @@ regex=NETMAN-2: Generic:LINK DOWN for (\S+); \
 
 #LOG:AUG 16 06:45:00 smf-custlog-02 1/1 1022 NETMAN-6: CLMcmd: wr mem,neteng@12.34.56.78
 #LOG:AUG 16 00:12:35 smf-custlog-02 1/1 49169 NETMAN-6: CLMcmd: wr memory ,neteng@90.12.34.56
-regex=NETMAN-6: CLMcmd: wr (\S+)\s*,(\S+)@([\d\.]+); \
+regex=NETMAN-\d: CLMcmd: wr (\S+)\s*,(\S+)@([\d\.]+); \
  classification.text=Configuration written to $1; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=6; \
  id=4701; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -83,16 +77,13 @@ regex=NETMAN-6: CLMcmd: wr (\S+)\s*,(\S+)@([\d\.]+); \
  last
 
 #LOG:AUG 16 07:31:45 smf-custlog-02 1/1 1065 NETMAN-6: CLMcmd: exit,neteng@12.34.56.78
-regex=NETMAN-6: CLMcmd: (.+)\s*,(\S+)@([\d\.]+); \
+regex=NETMAN-\d: CLMcmd: (.+)\s*,(\S+)@([\d\.]+); \
  classification.text=Command audit; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=6; \
  id=4702; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -113,16 +104,13 @@ regex=NETMAN-6: CLMcmd: (.+)\s*,(\S+)@([\d\.]+); \
 
 #LOG:AUG 16 00:13:46 smf-custlog-02 1/1 49172 SSHD-4: Access attempted by  from 12.34.56.78 port 1106
 #LOG:AUG 16 07:31:52 smf-custlog-02 1/1 1067 SSHD-4: Access attempted by neteng from 12.34.56.78 port 1121
-regex=SSHD-4: Access attempted by (.*) from ([\d\.]+) port (\d+); \
+regex=SSHD-\d: Access attempted by (.*) from ([\d\.]+) port (\d+); \
  classification.text=User login failed; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=SSHD; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=4; \
  id=4703; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -140,16 +128,13 @@ regex=SSHD-4: Access attempted by (.*) from ([\d\.]+) port (\d+); \
  last
 
 #LOG:AUG 16 07:31:57 smf-custlog-02 1/1 1069 NETMAN-6: CLM: Login neteng@12.34.56.78
-regex=NETMAN-6: CLM: Login (\S+)@([\d\.]+); \
+regex=NETMAN-\d: CLM: Login (\S+)@([\d\.]+); \
  classification.text=User login successful; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=6; \
  id=4704; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -165,16 +150,13 @@ regex=NETMAN-6: CLM: Login (\S+)@([\d\.]+); \
  last
 
 #LOG:AUG 18 05:44:35 smf-custlog-02 1/1 3201 IPV4-4: Duplicate IP address detected: 12.34.56.78 00-0a-b8-68-2d-8c
-regex=IPV4-4: Duplicate IP address detected: ([\d\.]+) ([a-f\d\-]+); \
+regex=IPV4-\d: Duplicate IP address detected: ([\d\.]+) ([a-f\d\-]+); \
  classification.text=Duplicate IP; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=IPV4; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=4; \
  id=4705; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -191,16 +173,13 @@ regex=IPV4-4: Duplicate IP address detected: ([\d\.]+) ([a-f\d\-]+); \
  last
 
 #LOG:AUG 16 06:46:56 smf-custlog-02 1/1 49124 NETMAN-2: Enterprise:Service Transition:web1-rw -> suspended
-regex=NETMAN-2: Enterprise:Service Transition:(\S+) -> (\S+); \
+regex=NETMAN-\d: Enterprise:Service Transition:(\S+) -> (\S+); \
  classification.text=Service $2; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
- classification.reference(1).origin=vendor-specific; \
- classification.reference(1).meaning=css_severity; \
- classification.reference(1).name=2; \
  id=4706; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
