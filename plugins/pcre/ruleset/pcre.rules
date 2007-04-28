@@ -79,7 +79,8 @@ regex=(honeyd|icmp|tcp|udp);		include = honeyd.rules;
 regex=(\[error\]|Pass|httpd);		include = httpd.rules; \
 					include = modsecurity.rules;
 regex=kernel;                           include = ipchains.rules; \
-                                        include = netfilter.rules;
+                                        include = netfilter.rules; \
+					include = bonding.rules;
 regex=ipfw;				include = ipfw.rules;
 regex=[Ww]ireless;			include = linksys-wap11.rules;
 regex=clussvc;				include = ms-cluster.rules; 
