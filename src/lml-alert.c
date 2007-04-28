@@ -107,16 +107,7 @@ static int fill_target_node_from_addrinfo(idmef_node_t *node, struct addrinfo *a
         idmef_address_t *addr;
         prelude_string_t *string;
 
-        while ( ai ) {
-                if ( ai->ai_canonname ) {
-                        ret = idmef_node_new_name(node, &string);
-                        if ( ret < 0 )
-                                return -1;
-                        
-                        if ( prelude_string_set_dup(string, ai->ai_canonname) < 0 )
-                                return -1;
-                }
-                
+        while ( ai ) {                
                 ret = idmef_node_new_address(node, &addr, IDMEF_LIST_APPEND);
                 if ( ret < 0 )
                         return -1;
@@ -140,6 +131,15 @@ static int fill_target_node_from_addrinfo(idmef_node_t *node, struct addrinfo *a
                 
                 if ( prelude_string_set_dup(string, str) < 0 )
                         return -1;
+
+                if ( ai->ai_canonname && strcmp(ai->ai_canonname, str) != 0 ) {
+                        ret = idmef_node_new_name(node, &string);
+                        if ( ret < 0 )
+                                return -1;
+                        
+                        if ( prelude_string_set_dup(string, ai->ai_canonname) < 0 )
+                                return -1;
+                }
 
                 ai = ai->ai_next;
         }
