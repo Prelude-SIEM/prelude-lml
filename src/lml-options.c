@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <glob.h>
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
@@ -89,47 +90,6 @@ static int drop_privilege(void)
         
         return 0;
 }
-
-
-
-
-static int check_file_access(const char *filename)
-{
-        int ret;
-        struct stat st;
-
-        ret = stat(filename, &st);
-        if ( ret < 0 ) {
-                if ( errno == ENOENT )
-                        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist.\n", filename);
-                
-                else if ( errno == EACCES )
-                        goto out;
-
-                else prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
-
-                return -1;
-        }
-
-        if ( config.wanted_uid == 0 )
-                return 0;
-        
-        if ( st.st_uid == config.wanted_uid && st.st_mode & S_IRUSR )
-                return 0;
-
-        if ( st.st_gid == config.wanted_gid && st.st_mode & S_IRGRP )
-                return 0;
-
-        if ( st.st_mode & S_IROTH )
-                return 0;
-
- out:
-        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading to uid %d/gid %d.\n",
-                    filename, config.wanted_uid, config.wanted_gid);
-
-        return -1;
-}
-
 
 
 static int set_conf_file(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
@@ -311,6 +271,88 @@ static int set_text_output(prelude_option_t *opt, const char *arg, prelude_strin
 }
 
 
+static int check_file_access(const char *filename)
+{
+        int ret;
+        struct stat st;
+
+        ret = stat(filename, &st);
+        if ( ret < 0 ) {
+                if ( errno == ENOENT )
+                        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s does not exist.\n", filename);
+                
+                else if ( errno == EACCES )
+                        goto out;
+
+                else prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
+
+                return -1;
+        }
+
+        if ( config.wanted_uid == 0 )
+                return 0;
+        
+        if ( st.st_uid == config.wanted_uid && st.st_mode & S_IRUSR )
+                return 0;
+
+        if ( st.st_gid == config.wanted_gid && st.st_mode & S_IRGRP )
+                return 0;
+
+        if ( st.st_mode & S_IROTH )
+                return 0;
+
+ out:
+        prelude_log(PRELUDE_LOG_WARN, "* WARNING: %s is not available for reading to uid %d/gid %d.\n",
+                    filename, config.wanted_uid, config.wanted_gid);
+
+        return -1;
+}
+
+
+static int glob_errfunc_cb(const char *epath, int eerrno)
+{
+        prelude_log(PRELUDE_LOG_WARN, "* WARNING: error with '%s': %s.\n", epath, strerror(eerrno));
+        return 0;
+}
+
+
+static int get_file_from_pattern(void *context, const char *pattern)
+{
+        int ret;
+        size_t i;
+        glob_t gl;
+        lml_log_source_t *ls;
+        
+        ret = glob(pattern, GLOB_NOCHECK | GLOB_TILDE, glob_errfunc_cb, &gl);
+        if ( ret != 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "glob failed: %s.\n", strerror(errno));
+                return ret; 
+        }
+        
+        for ( i = 0; i < gl.gl_pathc; i++ ) {
+                ret = check_file_access(gl.gl_pathv[i]);
+                if ( ret < 0 )
+                        continue; /* ignore error */
+        
+                ret = lml_log_source_new(&ls, context, gl.gl_pathv[i]);
+                if ( ret < 0 )
+                        break;
+                
+                else if ( ret == 1 ) 
+                        continue;
+                
+                ret = file_server_monitor_file(ls);
+                if ( ret < 0 )
+                        break;
+                
+                have_file = TRUE;
+        }
+        
+        globfree(&gl);
+        
+        return ret;
+}
+
 
 static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context) 
 {
@@ -318,24 +360,24 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
         lml_log_source_t *ls;
 
         if ( *arg != '-' ) {
-                ret = check_file_access(arg);
+                ret = get_file_from_pattern(context, arg);
                 if ( ret < 0 )
                         return 0; /* ignore error */
-        }
-        
-        ret = lml_log_source_new(&ls, context, arg);
-        if ( ret < 0 )
-                return prelude_error_from_errno(errno);
+        } else {
+                ret = lml_log_source_new(&ls, context, arg);
+                if ( ret < 0 )
+                        return prelude_error_from_errno(errno);
 
-        if ( ret == 1 ) 
-                return 0;
+                if ( ret == 1 ) 
+                        return 0;
                 
-        ret = file_server_monitor_file(ls);
-        if ( ret < 0 ) 
-                return ret;
-
-        have_file = TRUE;
+                ret = file_server_monitor_file(ls);
+                if ( ret < 0 ) 
+                        return ret;
         
+                have_file = TRUE;
+        }
+                
         return 0;
 }
 
