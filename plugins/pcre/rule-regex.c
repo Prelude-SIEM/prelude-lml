@@ -165,6 +165,48 @@ static pcre_context_t *lookup_context(value_container_t *vcont, pcre_plugin_t *p
 
 
 
+static int alert_add_rule_infos(pcre_rule_t *rule, idmef_message_t *idmef)
+{
+        int ret;
+        idmef_alert_t *alert;
+        prelude_string_t *str;
+        idmef_additional_data_t *ad;
+        
+        ret = idmef_message_new_alert(idmef, &alert);
+        if ( ret < 0 )
+                return ret;
+        
+        if ( rule->id ) {
+                ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
+                if ( ret < 0 )
+                        return ret;
+                
+                ret = idmef_additional_data_new_meaning(ad, &str);
+                if ( ret < 0 )
+                        return ret;
+                
+                prelude_string_set_constant(str, "Rule ID");
+                idmef_additional_data_set_integer(ad, rule->id);
+        }
+        
+        if ( rule->revision ) {
+                ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
+                if ( ret < 0 )
+                        return ret;
+                
+                ret = idmef_additional_data_new_meaning(ad, &str);
+                if ( ret < 0 )
+                        return ret;
+                
+                prelude_string_set_constant(str, "Rule Revision");
+                idmef_additional_data_set_integer(ad, rule->revision);
+        }
+        
+        return 0;    
+}
+
+
+
 static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
                              const lml_log_source_t *ls, const lml_log_entry_t *log_entry, int *ovector, int *osize)
 {
@@ -207,6 +249,7 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
         if ( state->idmef && ! state->log_added ) {
                 state->log_added = TRUE;
                 lml_alert_prepare(state->idmef, ls, log_entry);
+                alert_add_rule_infos(rule, state->idmef);
         }
 
         return ret;
