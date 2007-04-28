@@ -307,11 +307,11 @@ static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
                         continue;
 
                 ctx = pcre_context_search(plugin, prelude_string_get_string(str));
+                prelude_string_destroy(str);
                 if ( ! ctx )
                         continue;
                 
                 pcre_context_destroy(ctx);
-                prelude_string_destroy(str);
         }
 }
 
