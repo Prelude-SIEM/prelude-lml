@@ -40,8 +40,15 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # Each [format] section might have several file entry.
 # Each [format] section might have several udp-server entry.
 #
-# The same file entry / udp-server entry might be duplicated accross
+# The same file or udp-server entry might be duplicated accross
 # differents formats.
+#
+# Additionally, you can specify a pattern in a file entry. LML will then searches 
+# for all the pathnames matching pattern according to the rules used by the shell 
+# (see glob(7)).
+#
+# Example: file = /var/log/*/*.log
+
 
 
 [format=syslog]
@@ -52,7 +59,7 @@ file = /var/log/messages
 
 
 #
-# Example configuration for metalog output:
+# Sample configuration for metalog:
 #
 [format=metalog]
 prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
@@ -62,7 +69,7 @@ file = /var/log/everything/current
 
 
 #
-# Example configuration for apache output:
+# Sample configuration for apache:
 #
 [format=apache]
 time-format = "%d/%b/%Y:%H:%M:%S"
