@@ -1,36 +1,26 @@
-#serial 8
-dnl Copyright (C) 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
+#serial 13
+dnl Copyright (C) 2002, 2003, 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 dnl From Jim Meyering.
 
-# Redefine AC_FUNC_MKTIME, to fix a bug in Autoconf 2.60a and earlier.
+# Redefine AC_FUNC_MKTIME, to fix a bug in Autoconf 2.61a and earlier.
 # This redefinition can be removed once a new version of Autoconf is assumed.
 # The redefinition is taken from
-# <http://cvs.sv.gnu.org/viewcvs/*checkout*/autoconf/lib/autoconf/functions.m4?rev=1.108&root=autoconf>.
+# <http://cvs.sv.gnu.org/viewcvs/*checkout*/autoconf/autoconf/lib/autoconf/functions.m4?rev=1.119>.
 # AC_FUNC_MKTIME
 # --------------
 AC_DEFUN([AC_FUNC_MKTIME],
-[AC_REQUIRE([AC_HEADER_TIME])dnl
-AC_CHECK_HEADERS_ONCE(sys/time.h unistd.h)
+[AC_CHECK_HEADERS_ONCE(unistd.h)
 AC_CHECK_FUNCS_ONCE(alarm)
 AC_CACHE_CHECK([for working mktime], ac_cv_func_working_mktime,
 [AC_RUN_IFELSE([AC_LANG_SOURCE(
 [[/* Test program from Paul Eggert and Tony Leneis.  */
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
-
+#include <limits.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
@@ -178,12 +168,15 @@ main ()
      isn't worth using anyway.  */
   alarm (60);
 
-  for (time_t_max = 1; 0 < time_t_max; time_t_max *= 2)
-    continue;
-  time_t_max--;
-  if ((time_t) -1 < 0)
-    for (time_t_min = -1; (time_t) (time_t_min * 2) < 0; time_t_min *= 2)
-      continue;
+  for (;;)
+    {
+      t = (time_t_max << 1) + 1;
+      if (t <= time_t_max)
+	break;
+      time_t_max = t;
+    }
+  time_t_min = - ((time_t) ~ (time_t) 0 == (time_t) -1) - time_t_max;
+
   delta = time_t_max / 997; /* a suitable prime number */
   for (i = 0; i < N_STRINGS; i++)
     {
@@ -198,10 +191,12 @@ main ()
 	     && mktime_test ((time_t) (60 * 60 * 24))))
 	return 1;
 
-      for (j = 1; 0 < j; j *= 2)
+      for (j = 1; ; j <<= 1)
 	if (! bigtime_test (j))
 	  return 1;
-      if (! bigtime_test (j - 1))
+	else if (INT_MAX / 2 < j)
+	  break;
+      if (! bigtime_test (INT_MAX))
 	return 1;
     }
   return ! (irix_6_4_bug () && spring_forward_gap () && year_2050_test ());
@@ -216,7 +211,8 @@ fi
 
 AC_DEFUN([gl_FUNC_MKTIME],
 [
-  AC_REQUIRE([AC_FUNC_MKTIME])
+  AC_FUNC_MKTIME
+  dnl Note: AC_FUNC_MKTIME does AC_LIBOBJ(mktime).
   if test $ac_cv_func_working_mktime = no; then
     AC_DEFINE(mktime, rpl_mktime,
       [Define to rpl_mktime if the replacement function should be used.])
@@ -225,4 +221,7 @@ AC_DEFUN([gl_FUNC_MKTIME],
 ])
 
 # Prerequisites of lib/mktime.c.
-AC_DEFUN([gl_PREREQ_MKTIME], [:])
+AC_DEFUN([gl_PREREQ_MKTIME],
+[
+  AC_REQUIRE([AC_C_INLINE])
+])

@@ -1,5 +1,5 @@
-/* strdup.h -- duplicate a string
-   Copyright (C) 2004, 2006 Free Software Foundation, Inc.
+/* Copy memory area and return pointer after last written byte.
+   Copyright (C) 2003, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -15,25 +15,15 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef STRDUP_H_
-#define STRDUP_H_
+#include <config.h>
 
-/* Get strdup declaration, if available.  */
+/* Specification.  */
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-#if defined HAVE_DECL_STRDUP && !HAVE_DECL_STRDUP && !defined strdup
-/* Duplicate S, returning an identical malloc'd string.  */
-extern char *strdup (const char *s);
-#endif
-
-
-#ifdef __cplusplus
+/* Copy N bytes of SRC to DEST, return pointer to bytes after the
+   last written byte.  */
+void *
+mempcpy (void *dest, const void *src, size_t n)
+{
+  return (char *) memcpy (dest, src, n) + n;
 }
-#endif
-
-#endif /* STRDUP_H_ */
