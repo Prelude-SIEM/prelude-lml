@@ -348,7 +348,6 @@ static int match_rule_list(pcre_plugin_t *plugin,
                 *match_flags |= gl;
                 if ( gl & PCRE_MATCH_FLAGS_LAST )
                         break;
-
         }
 
         if ( optmatch < rule->min_optgoto_match ) {
@@ -367,10 +366,10 @@ static int match_rule_list(pcre_plugin_t *plugin,
                 destroy_idmef_state(state);
                 
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
-                
-                if ( rule->flags & PCRE_RULE_FLAGS_LAST )
-                        *match_flags |= PCRE_MATCH_FLAGS_LAST;
         }
+
+        if ( rule->flags & PCRE_RULE_FLAGS_LAST )
+                *match_flags |= PCRE_MATCH_FLAGS_LAST;
         
         destroy_context_if_needed(plugin, rule, log_entry, ovector, osize);
                 
