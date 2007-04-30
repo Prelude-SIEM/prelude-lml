@@ -309,7 +309,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         
         offptr = strchr(buf, ':');
         if ( ! offptr ) {
-                prelude_log(PRELUDE_LOG_WARN, "%s: Invalid metadata file.\n", lml_log_source_get_name(monitor->source), line);
+                prelude_log(PRELUDE_LOG_WARN, "%s:%d: Invalid metadata file.\n", lml_log_source_get_name(monitor->source), line);
                 ftruncate(fileno(monitor->metadata_fd), 0);
                 return -1;
         }
