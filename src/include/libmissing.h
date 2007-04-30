@@ -31,13 +31,13 @@
 
 #include "config.h"
 
+#include <glob.h>
+#include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <time.h>
 #include "getaddrinfo.h"
 #include "inet_ntop.h"
-#include "snprintf.h"
-#include "strdup.h"
 
 #endif /* _PRELUDE_LML_LIBMISSING_H */
