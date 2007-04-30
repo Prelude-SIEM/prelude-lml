@@ -147,11 +147,11 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
                 int (*cb)(lml_log_format_t *format, lml_log_source_t *ls, const char *log, void **out);
                 void **ptr;
         } tbl[] = {
-                { "hostname",  NULL,     (void **) &log_entry->target_hostname    },
-                { "process",   NULL,     (void **) &log_entry->target_process     },
-                { "pid",       NULL,     (void **) &log_entry->target_process_pid },
-                { "timestamp", parse_ts, (void **) &tv                            },
-                { NULL, NULL, NULL                                                },
+                { "hostname",  NULL,     (void **) (void *) &log_entry->target_hostname    },
+                { "process",   NULL,     (void **) (void *) &log_entry->target_process     },
+                { "pid",       NULL,     (void **) (void *) &log_entry->target_process_pid },
+                { "timestamp", parse_ts, (void **) &tv                                     },
+                { NULL, NULL, NULL                                                         },
         };
         
         matches = pcre_exec(prefix_regex, lml_log_format_get_prefix_regex_extra(format),
