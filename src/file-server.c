@@ -820,7 +820,7 @@ static int get_expected_event(FAMConnection *fc, int eventno)
         FD_ZERO(&fds);
         FD_SET(fc->fd, &fds);
 
-        tv.tv_sec = 1;
+        tv.tv_sec = 3;
         tv.tv_usec = 0;
 
         while ( ! FAMPending(fc) ) {
@@ -850,7 +850,7 @@ static int check_fam_writev_bug(FAMConnection *fc)
         char teststring[] = "testfam";
 
         snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
-
+        
         fd = mkstemp(buf);        
         if ( fd < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error creating unique temporary filename: %s.\n", strerror(errno));
@@ -874,10 +874,10 @@ static int check_fam_writev_bug(FAMConnection *fc)
 
         iov[0].iov_len = sizeof(teststring);
         iov[0].iov_base = teststring;
-        
+       
         ret = writev(fd, iov, 1);
         if ( ret != sizeof(teststring) ) {
-                prelude_log(PRELUDE_LOG_ERR, "error writing test string to %s: %s.\n", buf);
+                prelude_log(PRELUDE_LOG_ERR, "error writing test string to %s: %s.\n", buf, strerror(errno));
                 goto err;
         }
         
