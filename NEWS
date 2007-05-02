@@ -1,3 +1,23 @@
+* 2007-05-02, prelude-lml-0.9.9:
+
+        - Pattern can now be used to specify file to be monitored.
+
+	- Fix an issue in the detection of buggy writev() FAM notification.
+        
+        - Add bonding.rules, by Paul Robert Marino <prmarino1@gmail.com>. 
+                        
+        - ModSecurity ruleset update: remove unnecessary fields + ModSecurity 2.0 compatibility. 
+        
+        - New Cisco IOS common ruleset, by Alexandre Racine. 
+        
+        - Avoid duplicating information in node name and node address.
+        
+        - Add rule ID and revision to the generated alert for each matched rule. Fix #206. 
+
+        - Various bug fixes.
+        
+        
+
 * 2006-12-20, prelude-lml-0.9.8.1:
 
         - Compile / run under OS X.
