@@ -233,12 +233,13 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
                 if ( ! ctx )
                         return -1;
 
-                state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
+                if ( pcre_context_get_idmef(ctx) )
+                        state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
         }
 
         if ( rule->optional_context ) {
                 ctx = lookup_context(rule->optional_context, plugin, rule, log_entry, ovector, *osize);
-                if ( ctx )                
+                if ( ctx && pcre_context_get_idmef(ctx) )       
                         state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
         }
         
