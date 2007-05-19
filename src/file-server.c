@@ -481,20 +481,20 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
                         ignore_remaining = TRUE;
                 }
                 
-                ret = getc(fd->fd);                
+                ret = getc(fd->fd);
                 if ( ret == EOF ) {
                         clearerr(fd->fd);
                         return -1;
                 }
 
                 i++;
-                
+                   
                 if ( ret == '\n' )
                         break;
 
                 if ( ! ignore_remaining ) {
                         c = (char) ret;
-                        
+ 
                         ret = prelude_string_ncat(fd->buf, &c, 1);
                         if ( ret < 0 ) {
                                 prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
@@ -503,7 +503,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
                 }
                 
                 if ( i == available )
-                        return -1;
+                        return -2;
         }
 
         return i;       
@@ -528,22 +528,34 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
         
-        while ( (ret = read_logfile(monitor, len)) != -1 ) {
+        while ( (ret = read_logfile(monitor, len)) >= 0 ) {
                                 
                 eventno++;
                 config.line_processed++;
 
-                lml_dispatch_log(monitor->source,
-                                 prelude_string_get_string(monitor->buf),
-                                 prelude_string_get_len(monitor->buf));
+                /*
+                 * If the line we read only contained a '\n', string and len will be 0.
+                 */
+                if ( prelude_string_get_len(monitor->buf) ) {
+                        lml_dispatch_log(monitor->source,
+                                         prelude_string_get_string(monitor->buf),
+                                         prelude_string_get_len(monitor->buf));
 
-                file_metadata_save(monitor, st->st_size - len);
-                len -= prelude_string_get_len(monitor->buf) + 1;
+                        file_metadata_save(monitor, st->st_size - len);
+                }
                 
+                len -= prelude_string_get_len(monitor->buf) + 1; /* +1 account for the '\n' */
+                      
                 prelude_string_clear(monitor->buf);
                 _lml_handle_signal_if_needed();
+        
+                if ( len == 0 )
+                        break;
         }
         
+        if ( ret == -2 )
+                len = 0; /* everything has been read, but line is not complete */
+             
         /*
          * if len isn't 0, it mean we got EOF before reading every new byte,
          * we want to retry reading even if st_size isn't modified then.
