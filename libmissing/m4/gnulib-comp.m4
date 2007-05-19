@@ -124,6 +124,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/alloca_.h
   lib/asnprintf.c
   lib/dummy.c
+  lib/float+.h
   lib/fnmatch.c
   lib/fnmatch_.h
   lib/fnmatch_loop.c

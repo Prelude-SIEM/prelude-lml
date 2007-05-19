@@ -1,4 +1,4 @@
-# vasnprintf.m4 serial 13
+# vasnprintf.m4 serial 16
 dnl Copyright (C) 2002-2004, 2006-2007 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -59,6 +59,22 @@ AC_DEFUN([gl_PREREQ_VASNPRINTF],
   AC_CHECK_FUNCS(snprintf wcslen)
 ])
 
+# Extra prerequisites of lib/vasnprintf.c for supporting 'long double'
+# arguments.
+AC_DEFUN([gl_PREREQ_VASNPRINTF_LONG_DOUBLE],
+[
+  AC_REQUIRE([gl_PRINTF_LONG_DOUBLE])
+  case "$gl_cv_func_printf_long_double" in
+    *yes)
+      ;;
+    *)
+      AC_DEFINE([NEED_PRINTF_LONG_DOUBLE], 1,
+        [Define if the vasnprintf implementation needs special code for
+         'long double' arguments.])
+      ;;
+  esac
+])
+
 # Extra prerequisites of lib/vasnprintf.c for supporting the 'a' directive.
 AC_DEFUN([gl_PREREQ_VASNPRINTF_DIRECTIVE_A],
 [
@@ -86,6 +102,36 @@ AC_DEFUN([gl_PREREQ_VASNPRINTF_DIRECTIVE_F],
       AC_DEFINE([NEED_PRINTF_DIRECTIVE_F], 1,
         [Define if the vasnprintf implementation needs special code for
          the 'F' directive.])
+      ;;
+  esac
+])
+
+# Extra prerequisites of lib/vasnprintf.c for supporting the ' flag.
+AC_DEFUN([gl_PREREQ_VASNPRINTF_FLAG_GROUPING],
+[
+  AC_REQUIRE([gl_PRINTF_FLAG_GROUPING])
+  case "$gl_cv_func_printf_flag_grouping" in
+    *yes)
+      ;;
+    *)
+      AC_DEFINE([NEED_PRINTF_FLAG_GROUPING], 1,
+        [Define if the vasnprintf implementation needs special code for the
+         ' flag.])
+      ;;
+  esac
+])
+
+# Extra prerequisites of lib/vasnprintf.c for supporting the 0 flag.
+AC_DEFUN([gl_PREREQ_VASNPRINTF_FLAG_ZERO],
+[
+  AC_REQUIRE([gl_PRINTF_FLAG_ZERO])
+  case "$gl_cv_func_printf_flag_zero" in
+    *yes)
+      ;;
+    *)
+      AC_DEFINE([NEED_PRINTF_FLAG_ZERO], 1,
+        [Define if the vasnprintf implementation needs special code for the
+         0 flag.])
       ;;
   esac
 ])
