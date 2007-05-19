@@ -683,10 +683,6 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         ret = prelude_client_start(config.lml_client);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error starting prelude-client");
-                
-                if ( prelude_client_is_setup_needed(ret) )
-                        prelude_client_print_setup_error(config.lml_client);
-
                 return -1;
         }
         
