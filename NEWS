@@ -1,3 +1,21 @@
+* 2007-05-19, prelude-lml-0.9.10:
+
+        - Ability to use regular expressions in plugins.rules to define 
+          monitored sources, this can be very useful when combined to file globing.
+    
+        - [SPEEDUP] When the "*" keyword is used, the data is passed to the upper 
+          layer without trying to match anything.
+
+        - Fix NULL pointer dereference when a rule reference an existing, 
+          but empty context (fix #226).
+
+        - Remove deprecated use of prelude_client_print_setup_error(), 
+          directly handled via prelude_perror().
+
+        - Make the log parser more robust.
+
+
+
 * 2007-05-02, prelude-lml-0.9.9:
 
         - Pattern can now be used to specify file to be monitored.
