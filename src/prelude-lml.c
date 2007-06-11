@@ -105,16 +105,13 @@ static RETSIGTYPE sig_handler(int signum)
 }
 
 
-static void handle_signal(void)
+static void server_close(void)
 {
         size_t i;
 
         for ( i = 0; i < config.udp_nserver; i++ )
                 udp_server_close(config.udp_server[i]);
-
-        exit(2);
 }
-
 
 
 static void handle_sigquit(void)
@@ -151,20 +148,13 @@ static const char *get_restart_string(void)
 static void handle_sighup(void)
 {
         int ret;
-        size_t i;
-
-        /*
-         * close the UDP server, so that we can bind the port again.
-         */
-        for ( i = 0; i < config.udp_nserver; i++ )
-                udp_server_close(config.udp_server[i]);
 
         /*
          * Here we go !
          */
         ret = execvp(global_argv[0], global_argv);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "error re-executing lml\n");
+                prelude_log(PRELUDE_LOG_ERR, "error restarting '%s': %s\n", global_argv[0], prelude_strerror(ret));
                 return;
         }
 }
@@ -181,18 +171,25 @@ void _lml_handle_signal_if_needed(void)
         signo = got_signal;
         got_signal = 0;
 
-        if ( signo == SIGHUP ) {
-                prelude_log(PRELUDE_LOG_WARN, "signal %d received, restarting (%s).\n", signo, get_restart_string());
-                handle_sighup();
-        }
-
         if ( signo == SIGQUIT || signo == SIGUSR1 ) {
                 handle_sigquit();
                 return;
         }
 
+        server_close();
+
+        if ( config.lml_client )
+                prelude_client_destroy(config.lml_client, PRELUDE_CLIENT_EXIT_STATUS_FAILURE);
+
+        prelude_deinit();
+
+        if ( signo == SIGHUP ) {
+                prelude_log(PRELUDE_LOG_WARN, "signal %d received, restarting (%s).\n", signo, get_restart_string());
+                handle_sighup();
+        }
+
         prelude_log(PRELUDE_LOG_WARN, "signal %d received, terminating prelude-lml.\n", signo);
-        handle_signal();
+        exit(2);
 }
 
 
@@ -404,5 +401,6 @@ int main(int argc, char **argv)
                 print_stats("- ", &end);
         }
 
+        prelude_deinit();
         return 0;
 }
