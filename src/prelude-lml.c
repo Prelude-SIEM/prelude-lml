@@ -337,11 +337,10 @@ int main(int argc, char **argv)
                 return ret;
 
         ret = log_plugins_init(LOG_PLUGIN_DIR, lml_root_optlist);
-        if (ret < 0) {
-                prelude_log(PRELUDE_LOG_WARN, "error initializing logs plugins.\n");
-                return -1;
-        }
-        prelude_log_debug(1, "- Initialized %d logs plugins.\n", ret);
+        if (ret < 0)
+                return ret;
+
+        prelude_log_debug(1, "Initialized %d logs plugins.\n", ret);
 
         ret = lml_options_init(lml_root_optlist, argc, argv);
         if ( ret < 0 )

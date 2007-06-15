@@ -1,12 +1,12 @@
 /*****
 *
-* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 PreludeIDS Technologies. All Rights Reserved.
+* Copyright (C) 1998-2005,2006,2007 PreludeIDS Technologies. All Rights Reserved.
 * Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -46,7 +46,7 @@
 # endif
 #endif
 
-#ifdef HAVE_FAM 
+#ifdef HAVE_FAM
  #include <fam.h>
 #endif
 
@@ -96,7 +96,7 @@
 
 #define LOGFILE_DELETION_IMPACT_HIGH "An attacker seems to have erased the logfile, "      \
                                      "and the change doesn't seem to be related to a log " \
-                                     "rotation program." 
+                                     "rotation program."
 
 #define LOGFILE_MODIFICATION_CLASS "Logfile inconsistency"
 #define LOGFILE_MODIFICATION_IMPACT "An attacker might have modified the logfile in order " \
@@ -106,23 +106,23 @@
 
 typedef struct {
         prelude_list_t list;
-        
+
         lml_log_source_t *source;
-        
+
         FILE *fd;
         FILE *metadata_fd;
 
         off_t last_rotation_size;
         time_t last_rotation_time;
         time_t last_rotation_time_interval;
-        
+
         prelude_string_t *buf;
-        
+
         off_t need_more_read;
         off_t last_size;
 
         time_t last_mtime;
-        
+
 #ifdef HAVE_FAM
         FAMRequest fam_request;
 #endif
@@ -169,11 +169,11 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         idmef_message_t *message;
         idmef_assessment_t *assessment;
         prelude_string_t *string;
-        
+
         log_entry = lml_log_entry_new();
         if ( ! log_entry )
                 return;
-        
+
         ret = idmef_message_new(&message);
         if ( ret < 0 ) {
                 lml_log_entry_destroy(log_entry);
@@ -192,7 +192,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
                 goto err;
 
         ret = idmef_target_new_file(target, &file, -1);
-        if ( ret < 0 ) 
+        if ( ret < 0 )
                 goto err;
 
         idmef_file_set_category(file, IDMEF_FILE_CATEGORY_CURRENT);
@@ -210,7 +210,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         if ( ret < 0 )
                 goto err;
         prelude_string_set_ref(string, ptr ? (ptr + 1) : buf);
-        
+
         ret = idmef_file_new_path(file, &string);
         if ( ret < 0 )
                 goto err;
@@ -219,7 +219,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         ret = idmef_file_new_access_time(file, &time);
         if ( ret < 0 )
                 goto err;
-        
+
         idmef_time_set_sec(time, st->st_atime);
 
         ret = idmef_file_new_modify_time(file, &time);
@@ -231,12 +231,12 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
         ret = idmef_alert_new_assessment(alert, &assessment);
         if ( ret < 0 )
                 goto err;
-        
+
         idmef_assessment_set_impact(assessment, impact);
         idmef_alert_set_classification(alert, classification);
-        
+
         lml_alert_emit(fd->source, log_entry, message);
-        
+
  err:
         lml_log_entry_destroy(log_entry);
         idmef_message_destroy(message);
@@ -246,36 +246,36 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st,
 
 
 
-static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st) 
+static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
 {
         int ret;
         prelude_string_t *str;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
-        
+
         ret = idmef_impact_new(&impact);
         if ( ret < 0 )
                 return;
-        
+
         ret = idmef_classification_new(&classification);
         if ( ret < 0 ) {
                 idmef_impact_destroy(impact);
                 return;
         }
-        
+
         ret = idmef_classification_new_text(classification, &str);
         if ( ret < 0 ) {
                 idmef_impact_destroy(impact);
                 idmef_classification_destroy(classification);
                 return;
         }
-        
+
         prelude_string_set_constant(str, LOGFILE_MODIFICATION_CLASS);
-        
+
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
         idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
-        
+
         ret = idmef_impact_new_description(impact, &str);
         if ( ret < 0 ) {
                 idmef_impact_destroy(impact);
@@ -283,7 +283,7 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
                 return;
         }
         prelude_string_set_constant(str, LOGFILE_MODIFICATION_IMPACT);
-        
+
         logfile_alert(monitor, st, classification, impact);
 }
 
@@ -303,10 +303,10 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         *start = 0;
         buf = *sumline;
         *sumline = NULL;
-        
+
         if ( ! fgets(buf, size, monitor->metadata_fd) )
                 return -1;
-        
+
         offptr = strchr(buf, ':');
         if ( ! offptr ) {
                 prelude_log(PRELUDE_LOG_WARN, "%s:%d: Invalid metadata file.\n", lml_log_source_get_name(monitor->source), line);
@@ -321,7 +321,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
                 prelude_log(PRELUDE_LOG_WARN, "error reading metadata file offset.\n");
                 return -1;
         }
-        
+
         *sumline = offptr;
 
         return 0;
@@ -330,18 +330,18 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
 
 
 
-static int file_metadata_save(monitor_fd_t *monitor, off_t offset) 
+static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 {
         int len, ret;
         char buf[METADATA_MAXSIZE];
 
         if ( ignore_metadata )
                 return 0;
-        
+
         len = snprintf(buf, sizeof(buf), "%" PRELUDE_PRIu64 ":%s\n", offset, prelude_string_get_string(monitor->buf));
         if ( len >= sizeof(buf) || len < 0 )
                 return -1;
-        
+
         rewind(monitor->metadata_fd);
 
         ret = ftruncate(fileno(monitor->metadata_fd), 0);
@@ -349,19 +349,19 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
                 prelude_log(PRELUDE_LOG_ERR, "could not truncate metadata file: %s.\n", strerror(errno));
                 return -1;
         }
-        
+
         ret = fwrite(buf, 1, len, monitor->metadata_fd);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "could not write metadata file: %s.\n", strerror(errno));
                 return -1;
         }
-        
+
         return 0;
 }
 
 
 
-static int file_metadata_get_position(monitor_fd_t *monitor) 
+static int file_metadata_get_position(monitor_fd_t *monitor)
 {
         off_t offset;
         struct stat st;
@@ -374,11 +374,11 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
 
         sumptr = sumline;
         filename = lml_log_source_get_name(monitor->source);
-        
+
         ret = file_metadata_read(monitor, &offset, &sumptr, sizeof(sumline));
         if ( ret == 0 )
                 have_metadata = 1;
-        
+
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "stat: error on file %s: %s.\n", filename, strerror(errno));
@@ -389,43 +389,43 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         monitor->last_mtime = st.st_mtime;
 
         if ( ! have_metadata ) {
-                prelude_log(PRELUDE_LOG_INFO, "- %s: No metadata available.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "%s: No metadata available.\n", filename);
                 return fseek(monitor->fd, st.st_size, SEEK_SET);;
         }
 
         if ( st.st_size < offset ) {
-                prelude_log(PRELUDE_LOG_INFO, "- %s: Metadata available, but logfile got rotated, starting at 0.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "%s: Metadata available, but logfile got rotated, starting at 0.\n", filename);
                 monitor->last_size = 0;
                 return 0;
         }
-        
+
         ret = fseek(monitor->fd, offset, SEEK_SET);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "- %s: could not seek to byte %" PRELUDE_PRIu64 ": %s.\n",
+                prelude_log(PRELUDE_LOG_ERR, "%s: could not seek to byte %" PRELUDE_PRIu64 ": %s.\n",
                             filename, offset, strerror(errno));
-                return -1; 
+                return -1;
         }
 
         if ( ! fgets(buf, sizeof(buf), monitor->fd) || strcmp(buf, sumptr) != 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "- %s: Metadata available, but checksum is invalid, starting at 0.\n", filename);
+                prelude_log(PRELUDE_LOG_WARN, "%s: Metadata available, but checksum is invalid, starting at 0.\n", filename);
                 logfile_modified_alert(monitor, &st);
                 monitor->last_size = 0;
                 return fseek(monitor->fd, 0, SEEK_SET);
         }
-                
+
         monitor->last_size = offset;
         monitor->last_size += strlen(sumptr);
-        
-        prelude_log(PRELUDE_LOG_INFO, "- %s: Metadata available, starting log analyzis at offset %" PRELUDE_PRIu64 ".\n",
+
+        prelude_log(PRELUDE_LOG_INFO, "%s: Metadata available, starting log analyzis at offset %" PRELUDE_PRIu64 ".\n",
                     filename, monitor->last_size);
-        
+
         return 0;
 }
 
 
 
 
-static int file_metadata_open(monitor_fd_t *monitor) 
+static int file_metadata_open(monitor_fd_t *monitor)
 {
         int fd;
         char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
@@ -438,7 +438,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         while ( (ptr = strchr(file, '/')) )
                 *ptr = '-'; /* strip */
 
-        snprintf(path, sizeof(path), "%s/%s", METADATA_DIR, file);        
+        snprintf(path, sizeof(path), "%s/%s", METADATA_DIR, file);
 
         fd = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
         if ( fd < 0 && errno != EEXIST ) {
@@ -447,7 +447,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         }
 
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
-        
+
         monitor->metadata_fd = fdopen(fd, "r+");
         if ( ! monitor->metadata_fd ) {
                 prelude_log(PRELUDE_LOG_ERR, "fdopen failed: %s.\n", strerror(errno));
@@ -467,7 +467,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
  * The size of the whole syslog line is returned otherwise (not only what
  * has been read uppon this call).
  */
-static off_t read_logfile(monitor_fd_t *fd, off_t available) 
+static off_t read_logfile(monitor_fd_t *fd, off_t available)
 {
         char c;
         int ret;
@@ -480,7 +480,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
                                     LOG_LINE_MAXSIZE);
                         ignore_remaining = TRUE;
                 }
-                
+
                 ret = getc(fd->fd);
                 if ( ret == EOF ) {
                         clearerr(fd->fd);
@@ -488,48 +488,48 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
                 }
 
                 i++;
-                   
+
                 if ( ret == '\n' )
                         break;
 
                 if ( ! ignore_remaining ) {
                         c = (char) ret;
- 
+
                         ret = prelude_string_ncat(fd->buf, &c, 1);
                         if ( ret < 0 ) {
                                 prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
                                 return -1;
                         }
                 }
-                
+
                 if ( i == available )
                         return -2;
         }
 
-        return i;       
+        return i;
 }
 
 
 
 
-static int check_logfile_data(monitor_fd_t *monitor, struct stat *st) 
+static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
 {
         off_t len, ret;
         int eventno = 0;
-        
-        if ( monitor->fd != stdin && ! monitor->need_more_read && st->st_size == monitor->last_size ) 
+
+        if ( monitor->fd != stdin && ! monitor->need_more_read && st->st_size == monitor->last_size )
                 return 0;
-        
+
         if ( st->st_size < monitor->last_size ) {
                 monitor->last_size = 0;
                 rewind(monitor->fd);
         }
-        
+
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
-        
+
         while ( (ret = read_logfile(monitor, len)) >= 0 ) {
-                                
+
                 eventno++;
                 config.line_processed++;
 
@@ -543,19 +543,19 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
 
                         file_metadata_save(monitor, st->st_size - len);
                 }
-                
+
                 len -= prelude_string_get_len(monitor->buf) + 1; /* +1 account for the '\n' */
-                      
+
                 prelude_string_clear(monitor->buf);
                 _lml_handle_signal_if_needed();
-        
+
                 if ( len == 0 )
                         break;
         }
-        
+
         if ( ret == -2 )
                 len = 0; /* everything has been read, but line is not complete */
-             
+
         /*
          * if len isn't 0, it mean we got EOF before reading every new byte,
          * we want to retry reading even if st_size isn't modified then.
@@ -568,11 +568,11 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
 
 
 
-static monitor_fd_t *monitor_new(lml_log_source_t *ls) 
+static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 {
         int ret;
         monitor_fd_t *new;
-        
+
         new = calloc(1, sizeof(*new));
         if ( ! new ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -586,7 +586,7 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
                 free(new);
                 return NULL;
         }
-                
+
 #ifdef HAVE_FAM
         ret = fam_setup_monitor(new);
         if ( ret < 0 ) {
@@ -594,7 +594,7 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
                 return NULL;
         }
 #endif
-            
+
         prelude_list_add(&inactive_fd_list, &new->list);
 
         return new;
@@ -603,38 +603,38 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 
 
 #if 0
-static void monitor_destroy(monitor_fd_t *monitor) 
+static void monitor_destroy(monitor_fd_t *monitor)
 {
         if ( monitor->fd )
                 fclose(monitor->fd);
-        
+
         prelude_list_del(&monitor->list);
 
         free(monitor->file);
-        
+
         free(monitor);
 }
 #endif
 
 
 
-static int monitor_open(monitor_fd_t *monitor) 
+static int monitor_open(monitor_fd_t *monitor)
 {
         int ret, fd;
         const char *filename;
 
         filename = lml_log_source_get_name(monitor->source);
-        
+
         if ( strcmp(filename, STDIN_FILENAME) == 0 )
                 monitor->fd = stdin;
         else {
                 monitor->fd = fopen(filename, "r");
-                if ( ! monitor->fd ) 
+                if ( ! monitor->fd )
                         return -1;
 
                 fd = fileno(monitor->fd);
                 fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
-                
+
                 ret = file_metadata_get_position(monitor);
                 if ( ret < 0 )
                         return -1;
@@ -645,9 +645,9 @@ static int monitor_open(monitor_fd_t *monitor)
                 prelude_log(PRELUDE_LOG_ERR, "could not create string object: %s.\n", prelude_strerror(ret));
                 return ret;
         }
-        
+
         monitor->need_more_read = 0;
-        
+
         prelude_list_del(&monitor->list);
         prelude_list_add_tail(&active_fd_list, &monitor->list);
 
@@ -669,11 +669,11 @@ static void monitor_close(monitor_fd_t *monitor)
 
 
 
-static void try_reopening_inactive_monitor(void) 
+static void try_reopening_inactive_monitor(void)
 {
         prelude_list_t *tmp, *bkp;
 
-        prelude_list_for_each_safe(&inactive_fd_list, tmp, bkp) 
+        prelude_list_for_each_safe(&inactive_fd_list, tmp, bkp)
                 monitor_open(prelude_list_entry(tmp, monitor_fd_t, list));
 }
 
@@ -686,13 +686,13 @@ static void try_reopening_inactive_monitor(void)
  * cause heavy performance problem. The best solution may be to centralize
  * the logging on a remote host.
  */
-static void check_modification_time(monitor_fd_t *monitor, struct stat *st) 
+static void check_modification_time(monitor_fd_t *monitor, struct stat *st)
 {
         time_t old_mtime = monitor->last_mtime;
 
         monitor->last_mtime = st->st_mtime;
-        
-        if ( st->st_mtime >= old_mtime && st->st_size >= monitor->last_size ) 
+
+        if ( st->st_mtime >= old_mtime && st->st_size >= monitor->last_size )
                 return; /* everythings sound okay */
 
         logfile_modified_alert(monitor, st);
@@ -703,15 +703,15 @@ static int get_rotation_size_offset(monitor_fd_t *monitor, struct stat *st)
 {
         off_t diff;
         int prev = 0;
-        
-        diff = MAX(monitor->last_rotation_size, st->st_size) - 
+
+        diff = MAX(monitor->last_rotation_size, st->st_size) -
                MIN(monitor->last_rotation_size, st->st_size);
-      
+
         if ( monitor->last_rotation_size )
                 prev = 1;
-        
+
         monitor->last_rotation_size = st->st_size;
-        
+
         return prev ? diff : 0;
 }
 
@@ -720,20 +720,20 @@ static int get_rotation_time_offset(monitor_fd_t *monitor, struct stat *st)
 {
         int prev = 0;
         time_t interval, now, offset;
-              
+
         now = time(NULL);
         interval = now - monitor->last_rotation_time;
-        
-        offset = MAX(monitor->last_rotation_time_interval, interval) - 
+
+        offset = MAX(monitor->last_rotation_time_interval, interval) -
                  MIN(monitor->last_rotation_time_interval, interval);
 
         if ( monitor->last_rotation_time ) {
                 prev = 1;
                 monitor->last_rotation_time_interval = interval;
         }
-        
+
         monitor->last_rotation_time = now;
-        
+
         return prev ? offset : 0;
 }
 
@@ -749,9 +749,9 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         idmef_impact_t *impact;
         idmef_classification_t *classification;
         prelude_string_t *str;
-        
+
         filename = lml_log_source_get_name(monitor->source);
-        
+
         /*
          * test if the file has been removed
          */
@@ -760,29 +760,29 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                         /*
                          * test if the file has been renamed
                          */
-                        if ( st->st_ino == st_new.st_ino ) 
+                        if ( st->st_ino == st_new.st_ino )
                                 return 0;
-                       
+
                         fclose(monitor->fd);
                         monitor_open(monitor);
-                } 
+                }
                 else monitor_close(monitor);
-                prelude_log(PRELUDE_LOG_INFO, "- logfile %s has been renamed.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "logfile %s has been renamed.\n", filename);
         } else {
-                prelude_log(PRELUDE_LOG_INFO, "- logfile %s reached 0 hard link.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "logfile %s reached 0 hard link.\n", filename);
                 monitor_close(monitor);
         }
-        
+
         ret = idmef_classification_new(&classification);
         if ( ret < 0 )
                 return -1;
-        
+
         ret = idmef_impact_new(&impact);
         if ( ret < 0 ) {
                 idmef_classification_destroy(classification);
                 return -1;
         }
-        
+
         ret = idmef_classification_new_text(classification, &str);
         if ( ret < 0 ) {
                 idmef_impact_destroy(impact);
@@ -790,13 +790,13 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                 return -1;
         }
         prelude_string_set_constant(str, LOGFILE_DELETION_CLASS);
-        
+
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
         soff = get_rotation_size_offset(monitor, st);
         toff = get_rotation_time_offset(monitor, st);
-                
+
         if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
                 ret = idmef_impact_new_description(impact, &str);
@@ -807,13 +807,13 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                 snprintf(buf, sizeof(buf), "An inconsistency has been observed in file rotation: "
                         "The differences between the previously observed rotation time and size are higher "
                         "than the allowed limits: size difference=%u bytes allowed=%u bytes, time "
-                        "difference=%u seconds allowed=%u seconds", soff, max_rotation_size_offset, 
+                        "difference=%u seconds allowed=%u seconds", soff, max_rotation_size_offset,
                          toff, max_rotation_time_offset);
                 prelude_string_set_ref(str, buf);
         }
 
         logfile_alert(monitor, st, classification, impact);
-        
+
         return -1;
 }
 
@@ -845,7 +845,7 @@ static int get_expected_event(FAMConnection *fc, int eventno)
          * Wait for the notification started event.
          */
         ret = FAMNextEvent(fc, &event);
-        if ( ret < 0 || event.code != eventno ) 
+        if ( ret < 0 || event.code != eventno )
                 return -1;
 
         return 0;
@@ -862,13 +862,13 @@ static int check_fam_writev_bug(FAMConnection *fc)
         char teststring[] = "testfam";
 
         snprintf(buf, sizeof(buf), "%s/testfam.XXXXXX", P_tmpdir);
-        
-        fd = mkstemp(buf);        
+
+        fd = mkstemp(buf);
         if ( fd < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error creating unique temporary filename: %s.\n", strerror(errno));
                 return -1;
         }
-                
+
         ret = FAMMonitorFile(fc, buf, &fr, NULL);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "error creating FAM monitor for %s: %s.\n", buf, FamErrlist[FAMErrno]);
@@ -886,20 +886,20 @@ static int check_fam_writev_bug(FAMConnection *fc)
 
         iov[0].iov_len = sizeof(teststring);
         iov[0].iov_base = teststring;
-       
+
         ret = writev(fd, iov, 1);
         if ( ret != sizeof(teststring) ) {
                 prelude_log(PRELUDE_LOG_ERR, "error writing test string to %s: %s.\n", buf, strerror(errno));
                 goto err;
         }
-        
+
         ret = get_expected_event(fc, FAMChanged);
         if ( ret < 0 )
                 goto err;
-        
+
  err:
         FAMCancelMonitor(fc, &fr);
-        get_expected_event(fc, FAMAcknowledge);        
+        get_expected_event(fc, FAMAcknowledge);
 
         close(fd);
         unlink(buf);
@@ -909,15 +909,15 @@ static int check_fam_writev_bug(FAMConnection *fc)
 
 
 
-static int initialize_fam(void) 
+static int initialize_fam(void)
 {
         int ret;
-        
+
         if ( fam_initialized != 0 )
                 return fam_initialized;
 
         fam_initialized = -1;
-        
+
         ret = FAMOpen(&fc);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "error initializing FAM: %s.\n", FamErrlist[FAMErrno]);
@@ -926,13 +926,13 @@ static int initialize_fam(void)
 
         ret = check_fam_writev_bug(&fc);
         if ( ret < 0 ) {
-                FAMClose(&fc);        
-                prelude_log(PRELUDE_LOG_INFO, "- Checking for FAM writev() bug: disabling FAM.\n");
+                FAMClose(&fc);
+                prelude_log(PRELUDE_LOG_WARN, "FAM file notification not working: using polling method.\n");
                 return -1;
         }
 
-        prelude_log(PRELUDE_LOG_INFO, "- Checking for FAM writev() bug: FAM working nicely, enabling.\n");
-        
+        prelude_log(PRELUDE_LOG_DEBUG, "Checking for FAM writev() bug: FAM working nicely, enabling.\n");
+
         fam_initialized = 1;
 
         return 0;
@@ -947,25 +947,25 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
 
         if ( batch_mode )
                 return 0;
-        
+
         ret = initialize_fam();
         if ( ret < 0 )
                 return 0;
 
         filename = lml_log_source_get_name(monitor->source);
-        
+
         ret = FAMMonitorFile(&fc, filename, &monitor->fam_request, monitor);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "error creating FAM monitor for %s: %s.\n", filename, FamErrlist[FAMErrno]);
                 return -1;
         }
-        
+
         return 0;
 }
 
 
 
-static int fam_process_event(FAMEvent *event) 
+static int fam_process_event(FAMEvent *event)
 {
         int ret = 0;
         struct stat st;
@@ -976,7 +976,7 @@ static int fam_process_event(FAMEvent *event)
         case FAMChanged:
                 if ( ! monitor->fd && monitor_open(monitor) < 0 )
                         return -1;
-                
+
         case FAMDeleted:
                 ret = fstat(fileno(monitor->fd), &st);
                 if ( ret < 0 )
@@ -986,12 +986,12 @@ static int fam_process_event(FAMEvent *event)
                  * check mtime consistency.
                  */
                 check_modification_time(monitor, &st);
-        
+
                 /*
-                 * read and analyze available data. 
+                 * read and analyze available data.
                  */
                 check_logfile_data(monitor, &st);
-        
+
                 ret = is_file_already_used(monitor, &st);
                 break;
 
@@ -1001,7 +1001,7 @@ static int fam_process_event(FAMEvent *event)
                  * This happen when a monitor is created.
                  */
                 return 0;
-                
+
         default:
                 return -1;
         }
@@ -1012,11 +1012,11 @@ static int fam_process_event(FAMEvent *event)
 
 
 
-static int fam_process_queued_events(void) 
+static int fam_process_queued_events(void)
 {
         int ret;
         FAMEvent event;
-        
+
         while ( FAMPending(&fc) ) {
                 ret = FAMNextEvent(&fc, &event);
                 if ( ret < 0 ) {
@@ -1033,11 +1033,11 @@ static int fam_process_queued_events(void)
 
 
 
-static int process_file_event(monitor_fd_t *monitor) 
+static int process_file_event(monitor_fd_t *monitor)
 {
         int ret;
         struct stat st;
-        
+
         ret = fstat(fileno(monitor->fd), &st);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
@@ -1045,18 +1045,18 @@ static int process_file_event(monitor_fd_t *monitor)
         }
 
         if ( monitor->fd != stdin ) {
-                ret = is_file_already_used(monitor, &st);        
+                ret = is_file_already_used(monitor, &st);
                 if ( ret < 0 )
                         return -1;
         }
-        
+
         /*
          * check mtime consistency.
-         */ 
+         */
         check_modification_time(monitor, &st);
-        
+
         /*
-         * read and analyze available data. 
+         * read and analyze available data.
          */
         return check_logfile_data(monitor, &st);
 }
@@ -1064,16 +1064,16 @@ static int process_file_event(monitor_fd_t *monitor)
 
 
 
-int file_server_monitor_file(lml_log_source_t *ls) 
+int file_server_monitor_file(lml_log_source_t *ls)
 {
         monitor_fd_t *new;
-        
+
         /*
          * Don't open the monitor right now,
          * we want all unread bytes to be processed before activating
          * FAM notification (if enabled).
          */
-        
+
         new = monitor_new(ls);
         if ( ! new )
                 return -1;
@@ -1086,58 +1086,58 @@ int file_server_monitor_file(lml_log_source_t *ls)
                 return -1;
         }
 #endif
-        
+
         return 0;
 }
 
 
 
-int file_server_wake_up(void) 
+int file_server_wake_up(void)
 {
         int ret = -1, event;
         monitor_fd_t *monitor;
         prelude_list_t *tmp, *bkp;
-        
+
         if ( fam_initialized != 1 || batch_mode ) {
                 /*
                  * try to open inactive fd (file was not existing previously).
                  */
                 try_reopening_inactive_monitor();
-                
+
                 prelude_list_for_each_safe(&active_fd_list, tmp, bkp) {
-                        monitor = prelude_list_entry(tmp, monitor_fd_t, list);                        
+                        monitor = prelude_list_entry(tmp, monitor_fd_t, list);
 
                         event = process_file_event(monitor);
                         if ( event > 0 )
                                 ret = event;
                 }
         }
-        
+
 #ifdef HAVE_FAM
-        else 
+        else
                 return fam_process_queued_events();
 #endif
-        
+
         return ret;
 }
 
 
 
 
-int file_server_get_event_fd(void) 
+int file_server_get_event_fd(void)
 {
 #ifdef HAVE_FAM
         if ( fam_initialized == 1 )
                 return FAMCONNECTION_GETFD(&fc);
 #endif
-        
+
         return -1;
 }
 
 
 
 
-void file_server_set_max_rotation_time_offset(unsigned int val) 
+void file_server_set_max_rotation_time_offset(unsigned int val)
 {
         max_rotation_time_offset = val;
 }
