@@ -51,10 +51,10 @@
 # Prevent LML from matching its own output and creating a logging loop in case
 # of odd syslog configurations
 
-regex=could not match prefix against log entry; \
+regex=no appropriate format defined for log entry; \
   silent; \
   last
-
+  
 regex=EMU;				include = apc-emu.rules;
 regex=(anomaly|since|firstSeen);	include = arbor.rules;
 regex=arpwatch;				include = arpwatch.rules;

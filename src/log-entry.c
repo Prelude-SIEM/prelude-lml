@@ -301,7 +301,7 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
                 log_entry->target_hostname = get_hostname();
         
         if ( ret != 0 ) {
-                lml_log_source_warning(ls, "could not match prefix against log entry: %s.\n", log_entry->original_log);
+                lml_log_source_warning(ls, "no appropriate format defined for log entry: '%s'.\n", log_entry->original_log);
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }
