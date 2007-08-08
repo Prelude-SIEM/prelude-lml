@@ -1,3 +1,27 @@
+* 2007-08-08, prelude-lml-0.9.10.1:
+
+- Make SSH rules IPv6 compliants, allowing to merge old
+  IPv6 only rules with IPv4 rules. Some additional minor
+  bug fixes (fix #232).
+
+- Fix incorrect target user assignment, as well as incorrect
+  PCRE reference in assessment.impact.description
+  (Paul Robert Marino <prmarino1@gmail.com>) (fix #232).
+
+- CISCO router acl lists can now use names instead of numbers. This made
+  rule id=500 in cisco-router.rules fail to alert on packet denys on newer
+  cisco devices (Paul Robert Marino <prmarino1@gmail.com>).
+
+- Fix Apache formating when Apache logname or user is set
+  (Robin Gruyters <r.gruyters@yirdis.nl> and <andre@vandervlies.xs4all.nl>) 
+  (fix #229).
+
+- Invalid user.user_id(0).name assignement in SSH rule 1913 
+  (Scott Olihovik <skippylou@gmail.com>) (fix #243). 
+
+- Various bug fixes and minor improvements.
+
+
 * 2007-05-19, prelude-lml-0.9.10:
 
         - Ability to use regular expressions in plugins.rules to define 
