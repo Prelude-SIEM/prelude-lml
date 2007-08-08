@@ -15,6 +15,35 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
+/* This file can be parametrized with the following macros:
+     VASNPRINTF         The name of the function being defined.
+     FCHAR_T            The element type of the format string.
+     DCHAR_T            The element type of the destination (result) string.
+     FCHAR_T_ONLY_ASCII Set to 1 to enable verification that all characters
+                        in the format string are ASCII. MUST be set if
+                        FCHAR_T and DCHAR_T are not the same type.
+     DIRECTIVE          Structure denoting a format directive.
+                        Depends on FCHAR_T.
+     DIRECTIVES         Structure denoting the set of format directives of a
+                        format string.  Depends on FCHAR_T.
+     PRINTF_PARSE       Function that parses a format string.
+                        Depends on FCHAR_T.
+     DCHAR_CPY          memcpy like function for DCHAR_T[] arrays.
+     DCHAR_SET          memset like function for DCHAR_T[] arrays.
+     DCHAR_MBSNLEN      mbsnlen like function for DCHAR_T[] arrays.
+     SNPRINTF           The system's snprintf (or similar) function.
+                        This may be either snprintf or swprintf.
+     TCHAR_T            The element type of the argument and result string
+                        of the said SNPRINTF function.  This may be either
+                        char or wchar_t.  The code exploits that
+                        sizeof (TCHAR_T) | sizeof (DCHAR_T) and
+                        alignof (TCHAR_T) <= alignof (DCHAR_T).
+     DCHAR_IS_TCHAR     Set to 1 if DCHAR_T and TCHAR_T are the same type.
+     DCHAR_CONV_FROM_ENCODING A function to convert from char[] to DCHAR[].
+     DCHAR_IS_UINT8_T   Set to 1 if DCHAR_T is uint8_t.
+     DCHAR_IS_UINT16_T  Set to 1 if DCHAR_T is uint16_t.
+     DCHAR_IS_UINT32_T  Set to 1 if DCHAR_T is uint32_t.  */
+
 /* Tell glibc's <stdio.h> to provide a prototype for snprintf().
    This must come before <config.h> because <config.h> may include
    <features.h>, and once <features.h> has been included, it's too late.  */
@@ -22,16 +51,20 @@
 # define _GNU_SOURCE    1
 #endif
 
-#include <config.h>
+#ifndef VASNPRINTF
+# include <config.h>
+#endif
 #ifndef IN_LIBINTL
 # include <alloca.h>
 #endif
 
 /* Specification.  */
-#if WIDE_CHAR_VERSION
-# include "vasnwprintf.h"
-#else
-# include "vasnprintf.h"
+#ifndef VASNPRINTF
+# if WIDE_CHAR_VERSION
+#  include "vasnwprintf.h"
+# else
+#  include "vasnprintf.h"
+# endif
 #endif
 
 #include <locale.h>	/* localeconv() */
@@ -44,14 +77,33 @@
 #if HAVE_NL_LANGINFO
 # include <langinfo.h>
 #endif
-#if WIDE_CHAR_VERSION
-# include "wprintf-parse.h"
-#else
-# include "printf-parse.h"
+#ifndef VASNPRINTF
+# if WIDE_CHAR_VERSION
+#  include "wprintf-parse.h"
+# else
+#  include "printf-parse.h"
+# endif
 #endif
 
 /* Checked size_t computations.  */
 #include "xsize.h"
+
+#if NEED_PRINTF_LONG_DOUBLE && !defined IN_LIBINTL
+# include <math.h>
+# include "float+.h"
+# include "fpucw.h"
+#endif
+
+#if NEED_PRINTF_INFINITE_DOUBLE && !defined IN_LIBINTL
+# include <math.h>
+# include "isnan.h"
+#endif
+
+#if NEED_PRINTF_INFINITE_LONG_DOUBLE && !defined IN_LIBINTL
+# include <math.h>
+# include "isnanl-nolibm.h"
+# include "fpucw.h"
+#endif
 
 #if NEED_PRINTF_DIRECTIVE_A && !defined IN_LIBINTL
 # include <math.h>
@@ -60,11 +112,6 @@
 # include "isnanl-nolibm.h"
 # include "printf-frexpl.h"
 # include "fpucw.h"
-#endif
-
-#if NEED_PRINTF_LONG_DOUBLE && !defined IN_LIBINTL
-# include <math.h>
-# include "float+.h"
 #endif
 
 /* Some systems, like OSF/1 4.0 and Woe32, don't have EOVERFLOW.  */
@@ -95,12 +142,32 @@ local_wcslen (const wchar_t *s)
 # endif
 #endif
 
+/* Default parameters.  */
+#ifndef VASNPRINTF
+# if WIDE_CHAR_VERSION
+#  define VASNPRINTF vasnwprintf
+#  define FCHAR_T wchar_t
+#  define DCHAR_T wchar_t
+#  define TCHAR_T wchar_t
+#  define DCHAR_IS_TCHAR 1
+#  define DIRECTIVE wchar_t_directive
+#  define DIRECTIVES wchar_t_directives
+#  define PRINTF_PARSE wprintf_parse
+#  define DCHAR_CPY wmemcpy
+# else
+#  define VASNPRINTF vasnprintf
+#  define FCHAR_T char
+#  define DCHAR_T char
+#  define TCHAR_T char
+#  define DCHAR_IS_TCHAR 1
+#  define DIRECTIVE char_directive
+#  define DIRECTIVES char_directives
+#  define PRINTF_PARSE printf_parse
+#  define DCHAR_CPY memcpy
+# endif
+#endif
 #if WIDE_CHAR_VERSION
-# define VASNPRINTF vasnwprintf
-# define CHAR_T wchar_t
-# define DIRECTIVE wchar_t_directive
-# define DIRECTIVES wchar_t_directives
-# define PRINTF_PARSE wprintf_parse
+  /* TCHAR_T is wchar_t.  */
 # define USE_SNPRINTF 1
 # if HAVE_DECL__SNWPRINTF
    /* On Windows, the function swprintf() has a different signature than
@@ -111,11 +178,7 @@ local_wcslen (const wchar_t *s)
 #  define SNPRINTF swprintf
 # endif
 #else
-# define VASNPRINTF vasnprintf
-# define CHAR_T char
-# define DIRECTIVE char_directive
-# define DIRECTIVES char_directives
-# define PRINTF_PARSE printf_parse
+  /* TCHAR_T is char.  */
 # /* Use snprintf if it exists under the name 'snprintf' or '_snprintf'.
      But don't use it on BeOS, since BeOS snprintf produces no output if the
      size argument is >= 0x3000000.  */
@@ -137,7 +200,7 @@ local_wcslen (const wchar_t *s)
 /* Here we need to call the native sprintf, not rpl_sprintf.  */
 #undef sprintf
 
-#if NEED_PRINTF_DIRECTIVE_A && !defined IN_LIBINTL
+#if (NEED_PRINTF_DIRECTIVE_A || NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_INFINITE_DOUBLE) && !defined IN_LIBINTL
 /* Determine the decimal-point character according to the current locale.  */
 # ifndef decimal_point_char_defined
 #  define decimal_point_char_defined 1
@@ -162,6 +225,28 @@ decimal_point_char ()
   return (point[0] != '\0' ? point[0] : '.');
 }
 # endif
+#endif
+
+#if NEED_PRINTF_INFINITE_DOUBLE && !defined IN_LIBINTL
+
+/* Equivalent to !isfinite(x) || x == 0, but does not require libm.  */
+static int
+is_infinite_or_zero (double x)
+{
+  return isnan (x) || x + x == x;
+}
+
+#endif
+
+#if NEED_PRINTF_INFINITE_LONG_DOUBLE && !defined IN_LIBINTL
+
+/* Equivalent to !isfinite(x), but does not require libm.  */
+static int
+is_infinitel (long double x)
+{
+  return isnanl (x) || (x + x == x && x != 0.0L);
+}
+
 #endif
 
 #if NEED_PRINTF_LONG_DOUBLE && !defined IN_LIBINTL
@@ -1103,8 +1188,9 @@ floorlog10l (long double x)
 
 #endif
 
-CHAR_T *
-VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list args)
+DCHAR_T *
+VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
+	    const FCHAR_T *format, va_list args)
 {
   DIRECTIVES d;
   arguments a;
@@ -1120,7 +1206,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
   if (a.arg)								\
     free (a.arg);
 
-  if (printf_fetchargs (args, &a) < 0)
+  if (PRINTF_FETCHARGS (args, &a) < 0)
     {
       CLEANUP ();
       errno = EINVAL;
@@ -1129,13 +1215,13 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 
   {
     size_t buf_neededlength;
-    CHAR_T *buf;
-    CHAR_T *buf_malloced;
-    const CHAR_T *cp;
+    TCHAR_T *buf;
+    TCHAR_T *buf_malloced;
+    const FCHAR_T *cp;
     size_t i;
     DIRECTIVE *dp;
     /* Output string accumulator.  */
-    CHAR_T *result;
+    DCHAR_T *result;
     size_t allocated;
     size_t length;
 
@@ -1144,18 +1230,18 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
     buf_neededlength =
       xsum4 (7, d.max_width_length, d.max_precision_length, 6);
 #if HAVE_ALLOCA
-    if (buf_neededlength < 4000 / sizeof (CHAR_T))
+    if (buf_neededlength < 4000 / sizeof (TCHAR_T))
       {
-	buf = (CHAR_T *) alloca (buf_neededlength * sizeof (CHAR_T));
+	buf = (TCHAR_T *) alloca (buf_neededlength * sizeof (TCHAR_T));
 	buf_malloced = NULL;
       }
     else
 #endif
       {
-	size_t buf_memsize = xtimes (buf_neededlength, sizeof (CHAR_T));
+	size_t buf_memsize = xtimes (buf_neededlength, sizeof (TCHAR_T));
 	if (size_overflow_p (buf_memsize))
 	  goto out_of_memory_1;
-	buf = (CHAR_T *) malloc (buf_memsize);
+	buf = (TCHAR_T *) malloc (buf_memsize);
 	if (buf == NULL)
 	  goto out_of_memory_1;
 	buf_malloced = buf;
@@ -1182,22 +1268,22 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
     if ((needed) > allocated)						     \
       {									     \
 	size_t memory_size;						     \
-	CHAR_T *memory;							     \
+	DCHAR_T *memory;						     \
 									     \
 	allocated = (allocated > 0 ? xtimes (allocated, 2) : 12);	     \
 	if ((needed) > allocated)					     \
 	  allocated = (needed);						     \
-	memory_size = xtimes (allocated, sizeof (CHAR_T));		     \
+	memory_size = xtimes (allocated, sizeof (DCHAR_T));		     \
 	if (size_overflow_p (memory_size))				     \
 	  goto out_of_memory;						     \
 	if (result == resultbuf || result == NULL)			     \
-	  memory = (CHAR_T *) malloc (memory_size);			     \
+	  memory = (DCHAR_T *) malloc (memory_size);			     \
 	else								     \
-	  memory = (CHAR_T *) realloc (result, memory_size);		     \
+	  memory = (DCHAR_T *) realloc (result, memory_size);		     \
 	if (memory == NULL)						     \
 	  goto out_of_memory;						     \
 	if (result == resultbuf && length > 0)				     \
-	  memcpy (memory, result, length * sizeof (CHAR_T));		     \
+	  DCHAR_CPY (memory, result, length);				     \
 	result = memory;						     \
       }
 
@@ -1209,8 +1295,20 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 	    size_t augmented_length = xsum (length, n);
 
 	    ENSURE_ALLOCATION (augmented_length);
-	    memcpy (result + length, cp, n * sizeof (CHAR_T));
-	    length = augmented_length;
+	    /* This copies a piece of FCHAR_T[] into a DCHAR_T[].  Here we
+	       need that the format string contains only ASCII characters
+	       if FCHAR_T and DCHAR_T are not the same type.  */
+	    if (sizeof (FCHAR_T) == sizeof (DCHAR_T))
+	      {
+		DCHAR_CPY (result + length, (const DCHAR_T *) cp, n);
+		length = augmented_length;
+	      }
+	    else
+	      {
+		do
+		  result[length++] = (unsigned char) *cp++;
+		while (--n > 0);
+	      }
 	  }
 	if (i == d.count)
 	  break;
@@ -1257,23 +1355,16 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    abort ();
 		  }
 	      }
-#if NEED_PRINTF_LONG_DOUBLE && !defined IN_LIBINTL
-	    else if ((dp->conversion == 'f' || dp->conversion == 'F'
-		      || dp->conversion == 'e' || dp->conversion == 'E'
-		      || dp->conversion == 'g' || dp->conversion == 'G')
-		     && a.arg[dp->arg_index].type == TYPE_LONGDOUBLE)
+#if ENABLE_UNISTDIO
+	    /* The unistdio extensions.  */
+	    else if (dp->conversion == 'U')
 	      {
+		arg_type type = a.arg[dp->arg_index].type;
 		int flags = dp->flags;
 		int has_width;
 		size_t width;
 		int has_precision;
 		size_t precision;
-		long double arg;
-		size_t tmp_length;
-		CHAR_T tmpbuf[700];
-		CHAR_T *tmp;
-		CHAR_T *pad_ptr;
-		CHAR_T *p;
 
 		has_width = 0;
 		width = 0;
@@ -1298,7 +1389,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		    else
 		      {
-			const CHAR_T *digitp = dp->width_start;
+			const FCHAR_T *digitp = dp->width_start;
 
 			do
 			  width = xsum (xtimes (width, 10), *digitp++ - '0');
@@ -1328,7 +1419,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		    else
 		      {
-			const CHAR_T *digitp = dp->precision_start + 1;
+			const FCHAR_T *digitp = dp->precision_start + 1;
 
 			precision = 0;
 			while (digitp != dp->precision_end)
@@ -1337,434 +1428,395 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		  }
 
-		arg = a.arg[dp->arg_index].a.a_longdouble;
-
-		/* Allocate a temporary buffer of sufficient size.  */
-		tmp_length = LDBL_DIG + 1;
-		if (tmp_length < precision)
-		  tmp_length = precision;
-		if (dp->conversion == 'f' || dp->conversion == 'F')
-		  if (!(isnanl (arg) || arg + arg == arg))
+		switch (type)
+		  {
+		  case TYPE_U8_STRING:
 		    {
-		      int exponent = floorlog10l (arg < 0 ? -arg : arg);
-		      if (exponent >= 0 && tmp_length < exponent + precision)
-			tmp_length = exponent + precision;
-		    }
-		/* Account for sign, decimal point etc. */
-		tmp_length = xsum (tmp_length, 12);
+		      const uint8_t *arg = a.arg[dp->arg_index].a.a_u8_string;
+		      const uint8_t *arg_end;
+		      size_t characters;
 
-		if (tmp_length < width)
-		  tmp_length = width;
-
-		tmp_length = xsum (tmp_length, 1); /* account for trailing NUL */
-
-		if (tmp_length <= sizeof (tmpbuf) / sizeof (CHAR_T))
-		  tmp = tmpbuf;
-		else
-		  {
-		    size_t tmp_memsize = xtimes (tmp_length, sizeof (CHAR_T));
-
-		    if (size_overflow_p (tmp_memsize))
-		      /* Overflow, would lead to out of memory.  */
-		      goto out_of_memory;
-		    tmp = (CHAR_T *) malloc (tmp_memsize);
-		    if (tmp == NULL)
-		      /* Out of memory.  */
-		      goto out_of_memory;
-		  }
-
-		pad_ptr = NULL;
-		p = tmp;
-
-		if (isnanl (arg))
-		  {
-		    if (dp->conversion >= 'A' && dp->conversion <= 'Z')
-		      {
-			*p++ = 'N'; *p++ = 'A'; *p++ = 'N';
-		      }
-		    else
-		      {
-			*p++ = 'n'; *p++ = 'a'; *p++ = 'n';
-		      }
-		  }
-		else
-		  {
-		    int sign = 0;
-		    DECL_LONG_DOUBLE_ROUNDING
-
-		    BEGIN_LONG_DOUBLE_ROUNDING ();
-
-		    if (signbit (arg)) /* arg < 0.0L or negative zero */
-		      {
-			sign = -1;
-			arg = -arg;
-		      }
-
-		    if (sign < 0)
-		      *p++ = '-';
-		    else if (flags & FLAG_SHOWSIGN)
-		      *p++ = '+';
-		    else if (flags & FLAG_SPACE)
-		      *p++ = ' ';
-
-		    if (arg > 0.0L && arg + arg == arg)
-		      {
-			if (dp->conversion >= 'A' && dp->conversion <= 'Z')
-			  {
-			    *p++ = 'I'; *p++ = 'N'; *p++ = 'F';
-			  }
-			else
-			  {
-			    *p++ = 'i'; *p++ = 'n'; *p++ = 'f';
-			  }
-		      }
-		    else
-		      {
-			pad_ptr = p;
-
-			if (dp->conversion == 'f' || dp->conversion == 'F')
-			  {
-			    char *digits;
-			    size_t ndigits;
-
-			    if (!has_precision)
-			      precision = 6;
-
-			    digits =
-			      scale10_round_decimal_long_double (arg, precision);
-			    if (digits == NULL)
-			      {
-				END_LONG_DOUBLE_ROUNDING ();
-				goto out_of_memory;
-			      }
-			    ndigits = strlen (digits);
-
-			    if (ndigits > precision)
-			      do
-				{
-				  --ndigits;
-				  *p++ = digits[ndigits];
-				}
-			      while (ndigits > precision);
-			    else
-			      *p++ = '0';
-			    /* Here ndigits <= precision.  */
-			    if ((flags & FLAG_ALT) || precision > 0)
-			      {
-				*p++ = decimal_point_char ();
-				for (; precision > ndigits; precision--)
-				  *p++ = '0';
-				while (ndigits > 0)
-				  {
-				    --ndigits;
-				    *p++ = digits[ndigits];
-				  }
-			      }
-
-			    free (digits);
-			  }
-			else if (dp->conversion == 'e' || dp->conversion == 'E')
-			  {
-			    int exponent;
-
-			    if (!has_precision)
-			      precision = 6;
-
-			    if (arg == 0.0L)
-			      {
-				exponent = 0;
-				*p++ = '0';
-				if ((flags & FLAG_ALT) || precision > 0)
-				  {
-				    *p++ = decimal_point_char ();
-				    for (; precision > 0; precision--)
-				      *p++ = '0';
-				  }
-			      }
-			    else
-			      {
-				/* arg > 0.0L.  */
-				int adjusted;
-				char *digits;
-				size_t ndigits;
-
-				exponent = floorlog10l (arg);
-				adjusted = 0;
-				for (;;)
-				  {
-				    digits =
-				      scale10_round_decimal_long_double (arg,
-									 (int)precision - exponent);
-				    if (digits == NULL)
-				      {
-					END_LONG_DOUBLE_ROUNDING ();
-					goto out_of_memory;
-				      }
-				    ndigits = strlen (digits);
-
-				    if (ndigits == precision + 1)
-				      break;
-				    if (ndigits < precision
-					|| ndigits > precision + 2)
-				      /* The exponent was not guessed precisely
-					 enough.  */
-				      abort ();
-				    if (adjusted)
-				      /* None of two values of exponent is the
-					 right one.  Prevent an endless loop.  */
-				      abort ();
-				    free (digits);
-				    if (ndigits == precision)
-				      exponent -= 1;
-				    else
-				      exponent += 1;
-				    adjusted = 1;
-				  }
-
-				/* Here ndigits = precision+1.  */
-				*p++ = digits[--ndigits];
-				if ((flags & FLAG_ALT) || precision > 0)
-				  {
-				    *p++ = decimal_point_char ();
-				    while (ndigits > 0)
-				      {
-					--ndigits;
-					*p++ = digits[ndigits];
-				      }
-				  }
-
-				free (digits);
-			      }
-
-			    *p++ = dp->conversion; /* 'e' or 'E' */
-# if WIDE_CHAR_VERSION
+		      if (has_precision)
+			{
+			  /* Use only PRECISION characters, from the left.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (; precision > 0; precision--)
 			    {
-			      static const wchar_t decimal_format[] =
-				{ '%', '+', '.', '2', 'd', '\0' };
-			      SNPRINTF (p, 6 + 1, decimal_format, exponent);
+			      int count = u8_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
 			    }
+			}
+		      else if (has_width)
+			{
+			  /* Use the entire string, and count the number of
+			     characters.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (;;)
+			    {
+			      int count = u8_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
+			    }
+			}
+		      else
+			{
+			  /* Use the entire string.  */
+			  arg_end = arg + u8_strlen (arg);
+			  /* The number of characters doesn't matter.  */
+			  characters = 0;
+			}
+
+		      if (has_width && width > characters
+			  && !(dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
+
+# if DCHAR_IS_UINT8_T
+		      {
+			size_t n = arg_end - arg;
+			ENSURE_ALLOCATION (xsum (length, n));
+			DCHAR_CPY (result + length, arg, n);
+			length += n;
+		      }
 # else
-			    sprintf (p, "%+.2d", exponent);
-# endif
-			    while (*p != '\0')
-			      p++;
-			  }
-			else if (dp->conversion == 'g' || dp->conversion == 'G')
+		      { /* Convert.  */
+			DCHAR_T *converted = result + length;
+			size_t converted_len = allocated - length;
+#  if DCHAR_IS_TCHAR
+			/* Convert from UTF-8 to locale encoding.  */
+			if (u8_conv_to_encoding (locale_charset (),
+						 iconveh_question_mark,
+						 arg, arg_end - arg, NULL,
+						 &converted, &converted_len)
+			    < 0)
+#  else
+			/* Convert from UTF-8 to UTF-16/UTF-32.  */
+			converted =
+			  U8_TO_DCHAR (arg, arg_end - arg,
+				       converted, &converted_len);
+			if (converted == NULL)
+#  endif
 			  {
-			    /* This is not specified by POSIX, but
-			       implementations appear to do this.  */
-			    if (!has_precision)
-			      precision = 6;
-
-			    if (precision == 0)
-			      precision = 1;
-			    /* precision >= 1.  */
-
-			    if (arg == 0.0L)
-			      /* The exponent is 0, >= -4, < precision.
-				 Use fixed-point notation.  */
-			      {
-				size_t ndigits = precision;
-				/* Number of trailing zeroes that have to be
-				   dropped.  */
-				size_t nzeroes =
-				  (flags & FLAG_ALT ? 0 : precision - 1);
-
-				--ndigits;
-				*p++ = '0';
-				if ((flags & FLAG_ALT) || ndigits > nzeroes)
-				  {
-				    *p++ = decimal_point_char ();
-				    while (ndigits > nzeroes)
-				      {
-					--ndigits;
-					*p++ = '0';
-				      }
-				  }
-			      }
-			    else
-			      {
-				/* arg > 0.0L.  */
-				int exponent;
-				int adjusted;
-				char *digits;
-				size_t ndigits;
-				size_t nzeroes;
-
-				exponent = floorlog10l (arg);
-				adjusted = 0;
-				for (;;)
-				  {
-				    digits =
-				      scale10_round_decimal_long_double (arg,
-									 (int)(precision - 1) - exponent);
-				    if (digits == NULL)
-				      {
-					END_LONG_DOUBLE_ROUNDING ();
-					goto out_of_memory;
-				      }
-				    ndigits = strlen (digits);
-
-				    if (ndigits == precision)
-				      break;
-				    if (ndigits < precision - 1
-					|| ndigits > precision + 1)
-				      /* The exponent was not guessed precisely
-					 enough.  */
-				      abort ();
-				    if (adjusted)
-				      /* None of two values of exponent is the
-					 right one.  Prevent an endless loop.  */
-				      abort ();
-				    free (digits);
-				    if (ndigits < precision)
-				      exponent -= 1;
-				    else
-				      exponent += 1;
-				    adjusted = 1;
-				  }
-				/* Here ndigits = precision.  */
-
-				/* Determine the number of trailing zeroes that
-				   have to be dropped.  */
-				nzeroes = 0;
-				if ((flags & FLAG_ALT) == 0)
-				  while (nzeroes < ndigits
-					 && digits[nzeroes] == '0')
-				    nzeroes++;
-
-				/* The exponent is now determined.  */
-				if (exponent >= -4 && exponent < (long)precision)
-				  {
-				    /* Fixed-point notation: max(exponent,0)+1
-				       digits, then the decimal point, then the
-				       remaining digits without trailing zeroes.  */
-				    if (exponent >= 0)
-				      {
-					size_t count = exponent + 1;
-					/* Note: count <= precision = ndigits.  */
-					for (; count > 0; count--)
-					  *p++ = digits[--ndigits];
-					if ((flags & FLAG_ALT) || ndigits > nzeroes)
-					  {
-					    *p++ = decimal_point_char ();
-					    while (ndigits > nzeroes)
-					      {
-						--ndigits;
-						*p++ = digits[ndigits];
-					      }
-					  }
-				      }
-				    else
-				      {
-					size_t count = -exponent - 1;
-					*p++ = '0';
-					*p++ = decimal_point_char ();
-					for (; count > 0; count--)
-					  *p++ = '0';
-					while (ndigits > nzeroes)
-					  {
-					    --ndigits;
-					    *p++ = digits[ndigits];
-					  }
-				      }
-				  }
-				else
-				  {
-				    /* Exponential notation.  */
-				    *p++ = digits[--ndigits];
-				    if ((flags & FLAG_ALT) || ndigits > nzeroes)
-				      {
-					*p++ = decimal_point_char ();
-					while (ndigits > nzeroes)
-					  {
-					    --ndigits;
-					    *p++ = digits[ndigits];
-					  }
-				      }
-				    *p++ = dp->conversion - 'G' + 'E'; /* 'e' or 'E' */
-# if WIDE_CHAR_VERSION
-				    {
-				      static const wchar_t decimal_format[] =
-					{ '%', '+', '.', '2', 'd', '\0' };
-				      SNPRINTF (p, 6 + 1, decimal_format, exponent);
-				    }
-# else
-				    sprintf (p, "%+.2d", exponent);
-# endif
-				    while (*p != '\0')
-				      p++;
-				  }
-
-				free (digits);
-			      }
+			    int saved_errno = errno;
+			    if (!(result == resultbuf || result == NULL))
+			      free (result);
+			    if (buf_malloced != NULL)
+			      free (buf_malloced);
+			    CLEANUP ();
+			    errno = saved_errno;
+			    return NULL;
 			  }
-			else
-			  abort ();
+			if (converted != result + length)
+			  {
+			    ENSURE_ALLOCATION (xsum (length, converted_len));
+			    DCHAR_CPY (result + length, converted, converted_len);
+			    free (converted);
+			  }
+			length += converted_len;
 		      }
+# endif
 
-		    END_LONG_DOUBLE_ROUNDING ();
-		  }
-
-		/* The generated string now extends from tmp to p, with the
-		   zero padding insertion point being at pad_ptr.  */
-		if (has_width && p - tmp < width)
-		  {
-		    size_t pad = width - (p - tmp);
-		    CHAR_T *end = p + pad;
-
-		    if (flags & FLAG_LEFT)
-		      {
-			/* Pad with spaces on the right.  */
-			for (; pad > 0; pad--)
-			  *p++ = ' ';
-		      }
-		    else if ((flags & FLAG_ZERO) && pad_ptr != NULL)
-		      {
-			/* Pad with zeroes.  */
-			CHAR_T *q = end;
-
-			while (p > pad_ptr)
-			  *--q = *--p;
-			for (; pad > 0; pad--)
-			  *p++ = '0';
-		      }
-		    else
-		      {
-			/* Pad with spaces on the left.  */
-			CHAR_T *q = end;
-
-			while (p > tmp)
-			  *--q = *--p;
-			for (; pad > 0; pad--)
-			  *p++ = ' ';
-		      }
-
-		    p = end;
-		  }
-
-		{
-		  size_t count = p - tmp;
-
-		  if (count >= tmp_length)
-		    /* tmp_length was incorrectly calculated - fix the
-		       code above!  */
-		    abort ();
-
-		  /* Make room for the result.  */
-		  if (count >= allocated - length)
-		    {
-		      size_t n = xsum (length, count);
-
-		      ENSURE_ALLOCATION (n);
+		      if (has_width && width > characters
+			  && (dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
 		    }
+		    break;
 
-		  /* Append the result.  */
-		  memcpy (result + length, tmp, count * sizeof (CHAR_T));
-		  if (tmp != tmpbuf)
-		    free (tmp);
-		  length += count;
-		}
+		  case TYPE_U16_STRING:
+		    {
+		      const uint16_t *arg = a.arg[dp->arg_index].a.a_u16_string;
+		      const uint16_t *arg_end;
+		      size_t characters;
+
+		      if (has_precision)
+			{
+			  /* Use only PRECISION characters, from the left.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (; precision > 0; precision--)
+			    {
+			      int count = u16_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
+			    }
+			}
+		      else if (has_width)
+			{
+			  /* Use the entire string, and count the number of
+			     characters.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (;;)
+			    {
+			      int count = u16_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
+			    }
+			}
+		      else
+			{
+			  /* Use the entire string.  */
+			  arg_end = arg + u16_strlen (arg);
+			  /* The number of characters doesn't matter.  */
+			  characters = 0;
+			}
+
+		      if (has_width && width > characters
+			  && !(dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
+
+# if DCHAR_IS_UINT16_T
+		      {
+			size_t n = arg_end - arg;
+			ENSURE_ALLOCATION (xsum (length, n));
+			DCHAR_CPY (result + length, arg, n);
+			length += n;
+		      }
+# else
+		      { /* Convert.  */
+			DCHAR_T *converted = result + length;
+			size_t converted_len = allocated - length;
+#  if DCHAR_IS_TCHAR
+			/* Convert from UTF-16 to locale encoding.  */
+			if (u16_conv_to_encoding (locale_charset (),
+						  iconveh_question_mark,
+						  arg, arg_end - arg, NULL,
+						  &converted, &converted_len)
+			    < 0)
+#  else
+			/* Convert from UTF-16 to UTF-8/UTF-32.  */
+			converted =
+			  U16_TO_DCHAR (arg, arg_end - arg,
+					converted, &converted_len);
+			if (converted == NULL)
+#  endif
+			  {
+			    int saved_errno = errno;
+			    if (!(result == resultbuf || result == NULL))
+			      free (result);
+			    if (buf_malloced != NULL)
+			      free (buf_malloced);
+			    CLEANUP ();
+			    errno = saved_errno;
+			    return NULL;
+			  }
+			if (converted != result + length)
+			  {
+			    ENSURE_ALLOCATION (xsum (length, converted_len));
+			    DCHAR_CPY (result + length, converted, converted_len);
+			    free (converted);
+			  }
+			length += converted_len;
+		      }
+# endif
+
+		      if (has_width && width > characters
+			  && (dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
+		    }
+		    break;
+
+		  case TYPE_U32_STRING:
+		    {
+		      const uint32_t *arg = a.arg[dp->arg_index].a.a_u32_string;
+		      const uint32_t *arg_end;
+		      size_t characters;
+
+		      if (has_precision)
+			{
+			  /* Use only PRECISION characters, from the left.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (; precision > 0; precision--)
+			    {
+			      int count = u32_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
+			    }
+			}
+		      else if (has_width)
+			{
+			  /* Use the entire string, and count the number of
+			     characters.  */
+			  arg_end = arg;
+			  characters = 0;
+			  for (;;)
+			    {
+			      int count = u32_strmblen (arg_end);
+			      if (count == 0)
+				break;
+			      if (count < 0)
+				{
+				  if (!(result == resultbuf || result == NULL))
+				    free (result);
+				  if (buf_malloced != NULL)
+				    free (buf_malloced);
+				  CLEANUP ();
+				  errno = EILSEQ;
+				  return NULL;
+				}
+			      arg_end += count;
+			      characters++;
+			    }
+			}
+		      else
+			{
+			  /* Use the entire string.  */
+			  arg_end = arg + u32_strlen (arg);
+			  /* The number of characters doesn't matter.  */
+			  characters = 0;
+			}
+
+		      if (has_width && width > characters
+			  && !(dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
+
+# if DCHAR_IS_UINT32_T
+		      {
+			size_t n = arg_end - arg;
+			ENSURE_ALLOCATION (xsum (length, n));
+			DCHAR_CPY (result + length, arg, n);
+			length += n;
+		      }
+# else
+		      { /* Convert.  */
+			DCHAR_T *converted = result + length;
+			size_t converted_len = allocated - length;
+#  if DCHAR_IS_TCHAR
+			/* Convert from UTF-32 to locale encoding.  */
+			if (u32_conv_to_encoding (locale_charset (),
+						  iconveh_question_mark,
+						  arg, arg_end - arg, NULL,
+						  &converted, &converted_len)
+			    < 0)
+#  else
+			/* Convert from UTF-32 to UTF-8/UTF-16.  */
+			converted =
+			  U32_TO_DCHAR (arg, arg_end - arg,
+					converted, &converted_len);
+			if (converted == NULL)
+#  endif
+			  {
+			    int saved_errno = errno;
+			    if (!(result == resultbuf || result == NULL))
+			      free (result);
+			    if (buf_malloced != NULL)
+			      free (buf_malloced);
+			    CLEANUP ();
+			    errno = saved_errno;
+			    return NULL;
+			  }
+			if (converted != result + length)
+			  {
+			    ENSURE_ALLOCATION (xsum (length, converted_len));
+			    DCHAR_CPY (result + length, converted, converted_len);
+			    free (converted);
+			  }
+			length += converted_len;
+		      }
+# endif
+
+		      if (has_width && width > characters
+			  && (dp->flags & FLAG_LEFT))
+			{
+			  size_t n = width - characters;
+			  ENSURE_ALLOCATION (xsum (length, n));
+			  DCHAR_SET (result + length, ' ', n);
+			  length += n;
+			}
+		    }
+		    break;
+
+		  default:
+		    abort ();
+		  }
 	      }
 #endif
 #if NEED_PRINTF_DIRECTIVE_A && !defined IN_LIBINTL
@@ -1777,10 +1829,10 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		int has_precision;
 		size_t precision;
 		size_t tmp_length;
-		CHAR_T tmpbuf[700];
-		CHAR_T *tmp;
-		CHAR_T *pad_ptr;
-		CHAR_T *p;
+		DCHAR_T tmpbuf[700];
+		DCHAR_T *tmp;
+		DCHAR_T *pad_ptr;
+		DCHAR_T *p;
 
 		has_width = 0;
 		width = 0;
@@ -1805,7 +1857,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		    else
 		      {
-			const CHAR_T *digitp = dp->width_start;
+			const FCHAR_T *digitp = dp->width_start;
 
 			do
 			  width = xsum (xtimes (width, 10), *digitp++ - '0');
@@ -1835,7 +1887,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		    else
 		      {
-			const CHAR_T *digitp = dp->precision_start + 1;
+			const FCHAR_T *digitp = dp->precision_start + 1;
 
 			precision = 0;
 			while (digitp != dp->precision_end)
@@ -1867,16 +1919,16 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 
 		tmp_length = xsum (tmp_length, 1); /* account for trailing NUL */
 
-		if (tmp_length <= sizeof (tmpbuf) / sizeof (CHAR_T))
+		if (tmp_length <= sizeof (tmpbuf) / sizeof (DCHAR_T))
 		  tmp = tmpbuf;
 		else
 		  {
-		    size_t tmp_memsize = xtimes (tmp_length, sizeof (CHAR_T));
+		    size_t tmp_memsize = xtimes (tmp_length, sizeof (DCHAR_T));
 
 		    if (size_overflow_p (tmp_memsize))
 		      /* Overflow, would lead to out of memory.  */
 		      goto out_of_memory;
-		    tmp = (CHAR_T *) malloc (tmp_memsize);
+		    tmp = (DCHAR_T *) malloc (tmp_memsize);
 		    if (tmp == NULL)
 		      /* Out of memory.  */
 		      goto out_of_memory;
@@ -2011,11 +2063,24 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 				  { '%', '+', 'd', '\0' };
 				SNPRINTF (p, 6 + 1, decimal_format, exponent);
 			      }
-# else
-			      sprintf (p, "%+d", exponent);
-# endif
 			      while (*p != '\0')
 				p++;
+# else
+			      if (sizeof (DCHAR_T) == 1)
+				{
+				  sprintf ((char *) p, "%+d", exponent);
+				  while (*p != '\0')
+				    p++;
+				}
+			      else
+				{
+				  char expbuf[6 + 1];
+				  const char *ep;
+				  sprintf (expbuf, "%+d", exponent);
+				  for (ep = expbuf; (*p = *ep) != '\0'; ep++)
+				    p++;
+				}
+# endif
 			  }
 
 			END_LONG_DOUBLE_ROUNDING ();
@@ -2145,11 +2210,24 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 				  { '%', '+', 'd', '\0' };
 				SNPRINTF (p, 6 + 1, decimal_format, exponent);
 			      }
-# else
-			      sprintf (p, "%+d", exponent);
-# endif
 			      while (*p != '\0')
 				p++;
+# else
+			      if (sizeof (DCHAR_T) == 1)
+				{
+				  sprintf ((char *) p, "%+d", exponent);
+				  while (*p != '\0')
+				    p++;
+				}
+			      else
+				{
+				  char expbuf[6 + 1];
+				  const char *ep;
+				  sprintf (expbuf, "%+d", exponent);
+				  for (ep = expbuf; (*p = *ep) != '\0'; ep++)
+				    p++;
+				}
+# endif
 			  }
 		      }
 		  }
@@ -2158,7 +2236,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		if (has_width && p - tmp < width)
 		  {
 		    size_t pad = width - (p - tmp);
-		    CHAR_T *end = p + pad;
+		    DCHAR_T *end = p + pad;
 
 		    if (flags & FLAG_LEFT)
 		      {
@@ -2169,7 +2247,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    else if ((flags & FLAG_ZERO) && pad_ptr != NULL)
 		      {
 			/* Pad with zeroes.  */
-			CHAR_T *q = end;
+			DCHAR_T *q = end;
 
 			while (p > pad_ptr)
 			  *--q = *--p;
@@ -2179,7 +2257,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    else
 		      {
 			/* Pad with spaces on the left.  */
-			CHAR_T *q = end;
+			DCHAR_T *q = end;
 
 			while (p > tmp)
 			  *--q = *--p;
@@ -2207,36 +2285,50 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    }
 
 		  /* Append the result.  */
-		  memcpy (result + length, tmp, count * sizeof (CHAR_T));
+		  memcpy (result + length, tmp, count * sizeof (DCHAR_T));
 		  if (tmp != tmpbuf)
 		    free (tmp);
 		  length += count;
 		}
 	      }
 #endif
-	    else
+#if (NEED_PRINTF_INFINITE_DOUBLE || NEED_PRINTF_INFINITE_LONG_DOUBLE || NEED_PRINTF_LONG_DOUBLE) && !defined IN_LIBINTL
+	    else if ((dp->conversion == 'f' || dp->conversion == 'F'
+		      || dp->conversion == 'e' || dp->conversion == 'E'
+		      || dp->conversion == 'g' || dp->conversion == 'G'
+		      || dp->conversion == 'a' || dp->conversion == 'A')
+		     && (0
+# if NEED_PRINTF_INFINITE_DOUBLE
+			 || (a.arg[dp->arg_index].type == TYPE_DOUBLE
+			     /* The systems (mingw) which produce wrong output
+				for Inf, -Inf, and NaN also do so for -0.0.
+				Therefore we treat this case here as well.  */
+			     && is_infinite_or_zero (a.arg[dp->arg_index].a.a_double))
+# endif
+# if NEED_PRINTF_LONG_DOUBLE
+			 || a.arg[dp->arg_index].type == TYPE_LONGDOUBLE
+# elif NEED_PRINTF_INFINITE_LONG_DOUBLE
+			 || (a.arg[dp->arg_index].type == TYPE_LONGDOUBLE
+			     /* Some systems produce wrong output for Inf,
+				-Inf, and NaN.  */
+			     && is_infinitel (a.arg[dp->arg_index].a.a_longdouble))
+# endif
+			))
 	      {
+# if NEED_PRINTF_INFINITE_DOUBLE && (NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_INFINITE_LONG_DOUBLE)
 		arg_type type = a.arg[dp->arg_index].type;
+# endif
 		int flags = dp->flags;
-#if !USE_SNPRINTF || NEED_PRINTF_FLAG_ZERO
 		int has_width;
 		size_t width;
-#endif
-#if NEED_PRINTF_FLAG_ZERO
-		int pad_ourselves;
-#else
-#		define pad_ourselves 0
-#endif
-		CHAR_T *fbp;
-		unsigned int prefix_count;
-		int prefixes[2];
-#if !USE_SNPRINTF
+		int has_precision;
+		size_t precision;
 		size_t tmp_length;
-		CHAR_T tmpbuf[700];
-		CHAR_T *tmp;
-#endif
+		DCHAR_T tmpbuf[700];
+		DCHAR_T *tmp;
+		DCHAR_T *pad_ptr;
+		DCHAR_T *p;
 
-#if !USE_SNPRINTF || NEED_PRINTF_FLAG_ZERO
 		has_width = 0;
 		width = 0;
 		if (dp->width_start != dp->width_end)
@@ -2260,7 +2352,675 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      }
 		    else
 		      {
-			const CHAR_T *digitp = dp->width_start;
+			const FCHAR_T *digitp = dp->width_start;
+
+			do
+			  width = xsum (xtimes (width, 10), *digitp++ - '0');
+			while (digitp != dp->width_end);
+		      }
+		    has_width = 1;
+		  }
+
+		has_precision = 0;
+		precision = 0;
+		if (dp->precision_start != dp->precision_end)
+		  {
+		    if (dp->precision_arg_index != ARG_NONE)
+		      {
+			int arg;
+
+			if (!(a.arg[dp->precision_arg_index].type == TYPE_INT))
+			  abort ();
+			arg = a.arg[dp->precision_arg_index].a.a_int;
+			/* "A negative precision is taken as if the precision
+			    were omitted."  */
+			if (arg >= 0)
+			  {
+			    precision = arg;
+			    has_precision = 1;
+			  }
+		      }
+		    else
+		      {
+			const FCHAR_T *digitp = dp->precision_start + 1;
+
+			precision = 0;
+			while (digitp != dp->precision_end)
+			  precision = xsum (xtimes (precision, 10), *digitp++ - '0');
+			has_precision = 1;
+		      }
+		  }
+
+		/* POSIX specifies the default precision to be 6 for %f, %F,
+		   %e, %E, but not for %g, %G.  Implementations appear to use
+		   the same default precision also for %g, %G.  */
+		if (!has_precision)
+		  precision = 6;
+
+		/* Allocate a temporary buffer of sufficient size.  */
+# if NEED_PRINTF_INFINITE_DOUBLE && NEED_PRINTF_LONG_DOUBLE
+		tmp_length = (type == TYPE_LONGDOUBLE ? LDBL_DIG + 1 : 0);
+# elif NEED_PRINTF_LONG_DOUBLE
+		tmp_length = LDBL_DIG + 1;
+# else
+		tmp_length = 0;
+# endif
+		if (tmp_length < precision)
+		  tmp_length = precision;
+# if NEED_PRINTF_LONG_DOUBLE
+#  if NEED_PRINTF_INFINITE_DOUBLE
+		if (type == TYPE_LONGDOUBLE)
+#  endif
+		  if (dp->conversion == 'f' || dp->conversion == 'F')
+		    {
+		      long double arg = a.arg[dp->arg_index].a.a_longdouble;
+		      if (!(isnanl (arg) || arg + arg == arg))
+			{
+			  /* arg is finite and nonzero.  */
+			  int exponent = floorlog10l (arg < 0 ? -arg : arg);
+			  if (exponent >= 0 && tmp_length < exponent + precision)
+			    tmp_length = exponent + precision;
+			}
+		    }
+# endif
+		/* Account for sign, decimal point etc. */
+		tmp_length = xsum (tmp_length, 12);
+
+		if (tmp_length < width)
+		  tmp_length = width;
+
+		tmp_length = xsum (tmp_length, 1); /* account for trailing NUL */
+
+		if (tmp_length <= sizeof (tmpbuf) / sizeof (DCHAR_T))
+		  tmp = tmpbuf;
+		else
+		  {
+		    size_t tmp_memsize = xtimes (tmp_length, sizeof (DCHAR_T));
+
+		    if (size_overflow_p (tmp_memsize))
+		      /* Overflow, would lead to out of memory.  */
+		      goto out_of_memory;
+		    tmp = (DCHAR_T *) malloc (tmp_memsize);
+		    if (tmp == NULL)
+		      /* Out of memory.  */
+		      goto out_of_memory;
+		  }
+
+		pad_ptr = NULL;
+		p = tmp;
+
+# if NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_INFINITE_LONG_DOUBLE
+#  if NEED_PRINTF_INFINITE_DOUBLE
+		if (type == TYPE_LONGDOUBLE)
+#  endif
+		  {
+		    long double arg = a.arg[dp->arg_index].a.a_longdouble;
+
+		    if (isnanl (arg))
+		      {
+			if (dp->conversion >= 'A' && dp->conversion <= 'Z')
+			  {
+			    *p++ = 'N'; *p++ = 'A'; *p++ = 'N';
+			  }
+			else
+			  {
+			    *p++ = 'n'; *p++ = 'a'; *p++ = 'n';
+			  }
+		      }
+		    else
+		      {
+			int sign = 0;
+			DECL_LONG_DOUBLE_ROUNDING
+
+			BEGIN_LONG_DOUBLE_ROUNDING ();
+
+			if (signbit (arg)) /* arg < 0.0L or negative zero */
+			  {
+			    sign = -1;
+			    arg = -arg;
+			  }
+
+			if (sign < 0)
+			  *p++ = '-';
+			else if (flags & FLAG_SHOWSIGN)
+			  *p++ = '+';
+			else if (flags & FLAG_SPACE)
+			  *p++ = ' ';
+
+			if (arg > 0.0L && arg + arg == arg)
+			  {
+			    if (dp->conversion >= 'A' && dp->conversion <= 'Z')
+			      {
+				*p++ = 'I'; *p++ = 'N'; *p++ = 'F';
+			      }
+			    else
+			      {
+				*p++ = 'i'; *p++ = 'n'; *p++ = 'f';
+			      }
+			  }
+			else
+			  {
+#  if NEED_PRINTF_LONG_DOUBLE
+			    pad_ptr = p;
+
+			    if (dp->conversion == 'f' || dp->conversion == 'F')
+			      {
+				char *digits;
+				size_t ndigits;
+
+				digits =
+				  scale10_round_decimal_long_double (arg, precision);
+				if (digits == NULL)
+				  {
+				    END_LONG_DOUBLE_ROUNDING ();
+				    goto out_of_memory;
+				  }
+				ndigits = strlen (digits);
+
+				if (ndigits > precision)
+				  do
+				    {
+				      --ndigits;
+				      *p++ = digits[ndigits];
+				    }
+				  while (ndigits > precision);
+				else
+				  *p++ = '0';
+				/* Here ndigits <= precision.  */
+				if ((flags & FLAG_ALT) || precision > 0)
+				  {
+				    *p++ = decimal_point_char ();
+				    for (; precision > ndigits; precision--)
+				      *p++ = '0';
+				    while (ndigits > 0)
+				      {
+					--ndigits;
+					*p++ = digits[ndigits];
+				      }
+				  }
+
+				free (digits);
+			      }
+			    else if (dp->conversion == 'e' || dp->conversion == 'E')
+			      {
+				int exponent;
+
+				if (arg == 0.0L)
+				  {
+				    exponent = 0;
+				    *p++ = '0';
+				    if ((flags & FLAG_ALT) || precision > 0)
+				      {
+					*p++ = decimal_point_char ();
+					for (; precision > 0; precision--)
+					  *p++ = '0';
+				      }
+				  }
+				else
+				  {
+				    /* arg > 0.0L.  */
+				    int adjusted;
+				    char *digits;
+				    size_t ndigits;
+
+				    exponent = floorlog10l (arg);
+				    adjusted = 0;
+				    for (;;)
+				      {
+					digits =
+					  scale10_round_decimal_long_double (arg,
+									     (int)precision - exponent);
+					if (digits == NULL)
+					  {
+					    END_LONG_DOUBLE_ROUNDING ();
+					    goto out_of_memory;
+					  }
+					ndigits = strlen (digits);
+
+					if (ndigits == precision + 1)
+					  break;
+					if (ndigits < precision
+					    || ndigits > precision + 2)
+					  /* The exponent was not guessed
+					     precisely enough.  */
+					  abort ();
+					if (adjusted)
+					  /* None of two values of exponent is
+					     the right one.  Prevent an endless
+					     loop.  */
+					  abort ();
+					free (digits);
+					if (ndigits == precision)
+					  exponent -= 1;
+					else
+					  exponent += 1;
+					adjusted = 1;
+				      }
+
+				    /* Here ndigits = precision+1.  */
+				    *p++ = digits[--ndigits];
+				    if ((flags & FLAG_ALT) || precision > 0)
+				      {
+					*p++ = decimal_point_char ();
+					while (ndigits > 0)
+					  {
+					    --ndigits;
+					    *p++ = digits[ndigits];
+					  }
+				      }
+
+				    free (digits);
+				  }
+
+				*p++ = dp->conversion; /* 'e' or 'E' */
+#   if WIDE_CHAR_VERSION
+				{
+				  static const wchar_t decimal_format[] =
+				    { '%', '+', '.', '2', 'd', '\0' };
+				  SNPRINTF (p, 6 + 1, decimal_format, exponent);
+				}
+				while (*p != '\0')
+				  p++;
+#   else
+				if (sizeof (DCHAR_T) == 1)
+				  {
+				    sprintf ((char *) p, "%+.2d", exponent);
+				    while (*p != '\0')
+				      p++;
+				  }
+				else
+				  {
+				    char expbuf[6 + 1];
+				    const char *ep;
+				    sprintf (expbuf, "%+.2d", exponent);
+				    for (ep = expbuf; (*p = *ep) != '\0'; ep++)
+				      p++;
+				  }
+#   endif
+			      }
+			    else if (dp->conversion == 'g' || dp->conversion == 'G')
+			      {
+				if (precision == 0)
+				  precision = 1;
+				/* precision >= 1.  */
+
+				if (arg == 0.0L)
+				  /* The exponent is 0, >= -4, < precision.
+				     Use fixed-point notation.  */
+				  {
+				    size_t ndigits = precision;
+				    /* Number of trailing zeroes that have to be
+				       dropped.  */
+				    size_t nzeroes =
+				      (flags & FLAG_ALT ? 0 : precision - 1);
+
+				    --ndigits;
+				    *p++ = '0';
+				    if ((flags & FLAG_ALT) || ndigits > nzeroes)
+				      {
+					*p++ = decimal_point_char ();
+					while (ndigits > nzeroes)
+					  {
+					    --ndigits;
+					    *p++ = '0';
+					  }
+				      }
+				  }
+				else
+				  {
+				    /* arg > 0.0L.  */
+				    int exponent;
+				    int adjusted;
+				    char *digits;
+				    size_t ndigits;
+				    size_t nzeroes;
+
+				    exponent = floorlog10l (arg);
+				    adjusted = 0;
+				    for (;;)
+				      {
+					digits =
+					  scale10_round_decimal_long_double (arg,
+									     (int)(precision - 1) - exponent);
+					if (digits == NULL)
+					  {
+					    END_LONG_DOUBLE_ROUNDING ();
+					    goto out_of_memory;
+					  }
+					ndigits = strlen (digits);
+
+					if (ndigits == precision)
+					  break;
+					if (ndigits < precision - 1
+					    || ndigits > precision + 1)
+					  /* The exponent was not guessed
+					     precisely enough.  */
+					  abort ();
+					if (adjusted)
+					  /* None of two values of exponent is
+					     the right one.  Prevent an endless
+					     loop.  */
+					  abort ();
+					free (digits);
+					if (ndigits < precision)
+					  exponent -= 1;
+					else
+					  exponent += 1;
+					adjusted = 1;
+				      }
+				    /* Here ndigits = precision.  */
+
+				    /* Determine the number of trailing zeroes
+				       that have to be dropped.  */
+				    nzeroes = 0;
+				    if ((flags & FLAG_ALT) == 0)
+				      while (nzeroes < ndigits
+					     && digits[nzeroes] == '0')
+					nzeroes++;
+
+				    /* The exponent is now determined.  */
+				    if (exponent >= -4
+					&& exponent < (long)precision)
+				      {
+					/* Fixed-point notation:
+					   max(exponent,0)+1 digits, then the
+					   decimal point, then the remaining
+					   digits without trailing zeroes.  */
+					if (exponent >= 0)
+					  {
+					    size_t count = exponent + 1;
+					    /* Note: count <= precision = ndigits.  */
+					    for (; count > 0; count--)
+					      *p++ = digits[--ndigits];
+					    if ((flags & FLAG_ALT) || ndigits > nzeroes)
+					      {
+						*p++ = decimal_point_char ();
+						while (ndigits > nzeroes)
+						  {
+						    --ndigits;
+						    *p++ = digits[ndigits];
+						  }
+					      }
+					  }
+					else
+					  {
+					    size_t count = -exponent - 1;
+					    *p++ = '0';
+					    *p++ = decimal_point_char ();
+					    for (; count > 0; count--)
+					      *p++ = '0';
+					    while (ndigits > nzeroes)
+					      {
+						--ndigits;
+						*p++ = digits[ndigits];
+					      }
+					  }
+				      }
+				    else
+				      {
+					/* Exponential notation.  */
+					*p++ = digits[--ndigits];
+					if ((flags & FLAG_ALT) || ndigits > nzeroes)
+					  {
+					    *p++ = decimal_point_char ();
+					    while (ndigits > nzeroes)
+					      {
+						--ndigits;
+						*p++ = digits[ndigits];
+					      }
+					  }
+					*p++ = dp->conversion - 'G' + 'E'; /* 'e' or 'E' */
+#   if WIDE_CHAR_VERSION
+					{
+					  static const wchar_t decimal_format[] =
+					    { '%', '+', '.', '2', 'd', '\0' };
+					  SNPRINTF (p, 6 + 1, decimal_format, exponent);
+					}
+					while (*p != '\0')
+					  p++;
+#   else
+					if (sizeof (DCHAR_T) == 1)
+					  {
+					    sprintf ((char *) p, "%+.2d", exponent);
+					    while (*p != '\0')
+					      p++;
+					  }
+					else
+					  {
+					    char expbuf[6 + 1];
+					    const char *ep;
+					    sprintf (expbuf, "%+.2d", exponent);
+					    for (ep = expbuf; (*p = *ep) != '\0'; ep++)
+					      p++;
+					  }
+#   endif
+				      }
+
+				    free (digits);
+				  }
+			      }
+			    else
+			      abort ();
+#  else
+			    /* arg is finite.  */
+			    abort ();
+#  endif
+			  }
+
+			END_LONG_DOUBLE_ROUNDING ();
+		      }
+		  }
+#  if NEED_PRINTF_INFINITE_DOUBLE
+		else
+#  endif
+# endif
+# if NEED_PRINTF_INFINITE_DOUBLE
+		  {
+		    /* Simpler than above: handle only NaN, Infinity, zero.  */
+		    double arg = a.arg[dp->arg_index].a.a_double;
+
+		    if (isnan (arg))
+		      {
+			if (dp->conversion >= 'A' && dp->conversion <= 'Z')
+			  {
+			    *p++ = 'N'; *p++ = 'A'; *p++ = 'N';
+			  }
+			else
+			  {
+			    *p++ = 'n'; *p++ = 'a'; *p++ = 'n';
+			  }
+		      }
+		    else
+		      {
+			int sign = 0;
+
+			if (signbit (arg)) /* arg < 0.0L or negative zero */
+			  {
+			    sign = -1;
+			    arg = -arg;
+			  }
+
+			if (sign < 0)
+			  *p++ = '-';
+			else if (flags & FLAG_SHOWSIGN)
+			  *p++ = '+';
+			else if (flags & FLAG_SPACE)
+			  *p++ = ' ';
+
+			if (arg > 0.0 && arg + arg == arg)
+			  {
+			    if (dp->conversion >= 'A' && dp->conversion <= 'Z')
+			      {
+				*p++ = 'I'; *p++ = 'N'; *p++ = 'F';
+			      }
+			    else
+			      {
+				*p++ = 'i'; *p++ = 'n'; *p++ = 'f';
+			      }
+			  }
+			else
+			  {
+			    if (!(arg == 0.0))
+			      abort ();
+
+			    pad_ptr = p;
+
+			    if (dp->conversion == 'f' || dp->conversion == 'F')
+			      {
+				*p++ = '0';
+				if ((flags & FLAG_ALT) || precision > 0)
+				  {
+				    *p++ = decimal_point_char ();
+				    for (; precision > 0; precision--)
+				      *p++ = '0';
+				  }
+			      }
+			    else if (dp->conversion == 'e' || dp->conversion == 'E')
+			      {
+				*p++ = '0';
+				if ((flags & FLAG_ALT) || precision > 0)
+				  {
+				    *p++ = decimal_point_char ();
+				    for (; precision > 0; precision--)
+				      *p++ = '0';
+				  }
+				*p++ = dp->conversion; /* 'e' or 'E' */
+				*p++ = '+';
+				/* Produce the same number of exponent digits as
+				   the native printf implementation.  */
+#  if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+				*p++ = '0';
+#  endif
+				*p++ = '0';
+				*p++ = '0';
+			      }
+			    else if (dp->conversion == 'g' || dp->conversion == 'G')
+			      {
+				*p++ = '0';
+				if (flags & FLAG_ALT)
+				  {
+				    size_t ndigits =
+				      (precision > 0 ? precision - 1 : 0);
+				    *p++ = decimal_point_char ();
+				    for (; ndigits > 0; --ndigits)
+				      *p++ = '0';
+				  }
+			      }
+			    else
+			      abort ();
+			  }
+		      }
+		  }
+# endif
+
+		/* The generated string now extends from tmp to p, with the
+		   zero padding insertion point being at pad_ptr.  */
+		if (has_width && p - tmp < width)
+		  {
+		    size_t pad = width - (p - tmp);
+		    DCHAR_T *end = p + pad;
+
+		    if (flags & FLAG_LEFT)
+		      {
+			/* Pad with spaces on the right.  */
+			for (; pad > 0; pad--)
+			  *p++ = ' ';
+		      }
+		    else if ((flags & FLAG_ZERO) && pad_ptr != NULL)
+		      {
+			/* Pad with zeroes.  */
+			DCHAR_T *q = end;
+
+			while (p > pad_ptr)
+			  *--q = *--p;
+			for (; pad > 0; pad--)
+			  *p++ = '0';
+		      }
+		    else
+		      {
+			/* Pad with spaces on the left.  */
+			DCHAR_T *q = end;
+
+			while (p > tmp)
+			  *--q = *--p;
+			for (; pad > 0; pad--)
+			  *p++ = ' ';
+		      }
+
+		    p = end;
+		  }
+
+		{
+		  size_t count = p - tmp;
+
+		  if (count >= tmp_length)
+		    /* tmp_length was incorrectly calculated - fix the
+		       code above!  */
+		    abort ();
+
+		  /* Make room for the result.  */
+		  if (count >= allocated - length)
+		    {
+		      size_t n = xsum (length, count);
+
+		      ENSURE_ALLOCATION (n);
+		    }
+
+		  /* Append the result.  */
+		  memcpy (result + length, tmp, count * sizeof (DCHAR_T));
+		  if (tmp != tmpbuf)
+		    free (tmp);
+		  length += count;
+		}
+	      }
+#endif
+	    else
+	      {
+		arg_type type = a.arg[dp->arg_index].type;
+		int flags = dp->flags;
+#if !USE_SNPRINTF || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_ZERO
+		int has_width;
+		size_t width;
+#endif
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_ZERO
+		int pad_ourselves;
+#else
+#		define pad_ourselves 0
+#endif
+		TCHAR_T *fbp;
+		unsigned int prefix_count;
+		int prefixes[2];
+#if !USE_SNPRINTF
+		size_t tmp_length;
+		TCHAR_T tmpbuf[700];
+		TCHAR_T *tmp;
+#endif
+
+#if !USE_SNPRINTF || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_ZERO
+		has_width = 0;
+		width = 0;
+		if (dp->width_start != dp->width_end)
+		  {
+		    if (dp->width_arg_index != ARG_NONE)
+		      {
+			int arg;
+
+			if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
+			  abort ();
+			arg = a.arg[dp->width_arg_index].a.a_int;
+			if (arg < 0)
+			  {
+			    /* "A negative field width is taken as a '-' flag
+			        followed by a positive field width."  */
+			    flags |= FLAG_LEFT;
+			    width = (unsigned int) (-arg);
+			  }
+			else
+			  width = arg;
+		      }
+		    else
+		      {
+			const FCHAR_T *digitp = dp->width_start;
 
 			do
 			  width = xsum (xtimes (width, 10), *digitp++ - '0');
@@ -2290,7 +3050,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			}
 		      else
 			{
-			  const CHAR_T *digitp = dp->precision_start + 1;
+			  const FCHAR_T *digitp = dp->precision_start + 1;
 
 			  precision = 0;
 			  while (digitp != dp->precision_end)
@@ -2470,22 +3230,32 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      abort ();
 		    }
 
+# if ENABLE_UNISTDIO
+		  /* Padding considers the number of characters, therefore the
+		     number of elements after padding may be
+		       > max (tmp_length, width)
+		     but is certainly
+		       <= tmp_length + width.  */
+		  tmp_length = xsum (tmp_length, width);
+# else
+		  /* Padding considers the number of elements, says POSIX.  */
 		  if (tmp_length < width)
 		    tmp_length = width;
+# endif
 
 		  tmp_length = xsum (tmp_length, 1); /* account for trailing NUL */
 		}
 
-		if (tmp_length <= sizeof (tmpbuf) / sizeof (CHAR_T))
+		if (tmp_length <= sizeof (tmpbuf) / sizeof (TCHAR_T))
 		  tmp = tmpbuf;
 		else
 		  {
-		    size_t tmp_memsize = xtimes (tmp_length, sizeof (CHAR_T));
+		    size_t tmp_memsize = xtimes (tmp_length, sizeof (TCHAR_T));
 
 		    if (size_overflow_p (tmp_memsize))
 		      /* Overflow, would lead to out of memory.  */
 		      goto out_of_memory;
-		    tmp = (CHAR_T *) malloc (tmp_memsize);
+		    tmp = (TCHAR_T *) malloc (tmp_memsize);
 		    if (tmp == NULL)
 		      /* Out of memory.  */
 		      goto out_of_memory;
@@ -2493,11 +3263,20 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 #endif
 
 		/* Decide whether to perform the padding ourselves.  */
-#if NEED_PRINTF_FLAG_ZERO
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_ZERO
 		switch (dp->conversion)
 		  {
+# if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO
+		  /* If we need conversion from TCHAR_T[] to DCHAR_T[], we need
+		     to perform the padding after this conversion.  Functions
+		     with unistdio extensions perform the padding based on
+		     character count rather than element count.  */
+		  case 'c': case 's':
+# endif
+# if NEED_PRINTF_FLAG_ZERO
 		  case 'f': case 'F': case 'e': case 'E': case 'g': case 'G':
 		  case 'a': case 'A':
+# endif
 		    pad_ourselves = 1;
 		    break;
 		  default:
@@ -2533,15 +3312,39 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    if (dp->width_start != dp->width_end)
 		      {
 			size_t n = dp->width_end - dp->width_start;
-			memcpy (fbp, dp->width_start, n * sizeof (CHAR_T));
-			fbp += n;
+			/* The width specification is known to consist only
+			   of standard ASCII characters.  */
+			if (sizeof (FCHAR_T) == sizeof (TCHAR_T))
+			  {
+			    memcpy (fbp, dp->width_start, n * sizeof (TCHAR_T));
+			    fbp += n;
+			  }
+			else
+			  {
+			    const FCHAR_T *mp = dp->width_start;
+			    do
+			      *fbp++ = (unsigned char) *mp++;
+			    while (--n > 0);
+			  }
 		      }
 		  }
 		if (dp->precision_start != dp->precision_end)
 		  {
 		    size_t n = dp->precision_end - dp->precision_start;
-		    memcpy (fbp, dp->precision_start, n * sizeof (CHAR_T));
-		    fbp += n;
+		    /* The precision specification is known to consist only
+		       of standard ASCII characters.  */
+		    if (sizeof (FCHAR_T) == sizeof (TCHAR_T))
+		      {
+		        memcpy (fbp, dp->precision_start, n * sizeof (TCHAR_T));
+		        fbp += n;
+		      }
+		    else
+		      {
+			const FCHAR_T *mp = dp->precision_start;
+			do
+			  *fbp++ = (unsigned char) *mp++;
+			while (--n > 0);
+		      }
 		  }
 
 		switch (type)
@@ -2605,39 +3408,46 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		  }
 
 #if USE_SNPRINTF
+		/* The SNPRINTF result is appended after result[0..length].
+		   The latter is an array of DCHAR_T; SNPRINTF appends an
+		   array of TCHAR_T to it.  This is possible because
+		   sizeof (TCHAR_T) divides sizeof (DCHAR_T) and
+		   alignof (TCHAR_T) <= alignof (DCHAR_T).  */
+# define TCHARS_PER_DCHAR (sizeof (DCHAR_T) / sizeof (TCHAR_T))
 		/* Prepare checking whether snprintf returns the count
 		   via %n.  */
 		ENSURE_ALLOCATION (xsum (length, 1));
-		result[length] = '\0';
+		*(TCHAR_T *) (result + length) = '\0';
 #endif
 
 		for (;;)
 		  {
-		    size_t maxlen;
-		    int count;
-		    int retcount;
-
-		    maxlen = allocated - length;
-		    count = -1;
-		    retcount = 0;
+		    int count = -1;
 
 #if USE_SNPRINTF
-		    /* SNPRINTF can fail if maxlen > INT_MAX.  */
-		    if (maxlen > INT_MAX)
+		    int retcount = 0;
+		    size_t maxlen = allocated - length;
+		    /* SNPRINTF can fail if its second argument is
+		       > INT_MAX.  */
+		    if (maxlen > INT_MAX / TCHARS_PER_DCHAR)
 		      goto overflow;
+		    maxlen = maxlen * TCHARS_PER_DCHAR;
 # define SNPRINTF_BUF(arg) \
 		    switch (prefix_count)				    \
 		      {							    \
 		      case 0:						    \
-			retcount = SNPRINTF (result + length, maxlen, buf,  \
+			retcount = SNPRINTF ((TCHAR_T *) (result + length), \
+					     maxlen, buf,		    \
 					     arg, &count);		    \
 			break;						    \
 		      case 1:						    \
-			retcount = SNPRINTF (result + length, maxlen, buf,  \
+			retcount = SNPRINTF ((TCHAR_T *) (result + length), \
+					     maxlen, buf,		    \
 					     prefixes[0], arg, &count);	    \
 			break;						    \
 		      case 2:						    \
-			retcount = SNPRINTF (result + length, maxlen, buf,  \
+			retcount = SNPRINTF ((TCHAR_T *) (result + length), \
+					     maxlen, buf,		    \
 					     prefixes[0], prefixes[1], arg, \
 					     &count);			    \
 			break;						    \
@@ -2786,7 +3596,8 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      {
 			/* Verify that snprintf() has NUL-terminated its
 			   result.  */
-			if (count < maxlen && result[length + count] != '\0')
+			if (count < maxlen
+			    && ((TCHAR_T *) (result + length)) [count] != '\0')
 			  abort ();
 			/* Portability hack.  */
 			if (retcount > count)
@@ -2836,109 +3647,245 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			return NULL;
 		      }
 
-		    /* Make room for the result.  */
+#if USE_SNPRINTF
+		    /* Handle overflow of the allocated buffer.  */
 		    if (count >= maxlen)
 		      {
-			/* Need at least count bytes.  But allocate
-			   proportionally, to avoid looping eternally if
-			   snprintf() reports a too small count.  */
+			/* Need at least count * sizeof (TCHAR_T) bytes.  But
+			   allocate proportionally, to avoid looping eternally
+			   if snprintf() reports a too small count.  */
+			size_t n =
+			  xmax (xsum (length,
+				      (count + TCHARS_PER_DCHAR - 1)
+				      / TCHARS_PER_DCHAR),
+				xtimes (allocated, 2));
+
+			ENSURE_ALLOCATION (n);
+			continue;
+		      }
+#endif
+
+#if !DCHAR_IS_TCHAR
+# if !USE_SNPRINTF
+		    if (count >= tmp_length)
+		      /* tmp_length was incorrectly calculated - fix the
+			 code above!  */
+		      abort ();
+# endif
+
+		    /* Convert from TCHAR_T[] to DCHAR_T[].  */
+		    if (dp->conversion == 'c' || dp->conversion == 's')
+		      {
+			/* type = TYPE_CHAR or TYPE_WIDE_CHAR or TYPE_STRING
+			   TYPE_WIDE_STRING.
+			   The result string is not certainly ASCII.  */
+			const TCHAR_T *tmpsrc;
+			DCHAR_T *tmpdst;
+			size_t tmpdst_len;
+			/* This code assumes that TCHAR_T is 'char'.  */
+			typedef int TCHAR_T_verify
+				    [2 * (sizeof (TCHAR_T) == 1) - 1];
+# if USE_SNPRINTF
+			tmpsrc = (TCHAR_T *) (result + length);
+# else
+			tmpsrc = tmp;
+# endif
+			tmpdst = NULL;
+			tmpdst_len = 0;
+			if (DCHAR_CONV_FROM_ENCODING (locale_charset (),
+						      iconveh_question_mark,
+						      tmpsrc, count,
+						      NULL,
+						      &tmpdst, &tmpdst_len)
+			    < 0)
+			  {
+			    int saved_errno = errno;
+			    if (!(result == resultbuf || result == NULL))
+			      free (result);
+			    if (buf_malloced != NULL)
+			      free (buf_malloced);
+			    CLEANUP ();
+			    errno = saved_errno;
+			    return NULL;
+			  }
+			ENSURE_ALLOCATION (xsum (length, tmpdst_len));
+			DCHAR_CPY (result + length, tmpdst, tmpdst_len);
+			free (tmpdst);
+			count = tmpdst_len;
+		      }
+		    else
+		      {
+			/* The result string is ASCII.
+			   Simple 1:1 conversion.  */
+# if USE_SNPRINTF
+			/* If sizeof (DCHAR_T) == sizeof (TCHAR_T), it's a
+			   no-op conversion, in-place on the array starting
+			   at (result + length).  */
+			if (sizeof (DCHAR_T) != sizeof (TCHAR_T))
+# endif
+			  {
+			    const TCHAR_T *tmpsrc;
+			    DCHAR_T *tmpdst;
+			    size_t n;
+
+# if USE_SNPRINTF
+			    if (result == resultbuf)
+			      {
+				tmpsrc = (TCHAR_T *) (result + length);
+				/* ENSURE_ALLOCATION will not move tmpsrc
+				   (because it's part of resultbuf).  */
+				ENSURE_ALLOCATION (xsum (length, count));
+			      }
+			    else
+			      {
+				/* ENSURE_ALLOCATION will move the array
+				   (because it uses realloc().  */
+				ENSURE_ALLOCATION (xsum (length, count));
+				tmpsrc = (TCHAR_T *) (result + length);
+			      }
+# else
+			    tmpsrc = tmp;
+			    ENSURE_ALLOCATION (xsum (length, count));
+# endif
+			    tmpdst = result + length;
+			    /* Copy backwards, because of overlapping.  */
+			    tmpsrc += count;
+			    tmpdst += count;
+			    for (n = count; n > 0; n--)
+			      *--tmpdst = (unsigned char) *--tmpsrc;
+			  }
+		      }
+#endif
+
+#if DCHAR_IS_TCHAR && !USE_SNPRINTF
+		    /* Make room for the result.  */
+		    if (count > allocated - length)
+		      {
+			/* Need at least count elements.  But allocate
+			   proportionally.  */
 			size_t n =
 			  xmax (xsum (length, count), xtimes (allocated, 2));
 
 			ENSURE_ALLOCATION (n);
-#if USE_SNPRINTF
-			continue;
-#else
-			maxlen = allocated - length;
-#endif
 		      }
+#endif
+
+		    /* Here count <= allocated - length.  */
 
 		    /* Perform padding.  */
-#if NEED_PRINTF_FLAG_ZERO
-		    if (pad_ourselves && has_width && count < width)
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_ZERO
+		    if (pad_ourselves && has_width)
 		      {
-# if USE_SNPRINTF
-			/* Make room for the result.  */
-			if (width >= maxlen)
-			  {
-			    /* Need at least width bytes.  But allocate
-			       proportionally, to avoid looping eternally if
-			       snprintf() reports a too small count.  */
-			    size_t n =
-			      xmax (xsum (length + 1, width),
-				    xtimes (allocated, 2));
-
-			    length += count;
-			    ENSURE_ALLOCATION (n);
-			    length -= count;
-			    maxlen = allocated - length; /* > width */
-			  }
-			/* Here width < maxlen.  */
-# endif
-			{
-# if USE_SNPRINTF
-			  CHAR_T * const rp = result + length;
+			size_t w;
+# if ENABLE_UNISTDIO
+			/* Outside POSIX, it's preferrable to compare the width
+			   against the number of _characters_ of the converted
+			   value.  */
+			w = DCHAR_MBSNLEN (result + length, count);
 # else
-			  CHAR_T * const rp = tmp;
+			/* The width is compared against the number of _bytes_
+			   of the converted value, says POSIX.  */
+			w = count;
 # endif
-			  CHAR_T *p = rp + count;
-			  size_t pad = width - count;
-			  CHAR_T *end = p + pad;
-			  CHAR_T *pad_ptr = (*rp == '-' ? rp + 1 : rp);
-			  /* No zero-padding of "inf" and "nan".  */
-			  if ((*pad_ptr >= 'A' && *pad_ptr <= 'Z')
-			      || (*pad_ptr >= 'a' && *pad_ptr <= 'z'))
-			    pad_ptr = NULL;
-			  /* The generated string now extends from rp to p,
-			     with the zero padding insertion point being at
-			     pad_ptr.  */
+			if (w < width)
+			  {
+			    size_t pad = width - w;
+# if USE_SNPRINTF
+			    /* Make room for the result.  */
+			    if (xsum (count, pad) > allocated - length)
+			      {
+				/* Need at least count + pad elements.  But
+				   allocate proportionally.  */
+				size_t n =
+				  xmax (xsum3 (length, count, pad),
+					xtimes (allocated, 2));
 
-			  if (flags & FLAG_LEFT)
+				length += count;
+				ENSURE_ALLOCATION (n);
+				length -= count;
+			      }
+			    /* Here count + pad <= allocated - length.  */
+# endif
 			    {
-			      /* Pad with spaces on the right.  */
-			      for (; pad > 0; pad--)
-				*p++ = ' ';
-			    }
-			  else if ((flags & FLAG_ZERO) && pad_ptr != NULL)
-			    {
-			      /* Pad with zeroes.  */
-			      CHAR_T *q = end;
+# if !DCHAR_IS_TCHAR || USE_SNPRINTF
+			      DCHAR_T * const rp = result + length;
+# else
+			      DCHAR_T * const rp = tmp;
+# endif
+			      DCHAR_T *p = rp + count;
+			      DCHAR_T *end = p + pad;
+# if NEED_PRINTF_FLAG_ZERO
+			      DCHAR_T *pad_ptr;
+#  if !DCHAR_IS_TCHAR
+			      if (dp->conversion == 'c'
+				  || dp->conversion == 's')
+				/* No zero-padding for string directives.  */
+				pad_ptr = NULL;
+			      else
+#  endif
+				{
+				  pad_ptr = (*rp == '-' ? rp + 1 : rp);
+				  /* No zero-padding of "inf" and "nan".  */
+				  if ((*pad_ptr >= 'A' && *pad_ptr <= 'Z')
+				      || (*pad_ptr >= 'a' && *pad_ptr <= 'z'))
+				    pad_ptr = NULL;
+				}
+# endif
+			      /* The generated string now extends from rp to p,
+				 with the zero padding insertion point being at
+				 pad_ptr.  */
 
-			      while (p > pad_ptr)
-				*--q = *--p;
-			      for (; pad > 0; pad--)
-				*p++ = '0';
-			    }
-			  else
-			    {
-			      /* Pad with spaces on the left.  */
-			      CHAR_T *q = end;
+			      count = count + pad; /* = end - rp */
 
-			      while (p > rp)
-				*--q = *--p;
-			      for (; pad > 0; pad--)
-				*p++ = ' ';
-			    }
+			      if (flags & FLAG_LEFT)
+				{
+				  /* Pad with spaces on the right.  */
+				  for (; pad > 0; pad--)
+				    *p++ = ' ';
+				}
+# if NEED_PRINTF_FLAG_ZERO
+			      else if ((flags & FLAG_ZERO) && pad_ptr != NULL)
+				{
+				  /* Pad with zeroes.  */
+				  DCHAR_T *q = end;
 
-			  count = width; /* = count + pad = end - rp */
-			}
+				  while (p > pad_ptr)
+				    *--q = *--p;
+				  for (; pad > 0; pad--)
+				    *p++ = '0';
+				}
+# endif
+			      else
+				{
+				  /* Pad with spaces on the left.  */
+				  DCHAR_T *q = end;
+
+				  while (p > rp)
+				    *--q = *--p;
+				  for (; pad > 0; pad--)
+				    *p++ = ' ';
+				}
+			    }
+			  }
 		      }
 #endif
 
-#if !USE_SNPRINTF
+#if DCHAR_IS_TCHAR && !USE_SNPRINTF
 		    if (count >= tmp_length)
 		      /* tmp_length was incorrectly calculated - fix the
 			 code above!  */
 		      abort ();
 #endif
 
-		    /* Here still count < maxlen.  */
+		    /* Here still count <= allocated - length.  */
 
-#if USE_SNPRINTF
+#if !DCHAR_IS_TCHAR || USE_SNPRINTF
 		    /* The snprintf() result did fit.  */
 #else
 		    /* Append the sprintf() result.  */
-		    memcpy (result + length, tmp, count * sizeof (CHAR_T));
+		    memcpy (result + length, tmp, count * sizeof (DCHAR_T));
+#endif
+#if !USE_SNPRINTF
 		    if (tmp != tmpbuf)
 		      free (tmp);
 #endif
@@ -2947,7 +3894,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    if (dp->conversion == 'F')
 		      {
 			/* Convert the %f result to upper case for %F.  */
-			CHAR_T *rp = result + length;
+			DCHAR_T *rp = result + length;
 			size_t rc;
 			for (rc = count; rc > 0; rc--, rp++)
 			  if (*rp >= 'a' && *rp <= 'z')
@@ -2969,9 +3916,9 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
     if (result != resultbuf && length + 1 < allocated)
       {
 	/* Shrink the allocated memory if possible.  */
-	CHAR_T *memory;
+	DCHAR_T *memory;
 
-	memory = (CHAR_T *) realloc (result, (length + 1) * sizeof (CHAR_T));
+	memory = (DCHAR_T *) realloc (result, (length + 1) * sizeof (DCHAR_T));
 	if (memory != NULL)
 	  result = memory;
       }
@@ -3007,10 +3954,13 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
   }
 }
 
+#undef TCHARS_PER_DCHAR
 #undef SNPRINTF
 #undef USE_SNPRINTF
 #undef PRINTF_PARSE
 #undef DIRECTIVES
 #undef DIRECTIVE
-#undef CHAR_T
+#undef TCHAR_T
+#undef DCHAR_T
+#undef FCHAR_T
 #undef VASNPRINTF

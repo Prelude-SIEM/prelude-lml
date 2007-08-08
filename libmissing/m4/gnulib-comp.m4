@@ -47,6 +47,7 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
   gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
+  gl_FLOAT_H
   # No macro. You should also use one of fnmatch-posix or fnmatch-gnu.
   gl_GETADDRINFO
   gl_GETLOGIN_R
@@ -125,6 +126,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/asnprintf.c
   lib/dummy.c
   lib/float+.h
+  lib/float_.h
   lib/fnmatch.c
   lib/fnmatch_.h
   lib/fnmatch_loop.c
@@ -163,17 +165,18 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/wchar_.h
   lib/wctype_.h
   lib/xsize.h
-  m4/absolute-header.m4
   m4/alloca.m4
   m4/arpa_inet_h.m4
   m4/d-type.m4
   m4/eoverflow.m4
   m4/extensions.m4
+  m4/float_h.m4
   m4/fnmatch.m4
   m4/getaddrinfo.m4
   m4/getlogin_r.m4
   m4/glob.m4
   m4/gnulib-common.m4
+  m4/include_next.m4
   m4/inet_ntop.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
