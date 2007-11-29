@@ -58,6 +58,7 @@ regex=no appropriate format defined for log entry; \
 regex=EMU;				include = apc-emu.rules;
 regex=(anomaly|since|firstSeen);	include = arbor.rules;
 regex=arpwatch;				include = arpwatch.rules;
+regex=chan_sip.c;                       include = asterisk.rules;
 regex=CactiTholdLog;			include = cacti-thold.rules;
 regex=product:;				include = checkpoint.rules;
 regex=%\S+-\d+-\S+;			include = cisco-asa.rules; \

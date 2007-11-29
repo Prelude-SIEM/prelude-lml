@@ -4,6 +4,7 @@ ruleset_DATA = \
 	apc-emu.rules		\
 	arbor.rules		\
 	arpwatch.rules		\
+	asterisk.rules		\
 	bonding.rules		\
 	cacti-thold.rules	\
 	checkpoint.rules	\

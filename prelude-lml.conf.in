@@ -76,6 +76,14 @@ time-format = "%d/%b/%Y:%H:%M:%S"
 prefix-regex = "^(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
 file = /var/log/apache2/access_log
 
+#
+# Sample configuration for asterisk:
+#
+#[format=asterisk]
+#time-format = "%b %d %H:%M:%S"
+#prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])? (\S*): )?"
+#file = /var/log/asterisk/messages
+
 
 #
 # Specifies the maximum difference, in seconds, between
