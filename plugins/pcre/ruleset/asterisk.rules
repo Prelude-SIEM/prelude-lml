@@ -38,3 +38,22 @@ regex=Registration from '<sip:(\S*)>' failed for '(\S+)' - (.*)$; \
  target(0).user.user_id(0).type=original-user; \
  target(0).user.user_id(0).name=$1; \
  last;
+
+#Dec  3 10:32:10 NOTICE[23701] chan_sip.c: Invalid to address: '' from 192.168.33.180 (missing sip:) trying to use anyway...
+regex=chan_sip.c: ([[:print:]]+): '(\S*)' from (\S+) \(([[:print:]]+)\) trying to use anyway...; \
+ classification.text=$1; \
+ id=6001; \
+ revision=1; \
+ analyzer(0).name=Asterisk; \
+ analyzer(0).manufacturer=Digium; \
+ analyzer(0).class=Private Branch Exchange; \
+ assessment.impact.severity=low; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The SIP message is invalid: '$4'. This is probably due to a crafted SIP message; \
+ source(0).node.address(0).address=$3; \
+ target(0).service.name=sip; \
+ target(0).user.user_id(0).type=original-user; \
+ target(0).user.user_id(0).name=$2; \
+ last;
+
