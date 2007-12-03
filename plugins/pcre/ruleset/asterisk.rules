@@ -40,7 +40,7 @@ regex=Registration from '<sip:(\S*)>' failed for '(\S+)' - (.*)$; \
  last;
 
 #Dec  3 10:32:10 NOTICE[23701] chan_sip.c: Invalid to address: '' from 192.168.33.180 (missing sip:) trying to use anyway...
-regex=chan_sip.c: ([[:print:]]+): '(\S*)' from (\S+) \(([[:print:]]+)\) trying to use anyway...; \
+regex=: ([[:print:]]+): '(\S*)' from (\S+) \(([[:print:]]+)\) trying to use anyway...; \
  classification.text=$1; \
  id=6001; \
  revision=1; \
