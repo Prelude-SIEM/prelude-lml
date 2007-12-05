@@ -124,10 +124,51 @@ static int set_batch_mode(prelude_option_t *opt, const char *optarg, prelude_str
 
 
 
-static int set_ignore_metadata(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
+static char *const2char(const char *val)
 {
-        config.ignore_metadata = TRUE;
-        file_server_set_ignore_metadata();
+        union {
+                const char *ro;
+                char *rw;
+        } uval;
+
+        uval.ro = val;
+
+        return uval.rw;
+}
+
+
+static int set_metadata_flags(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        int i;
+        file_server_metadata_flags_t flags = 0;
+        char *name, *value = const2char(arg);
+        struct {
+                const char *name;
+                file_server_metadata_flags_t flags;
+        } tbl[] = {
+                { "nowrite", FILE_SERVER_METADATA_FLAGS_NO_WRITE },
+                { "last", FILE_SERVER_METADATA_FLAGS_LAST        },
+                { "head", FILE_SERVER_METADATA_FLAGS_HEAD        },
+                { "tail", FILE_SERVER_METADATA_FLAGS_TAIL        }
+        };
+
+        while ( (name = strsep(&value, " ,")) ) {
+
+                for ( i = 0; i < sizeof(tbl) / sizeof(*tbl); i++ ) {
+                        if ( ! strstr(name, tbl[i].name) )
+                                continue;
+
+                        if ( tbl[i].flags != FILE_SERVER_METADATA_FLAGS_NO_WRITE &&
+                             flags & (~FILE_SERVER_METADATA_FLAGS_NO_WRITE) ) {
+                                prelude_log(PRELUDE_LOG_ERR, "attribute '%s' is incompatible with previously specified attribute.\n", tbl[i].name);
+                                return -1;
+                        }
+
+                        flags |= tbl[i].flags;
+                }
+        }
+
+        file_server_set_metadata_flags(flags);
         return 0;
 }
 
@@ -602,9 +643,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Tell LML to run in batch mode", PRELUDE_OPTION_ARGUMENT_NONE,
                            set_batch_mode, NULL);
 
-        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "ignore-metadata",
-                           "Tell LML not to read/write metadata", PRELUDE_OPTION_ARGUMENT_NONE,
-                           set_ignore_metadata, NULL);
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "metadata",
+                           "Specify whether log analyzis should begin from 'head', 'tail', or 'last' known file position. "
+                           "You can also use the 'nowrite' attribute so that existing file metadata are not overwritten. "
+                           "The default value is 'last'", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           set_metadata_flags, NULL);
 
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "no-resolve",
                            "Do not attempt to resolve target address (useful for profiling)",

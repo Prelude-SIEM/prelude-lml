@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -22,11 +22,20 @@
 *****/
 
 
+typedef enum {
+        FILE_SERVER_METADATA_FLAGS_HEAD     = 0x01,
+        FILE_SERVER_METADATA_FLAGS_TAIL     = 0x02,
+        FILE_SERVER_METADATA_FLAGS_LAST     = 0x04,
+        FILE_SERVER_METADATA_FLAGS_NO_WRITE = 0x08
+} file_server_metadata_flags_t;
+
+
+
 int file_server_get_event_fd(void);
 
 void file_server_set_batch_mode(void);
 
-void file_server_set_ignore_metadata(void);
+void file_server_set_metadata_flags(file_server_metadata_flags_t flags);
 
 int file_server_wake_up(void);
 

@@ -111,6 +111,7 @@ typedef struct {
 
         FILE *fd;
         FILE *metadata_fd;
+        prelude_bool_t need_position;
 
         off_t last_rotation_size;
         time_t last_rotation_time;
@@ -144,7 +145,8 @@ static FAMConnection fc;
 
 static int batch_mode = 0;
 static int fam_initialized = 0;
-static int ignore_metadata = 0;
+static file_server_metadata_flags_t metadata_flags = FILE_SERVER_METADATA_FLAGS_LAST;
+
 extern lml_config_t config;
 
 
@@ -295,9 +297,6 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
         int line = 0, ret;
         char *offptr, *buf;
 
-        if ( ignore_metadata )
-                return 0;
-
         rewind(monitor->metadata_fd);
 
         *start = 0;
@@ -335,7 +334,7 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
         int len, ret;
         char buf[METADATA_MAXSIZE];
 
-        if ( ignore_metadata )
+        if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_NO_WRITE )
                 return 0;
 
         len = snprintf(buf, sizeof(buf), "%" PRELUDE_PRIu64 ":%s\n", offset, prelude_string_get_string(monitor->buf));
@@ -369,9 +368,6 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         int ret, have_metadata = 0;
         char buf[1024], sumline[METADATA_MAXSIZE], *sumptr;
 
-        if ( ignore_metadata )
-                return 0;
-
         sumptr = sumline;
         filename = lml_log_source_get_name(monitor->source);
 
@@ -390,7 +386,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
 
         if ( ! have_metadata ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: No metadata available.\n", filename);
-                return fseek(monitor->fd, st.st_size, SEEK_SET);;
+                return fseek(monitor->fd, st.st_size, SEEK_SET);
         }
 
         if ( st.st_size < offset ) {
@@ -430,9 +426,6 @@ static int file_metadata_open(monitor_fd_t *monitor)
         int fd;
         char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
 
-        if ( ignore_metadata )
-                return 0;
-
         strncpy(file, lml_log_source_get_name(monitor->source), sizeof(file));
 
         while ( (ptr = strchr(file, '/')) )
@@ -441,7 +434,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         snprintf(path, sizeof(path), "%s/%s", METADATA_DIR, file);
 
         fd = open(path, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
-        if ( fd < 0 && errno != EEXIST ) {
+        if ( fd < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error creating %s: %s.\n", path, strerror(errno));
                 return -1;
         }
@@ -451,6 +444,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
         monitor->metadata_fd = fdopen(fd, "r+");
         if ( ! monitor->metadata_fd ) {
                 prelude_log(PRELUDE_LOG_ERR, "fdopen failed: %s.\n", strerror(errno));
+                close(fd);
                 return -1;
         }
 
@@ -580,6 +574,7 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
         }
 
         new->source = ls;
+        new->need_position = TRUE;
 
         ret = file_metadata_open(new);
         if ( ret < 0 ) {
@@ -618,6 +613,35 @@ static void monitor_destroy(monitor_fd_t *monitor)
 
 
 
+static int monitor_set_position(monitor_fd_t *monitor, const char *filename, int fd)
+{
+        int ret = 0;
+
+        if ( ! monitor->need_position )
+                return 0;
+
+        monitor->need_position = FALSE;
+
+        if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_LAST )
+                return file_metadata_get_position(monitor);
+
+        else if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_HEAD )
+                ret = fseek(monitor->fd, 0, SEEK_SET);
+
+        else if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_TAIL )
+                ret = fseek(monitor->fd, 0, SEEK_END);
+
+        if ( ret < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to the %s of the file: %s.\n",
+                            filename, (metadata_flags & FILE_SERVER_METADATA_FLAGS_TAIL) ? "tail" : "head",
+                            strerror(errno));
+                return -1;
+        }
+
+        return ret;
+}
+
+
 static int monitor_open(monitor_fd_t *monitor)
 {
         int ret, fd;
@@ -635,7 +659,7 @@ static int monitor_open(monitor_fd_t *monitor)
                 fd = fileno(monitor->fd);
                 fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 
-                ret = file_metadata_get_position(monitor);
+                ret = monitor_set_position(monitor, filename, fd);
                 if ( ret < 0 )
                         return -1;
         }
@@ -763,7 +787,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                         if ( st->st_ino == st_new.st_ino )
                                 return 0;
 
-                        fclose(monitor->fd);
+                        monitor_close(monitor);
                         monitor_open(monitor);
                 }
                 else monitor_close(monitor);
@@ -1173,9 +1197,9 @@ void file_server_start_monitoring(void)
 }
 
 
-void file_server_set_ignore_metadata(void)
+void file_server_set_metadata_flags(file_server_metadata_flags_t flags)
 {
-        ignore_metadata = 1;
+        metadata_flags = flags;
 }
 
 
