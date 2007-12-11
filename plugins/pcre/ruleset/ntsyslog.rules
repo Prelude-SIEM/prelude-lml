@@ -125,7 +125,7 @@ regex=security\[success\] 538 .* User Logoff:\s+User Name:([\w ]+) Domain:([\w ]
 # 1.d 560
 # Currently broken on Windows 2003; verify against older Windows
 #LOG:Jul 11 08:55:16 somehost.ragingwire.net smf-eng-srobins/smf-eng-srobins security[success] 560 NT AUTHORITY\SYSTEM  Object Open:  Object Server:Security Account Manager  Object Type:SAM_DOMAIN  Object Name:SMF-ENG-GGOMEZ  Handle ID:1290248  Operation ID:{0,378510053}  Process ID:944  Image File Name: C:\WINDOWS\system32\lsass.exe  Primary User Name:SMF-ENG-GGOMEZ$  Primary Domain:RES  Primary Logon ID:(0x0,0x3E7)  Client User Name:SMF-ENG-GGOMEZ$  Client Domain:RES  Client Logon ID:(0x0,0x3E7)  Accesses: %%1537 %%1538 %%1539 %%1540 %%5392 %%5393 %%5394 %%5395 %%5396 %%5398 %%5399 %%5400 %%5401 %%5402   Privileges:-  Restricted Sid Count: 0
-regex= security\[success\] 560 (.*)  Object Open:  Object Server:[\w\s]+  Object Type:[\w\_]+  Object Name:(\w+)  New Handle ID:\d+  Operation ID:.*  Process ID:(\d+)  Primary User Name:(.*)  Primary Domain:.+  Primary Logon ID:.*  Client User Name:([\w ]+); \
+regex=security\[success\] 560 (.*) Object Open:\s* Object Server:[\w\s]+ Object Type:[\w\_]+\s* Object Name:([\w-]+)\s* Handle ID:\d+\s* Operation ID:.*\s* Process ID:(\d+) [\S ]+ Primary User Name:(\S*)\s* Primary Domain:\S+\s* Primary Logon ID:\S*\s* Client User Name:(\S+)\s* Client Domain; \
  classification.text=Object opened; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
