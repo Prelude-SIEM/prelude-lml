@@ -23,6 +23,7 @@ ruleset_DATA = \
 	httpd.rules		\
 	ipchains.rules		\
 	ipfw.rules		\
+	kojoney.rules		\
 	modsecurity.rules	\
 	ms-cluster.rules	\
 	ms-sql.rules		\
