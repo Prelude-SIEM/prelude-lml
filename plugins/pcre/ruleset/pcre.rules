@@ -102,6 +102,7 @@ regex=portsentry;			include = portsentry.rules;
 regex=postfix/;                 	include = postfix.rules;
 regex=proftpd;				include = proftpd.rules;
 regex=popper;				include = qpopper.rules;
+regex=INFO\s+srcIP;			include = rishi.rules;
 regex=avc:;				include = selinux.rules;
 regex=sendmail;				include = sendmail.rules;
 regex=(user|group)(mod|add);		include = shadow-utils.rules;
