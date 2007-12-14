@@ -397,7 +397,7 @@ int main(int argc, char **argv)
                 if ( ! config.dry_run )
                         prelude_client_destroy(config.lml_client, PRELUDE_CLIENT_EXIT_STATUS_SUCCESS);
 
-                print_stats("- ", &end);
+                print_stats("", &end);
         }
 
         prelude_deinit();
