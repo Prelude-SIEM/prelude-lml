@@ -90,16 +90,16 @@
 #define LOG_LINE_MAXSIZE 65535
 
 
-#define LOGFILE_DELETION_CLASS "Logfile deletion"
+#define LOGFILE_DELETION_CLASS "Log file deletion"
 #define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"               \
                                 "or a log rotation program may have rotated the logfile."
 
-#define LOGFILE_DELETION_IMPACT_HIGH "An attacker seems to have erased the logfile, "      \
+#define LOGFILE_DELETION_IMPACT_HIGH "An attacker seems to have erased the log file, "      \
                                      "and the change doesn't seem to be related to a log " \
                                      "rotation program."
 
-#define LOGFILE_MODIFICATION_CLASS "Logfile inconsistency"
-#define LOGFILE_MODIFICATION_IMPACT "An attacker might have modified the logfile in order " \
+#define LOGFILE_MODIFICATION_CLASS "Log file inconsistency"
+#define LOGFILE_MODIFICATION_IMPACT "An attacker might have modified the log file in order " \
                                     "to remove the trace he left."
 
 
@@ -385,26 +385,28 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         monitor->last_mtime = st.st_mtime;
 
         if ( ! have_metadata ) {
-                prelude_log(PRELUDE_LOG_INFO, "%s: No metadata available.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "%s: No metadata available, starting from tail.\n", filename);
                 return fseek(monitor->fd, st.st_size, SEEK_SET);
         }
 
         if ( st.st_size < offset ) {
-                prelude_log(PRELUDE_LOG_INFO, "%s: Metadata available, but logfile got rotated, starting at 0.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "%s: log file was rotated, starting from head.\n", filename);
                 monitor->last_size = 0;
                 return 0;
         }
 
         ret = fseek(monitor->fd, offset, SEEK_SET);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "%s: could not seek to byte %" PRELUDE_PRIu64 ": %s.\n",
+                prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to offset %" PRELUDE_PRIu64 ": %s.\n",
                             filename, offset, strerror(errno));
                 return -1;
         }
 
+        /*
+         * If the metadata checksum does not match, the file was probably rotated.
+         */
         if ( ! fgets(buf, sizeof(buf), monitor->fd) || strcmp(buf, sumptr) != 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "%s: Metadata available, but checksum is invalid, starting at 0.\n", filename);
-                logfile_modified_alert(monitor, &st);
+                prelude_log(PRELUDE_LOG_INFO, "%s: log file was rotated, starting from head.\n", filename);
                 monitor->last_size = 0;
                 return fseek(monitor->fd, 0, SEEK_SET);
         }
@@ -412,7 +414,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         monitor->last_size = offset;
         monitor->last_size += strlen(sumptr);
 
-        prelude_log(PRELUDE_LOG_INFO, "%s: Metadata available, starting log analyzis at offset %" PRELUDE_PRIu64 ".\n",
+        prelude_log(PRELUDE_LOG_INFO, "%s: resuming log analyzis at offset %" PRELUDE_PRIu64 ".\n",
                     filename, monitor->last_size);
 
         return 0;
@@ -791,9 +793,9 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                         monitor_open(monitor);
                 }
                 else monitor_close(monitor);
-                prelude_log(PRELUDE_LOG_INFO, "logfile %s has been renamed.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "log file %s has been renamed.\n", filename);
         } else {
-                prelude_log(PRELUDE_LOG_INFO, "logfile %s reached 0 hard link.\n", filename);
+                prelude_log(PRELUDE_LOG_INFO, "log file %s has been deleted.\n", filename);
                 monitor_close(monitor);
         }
 
