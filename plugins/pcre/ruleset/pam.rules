@@ -21,6 +21,32 @@
 #
 #####
 
+# The two first rules ignore cron jobs (allowing admin to log them, but without receiving
+# alerts), without having to reconfigure or change the syslog engine.
+#
+# other lines will still be logged by pam.rules:
+# Dec 14 09:31:58 piche sshd[8778]: pam_unix(ssh:session): session opened for user pollux by (uid=0)
+
+# old pam format (< 0.99):
+
+# ignore opened or closed sessions
+#Apr 20 11:55:01 piche CRON[23295]: (pam_unix) session opened for user root by (uid=0)
+#Apr 20 11:55:01 piche CRON[23293]: (pam_unix) session closed for user root
+#LOG:Dec 14 09:31:58 piche sshd[8778]: pam_unix(ssh:session): session opened for user pollux by (uid=0)
+regex=CRON\[\d+\]: \(pam_unix\) session (opened|closed) for user; \
+ silent; \
+ last;
+
+# new pam format:
+# ignore opened or closed sessions (for all pam modules)
+#Dec 14 09:09:01 piche CRON[5898]: pam_unix(cron:session): session opened for user root by (uid=0)
+#Dec 14 09:09:01 piche CRON[5898]: pam_unix(cron:session): session closed for user root
+#LOG:Dec 14 09:31:58 piche sshd[8778]: pam_unix(ssh:session): session opened for user pollux by (uid=0)
+regex=CRON\[\d+\]: \S+\(cron:\S+\): session (opened|closed) for user; \
+ silent; \
+ last;
+
+
 #LOG:Aug 14 17:32:19 blah su(pam_unix)[17944]: session opened for user root by (uid=123)
 #LOG:Dec  9 18:47:10 devel5 sshd(pam_unix)[13189]: session opened for user yyyy by xxxx(uid=0)
 regex=session opened for user (\S+) by (\S*)\(uid=(\d*)\); \
