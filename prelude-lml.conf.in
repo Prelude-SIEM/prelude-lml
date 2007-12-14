@@ -14,6 +14,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # overwrite the default address for this sensor by uncommenting 
 # this entry.
 #
+# [prelude]
 # server-addr = 127.0.0.1
 
 
@@ -73,7 +74,7 @@ file = /var/log/everything/current
 #
 [format=apache]
 time-format = "%d/%b/%Y:%H:%M:%S"
-prefix-regex = "^(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
+prefix-regex = "^\S*(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
 file = /var/log/apache2/access_log
 
 #
