@@ -51,12 +51,13 @@ ruleset_DATA = \
 	squid.rules		\
 	ssh.rules		\
 	sudo.rules		\
+	suhosin.rules		\
 	tripwire.rules		\
 	vigor.rules		\
 	vpopmail.rules		\
 	linksys-wap11.rules	\
 	webmin.rules		\
-	wu-ftp.rules		
+	wu-ftp.rules
 
 
 
