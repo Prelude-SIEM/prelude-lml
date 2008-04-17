@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -66,12 +66,12 @@ static int add_dynamic_object_value(value_container_t *vcont, unsigned int refer
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
-        
+
         vitem->value = NULL;
         vitem->refno = reference;
         prelude_list_add_tail(&vcont->value_item_list, &vitem->list);
 
-        return 0;                
+        return 0;
 }
 
 
@@ -116,7 +116,7 @@ static int parse_value(value_container_t *vcont, const char *line)
 
                         i = 0;
                         str++;
-                        
+
                         while ( isdigit((int) *str) && i < sizeof(num) )
                                 num[i++] = *str++;
 
@@ -164,25 +164,24 @@ static int parse_value(value_container_t *vcont, const char *line)
 static void resolve_referenced_value(value_item_t *vitem, const pcre_rule_t *rule,
                                      const char *log_entry, int *ovector, size_t osize)
 {
-         int ret;
-         char buf[1024] = { 0 };
+        int ret;
 
-         ret = pcre_copy_substring(log_entry, ovector, osize, vitem->refno, buf, sizeof(buf));
-         if ( ret < 0 ) {
-                 if ( ret == PCRE_ERROR_NOMEMORY ) 
-                         prelude_log(PRELUDE_LOG_WARN, "not enough memory to get backward reference %d.\n",
-                                     vitem->refno);
-                 
-                 else if ( ret == PCRE_ERROR_NOSUBSTRING )
-                         prelude_log(PRELUDE_LOG_WARN, "backward reference number %d does not exist in rule id %d.\n",
-                                     vitem->refno, rule->id);
-                 
+        ret = pcre_get_substring(log_entry, ovector, osize, vitem->refno, (const char **) &vitem->value);
+        if ( ret < 0 ) {
+                vitem->value = NULL;
+
+                if ( ret == PCRE_ERROR_NOMEMORY )
+                        prelude_log(PRELUDE_LOG_WARN, "not enough memory to get backward reference %d.\n",
+                                    vitem->refno);
+
+                else if ( ret == PCRE_ERROR_NOSUBSTRING )
+                        prelude_log(PRELUDE_LOG_WARN, "backward reference number %d does not exist in rule id %d.\n",
+                                    vitem->refno, rule->id);
+
                  else
-                         prelude_log(PRELUDE_LOG_WARN, "unknown PCRE error while getting backward reference %d.\n",
-                                     vitem->refno);
-         }
-
-         vitem->value = (buf[0]) ? strdup(buf) : NULL;
+                        prelude_log(PRELUDE_LOG_WARN, "unknown PCRE error while getting backward reference %d.\n",
+                                    vitem->refno);
+        }
 }
 
 
@@ -194,7 +193,7 @@ prelude_string_t *value_container_resolve(value_container_t *vcont, const pcre_r
         value_item_t *vitem;
         prelude_list_t *tmp;
         prelude_string_t *str;
-        
+
         ret = prelude_string_new(&str);
         if ( ret < 0 ) {
                 prelude_perror(ret, "error creating prelude-string");
@@ -209,7 +208,7 @@ prelude_string_t *value_container_resolve(value_container_t *vcont, const pcre_r
                         if ( ! vitem->value )
                                 continue;
                 }
-                
+
                 if ( prelude_string_cat(str, vitem->value) < 0 ) {
                         prelude_string_destroy(str);
                         return NULL;
@@ -230,7 +229,7 @@ prelude_string_t *value_container_resolve(value_container_t *vcont, const pcre_r
 int value_container_new(value_container_t **vcont, const char *str)
 {
         int ret;
-        
+
         *vcont = malloc(sizeof(**vcont));
         if ( ! *vcont ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -239,7 +238,7 @@ int value_container_new(value_container_t **vcont, const char *str)
 
         (*vcont)->data = NULL;
         prelude_list_init(&(*vcont)->value_item_list);
-        
+
         ret = parse_value(*vcont, str);
         if ( ret < 0 ) {
                 free(*vcont);
@@ -255,13 +254,17 @@ void value_container_destroy(value_container_t *vcont)
 {
         value_item_t *vitem;
         prelude_list_t *tmp, *bkp;
-        
+
         prelude_list_for_each_safe(&vcont->value_item_list, tmp, bkp) {
                 vitem = prelude_list_entry(tmp, value_item_t, list);
 
-                if ( vitem->value )
-                        free(vitem->value);
-                
+                if ( vitem->value ) {
+                        if ( vitem->refno != -1 )
+                                pcre_free_substring(vitem->value);
+                        else
+                                free(vitem->value);
+                }
+
                 prelude_list_del(&vitem->list);
                 free(vitem);
         }
@@ -275,12 +278,12 @@ void value_container_reset(value_container_t *vcont)
 {
         value_item_t *vitem;
         prelude_list_t *tmp;
-        
+
         prelude_list_for_each(&vcont->value_item_list, tmp) {
                 vitem = prelude_list_entry(tmp, value_item_t, list);
 
                 if ( vitem->refno != -1 && vitem->value ) {
-                        free(vitem->value);
+                        pcre_free_substring(vitem->value);
                         vitem->value = NULL;
                 }
         }
