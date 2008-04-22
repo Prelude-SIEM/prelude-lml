@@ -90,13 +90,10 @@
 #define LOG_LINE_MAXSIZE 65535
 
 
+#define LOGFILE_RENAME_CLASS   "Log file rename"
 #define LOGFILE_DELETION_CLASS "Log file deletion"
 #define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"               \
                                 "or a log rotation program may have rotated the logfile."
-
-#define LOGFILE_DELETION_IMPACT_HIGH "An attacker seems to have erased the log file, "      \
-                                     "and the change doesn't seem to be related to a log " \
-                                     "rotation program."
 
 #define LOGFILE_MODIFICATION_CLASS "Log file inconsistency"
 #define LOGFILE_MODIFICATION_IMPACT "An attacker might have modified the log file in order " \
@@ -688,6 +685,8 @@ static void monitor_close(monitor_fd_t *monitor)
 
         fclose(monitor->fd);
         monitor->fd = NULL;
+        monitor->last_size = 0;
+        monitor->last_mtime = 0;
 
         prelude_list_del(&monitor->list);
         prelude_list_add_tail(&inactive_fd_list, &monitor->list);
@@ -771,7 +770,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         char buf[1024];
         int toff, soff;
         struct stat st_new;
-        const char *filename;
+        const char *filename, *ctxt;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
         prelude_string_t *str;
@@ -794,9 +793,11 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                 }
                 else monitor_close(monitor);
                 prelude_log(PRELUDE_LOG_INFO, "log file %s has been renamed.\n", filename);
+                ctxt = LOGFILE_RENAME_CLASS;
         } else {
                 prelude_log(PRELUDE_LOG_INFO, "log file %s has been deleted.\n", filename);
                 monitor_close(monitor);
+                ctxt = LOGFILE_DELETION_CLASS;
         }
 
         ret = idmef_classification_new(&classification);
@@ -815,7 +816,7 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
                 idmef_classification_destroy(classification);
                 return -1;
         }
-        prelude_string_set_constant(str, LOGFILE_DELETION_CLASS);
+        prelude_string_set_ref(str, ctxt);
 
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
@@ -946,7 +947,7 @@ static int initialize_fam(void)
 
         ret = FAMOpen(&fc);
         if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_WARN, "error initializing FAM: %s.\n", FamErrlist[FAMErrno]);
+                prelude_log(PRELUDE_LOG_WARN, "error initializing FAM: %s.\n", FAMErrno ? FamErrlist[FAMErrno] : "unknown");
                 return -1;
         }
 
@@ -990,11 +991,38 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
 }
 
 
+static int process_file_event(monitor_fd_t *monitor)
+{
+        int ret;
+        struct stat st;
+
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
+                return -1;
+        }
+
+        if ( monitor->fd != stdin ) {
+                ret = is_file_already_used(monitor, &st);
+                if ( ret < 0 )
+                        return -1;
+        }
+
+        /*
+         * check mtime consistency.
+         */
+        check_modification_time(monitor, &st);
+
+        /*
+         * read and analyze available data.
+         */
+        return check_logfile_data(monitor, &st);
+}
+
 
 static int fam_process_event(FAMEvent *event)
 {
         int ret = 0;
-        struct stat st;
         monitor_fd_t *monitor = event->userdata;
 
         switch (event->code) {
@@ -1004,21 +1032,7 @@ static int fam_process_event(FAMEvent *event)
                         return -1;
 
         case FAMDeleted:
-                ret = fstat(fileno(monitor->fd), &st);
-                if ( ret < 0 )
-                        prelude_log(PRELUDE_LOG_ERR, "fstat returned an error.\n");
-
-                /*
-                 * check mtime consistency.
-                 */
-                check_modification_time(monitor, &st);
-
-                /*
-                 * read and analyze available data.
-                 */
-                check_logfile_data(monitor, &st);
-
-                ret = is_file_already_used(monitor, &st);
+                ret = process_file_event(monitor);
                 break;
 
         case FAMExists:
@@ -1056,37 +1070,6 @@ static int fam_process_queued_events(void)
         return 0;
 }
 #endif
-
-
-
-static int process_file_event(monitor_fd_t *monitor)
-{
-        int ret;
-        struct stat st;
-
-        ret = fstat(fileno(monitor->fd), &st);
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
-                return -1;
-        }
-
-        if ( monitor->fd != stdin ) {
-                ret = is_file_already_used(monitor, &st);
-                if ( ret < 0 )
-                        return -1;
-        }
-
-        /*
-         * check mtime consistency.
-         */
-        check_modification_time(monitor, &st);
-
-        /*
-         * read and analyze available data.
-         */
-        return check_logfile_data(monitor, &st);
-}
-
 
 
 
