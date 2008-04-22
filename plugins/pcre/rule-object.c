@@ -7,7 +7,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -53,7 +53,7 @@ struct rule_object_list {
  */
 typedef struct {
         prelude_list_t list;
-        
+
         idmef_path_t *object;
         value_container_t *vcont;
 } rule_object_t;
@@ -65,16 +65,16 @@ static const char *str_tolower(const char *str, char *buf, size_t size)
         unsigned int i = 0;
 
         buf[0] = 0;
-        
+
         while ( i < size ) {
                 buf[i] = tolower(str[i]);
 
                 if ( str[i] == 0 )
                         break;
-                
+
                 i++;
         }
-        
+
         return buf;
 }
 
@@ -85,16 +85,16 @@ static idmef_value_t *build_message_object_value(pcre_rule_t *rule, rule_object_
         const char *str;
         struct servent *service;
         idmef_value_t *value = NULL;
-        
+
         str = idmef_path_get_name(rule_object->object, idmef_path_get_depth(rule_object->object) - 1);
-        
+
         ret = strcmp(str, "port");
         if ( ret != 0 || (ret == 0 && isdigit((int) *valstr)) )
                 ret = idmef_value_new_from_path(&value, rule_object->object, valstr);
 
         else {
                 char tmp[32];
-                
+
                 service = getservbyname(str_tolower(valstr, tmp, sizeof(tmp)), NULL);
                 if ( ! service ) {
                         prelude_log(PRELUDE_LOG_ERR, "could not map service '%s' in rule ID %d.\n", tmp, rule->id);
@@ -103,13 +103,13 @@ static idmef_value_t *build_message_object_value(pcre_rule_t *rule, rule_object_
 
                 ret = idmef_value_new_uint16(&value, ntohs(service->s_port));
         }
-        
+
         if ( ret < 0 ) {
                 prelude_perror(ret, "could not create path '%s' with value '%s' in rule ID %d",
                                idmef_path_get_name(rule_object->object, -1), valstr, rule->id);
                 value = NULL;
         }
-        
+
         return value;
 }
 
@@ -124,16 +124,16 @@ int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idme
         idmef_value_t *value;
         prelude_string_t *strbuf;
         rule_object_t *rule_object;
-        
+
         if ( prelude_list_is_empty(&olist->rule_object_list) )
                 return 0;
-        
+
         if ( ! *message ) {
                 ret = idmef_message_new(message);
                 if ( ret < 0 )
                         return -1;
         }
-        
+
         prelude_list_for_each(&olist->rule_object_list, tmp) {
                 rule_object = prelude_list_entry(tmp, rule_object_t, list);
 
@@ -143,10 +143,10 @@ int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idme
 
                 value = build_message_object_value(rule, rule_object, prelude_string_get_string(strbuf));
                 prelude_string_destroy(strbuf);
-                
+
                 if ( ! value )
                         continue;
-                
+
                 ret = idmef_path_set(rule_object->object, *message, value);
 
                 idmef_value_destroy(value);
@@ -159,7 +159,7 @@ int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idme
                         return -1;
                 }
         }
-        
+
         return 0;
 }
 
@@ -191,7 +191,7 @@ int rule_object_add(rule_object_list_t *olist,
                 idmef_path_destroy(object);
                 return -1;
         }
-        
+
         rule_object->object = object;
 
         ret = value_container_new(&rule_object->vcont, value);
@@ -230,17 +230,17 @@ void rule_object_list_destroy(rule_object_list_t *olist)
 {
         rule_object_t *robject;
         prelude_list_t *tmp, *bkp;
-        
+
         prelude_list_for_each_safe(&olist->rule_object_list, tmp, bkp) {
                 robject = prelude_list_entry(tmp, rule_object_t, list);
 
                 idmef_path_destroy(robject->object);
                 value_container_destroy(robject->vcont);
-                
+
                 prelude_list_del(&robject->list);
                 free(robject);
         }
-        
+
         free(olist);
 }
 
