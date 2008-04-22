@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -29,8 +29,6 @@ typedef struct value_container value_container_t;
 int value_container_new(value_container_t **vcont, const char *str);
 
 void value_container_destroy(value_container_t *vcont);
-
-void value_container_reset(value_container_t *vcont);
 
 void *value_container_get_data(value_container_t *vcont);
 

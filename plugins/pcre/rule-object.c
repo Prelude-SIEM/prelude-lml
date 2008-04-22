@@ -148,9 +148,7 @@ int rule_object_build_message(pcre_rule_t *rule, rule_object_list_t *olist, idme
                         continue;
 
                 ret = idmef_path_set(rule_object->object, *message, value);
-
                 idmef_value_destroy(value);
-                value_container_reset(rule_object->vcont);
 
                 if ( ret < 0 ) {
                         prelude_perror(ret, "idmef path set failed for %s", idmef_path_get_name(rule_object->object, -1));

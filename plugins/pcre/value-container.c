@@ -178,7 +178,7 @@ static void resolve_referenced_value(value_item_t *vitem, const pcre_rule_t *rul
                         prelude_log(PRELUDE_LOG_WARN, "backward reference number %d does not exist in rule id %d.\n",
                                     vitem->refno, rule->id);
 
-                 else
+                else
                         prelude_log(PRELUDE_LOG_WARN, "unknown PCRE error while getting backward reference %d.\n",
                                     vitem->refno);
         }
@@ -209,18 +209,21 @@ prelude_string_t *value_container_resolve(value_container_t *vcont, const pcre_r
                                 continue;
                 }
 
-                if ( prelude_string_cat(str, vitem->value) < 0 ) {
-                        prelude_string_destroy(str);
-                        return NULL;
-                }
+                ret = prelude_string_cat(str, vitem->value);
+
+                if ( vitem->refno != -1 && vitem->value )
+                        pcre_free_substring(vitem->value);
+
+                if ( ret < 0 )
+                        goto err;
         }
 
-        if ( prelude_string_is_empty(str) ) {
-                prelude_string_destroy(str);
-                return NULL;
-        }
+        if ( ! prelude_string_is_empty(str) )
+                return str;
 
-        return str;
+err:
+        prelude_string_destroy(str);
+        return NULL;
 }
 
 
@@ -258,12 +261,8 @@ void value_container_destroy(value_container_t *vcont)
         prelude_list_for_each_safe(&vcont->value_item_list, tmp, bkp) {
                 vitem = prelude_list_entry(tmp, value_item_t, list);
 
-                if ( vitem->value ) {
-                        if ( vitem->refno != -1 )
-                                pcre_free_substring(vitem->value);
-                        else
-                                free(vitem->value);
-                }
+                if ( vitem->value && vitem->refno == -1 )
+                        free(vitem->value);
 
                 prelude_list_del(&vitem->list);
                 free(vitem);
@@ -271,24 +270,6 @@ void value_container_destroy(value_container_t *vcont)
 
         free(vcont);
 }
-
-
-
-void value_container_reset(value_container_t *vcont)
-{
-        value_item_t *vitem;
-        prelude_list_t *tmp;
-
-        prelude_list_for_each(&vcont->value_item_list, tmp) {
-                vitem = prelude_list_entry(tmp, value_item_t, list);
-
-                if ( vitem->refno != -1 && vitem->value ) {
-                        pcre_free_substring(vitem->value);
-                        vitem->value = NULL;
-                }
-        }
-}
-
 
 
 void *value_container_get_data(value_container_t *vcont)
