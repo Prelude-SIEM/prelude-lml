@@ -379,6 +379,26 @@ static int add_value_to_list(prelude_list_t *head, const char *arg, void *data)
 
 
 
+static int pcre_context_setting_new(pcre_context_setting_t **pcs)
+{
+        *pcs = calloc(1, sizeof(**pcs));
+        if ( ! *pcs )
+                return -1;
+
+        (*pcs)->refcount = 1;
+
+        return 0;
+}
+
+
+static void pcre_context_setting_destroy(pcre_context_setting_t *pcs)
+{
+        if ( --pcs->refcount == 0 )
+                free(pcs);
+}
+
+
+
 static int _parse_create_context(pcre_rule_t *rule, const char *arg, pcre_context_setting_flags_t flags)
 {
         int ret;
@@ -386,9 +406,9 @@ static int _parse_create_context(pcre_rule_t *rule, const char *arg, pcre_contex
         const char *cname = NULL;
         pcre_context_setting_t *pcs;
 
-        pcs = calloc(1, sizeof(*pcs));
-        if ( ! pcs )
-                return -1;
+        ret = pcre_context_setting_new(&pcs);
+        if ( ret < 0 )
+                return ret;
 
         pcs->timeout = 60;
         pcs->flags = flags;
@@ -644,6 +664,16 @@ static pcre_rule_t *create_rule(void)
 }
 
 
+static void free_value(value_container_t *vcont)
+{
+        pcre_context_setting_t *pcs = value_container_get_data(vcont);
+
+        if ( pcs )
+                pcre_context_setting_destroy(pcs);
+
+        value_container_destroy(vcont);
+}
+
 
 static void free_rule(pcre_rule_t *rule)
 {
@@ -660,6 +690,21 @@ static void free_rule(pcre_rule_t *rule)
                 item = prelude_linked_object_get_object(tmp);
                 rule_regex_destroy(item);
         }
+
+        if ( rule->required_context )
+                free_value(rule->required_context);
+
+        if ( rule->optional_context )
+                free_value(rule->optional_context);
+
+        prelude_list_for_each_safe(&rule->create_context_list, tmp, bkp)
+                free_value(prelude_linked_object_get_object(tmp));
+
+        prelude_list_for_each_safe(&rule->not_context_list, tmp, bkp)
+                free_value(prelude_linked_object_get_object(tmp));
+
+        prelude_list_for_each_safe(&rule->destroy_context_list, tmp, bkp)
+                free_value(prelude_linked_object_get_object(tmp));
 
         rule_object_list_destroy(rule->object_list);
 
@@ -920,6 +965,9 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
         pcre_rule_container_t *rule;
         pcre_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(pi);
 
+        prelude_list_for_each_safe(&plugin->context_list, tmp, bkp)
+                pcre_context_destroy(prelude_list_entry(tmp, pcre_context_t, list));
+
         prelude_list_for_each_safe(&plugin->rule_list, tmp, bkp) {
                 rule = prelude_list_entry(tmp, pcre_rule_container_t, list);
                 free_rule_container(rule);
@@ -932,6 +980,9 @@ static void pcre_destroy(prelude_plugin_instance_t *pi, prelude_string_t *err)
 static void _pcre_context_destroy(pcre_context_t *ctx)
 {
         prelude_log_debug(1, "[%s]: destroying context.\n", ctx->name);
+
+        if ( ctx->setting )
+                pcre_context_setting_destroy(ctx->setting);
 
         if ( ctx->idmef )
                 idmef_message_destroy(ctx->idmef);
@@ -1010,6 +1061,7 @@ int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *i
                 return -1;
         }
 
+        setting->refcount += 1;
         ctx->setting = setting;
         prelude_timer_init_list(&ctx->timer);
 

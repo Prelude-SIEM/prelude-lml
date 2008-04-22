@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -43,7 +43,7 @@ typedef enum {
 struct pcre_rule {
         /**/
         unsigned int id;
-                
+
         /**/
         uint8_t revision;
         uint8_t refcount;
@@ -52,18 +52,18 @@ struct pcre_rule {
 
         unsigned int event_threshold;
         unsigned int threshold;
-        
+
         /**/
         pcre_rule_flags_t flags;
 
-        
+
         prelude_list_t create_context_list;
         prelude_list_t destroy_context_list;
         prelude_list_t not_context_list;
-        
+
         value_container_t *required_context;
         value_container_t *optional_context;
-        
+
         prelude_list_t rule_list;
         prelude_list_t regex_list;
 
@@ -98,6 +98,7 @@ typedef enum {
 
 typedef struct {
         int timeout;
+        int refcount;
         pcre_context_setting_flags_t flags;
 } pcre_context_setting_t;
 
