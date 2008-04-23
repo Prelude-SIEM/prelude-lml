@@ -25,7 +25,7 @@
 #####
 #
 # The rules included here were developed using a Cisco PIX 525.  Please report
-# any inconsistencies on other models to G Ramon Gomez at the address provided 
+# any inconsistencies on other models to G Ramon Gomez at the address provided
 # above
 #
 #####
@@ -58,13 +58,13 @@ regex=-(4000\d\d): IDS:(\d+) (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+)
 
 #LOG:Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=User login successful; \
+ classification.text=User login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605005; \
  classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=201; \
- revision=4; \
+ revision=5; \
  analyzer(0).name=ASA; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -87,13 +87,13 @@ regex=-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) f
 
 #LOG:Nov  2 11:03:55 pix %PIX-5-111008: User 'enable_1' executed the 'enable' command.
 regex=-111008: User '(\S+)' executed the 'enable' command; \
- classification.text=Admin login successful; \
+ classification.text=Admin login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=111008; \
  classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=202; \
- revision=4; \
+ revision=5; \
  analyzer(0).name=ASA; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -157,13 +157,13 @@ regex=-611103: User logged out: Uname: (\S+); \
 
 #LOG:Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=User login failed; \
+ classification.text=User login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605004; \
  classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=205; \
- revision=4; \
+ revision=5; \
  analyzer(0).name=ASA; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -186,13 +186,13 @@ regex=-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for 
 
 #LOG:Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
 regex=-308001: PIX (\S+) enable password incorrect for (\d+) tries \(from (.+)\); \
- classification.text=Admin login failed; \
+ classification.text=Admin login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=308001; \
  classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=206; \
- revision=4; \
+ revision=5; \
  analyzer(0).name=ASA; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -222,7 +222,7 @@ regex=-315011: SSH session from ([\d\.]+) on interface (\S+) for user "" disconn
  classification.reference(0).name=315001; \
  classification.reference(0).url=http://www.cisco.com/en/US/products/sw/secursw/ps2120/products_system_message_guide_chapter09186a008051a0cd.html; \
  id=207; \
- revision=4; \ 
+ revision=4; \
  analyzer(0).name=ASA; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Firewall; \
@@ -411,7 +411,7 @@ regex=-405001: Received ARP (request|response) collision from ([\d\.]+)\/([A-Fa-
  source(0).interface=$4; \
  target(0).node.address(0).category=ipv4-addr; \
  target(0).node.address(0).address=$2; \
- last; 
+ last;
 
 #LOG:Jan 25 14:59:33 pix %PIX-3-710003: TCP access denied by ACL from 148.208.247.3/2984 to outside:12.40.199.252/ssh
 #LOG:Jul 12 17:30:17 smf-custlog-02 12.34.56.78/90.12.34.56 :Jul 12 10:25:06 PDT: %ASA-session-3-710003: TCP access denied by ACL from 78.90.12.34/3354 to OUTSIDE-01:56.78.90.12/80
@@ -710,19 +710,19 @@ regex=-313003: Invalid destination for ICMP error message: icmp src (\S+):([\d\.
 
 # Events taken from the Cisco System Log Messages List that will need rules
 # (include 'attack' || 'intrusion' || 'probe' || 'covert' in description; no log samples):
-# %PIX-1-106021: Deny protocol reverse path check from source_address to dest_address on interface interface_name 
-# %PIX-1-106022: Deny protocol connection spoof from source_address to dest_address on interface interface_name 
+# %PIX-1-106021: Deny protocol reverse path check from source_address to dest_address on interface interface_name
+# %PIX-1-106022: Deny protocol connection spoof from source_address to dest_address on interface interface_name
 # %PIX-1-106101 The number of ACL log deny-flows has reached limit (number).
-# %PIX-1-107001: RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name 
-# %PIX-1-107002: RIP pkt failed from IP_address: version=number on interface interface_name 
+# %PIX-1-107001: RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name
+# %PIX-1-107002: RIP pkt failed from IP_address: version=number on interface interface_name
 # %PIX-4-109017: User at IP_address exceeded auth proxy connection limit (max)
-# %PIX-2-201003: Embryonic limit exceeded nconns/elimit for outside_address/outside_port (global_address) inside_address/inside_port on interface interface_name 
-# %PIX-3-320001: The subject name of the peer cert is not allowed for connection 
+# %PIX-2-201003: Embryonic limit exceeded nconns/elimit for outside_address/outside_port (global_address) inside_address/inside_port on interface interface_name
+# %PIX-3-320001: The subject name of the peer cert is not allowed for connection
 # %PIX-4-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number
-# %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol 
-# %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host 
-# %PIX-7-710005: {TCP|UDP} request discarded from source_address/source_port to interface_name:dest_address/service 
+# %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol
+# %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host
+# %PIX-7-710005: {TCP|UDP} request discarded from source_address/source_port to interface_name:dest_address/service
 # %PIX-7-710006: protocol request discarded from source_address to interface_name:dest_address
 # %PIX-2-106020: Deny IP teardrop fragment (size = number, offset = number) from IP_address to IP_address
 # %PIX-4-209004: Invalid IP fragment, size = bytes exceeds maximum size = bytes: src = IP_address, dest = IP_address, proto = protocol, id = number
-# %PIX-4-209005: Discard IP fragment set with more than number elements: src = IP_address, dest = IP_address, proto = protocol, id = number 
+# %PIX-4-209005: Discard IP fragment set with more than number elements: src = IP_address, dest = IP_address, proto = protocol, id = number

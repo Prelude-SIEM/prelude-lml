@@ -24,7 +24,7 @@
 #####
 #
 # The rules included here were developed using BIG-IP Kernel 4.5PTF-06 Build25.
-# Please report any inconsistencies on other versions to G Ramon Gomez at the 
+# Please report any inconsistencies on other versions to G Ramon Gomez at the
 # address provided above
 #
 #####
@@ -105,12 +105,12 @@ regex=NETMAN-\d: CLMcmd: (.+)\s*,(\S+)@([\d\.]+); \
 #LOG:AUG 16 00:13:46 smf-custlog-02 1/1 49172 SSHD-4: Access attempted by  from 12.34.56.78 port 1106
 #LOG:AUG 16 07:31:52 smf-custlog-02 1/1 1067 SSHD-4: Access attempted by neteng from 12.34.56.78 port 1121
 regex=SSHD-\d: Access attempted by (.*) from ([\d\.]+) port (\d+); \
- classification.text=User login failed; \
+ classification.text=User login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=SSHD; \
  id=4703; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
@@ -129,12 +129,12 @@ regex=SSHD-\d: Access attempted by (.*) from ([\d\.]+) port (\d+); \
 
 #LOG:AUG 16 07:31:57 smf-custlog-02 1/1 1069 NETMAN-6: CLM: Login neteng@12.34.56.78
 regex=NETMAN-\d: CLM: Login (\S+)@([\d\.]+); \
- classification.text=User login successful; \
+ classification.text=User login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=css_subsystem; \
  classification.reference(0).name=NETMAN; \
  id=4704; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=CSS; \
  analyzer(0).manufacturer=Cisco; \
  analyzer(0).class=Load Balancer; \
