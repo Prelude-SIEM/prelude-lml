@@ -856,7 +856,33 @@ static int is_file_already_used(monitor_fd_t *monitor, struct stat *st)
         return -1;
 }
 
+static int process_file_event(monitor_fd_t *monitor)
+{
+        int ret;
+        struct stat st;
 
+        ret = fstat(fileno(monitor->fd), &st);
+        if ( ret < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
+                return -1;
+        }
+
+        if ( monitor->fd != stdin ) {
+                ret = is_file_already_used(monitor, &st);
+                if ( ret < 0 )
+                        return -1;
+        }
+
+        /*
+         * check mtime consistency.
+         */
+        check_modification_time(monitor, &st);
+
+        /*
+         * read and analyze available data.
+         */
+        return check_logfile_data(monitor, &st);
+}
 
 
 #ifdef HAVE_FAM
@@ -1000,35 +1026,6 @@ static int fam_setup_monitor(monitor_fd_t *monitor)
         }
 
         return 0;
-}
-
-
-static int process_file_event(monitor_fd_t *monitor)
-{
-        int ret;
-        struct stat st;
-
-        ret = fstat(fileno(monitor->fd), &st);
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "couldn't fstat '%s'.\n", lml_log_source_get_name(monitor->source));
-                return -1;
-        }
-
-        if ( monitor->fd != stdin ) {
-                ret = is_file_already_used(monitor, &st);
-                if ( ret < 0 )
-                        return -1;
-        }
-
-        /*
-         * check mtime consistency.
-         */
-        check_modification_time(monitor, &st);
-
-        /*
-         * read and analyze available data.
-         */
-        return check_logfile_data(monitor, &st);
 }
 
 
