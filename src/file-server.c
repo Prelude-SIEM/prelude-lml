@@ -513,11 +513,6 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
         if ( monitor->fd != stdin && ! monitor->need_more_read && st->st_size == monitor->last_size )
                 return 0;
 
-        if ( st->st_size < monitor->last_size ) {
-                monitor->last_size = 0;
-                rewind(monitor->fd);
-        }
-
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
 
@@ -713,6 +708,7 @@ static void try_reopening_inactive_monitor(void)
  */
 static void check_modification_time(monitor_fd_t *monitor, struct stat *st)
 {
+        int ret;
         time_t old_mtime = monitor->last_mtime;
 
         monitor->last_mtime = st->st_mtime;
@@ -721,6 +717,22 @@ static void check_modification_time(monitor_fd_t *monitor, struct stat *st)
                 return; /* everythings sound okay */
 
         logfile_modified_alert(monitor, st);
+
+        /*
+         * If the logfile has been modified, we reposition the current
+         * descriptor to EOF, and start analyzing from this place.
+         */
+        if ( st->st_size < monitor->last_size ) {
+                ret = fseek(monitor->fd, 0, SEEK_END);
+                if ( ret < 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to end of file: %s.\n",
+                                    lml_log_source_get_name(monitor->source), strerror(errno));
+                        return;
+                }
+
+                monitor->need_more_read = 0;
+                monitor->last_size = st->st_size;
+        }
 }
 
 
