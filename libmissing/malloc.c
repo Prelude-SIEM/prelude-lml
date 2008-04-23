@@ -1,6 +1,6 @@
-/* Provide a working getlogin_r for systems which lack it.
+/* malloc() function that is glibc compatible.
 
-   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1997, 1998, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -16,41 +16,42 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* written by Paul Eggert and Derek Price */
+/* written by Jim Meyering and Bruno Haible */
 
 #include <config.h>
-
-/* Specification.  */
-#include <unistd.h>
-
-#include <errno.h>
-#include <string.h>
-
-#if !HAVE_DECL_GETLOGIN
-char *getlogin (void);
+/* Only the AC_FUNC_MALLOC macro defines 'malloc' already in config.h.  */
+#ifdef malloc
+# define NEED_MALLOC_GNU
+# undef malloc
 #endif
 
-/* See unistd.in.h for documentation.  */
-int
-getlogin_r (char *name, size_t size)
+/* Specification.  */
+#include <stdlib.h>
+
+#include <errno.h>
+
+/* Call the system's malloc below.  */
+#undef malloc
+
+/* Allocate an N-byte block of memory from the heap.
+   If N is zero, allocate a 1-byte block.  */
+
+void *
+rpl_malloc (size_t n)
 {
-  char *n;
-  size_t nlen;
+  void *result;
 
-  errno = 0;
-  n = getlogin ();
+#ifdef NEED_MALLOC_GNU
+  if (n == 0)
+    n = 1;
+#endif
 
-  /* A system function like getlogin_r is never supposed to set errno
-     to zero, so make sure errno is nonzero here.  ENOENT is a
-     reasonable errno value if getlogin returns NULL.  */
-  if (!errno)
-    errno = ENOENT;
+  result = malloc (n);
 
-  if (!n)
-    return errno;
-  nlen = strlen (n);
-  if (size <= nlen)
-    return ERANGE;
-  memcpy (name, n, nlen + 1);
-  return 0;
+#if !HAVE_MALLOC_POSIX
+  if (result == NULL)
+    errno = ENOMEM;
+#endif
+
+  return result;
 }
