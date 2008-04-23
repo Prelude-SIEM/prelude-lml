@@ -1,3 +1,8 @@
+* 2008-04-23, prelude-lml-0.9.12.1:
+
+- Fix undefined reference with non-FAM build.
+
+
 * 2008-04-23, prelude-lml-0.9.12:
 
 - [rulesets]: Remove successful/failure keyword from classification
