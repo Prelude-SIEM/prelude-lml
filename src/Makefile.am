@@ -1,9 +1,7 @@
 SUBDIRS = include
 
-
-AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmissing @defined@ \
-        -DLOG_PLUGIN_DIR=\"@log_plugin_dir@\" -DREGEX_CONF=\"@regex_conf@\" -DCONFIG_DIR=\"@configdir@\" \
-        -DMETADATA_DIR=\"@metadata_dir@\" @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@ @FAM_CFLAGS@
+AM_CPPFLAGS = -I$(srcdir)/include/ -I$(top_srcdir)/libmissing @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@ @FAM_CFLAGS@
+AM_CFLAGS = @GLOBAL_CFLAGS@
 
 bin_PROGRAMS = prelude-lml
 prelude_lml_LDADD = @LIBPRELUDE_LIBS@ @PCRE_LIBS@ @FAM_LIBS@ $(top_builddir)/libmissing/libmissing.la

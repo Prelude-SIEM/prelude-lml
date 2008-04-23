@@ -1,6 +1,7 @@
-AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmissing @defined@
+AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmissing @LIBPRELUDE_CFLAGS@
+AM_CFLAGS = @GLOBAL_CFLAGS@
 
 debug_la_SOURCES = debug.c
 debug_la_LDFLAGS = -module -avoid-version
-debugdir = $(log_plugin_dir)
+debugdir = $(libdir)/prelude-lml
 debug_LTLIBRARIES = debug.la
