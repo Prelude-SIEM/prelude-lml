@@ -423,7 +423,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
 static int file_metadata_open(monitor_fd_t *monitor)
 {
         int fd;
-        char file[FILENAME_MAX], path[FILENAME_MAX], *ptr;
+        char file[PATH_MAX], path[PATH_MAX], *ptr;
 
         strncpy(file, lml_log_source_get_name(monitor->source), sizeof(file));
 
