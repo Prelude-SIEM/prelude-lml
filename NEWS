@@ -47,27 +47,27 @@
   cisco devices (Paul Robert Marino <prmarino1@gmail.com>).
 
 - Fix Apache formating when Apache logname or user is set
-  (Robin Gruyters <r.gruyters@yirdis.nl> and <andre@vandervlies.xs4all.nl>) 
+  (Robin Gruyters <r.gruyters@yirdis.nl> and <andre@vandervlies.xs4all.nl>)
   (fix #229).
 
-- Invalid user.user_id(0).name assignement in SSH rule 1913 
-  (Scott Olihovik <skippylou@gmail.com>) (fix #243). 
+- Invalid user.user_id(0).name assignement in SSH rule 1913
+  (Scott Olihovik <skippylou@gmail.com>) (fix #243).
 
 - Various bug fixes and minor improvements.
 
 
 * 2007-05-19, prelude-lml-0.9.10:
 
-        - Ability to use regular expressions in plugins.rules to define 
+        - Ability to use regular expressions in plugins.rules to define
           monitored sources, this can be very useful when combined to file globing.
-    
-        - [SPEEDUP] When the "*" keyword is used, the data is passed to the upper 
+
+        - [SPEEDUP] When the "*" keyword is used, the data is passed to the upper
           layer without trying to match anything.
 
-        - Fix NULL pointer dereference when a rule reference an existing, 
+        - Fix NULL pointer dereference when a rule reference an existing,
           but empty context (fix #226).
 
-        - Remove deprecated use of prelude_client_print_setup_error(), 
+        - Remove deprecated use of prelude_client_print_setup_error(),
           directly handled via prelude_perror().
 
         - Make the log parser more robust.
@@ -78,517 +78,517 @@
 
         - Pattern can now be used to specify file to be monitored.
 
-	- Fix an issue in the detection of buggy writev() FAM notification.
-        
-        - Add bonding.rules, by Paul Robert Marino <prmarino1@gmail.com>. 
-                        
-        - ModSecurity ruleset update: remove unnecessary fields + ModSecurity 2.0 compatibility. 
-        
-        - New Cisco IOS common ruleset, by Alexandre Racine. 
-        
+        - Fix an issue in the detection of buggy writev() FAM notification.
+
+        - Add bonding.rules, by Paul Robert Marino <prmarino1@gmail.com>.
+
+        - ModSecurity ruleset update: remove unnecessary fields + ModSecurity 2.0 compatibility.
+
+        - New Cisco IOS common ruleset, by Alexandre Racine.
+
         - Avoid duplicating information in node name and node address.
-        
-        - Add rule ID and revision to the generated alert for each matched rule. Fix #206. 
+
+        - Add rule ID and revision to the generated alert for each matched rule. Fix #206.
 
         - Various bug fixes.
-        
-        
+
+
 
 * 2006-12-20, prelude-lml-0.9.8.1:
 
         - Compile / run under OS X.
-        
+
         - Various portability fixes.
-        
-        
+
+
 * 2006-12-15, prelude-lml-0.9.8:
 
         - Introduce Cisco ASA IPS module support.
-        
+
         - Introduce yum support.
-        
-        - Introduce Cacti thold plugin support. 
+
+        - Introduce Cacti thold plugin support.
 
         - Introduce Microsoft Cluster Service support.
 
         - Honeyd rules update and improvement.
 
-        - Updated NAVCE rules; modified ClamAV rules for consistency. 
+        - Updated NAVCE rules; modified ClamAV rules for consistency.
 
         - Improve NTSyslog ruleset.
 
-        - Added rule to ignore LML's "could not match prefix" log entries. 
+        - Added rule to ignore LML's "could not match prefix" log entries.
 
         - Fix format problem with Apache logs from western hemisphere (- versus + TZ)
-        
+
         - Fix Squid process exited rule (#185).
-        
-        
+
+
 * 2006-09-11, prelude-lml-0.9.7:
 
-	- Fix reading from standard input.
+        - Fix reading from standard input.
 
-	- Fix OpenBSD getaddrinfo() problem.
+        - Fix OpenBSD getaddrinfo() problem.
 
-	- Add Cisco-CSS support.
+        - Add Cisco-CSS support.
 
-	- Add Cisco-Router IDS module support.
+        - Add Cisco-Router IDS module support.
 
-	- Checkpoint ruleset is supported again.
+        - Checkpoint ruleset is supported again.
 
-	- Support 'fork failure' grsecurity warning, fix 'terminal being sniffed' match.
+        - Support 'fork failure' grsecurity warning, fix 'terminal being sniffed' match.
 
-	- NTsyslog ruleset audit.
+        - NTsyslog ruleset audit.
 
-	- Fix WAP11 ruleset.
+        - Fix WAP11 ruleset.
 
 
 * 2006-06-10, prelude-lml-0.9.6:
 
-	- Fix a bug where some rules marked silent would trigger an alert.
+        - Fix a bug where some rules marked silent would trigger an alert.
 
-	- Load Sonicwall and Spamassassin ruleset by default.
+        - Load Sonicwall and Spamassassin ruleset by default.
 
-	- Fix rule syntax problem in Sonicwall ruleset.
+        - Fix rule syntax problem in Sonicwall ruleset.
 
-	- Fix rule indexing problem in Squid ruleset.
+        - Fix rule indexing problem in Squid ruleset.
 
-	- Postfix rule consistency fix.
+        - Postfix rule consistency fix.
 
 
 * 2006-05-17, prelude-lml-0.9.5:
 
-	- Experimental context support (ala SEC): we now handle 
-	  multiline log matching.
+        - Experimental context support (ala SEC): we now handle
+          multiline log matching.
 
-	- Update PAX rules so that it use the new context feature. 
+        - Update PAX rules so that it use the new context feature.
 
-	- Don't exit on statistics signal, improve statistics precision,
-	  make them easier to read.
+        - Don't exit on statistics signal, improve statistics precision,
+          make them easier to read.
 
-	- Fix some problem with user & group options.
+        - Fix some problem with user & group options.
 
-	- text-output argument is optional.
+        - text-output argument is optional.
 
-	- New experimental ruleset: Sonicwall and Spamassassin. These
-	  need to be manually hooked to pcre.rules if you plan to use
-	  them.
+        - New experimental ruleset: Sonicwall and Spamassassin. These
+          need to be manually hooked to pcre.rules if you plan to use
+          them.
 
-	- Fix FAM activation switches.
+        - Fix FAM activation switches.
 
 
 * 2006-03-06, prelude-lml-0.9.4:
 
-	- Remove trailing space from regex we get from plugins.rules (this fix 
-	  a match problem on log entry that didn't contain any space). 
+        - Remove trailing space from regex we get from plugins.rules (this fix
+          a match problem on log entry that didn't contain any space).
 
-	- Add --user / --group option to drop privilege. However, make sure it is 
-	  not allowed to open file that the target user can not read, because it 
-	  would lead to failure when trying to re-open the logfile after a rotation.
+        - Add --user / --group option to drop privilege. However, make sure it is
+          not allowed to open file that the target user can not read, because it
+          would lead to failure when trying to re-open the logfile after a rotation.
 
-	- Signal handling improvement.
+        - Signal handling improvement.
 
-	- Fix priority for --quiet option.
+        - Fix priority for --quiet option.
 
-	- Use newer libprelude IDMEF_LIST_APPEND/IDMEF_LIST_PREPEND addition.
+        - Use newer libprelude IDMEF_LIST_APPEND/IDMEF_LIST_PREPEND addition.
 
-	- Add unhandled arguments warning. 
+        - Add unhandled arguments warning.
 
 
 * 2006-02-21, prelude-lml-0.9.3:
 
-	- Fix a byte ordering issue, resulting in non working LML on some 
-	  architecture.
+        - Fix a byte ordering issue, resulting in non working LML on some
+          architecture.
 
-	- Fix a bug introduced in 0.9.2, that could result in some rules not 
-	  being matched.
+        - Fix a bug introduced in 0.9.2, that could result in some rules not
+          being matched.
 
-	- Rename udp-srvr option to udp-server, as defined in the 
- 	  configuration file.
+        - Rename udp-srvr option to udp-server, as defined in the
+          configuration file.
 
-	- Marked selinux rules as experimental.
+        - Marked selinux rules as experimental.
 
-	- Extended modsecurity with additional_data fields, added one rule. 
+        - Extended modsecurity with additional_data fields, added one rule.
 
-	- Add missing "chained" keyword to some Netfilter rules.
+        - Add missing "chained" keyword to some Netfilter rules.
 
-	- Fixed a simple layout oddity in single. 
+        - Fixed a simple layout oddity in single.
 
 
 * 2006-01-31, prelude-lml-0.9.2:
 
-	- Get rid of the 1024 characters per line limitation (defined as per 
-	  the syslog RFC), since LML is not limited to parsing input from syslog 
-	  anymore.
+        - Get rid of the 1024 characters per line limitation (defined as per
+          the syslog RFC), since LML is not limited to parsing input from syslog
+          anymore.
 
-	- Handle events in Clamav logging format as well as syslog. 
+        - Handle events in Clamav logging format as well as syslog.
 
-	- Abstracted Squid chain regex to allow parsing of data directly 
-	  from Squid log files. 
+        - Abstracted Squid chain regex to allow parsing of data directly
+          from Squid log files.
 
-	- Introduced support for openhostapd.
+        - Introduced support for openhostapd.
 
-	- Began expanding rulesets with additional_data and vendor-specific 
-	  classification data. 
+        - Began expanding rulesets with additional_data and vendor-specific
+          classification data.
 
-	- Various ruleset updates and bug fixes.
+        - Various ruleset updates and bug fixes.
 
 
 * 2005-11-24, prelude-lml-0.9.1:
 
-	- Fixed bad mssql chain regex.
+        - Fixed bad mssql chain regex.
 
-	- Added analyzer name and manufacturer to linksys-wap11 rules.
+        - Added analyzer name and manufacturer to linksys-wap11 rules.
 
-	- Added rules ID 1914 and 1915 for Suse specific PAM log format (#73).
+        - Added rules ID 1914 and 1915 for Suse specific PAM log format (#73).
 
-	- Updated p3scan rule (id 405) for newer version log format.
+        - Updated p3scan rule (id 405) for newer version log format.
 
-	- Rework Netfilter ruleset resulting in simpler and faster ruleset
-	  matching a wider range of Netfilter log entry. The new implementation 
-	  remove part of the Netfilter rules that had to be manually enabled depending 
-	  on your Netfilter configuration. This is now handled automatically.
+        - Rework Netfilter ruleset resulting in simpler and faster ruleset
+          matching a wider range of Netfilter log entry. The new implementation
+          remove part of the Netfilter rules that had to be manually enabled depending
+          on your Netfilter configuration. This is now handled automatically.
 
-	- Implement the ability to have multiple logfile format per source (#107).
+        - Implement the ability to have multiple logfile format per source (#107).
 
-	- Implement the ability to start multiple UDP server and to filter on any server instance.
+        - Implement the ability to start multiple UDP server and to filter on any server instance.
 
-	- Fix issue with Target.node remaining empty on configuration using no-resolve (#108).
+        - Fix issue with Target.node remaining empty on configuration using no-resolve (#108).
 
-	- Fix static compilation (#109).
+        - Fix static compilation (#109).
 
-	- Fix a possible bug where LML file descriptor were not monitored in daemon mode.
+        - Fix a possible bug where LML file descriptor were not monitored in daemon mode.
 
-	- Fix crash if we could not retrieve the machine canonical name (#100).
+        - Fix crash if we could not retrieve the machine canonical name (#100).
 
-	- Fix debug plugin crash.
+        - Fix debug plugin crash.
 
-	- Various bugfix.
+        - Various bugfix.
 
 
 * 2005-09-20, prelude-lml-0.9.0:
 
-	- 0.9.0 final.
+        - 0.9.0 final.
 
-	- Standardized usage of service.iana_protocol_name / 
-	  service.iana_protocol_number over service.protocol.
+        - Standardized usage of service.iana_protocol_name /
+          service.iana_protocol_number over service.protocol.
 
 
 * 2005-09-12, prelude-lml-0.9.0-rc6:
 
-	- Netscreen support.
+        - Netscreen support.
 
-	- Nagios rules update.
+        - Nagios rules update.
 
-	- grsecurity rules update.
+        - grsecurity rules update.
 
-	- File path logging according to IDMEF v14.
+        - File path logging according to IDMEF v14.
 
-	- Update for gentoo system. Log tty on authentication failure.
+        - Update for gentoo system. Log tty on authentication failure.
 
-	- Fix file descriptor leak. Set close-on-exec.
+        - Fix file descriptor leak. Set close-on-exec.
 
-	- Log messages for services being turned off are now all 'medium' 
-	  severity, while services being turned on are now all 'info' severity.
+        - Log messages for services being turned off are now all 'medium'
+          severity, while services being turned on are now all 'info' severity.
 
-	- Re-establish signal handler for older *nix. Print statistics on SIGQUIT.
+        - Re-establish signal handler for older *nix. Print statistics on SIGQUIT.
 
 
 * 2005-07-14, prelude-lml-0.9.0-rc5:
 
-	- New ruleset for Arbor Networks Peakflow system, by Herve Debar.
+        - New ruleset for Arbor Networks Peakflow system, by Herve Debar.
 
-	- Added preliminary support for PIX conduits.
+        - Added preliminary support for PIX conduits.
 
-	- Implement the "warning-limit" option. Can be used in order to supress 
-	  reporting of prefix parser error (warning-limit 0), or to define a limit 
-	  of warning (stop reporting once the threshold is reached). -1 for no limit.	
+        - Implement the "warning-limit" option. Can be used in order to supress
+          reporting of prefix parser error (warning-limit 0), or to define a limit
+          of warning (stop reporting once the threshold is reached). -1 for no limit.
 
-	- Improve error reporting.
+        - Improve error reporting.
 
-	- Various bugfix, minor rules update.
+        - Various bugfix, minor rules update.
 
 
 * 2005-05-16, prelude-lml-0.9.0-rc4:
 
-	- Added systrace, identd, arpwatch, pure-ftpd support.
+        - Added systrace, identd, arpwatch, pure-ftpd support.
 
-	- Fix a crash uppon activation of the debug plugin.
+        - Fix a crash uppon activation of the debug plugin.
 
-	- Fix a Solaris specific issue resulting in invalid alert detect-time.
+        - Fix a Solaris specific issue resulting in invalid alert detect-time.
 
-	- Fix possible crash with rule referencing invalid IDMEF path.
-	  Better error reporting on invalid path/invalid value. Always include the rule ID.
+        - Fix possible crash with rule referencing invalid IDMEF path.
+          Better error reporting on invalid path/invalid value. Always include the rule ID.
 
-	- Fix a problem with generated alert possibly containing content gathered from other rules.
+        - Fix a problem with generated alert possibly containing content gathered from other rules.
 
-	- Fix option namespace conflict. Correct --version option.
+        - Fix option namespace conflict. Correct --version option.
 
         - Ruleset improvement and fixes.
 
-	- Decrease startup verbosity level.
-	
-	- Add --enable-unsupported-ruleset configure option enabling installation
-	  of currently unsupported ruleset. Theses ruleset need love, see 
-          http://prelude-ids.org/pipermail/prelude-user/2005-May/000861.html,
-	  and contact Gene R Gomez <gene@gomezbrothers.com> if interested.
+        - Decrease startup verbosity level.
 
-	- New '--dump-unmatched' option, useful for regression testing. Print out the log
-	  that were not matched by the current set of rules.
-	
-	 
+        - Add --enable-unsupported-ruleset configure option enabling installation
+          of currently unsupported ruleset. Theses ruleset need love, see
+          http://prelude-ids.org/pipermail/prelude-user/2005-May/000861.html,
+          and contact Gene R Gomez <gene@gomezbrothers.com> if interested.
+
+        - New '--dump-unmatched' option, useful for regression testing. Print out the log
+          that were not matched by the current set of rules.
+
+
 * 2005-04-17, prelude-lml-0.9.0-rc3:
 
-	- Introduced SELinux, httpd, Dlink ruleset support.
+        - Introduced SELinux, httpd, Dlink ruleset support.
 
-	- More rule classification work.
+        - More rule classification work.
 
-	- Ipv6 support in sshd.rules, support more events.
+        - Ipv6 support in sshd.rules, support more events.
 
-	- Ntsyslog ruleset consistancy work.
+        - Ntsyslog ruleset consistancy work.
 
-	- Make it easier to use chained rules. Apply chained on all top
-	  inclusion. Result is ~850% performance improvement. Check:
-	  http://prelude-ids.org/pipermail/prelude-user/2005-April/000781.html
-	  
+        - Make it easier to use chained rules. Apply chained on all top
+          inclusion. Result is ~850% performance improvement. Check:
+          http://prelude-ids.org/pipermail/prelude-user/2005-April/000781.html
+
 
 * 2005-04-09, prelude-lml 0.9.0-rc2:
 
-	- Ruleset update to provide better Analyzer class definition.
+        - Ruleset update to provide better Analyzer class definition.
 
-	- Analyzer class changed from Prelude-LML to Log Analyzer.
+        - Analyzer class changed from Prelude-LML to Log Analyzer.
 
-	- Correct FAM checks.
-	
-	- Fix IRIX & OpenBSD compilation.
+        - Correct FAM checks.
 
-	- Set minimum PCRE version requirement to 4.1.
-	
+        - Fix IRIX & OpenBSD compilation.
+
+        - Set minimum PCRE version requirement to 4.1.
+
 
 * 2005-03-29, prelude-lml 0.9.0-rc1:
 
         Note: due to several years of work and the habit of working with the new
-	version, it is hard to remind all the enhancement made in this release.
-	Please bear with us and try it for yourself :-)
+        version, it is hard to remind all the enhancement made in this release.
+        Please bear with us and try it for yourself :-)
 
-	- Handle the whole IDMEF set of object.
-	- Support any kind of log format.
-	- Support for multiple/optional regular expressions.
-	- Support jump/optional jump between different rules.
+        - Handle the whole IDMEF set of object.
+        - Support any kind of log format.
+        - Support for multiple/optional regular expressions.
+        - Support jump/optional jump between different rules.
 
-	- New rules for: Dell OM, Shadow Utils, Modsecurity, P3Scan, Tripwire, 
-	  ClamAV, Sendmail, Tripwire, APC Environmental Monitoring Unit, CISCO PIX, 
-	  Cisco VPN Concentrator, Microsoft SQL Server, PAM, pcAnywhere, Oracle, Webmin, Wu-Ftpd.
+        - New rules for: Dell OM, Shadow Utils, Modsecurity, P3Scan, Tripwire,
+          ClamAV, Sendmail, Tripwire, APC Environmental Monitoring Unit, CISCO PIX,
+          Cisco VPN Concentrator, Microsoft SQL Server, PAM, pcAnywhere, Oracle, Webmin, Wu-Ftpd.
 
-	- Per log file ruleset are now possible. 
-	- Optimization work.
-	- Support plugin dl-preopening on platform without dlopen() or dlsym().
+        - Per log file ruleset are now possible.
+        - Optimization work.
+        - Support plugin dl-preopening on platform without dlopen() or dlsym().
 
 
 * 2003-10-22, prelude-lml 0.8.6:
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Automatically translate a value from base 8 and 16 to base 10. 
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Automatically translate a value from base 8 and 16 to base 10.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Add a workaround for log using hexadecimal value without 0x prefix.
-	  This permit to handle, for example, the way ZyXel modem output the 
-	  packet port. 
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Add a workaround for log using hexadecimal value without 0x prefix.
+          This permit to handle, for example, the way ZyXel modem output the
+          packet port.
 
-	- Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
-	  Add a new portsentry rule concerning dropped packets.
+        - Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+          Add a new portsentry rule concerning dropped packets.
 
-	- Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
-	  New ZyXel rules for PPP logs, as well as ruleset improvment
-	  and bugfix.
+        - Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+          New ZyXel rules for PPP logs, as well as ruleset improvment
+          and bugfix.
 
-	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
-	  Fixed handling return value of prelude_inet_getaddrinfo. Fix
-	  a BSD crash.
+        - Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+          Fixed handling return value of prelude_inet_getaddrinfo. Fix
+          a BSD crash.
 
-	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
-	  Fixed Ipfw ICMP rules. Thanks to mark@fantoma.net for the report. 
+        - Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+          Fixed Ipfw ICMP rules. Thanks to mark@fantoma.net for the report.
 
 * 2003-10-06, prelude-lml 0.8.5:
 
-	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
-	  Handle case where a file is rotated by being
-	  compressed and renamed. Not only deleted.
+        - Nicolas Delon <delon.nicolas@wanadoo.fr>:
+          Handle case where a file is rotated by being
+          compressed and renamed. Not only deleted.
 
-	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
-	  Make it work on OpenBSD.
+        - Nicolas Delon <delon.nicolas@wanadoo.fr>:
+          Make it work on OpenBSD.
 
-* 2003-09-21, prelude-lml 0.8.4:	
-	
-	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
-	  Removed bogus pcre.h test in configure.
-	  Handle situation where $fam_include_dir is undefined correctly.
+* 2003-09-21, prelude-lml 0.8.4:
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Make sure we always have a target hostname to use in alert.
+        - Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+          Removed bogus pcre.h test in configure.
+          Handle situation where $fam_include_dir is undefined correctly.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Avoid duplicate rotation alert. In case there was a rotation or 
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Make sure we always have a target hostname to use in alert.
+
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Avoid duplicate rotation alert. In case there was a rotation or
           a checksum error, we have to analyze the file from the beginning.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Use new libprelude IPv6 aware function in order to populate
-	  Node and Address members. 
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Use new libprelude IPv6 aware function in order to populate
+          Node and Address members.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Fix a possible crash within metadata handling. I wonder
-	  how it worked before.
-	  
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  New --group (-g) option that take a groupname argument: 
-	  LML will setgid to the specified group if requested. This
-	  fix bug #0000081.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Fix a possible crash within metadata handling. I wonder
+          how it worked before.
 
-	- Stephane Loeuillet <stephane.loeuillet@tiscali.fr>:
-	  Add a new variable type for [source/target].service.port
-          (VARIABLE_TYPE_PORT). now, ports could either contain a 
-	  port number or a service name (www would resolve to 80, 
-	  depending your /etc/services).
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          New --group (-g) option that take a groupname argument:
+          LML will setgid to the specified group if requested. This
+          fix bug #0000081.
 
-	- Simon Castro <scastro@entreelibre.com>:
-	  New IPChains ruleset.
+        - Stephane Loeuillet <stephane.loeuillet@tiscali.fr>:
+          Add a new variable type for [source/target].service.port
+          (VARIABLE_TYPE_PORT). now, ports could either contain a
+          port number or a service name (www would resolve to 80,
+          depending your /etc/services).
 
-	- John Green <john@giggled.org>:
-	  Add Vigor xDSl router built-in firewall support.
+        - Simon Castro <scastro@entreelibre.com>:
+          New IPChains ruleset.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Stop using getc_unlocked(). This function is not available
-	  on some plateform, and we don't need it anymore as we droped
-	  the threaded architecture.
+        - John Green <john@giggled.org>:
+          Add Vigor xDSl router built-in firewall support.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Be verbose when we fail opening a logfile.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Stop using getc_unlocked(). This function is not available
+          on some plateform, and we don't need it anymore as we droped
+          the threaded architecture.
+
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Be verbose when we fail opening a logfile.
 
 * 2003-04-24, prelude-lml 0.8.3:
-	
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Implement logfile metadata:
 
-	  If there is metadata available and current logfile size is
-	  less than the specified metadata offset, assume the log got 
-	  rotated, and start analyzing the file at offset 0.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Implement logfile metadata:
 
-	  If there are metadata available and current logfile size is
-	  more or equal than the specified metadata offset: start analyzing
-	  the logfile from the specified offset. Unless the checksum doesn't
-	  match, in which case we'll issue an alert, and restart from 0.
+          If there is metadata available and current logfile size is
+          less than the specified metadata offset, assume the log got
+          rotated, and start analyzing the file at offset 0.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Should now be able to read up to 2 ^ (64-1) bytes logfile.
+          If there are metadata available and current logfile size is
+          more or equal than the specified metadata offset: start analyzing
+          the logfile from the specified offset. Unless the checksum doesn't
+          match, in which case we'll issue an alert, and restart from 0.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Implemented runtime detection and workaround of the FAM (Dnotify)
-	  writev() bug. We go back to simple file polling if the bug is 
-	  present.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Should now be able to read up to 2 ^ (64-1) bytes logfile.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Restart LML on SIGHUP, so that log rotation program might
-	  restart it.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Implemented runtime detection and workaround of the FAM (Dnotify)
+          writev() bug. We go back to simple file polling if the bug is
+          present.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Implemented handling of the source and destination address,
-	  by the Simple (signature) plugin.
-	
-	- Vincent Glaume <vglaume@exaprobe.com>:
-	  Implemented handling of the "last" keyword, telling LML to stop
-	  matching regex against a line of log once one of them has been 
-	  matched.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Restart LML on SIGHUP, so that log rotation program might
+          restart it.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  LML alert now carry LML version.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Implemented handling of the source and destination address,
+          by the Simple (signature) plugin.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>:
-	  Modified the Debug plugin so that it use the shared LML API
-	  for sending alert. Also, Debug alert are now low priority.
+        - Vincent Glaume <vglaume@exaprobe.com>:
+          Implemented handling of the "last" keyword, telling LML to stop
+          matching regex against a line of log once one of them has been
+          matched.
 
-	- Laurent Oudot <oudot.laurent@wanadoo.fr>:
-	  Exim ruleset.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          LML alert now carry LML version.
 
-	- Stéphane Loeuillet <LeRoutier@wanadoo.fr>:
-	  ProFTPD, vpopmail, qpopper rulesets.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Modified the Debug plugin so that it use the shared LML API
+          for sending alert. Also, Debug alert are now low priority.
 
-	- Vincent Glaume <vglaume@exaprobe.com>:
-	  Squid, NtSyslog, Ipso, Checkpoint, rulesets.
+        - Laurent Oudot <oudot.laurent@wanadoo.fr>:
+          Exim ruleset.
 
-	
+        - Stéphane Loeuillet <LeRoutier@wanadoo.fr>:
+          ProFTPD, vpopmail, qpopper rulesets.
+
+        - Vincent Glaume <vglaume@exaprobe.com>:
+          Squid, NtSyslog, Ipso, Checkpoint, rulesets.
+
+
 * 2002-12-06, prelude-lml-0.8.2:
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  LML doesn't use pthread anymore, but use more favorable technic
-	  where several file descriptor are monitored from a single thread.
-	
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  Massive reorganisation of the way we're doing file monitoring,
-	  we are now able to monitor file change throught FAM instead of
-	  polling every file descriptor every second. Be warned that a bug
-	  in current Linux Kernel (up to 2.4.20 and 2.5.50) prevent FAM from
-	  being enabled cause the kernel won't send file notification event 
-	  for writev() issued change. FAM support will only be activated in 
-	  case the bug is not present.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          LML doesn't use pthread anymore, but use more favorable technic
+          where several file descriptor are monitored from a single thread.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  Fix Solaris compilation problem.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Massive reorganisation of the way we're doing file monitoring,
+          we are now able to monitor file change throught FAM instead of
+          polling every file descriptor every second. Be warned that a bug
+          in current Linux Kernel (up to 2.4.20 and 2.5.50) prevent FAM from
+          being enabled cause the kernel won't send file notification event
+          for writev() issued change. FAM support will only be activated in
+          case the bug is not present.
 
-	- Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
-	  Fix a build problem on FreeBSD
-	  
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  The Simple plugin now support setting User and UserID fields.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Fix Solaris compilation problem.
 
-	- Brad Spengler <spender@grsecurity.net>:
-	  Update grsecurity ruleset. The new ruleset should handle event 
-	  generated by grsecurity up to version 1.9.7.
-	
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  Prevent signatures without regex to be compiled in. This fix a 
-	  possible SIGSEGV due to a NULL pointer dereference in case a 
-	  signatures didn't provide a regex.
+        - Krzysztof Zaraska <kzaraska@student.uci.agh.edu.pl>:
+          Fix a build problem on FreeBSD
 
-	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
-	  New sshd ruleset.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          The Simple plugin now support setting User and UserID fields.
 
-	- Laurent Oudot <oudot.laurent@wanadoo.fr>
-	  New ZyWall ruleset.
+        - Brad Spengler <spender@grsecurity.net>:
+          Update grsecurity ruleset. The new ruleset should handle event
+          generated by grsecurity up to version 1.9.7.
 
-	- Nicolas Delon <delon.nicolas@wanadoo.fr>:
-	  Updated the Netfilter ruleset so that it is able to match 
-	  packets not received from the LAN.
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Prevent signatures without regex to be compiled in. This fix a
+          possible SIGSEGV due to a NULL pointer dereference in case a
+          signatures didn't provide a regex.
 
-	- Yoann Vandoorselaere <yoann@prelude-ids.org>: 
-	  Add a COPYING.OPENSSL file, containing the OpenSSL license.
-	  Permit linking with OpenSSL so that Debian package might be distributed.
+        - Nicolas Delon <delon.nicolas@wanadoo.fr>:
+          New sshd ruleset.
+
+        - Laurent Oudot <oudot.laurent@wanadoo.fr>
+          New ZyWall ruleset.
+
+        - Nicolas Delon <delon.nicolas@wanadoo.fr>:
+          Updated the Netfilter ruleset so that it is able to match
+          packets not received from the LAN.
+
+        - Yoann Vandoorselaere <yoann@prelude-ids.org>:
+          Add a COPYING.OPENSSL file, containing the OpenSSL license.
+          Permit linking with OpenSSL so that Debian package might be distributed.
 
 * 2002-08-29, prelude-lml-0.8.1:
-	- Check strdup() return value, and fix a possible
-	  memory leak in the udp-server code.
-	  (Guillaume Pelat).
+        - Check strdup() return value, and fix a possible
+          memory leak in the udp-server code.
+          (Guillaume Pelat).
 
-	- Fix possible assertion when two modifications
-	  are done in the logfile at the same second.
-	  (Guillaume Pelat).
+        - Fix possible assertion when two modifications
+          are done in the logfile at the same second.
+          (Guillaume Pelat).
 
-	- Fix possible unterminated string.
-	  (Guillaume Pelat).
+        - Fix possible unterminated string.
+          (Guillaume Pelat).
 
-	- Fix possible file descriptor leak.
-	  (Guillaume Pelat).
+        - Fix possible file descriptor leak.
+          (Guillaume Pelat).
 
-	- Dup the filename before checking if opening the file
-	  suceeded, so that re-opening inactive file work again.
-	  (Yoann Vandoorselaere).
+        - Dup the filename before checking if opening the file
+          suceeded, so that re-opening inactive file work again.
+          (Yoann Vandoorselaere).
 
-	- Emit an alert if the modification time get modified,
-	  but file size doesn't increase.
-	  (Yoann Vandoorselaere).
+        - Emit an alert if the modification time get modified,
+          but file size doesn't increase.
+          (Yoann Vandoorselaere).
 
-	- Emit an alert if logfile hard link count reach 0.
+        - Emit an alert if logfile hard link count reach 0.
           (Yoann Vandoorselaere).
 
 * 2002-07-30, prelude-lml-0.8.0:
-	- Initial release.
-	- Support for (GrSecurity, NetFilter, Cisco, ZyXel, IpFw, Pax).
+        - Initial release.
+        - Support for (GrSecurity, NetFilter, Cisco, ZyXel, IpFw, Pax).
