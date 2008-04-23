@@ -25,16 +25,16 @@
 #####
 #
 # The rules included here were developed using WU-ftpd 2.6.2.  Please report
-# any inconsistencies on other versions to G Ramon Gomez at the address provided 
+# any inconsistencies on other versions to G Ramon Gomez at the address provided
 # above
 #
 #####
 
 #LOG:Oct 28 20:38:47 www.tyco-training.stag ftpd[12781]: ANONYMOUS FTP LOGIN FROM p508ee95a.dip.t-dialin.net [80.142.233.90], Igpuser@home.com
 regex=ANONYMOUS FTP LOGIN FROM ([\w\-\.]+) \[([\d\.)]+)\], (\S+); \
- classification.text=Anonymous FTP logon; \
+ classification.text=Anonymous FTP login; \
  id=2300; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=WU-FTPD; \
  analyzer(0).manufacturer=www.wu-ftpd.org; \
  analyzer(0).class=Service; \
@@ -59,9 +59,9 @@ regex=ANONYMOUS FTP LOGIN FROM ([\w\-\.]+) \[([\d\.)]+)\], (\S+); \
 
 #LOG:Oct 28 20:38:48 itguxweb2 ftpd[19188]: FTP LOGIN FAILED (cannot set guest privileges) for p508ee95a.dip.t-dialin.net [80.142.233.90], ftp
 regex=FTP LOGIN FAILED \(([\w\s]+)\) for ([\w\-\.]+) \[([\d\.)]+)\], (\S+); \
- classification.text=FTP logon failed; \
+ classification.text=FTP login; \
  id=2301; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=WU-FTPD; \
  analyzer(0).manufacturer=www.wu-ftpd.org; \
  analyzer(0).class=Service; \

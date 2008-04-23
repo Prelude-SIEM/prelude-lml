@@ -24,17 +24,17 @@
 
 #####
 #
-# The rules included here were developed using Webmin 1.130.  Please 
-# report any inconsistencies on other versions to G Ramon Gomez at the 
+# The rules included here were developed using Webmin 1.130.  Please
+# report any inconsistencies on other versions to G Ramon Gomez at the
 # address provided above
 #
 #####
 
-#LOG:Mar 14 15:18:22 gtsproduxlvs1 webmin[27244]: Successful login as root from 12.34.56.78 
+#LOG:Mar 14 15:18:22 gtsproduxlvs1 webmin[27244]: Successful login as root from 12.34.56.78
 regex=Successful login as (.+) from ([\d\.]+); \
- classification.text=Web administration admin login successful; \
+ classification.text=Web administration admin login; \
  id=2900; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Webmin; \
  analyzer(0).manufacturer=www.webmin.com; \
  analyzer(0).class=Administration; \
@@ -53,9 +53,9 @@ regex=Successful login as (.+) from ([\d\.]+); \
 
 #LOG:Mar 17 19:18:32 gtsdmzuxids1 webmin[28655]: Invalid login as root from 10.100.17.38
 regex=Invalid login as (.+) from ([\d\.]+); \
- classification.text=Web administration admin login failed; \
+ classification.text=Web administration admin login; \
  id=2901; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Webmin; \
  analyzer(0).manufacturer=www.webmin.com; \
  analyzer(0).class=Administration; \

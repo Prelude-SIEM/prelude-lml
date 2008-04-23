@@ -1,13 +1,13 @@
 #####
 #
-# Copyright (C) 2003 Vincent Glaume 
+# Copyright (C) 2003 Vincent Glaume
 # Currently supported by G Ramon Gomez <gene at gomezbrothers dot com>
 # All Rights Reserved
 #
 # This file is part of the Prelude-LML program.
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by 
+# it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
 #
@@ -23,9 +23,9 @@
 #####
 
 #############################################################################
-# 
-# This ruleset aims at analyzing the logs returned by the ntsyslog 
-# application, which converts NT events to syslog. 
+#
+# This ruleset aims at analyzing the logs returned by the ntsyslog
+# application, which converts NT events to syslog.
 # English logs only.
 # TODO:
 # *  Add all log entries not currently present
@@ -63,13 +63,13 @@ regex=security\[success\] 515 (.*)  A trusted logon process has registered with 
 # 1.b 528
 #LOG:Jul 11 13:44:11 somehost.ragingwire.net smf-eng-srobins/smf-eng-srobins security[success] 528 SACRAMENTO\ggomez  Successful Logon:  User Name:ggomez  Domain:SACRAMENTO  Logon ID:(0x0,0x16AC1854)  Logon Type:7  Logon Process:User32    Authentication Package:Negotiate  Workstation Name:SMF-ENG-GGOMEZ  Logon GUID: {621924db-649e-3b17-b41a-215e55680eb3}
 regex=security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domain:(.+)  Logon ID:\(.*\)  Logon Type:(\d+)  Logon Process:(\w+) .* Workstation Name:(\S+); \
- classification.text=Login successful; \
+ classification.text=Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
  classification.reference(0).name=528; \
  classification.reference(0).url=http://www.ultimatewindowssecurity.com/events/com189.html; \
  id=1401; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=NTsyslog; \
  analyzer(0).manufacturer=ntsyslog.sourceforge.net; \
  analyzer(0).class=Logging; \
@@ -95,7 +95,7 @@ regex=security\[success\] 528 (.*) Successful Logon:  User Name:([\w ]+)  Domain
  last
 
 # 1.c 538
-#LOG:Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3 
+#LOG:Jun 24 15:22:39 bigipnet security[success] 538 NT AUTHORITY\ANONYMOUS LOGON User Logoff: User Name:ANONYMOUS LOGON Domain:NT AUTHORITY Logon ID:(0x0,0x938205) Logon Type:3
 regex=security\[success\] 538 .* User Logoff:\s+User Name:([\w ]+) Domain:([\w ]+) Logon ID:\S+ Logon Type:(\d+); \
  classification.text=Logoff; \
  classification.reference(0).origin=vendor-specific; \
@@ -195,7 +195,7 @@ regex= security\[success\] 577 (.*)  Privileged Service Called:  Server:.+  Serv
  assessment.impact.completion=succeeded; \
  assessment.impact.type=other; \
  assessment.impact.description=Service $2 called with the following privileges: $5; \
- source(0).user.category=os-device; \ 
+ source(0).user.category=os-device; \
  source(0).user.user_id(0).type=current-user; \
  source(0).user.user_id(0).name=$1; \
  source(0).user.user_id(1).type=current-user; \
@@ -234,13 +234,13 @@ regex= security\[success\] 643 (.*)  Domain Policy Changed: Password Policy  mod
 # 1.i 680
 #LOG:Oct 22 20:57:03 smf-syslog-02 smf-dc-01/smf-dc-01 security[success] Account Used for Logon by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Account Name:  DRankin  Workstation:   SMF-HLP-16
 regex= security\[success\].*Account Used for Logon by: (.+)  Account Name: (.+)  Workstation: (.+); \
- classification.text=Login successful; \
+ classification.text=Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
  classification.reference(0).name=680; \
  classification.reference(0).url=http://www.ultimatewindowssecurity.com/events/com304.html; \
  id=1408; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=NTsyslog; \
  analyzer(0).manufacturer=ntsyslog.sourceforge.net; \
  analyzer(0).class=Logging; \
@@ -331,12 +331,12 @@ regex= security\[success\] 683 (.*)  Session disconnected from winstation:  User
 # 2.a 529 or 534
 #LOG:Dec 10 00:23:37 webbrain.itg.sac.tfs security[failure] 529 NT AUTHORITY\SYSTEM  Logon Failure:  Reason:Unknown user name or bad password  User Name:administrator  Domain:ITG  Logon Type:2  Logon Process:Advapi    Authentication Package: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  Workstation Name:WEBBRAIN
 regex=security\[failure\] (529|534) .+ Logon Failure:  Reason:(.+)  User Name:([\w ]+)  Domain:(.+)  Logon Type:(\d+)  Logon Process:(\w+)    Authentication Package:.+  Workstation Name:(.+); \
- classification.text=Login failure; \
+ classification.text=Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
  classification.reference(0).name=$1; \
  id=1412; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=NTsyslog; \
  analyzer(0).manufacturer=ntsyslog.sourceforge.net; \
  analyzer(0).class=Logging; \
@@ -420,13 +420,13 @@ regex= security\[failure\] 627 (.+)  Change Password Attempt:  Target Account Na
 # 2.d 681
 # LOG:Dec 10 08:20:07 mrfreeze.itg.sac.tfs security[failure] 681 NT AUTHORITY\SYSTEM  The logon to account: tfslegalask@itg.sac.tfs  by: MICROSOFT_AUTHENTICATION_PACKAGE_V1_0  from workstation: MRFREEZE  failed. The error code was: 3221225572
 regex=security\[failure\] 681 (.+)  The logon to account: (\S+)  by:.+  from workstation: (\w+); \
- classification.text=Logon failure; \
+ classification.text=Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=Windows Event ID; \
  classification.reference(0).name=681; \
  classification.reference(0).url=http://www.ultimatewindowssecurity.com/events/com326.html; \
  id=1415; \
- revision=2; \
+ revision=3; \
  analyzer(0).name=NTsyslog; \
  analyzer(0).manufacturer=ntsyslog.sourceforge.net; \
  analyzer(0).class=Logging; \

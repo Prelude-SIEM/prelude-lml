@@ -22,7 +22,7 @@
 #####
 
 #Ruleset fot the Kojoney SSH Honeypot
-# 
+#
 #2007/04/12 21:57 CEST [SSHService ssh-userauth on SSHServerTransport,3,88.64.180.35] root trying auth password
 #2007/04/12 21:57 CEST [SSHService ssh-userauth on SSHServerTransport,3,88.64.180.35] root authenticated with password
 #2007/04/12 21:57 CEST [SSHChannel session (0) on SSHService ssh-connection on SSHServerTransport,3,88.64.180.35] COMMAND IS : pwd
@@ -48,9 +48,9 @@
 
 #LOG:2007/04/12 21:57 CEST [SSHService ssh-userauth on SSHServerTransport,3,88.64.180.35] root authenticated with password
  regex=\[SSHService ssh-userauth on SSHServerTransport,\d+,(\S+)\] (\S+) authenticated with password; \
- classification.text=SSH Login successful; \
+ classification.text=SSH Login; \
  id=20001; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=Kojoney SSH Honeypot; \
  analyzer(0).manufacturer=http://kojoney.sourceforge.net; \
  analyzer(0).class=Honeypot; \

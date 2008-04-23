@@ -26,7 +26,7 @@
 # Copyright (C) 2004 Yoann Vandoorselaere <yoann@prelude-ids.org>
 # All Rights Reserved
 
-#LOG:Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode 
+#LOG:Mar 28 12:30:01 gtsdmzuxids1 kernel: device eth1 entered promiscuous mode
 regex=device (\S+) entered promiscuous mode; \
  classification.text=Promiscuous mode detected; \
  id=400; \
@@ -165,7 +165,7 @@ regex=Drop (TCP|UDP) packet from ([LW]AN) ([\d\.]+):(\d+)  ([\d\.]+):(\d+) Rule:
  analyzer(0).manufacturer=D-Link; \
  analyzer(0).class=Firewall; \
  assessment.impact.severity=medium; \
- assessment.impact.description=A packet was dropped by D-Link rule "$7".; \ 
+ assessment.impact.description=A packet was dropped by D-Link rule "$7".; \
  source(0).interface=$2; \
  source(0).service.iana_protocol_name=$1; \
  source(0).node.address(0).category=ipv4-addr; \
@@ -233,9 +233,9 @@ regex=deny user: (\S+), prog: (\D+), pid: \d+\(\d+\)\[(\d+)\], policy: (\S+) fil
 
 #LOG:May 10 15:24:21 mighty pure-ftpd: (?@127.0.0.1) [WARNING] Authentication failed for user [asdfasdf]
 regex=([\d\.]+)\) \[WARNING\] Authentication failed for user \[(.+)\]; \
- classification.text=FTP logon failed; \
+ classification.text=FTP login; \
  id=410; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=PureFTPD; \
  analyzer(0).manufacturer=www.pureftpd.org; \
  analyzer(0).class=Service; \

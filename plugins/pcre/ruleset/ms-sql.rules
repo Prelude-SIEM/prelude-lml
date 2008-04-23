@@ -24,17 +24,17 @@
 
 #####
 #
-# The rules included here were developed using Microsoft SQL Server 2000 SP3a 
-# events collected using NTSysLog.  Please report any inconsistencies on other 
+# The rules included here were developed using Microsoft SQL Server 2000 SP3a
+# events collected using NTSysLog.  Please report any inconsistencies on other
 # versions to G Ramon Gomez at the address provided above
 #
 #####
 
 #LOG:Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'probe'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
- classification.text=Database user login failure; \
+ classification.text=Database user login; \
  id=1000; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=SQL Server; \
  analyzer(0).manufacturer=Microsoft; \
  analyzer(0).class=Database; \
@@ -49,9 +49,9 @@ regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user '(?!sa)(.+)'; \
 
 #LOG:Nov 24 14:45:58 testdb.itg.sac.tfs mssqlserver[info] 17055  18456 : Login failed for user 'sa'.
 regex=(mssql.+)\[\w+\] \d+  \d+ : Login failed for user 'sa'; \
- classification.text=Database admin login failure; \
+ classification.text=Database admin login; \
  id=1001; \
- revision=1; \
+ revision=2; \
  analyzer(0).name=SQL Server; \
  analyzer(0).manufacturer=Microsoft; \
  analyzer(0).class=Database; \
