@@ -184,7 +184,7 @@ AS_AC_EXPAND(DATADIR, $datadir)
 AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
 AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
 
-configdir=$SYSCONFDIR/prelude-manager
+configdir=$SYSCONFDIR/prelude-lml
 prelude_lml_conf=$configdir/prelude-lml.conf
 regex_conf=$configdir/plugins.rules
 metadata_dir=$LOCALSTATEDIR/lib/prelude-lml
