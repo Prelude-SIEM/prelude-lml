@@ -1,4 +1,4 @@
-EXTRA_DIST = loggrep.py prelude-lml.conf
+EXTRA_DIST = loggrep.py prelude-lml.conf ignored
 
 $(top_srcdir)/prelude-lml:
 	cd $(top_srcdir)/prelude-lml && make
