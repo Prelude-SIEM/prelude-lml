@@ -94,6 +94,7 @@ regex=\[[^:]*:[^\]]*\]:;		include = netapp-ontap.rules;
 regex=system-(emergency|alert)-;	include = netscreen.rules;
 regex=security\[;			include = ntsyslog.rules;
 regex=[Pp][Aa][Mm]_;			include = pam.rules;
+regex=([Ss][Uu]:); 			include = su.rules; 
 regex=pcanywhere;			include = pcanywhere.rules;
 regex=portsentry;			include = portsentry.rules;
 regex=postfix/;                 	include = postfix.rules;
