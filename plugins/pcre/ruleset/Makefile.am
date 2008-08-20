@@ -49,6 +49,7 @@ ruleset_DATA = \
 	sonicwall.rules		\
 	spamassassin.rules	\
 	squid.rules		\
+	su.rules		\
 	ssh.rules		\
 	sudo.rules		\
 	suhosin.rules		\
