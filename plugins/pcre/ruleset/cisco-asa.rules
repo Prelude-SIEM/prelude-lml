@@ -58,7 +58,7 @@ regex=-(4000\d\d): IDS:(\d+) (.+) from ([\d\.]+) to ([\d\.]+) on interface (\S+)
 
 #LOG:Nov  2 11:03:52 pix %PIX-6-605005: Login permitted from 12.34.56.78/43610 to inside:90.12.34.56/ssh for user "pix"
 regex=-605005: Login permitted from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=User login; \
+ classification.text=Remote Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605005; \
@@ -157,7 +157,7 @@ regex=-611103: User logged out: Uname: (\S+); \
 
 #LOG:Nov  2 19:13:43 pix %PIX-6-605004: Login denied from 12.34.56.78/44660 to inside:90.12.34.56/ssh for user "frag"
 regex=-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for user "(\S+)"; \
- classification.text=User login; \
+ classification.text=Remote Login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
  classification.reference(0).name=605004; \
