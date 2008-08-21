@@ -209,6 +209,7 @@ plugins.rules
 
 Makefile
 libmissing/Makefile
+libmissing/tests/Makefile
 
 src/Makefile
 src/include/Makefile
