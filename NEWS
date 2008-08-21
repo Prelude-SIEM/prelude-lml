@@ -1,3 +1,22 @@
+* 2008-08-21, prelude-lml-0.9.13:
+
+- ModSecurity ruleset rewrite, by Peter Vrabec <pvrabec@redhat.com> and
+  Dan Kopecek <dkopecek@redhat.com>. This ruleset handle ModSecurity 2.0
+  output. (Fix #216).
+
+- New rulesets for FreeBSD su attempts, by Alexander Afonyashin <firm@iname.com>
+  (Fix #304).
+
+- Add additional format to the default configuration to deal with apache 
+  error_log file format, by Alexander Afonyashin <firm@iname.com> (Fix #307).
+
+- Normalize some classification: introduce Remote Login, and 
+  Credentials Change. Cleanup SSH ruleset, and remove duplicated rules.
+
+- Automated regression tests on make check.
+
+
+
 * 2008-04-24, prelude-lml-0.9.12.2:
 
 - Fix wrong ruleset/config installation path.
