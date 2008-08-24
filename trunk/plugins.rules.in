@@ -1,0 +1,23 @@
+##
+# This file allow you to define how data are routed by Prelude-LML.
+#
+# Log source matching 'source', with input data matching 'regex', 
+# will be sent to the defined 'plugin'.
+#
+# 'source' should be one of:
+#  - "*"                  Data from any sources (logfile, UDP listener, etc) is sent to 'plugin'.
+#  - REGEXP               Data which sources match regular expression REGEXP is sent to 'plugin'.
+#  - "address:port/udp"   Data received from this listener is sent to 'plugin'.
+#  - "/path/to/logfile"   Data from this logfile is sent to 'plugin'.
+#
+#
+# 'regex' should be one of:
+#  - "*"	 Any data is sent to 'plugin'.
+#  - REGEXP		Data which match regular expression REGEXP is sent to 'plugin'.
+#
+# 'pcre-options' is unsupported at the moment.
+
+# source	plugin      	pcre-options		regex
+#
+# *		Debug		-			*
+  * 		Pcre		-			*

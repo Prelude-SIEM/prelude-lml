@@ -1,0 +1,134 @@
+##############################################
+# Configuration for the Prelude LML Sensor   #
+##############################################
+
+include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
+
+
+# Address where the Prelude Manager Server is listening on.
+# if value is "127.0.0.1", the connection will occur throught
+# an UNIX socket.
+#
+# This entry is disabled. The default is to use the entry 
+# located in the Prelude system wide clients.conf. You may 
+# overwrite the default address for this sensor by uncommenting 
+# this entry.
+#
+# [prelude]
+# server-addr = 127.0.0.1
+
+
+#
+# Files to monitor
+#
+# You should define the log message prefix-regex and time-format within a
+# [format] section. If not specified, the default syslog format will be used.
+#
+# The prefix-regex should contain PCRE named subpatterns to pick out the
+# information available in your syslog's prefix.
+#
+# The available field names are:
+#   - hostname
+#   - process
+#   - pid
+#   - timestamp
+#
+# Please see pcrepattern(3) manpage for help writing the prefix-regex
+# In order to set the time-format, please have a look at the strptime(3) manpage.
+#
+# Example configuration for syslog output:
+#
+# Each [format] section might have several file entry.
+# Each [format] section might have several udp-server entry.
+#
+# The same file or udp-server entry might be duplicated accross
+# differents formats.
+#
+# Additionally, you can specify a pattern in a file entry. LML will then searches 
+# for all the pathnames matching pattern according to the rules used by the shell 
+# (see glob(7)).
+#
+# Example: file = /var/log/*/*.log
+
+
+
+[format=syslog]
+time-format = "%b %d %H:%M:%S" 
+prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])?: )?"
+file = /var/log/messages
+# udp-server = 0.0.0.0
+
+
+#
+# Sample configuration for metalog:
+#
+[format=metalog]
+prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
+time-format = "%b %d %H:%M:%S" 
+file = /var/log/everything/current
+# udp-server = 0.0.0.0
+
+
+#
+# Sample configuration for apache:
+#
+[format=apache]
+time-format = "%d/%b/%Y:%H:%M:%S"
+prefix-regex = "(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
+file = /var/log/httpd/access_log
+file = /var/log/apache2/access_log
+
+[format=apache-error]
+time-format = "%a %b %d %H:%M:%S %Y"
+prefix-regex = "^\[(?P<timestamp>.{24})\] \S+ (\[client (?P<hostname>\S+)\] )?"
+file = /var/log/httpd/error_log
+file = /var/log/apache2/error_log
+
+
+
+#
+# Sample configuration for asterisk:
+#
+#[format=asterisk]
+#time-format = "%b %d %H:%M:%S"
+#prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])? (\S*): )?"
+#file = /var/log/asterisk/messages
+
+
+#
+# Specifies the maximum difference, in seconds, between
+# the interval of two logfiles' rotation. If this difference 
+# is reached, a high severity alert will be emited
+#
+#max-rotation-size-offset = 1024
+#max-rotation-time-offset = 300
+
+
+#
+# Maximum number of warning a given source should emit in case it can not
+# parse log entry with the provided prefix_regex and time_format. 
+#
+# -1 == unlimited number of warning
+#  0 == no warning at all 
+#  X == print at most X warnings.
+#
+# warning-limit = -1
+
+
+####################################
+# Here start plugins configuration #
+####################################
+
+[Pcre]
+
+ruleset=@configdir@/ruleset/pcre.rules
+
+
+# [Debug]
+#
+# This plugin issue an alert for each packet.
+# Carefull to the loging activity it generate.
+# 
+# Triger Report to the console.
+# stderr
+

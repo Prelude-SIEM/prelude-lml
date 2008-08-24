@@ -1,0 +1,233 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT
+AC_PREREQ(2.59)
+AC_CANONICAL_TARGET([])
+AM_INIT_AUTOMAKE(prelude-lml, 0.9.13)
+AM_CONFIG_HEADER(config.h)
+AM_DISABLE_STATIC
+
+AM_MAINTAINER_MODE
+
+
+dnl **********************************************************
+dnl * Check required program.
+dnl **********************************************************
+
+AC_PROG_CPP
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PATH_PROG(GREP, grep, no)
+
+dnl **********************************************************
+dnl * Setup GnuLib, libtool and libltdl.
+dnl **********************************************************
+
+gl_EARLY
+AC_LIBTOOL_DLOPEN
+AM_DISABLE_STATIC
+AC_PROG_LIBTOOL
+
+
+dnl **************************************************
+dnl * Check for missing function replacement         *
+dnl **************************************************
+
+gl_SOURCE_BASE(libmissing)
+gl_M4_BASE(libmissing/m4)
+gl_INIT
+
+dnl **************************************************
+dnl * Typedefs, structures, compiler characteristics.*
+dnl **************************************************
+
+AC_C_CONST
+AC_TYPE_UID_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_TYPE_SIGNAL
+AC_C_INLINE
+AC_SYS_LARGEFILE
+
+
+
+dnl **************************************************
+dnl * Setup custom compiler flags                    *
+dnl **************************************************
+
+AC_MSG_CHECKING(for platform-specific compiler flags)
+case "$host_os" in
+ darwin*)
+        # It may be called "cc", but it's really a GCC derivative
+        # with a problematic special precompiler and precompiled
+        # headers; turn off the special precompiler, as some
+        # apparently-legal code won't compile with its precompiled
+        # headers.
+        AC_MSG_RESULT(Darwin: adding -no-cpp-precomp)
+        AX_C_CHECK_FLAG(-no-cpp-precomp, , , GLOBAL_CFLAGS="$GLOBAL_CFLAGS -no-cpp-precomp")
+        ;;
+ *)
+        AC_MSG_RESULT(none needed)
+        ;;
+esac
+
+AX_LD_CHECK_FLAG(-z relro, , , LDFLAGS="$LDFLAGS -z relro")
+AX_LD_CHECK_FLAG(-z now, , , LDFLAGS="$LDFLAGS -z now")
+
+for i in -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
+         -Wbad-function-cast -Wcast-qual -Wcast-align -Wnested-externs -Wunused \
+         -Wformat -Wformat-security; do
+        AX_C_CHECK_FLAG($i, , , GLOBAL_CFLAGS="$GLOBAL_CFLAGS $i")
+done
+
+
+dnl **************************************************
+dnl * Check for libprelude                           *
+dnl **************************************************
+
+AM_PATH_LIBPRELUDE(0.9.8, ,
+  AC_MSG_ERROR(Cannot find libprelude: Is libprelude-config in the path?) )
+
+
+dnl **************************************************
+dnl * Check for PCRE                                 *
+dnl **************************************************
+
+AC_PATH_PROG(PCRE_CONFIG, pcre-config, no)
+
+if test x$PCRE_CONFIG = xno; then
+   AC_MSG_ERROR(PCRE 4.1 or higher is required to build Prelude-LML. Get it from http://www.pcre.org .)
+fi
+
+PCRE_LIBS=`$PCRE_CONFIG --libs`
+PCRE_CFLAGS=`$PCRE_CONFIG --cflags`
+
+LIBS_bkp=$LIBS
+LIBS="$LIBS $PCRE_LIBS"
+
+CPPFLAGS_bkp=$CPPFLAGS
+CPPFLAGS="$CPPFLAGS $PCRE_CFLAGS"
+
+AC_CHECK_LIB(pcre, pcre_get_named_substring, ,
+ AC_MSG_ERROR(PCRE 4.1 or higher is required to build Prelude-LML. Get it from http://www.pcre.org .)
+)
+
+LIBS=$LIBS_bkp
+CPPFLAGS=$CPPFLAGS_bkp
+
+AC_SUBST(PCRE_LIBS)
+AC_SUBST(PCRE_CFLAGS)
+
+
+dnl **************************************************
+dnl * Check for unsupported ruleset install request  *
+dnl **************************************************
+
+AC_ARG_ENABLE(unsupported-rulesets, AC_HELP_STRING(--enable-unsupported-rulesets, Enable install of unsupported rulesets [default=no]), enable_unsupported_rulesets="$enableval", enable_unsupported_rulesets="$enableval")
+
+AM_CONDITIONAL(ENABLE_UNSUPPORTED_RULESETS, test x$enable_unsupported_rulesets = xyes)
+
+
+
+dnl **************************************************
+dnl * Check for FAM.                                 *
+dnl **************************************************
+
+AC_ARG_WITH(fam, AC_HELP_STRING(--with-fam@<:@=PATH@:>@, Path where FAM is installed @<:@default=auto@:>@),
+            fam_required=true, with_fam=yes)
+
+if test x$with_fam != xno; then
+   old_LIBS=$LIBS
+   old_LDFLAGS=$LDFLAGS
+   old_CPPFLAGS=$CPPFLAGS
+
+   if test x$with_fam != xyes; then
+      FAM_LIBS="-L$with_fam/lib"
+      FAM_CFLAGS="-I$with_fam/include"
+      LDFLAGS="$LDFLAGS -L$with_fam/lib"
+      CPPFLAGS="$CPPFLAGS -I$with_fam/include"
+   fi
+
+   AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
+   AC_CHECK_LIB(fam, FAMOpen, , fam_lib_ok="no")
+
+   LIBS="$old_LIBS"
+   LDFLAGS="$old_LDFLAGS"
+   CPPFLAGS="$old_CPPFLAGS"
+
+   if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then
+        FAM_LIBS=""
+        FAM_CFLAGS=""
+        FAM_LDFLAGS=""
+        with_fam=no;
+   else
+        with_fam=yes;
+        FAM_LIBS="-lfam"
+        AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
+   fi
+fi
+
+AC_SUBST(FAM_LIBS)
+AC_SUBST(FAM_CFLAGS)
+AC_SUBST(FAM_LDFLAGS)
+AM_CONDITIONAL(HAVE_FAM, test x$with_fam = xyes)
+
+
+dnl **************************************************
+dnl * Setup build variable                           *
+dnl **************************************************
+
+AS_AC_EXPAND(LIBDIR, $libdir)
+AS_AC_EXPAND(DATADIR, $datadir)
+AS_AC_EXPAND(SYSCONFDIR, $sysconfdir)
+AS_AC_EXPAND(LOCALSTATEDIR, $localstatedir)
+
+configdir=$SYSCONFDIR/prelude-lml
+prelude_lml_conf=$configdir/prelude-lml.conf
+regex_conf=$configdir/plugins.rules
+metadata_dir=$LOCALSTATEDIR/lib/prelude-lml
+plugindir=$LIBDIR/prelude-lml
+
+AC_DEFINE_UNQUOTED(PRELUDE_LML_CONF, "$prelude_lml_conf", Path to the LML configuration file)
+AC_DEFINE_UNQUOTED(LOG_PLUGIN_DIR, "$plugindir", Prelude-LML report plugin directory)
+AC_DEFINE_UNQUOTED(REGEX_CONF, "$regex_conf", Prelude-LML plugin regex configuration)
+AC_DEFINE_UNQUOTED(METADATA_DIR, "$metadata_dir", Prelude-LML Metadata directory)
+
+AC_SUBST(configdir)
+AC_SUBST(metadata_dir)
+AC_SUBST(localstatedir)
+
+AC_SUBST(GLOBAL_CFLAGS)
+
+
+AC_CONFIG_FILES([
+
+prelude-lml.conf
+plugins.rules
+
+Makefile
+libmissing/Makefile
+libmissing/tests/Makefile
+
+src/Makefile
+src/include/Makefile
+
+plugins/Makefile
+
+plugins/debug/Makefile
+
+plugins/pcre/Makefile
+plugins/pcre/ruleset/Makefile
+plugins/pcre/ruleset/unsupported/Makefile
+
+tests/Makefile
+
+])
+AC_OUTPUT
+
+echo
+echo "*** Dumping configuration ***"
+echo "    - Enable FAM support                  : $with_fam"
+echo "    - Enable unsupported rulesets:        : $enable_unsupported_rulesets"
