@@ -18,6 +18,8 @@
 
 #ifndef _GL_STRING_H
 
+@PRAGMA_SYSTEM_HEADER@
+
 /* The include_next requires a split double-inclusion guard.  */
 #@INCLUDE_NEXT@ @NEXT_STRING_H@
 
@@ -574,6 +576,18 @@ extern char *strsignal (int __sig);
     (GL_LINK_WARNING ("strsignal is unportable - " \
                       "use gnulib module strsignal for portability"), \
      strsignal (a))
+#endif
+
+#if @GNULIB_STRVERSCMP@
+# if !@HAVE_STRVERSCMP@
+extern int strverscmp (const char *, const char *);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strverscmp
+# define strverscmp(a, b) \
+    (GL_LINK_WARNING ("strverscmp is unportable - " \
+                      "use gnulib module strverscmp for portability"), \
+     strverscmp (a, b))
 #endif
 
 
