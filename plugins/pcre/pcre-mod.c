@@ -29,7 +29,6 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <pcre.h>
-#include <netdb.h>
 #include <libprelude/prelude-log.h>
 
 #include "prelude-lml.h"

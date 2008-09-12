@@ -30,7 +30,6 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <pcre.h>
-#include <netdb.h>
 
 #include <libprelude/prelude.h>
 #include <libprelude/common.h>
