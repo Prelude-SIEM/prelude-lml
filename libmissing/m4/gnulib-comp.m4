@@ -53,6 +53,7 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_DIRFD
   gl_FLOAT_H
   # No macro. You should also use one of fnmatch-posix or fnmatch-gnu.
+  gl_FUNC_FNMATCH_GNU
   gl_GETADDRINFO
   gl_GETLOGIN_R
   gl_UNISTD_MODULE_INDICATOR([getlogin_r])
@@ -70,7 +71,15 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_PATHMAX
+  AC_REPLACE_FUNCS(raise)
+  gl_SIGACTION
+  gl_SIGNAL_MODULE_INDICATOR([sigaction])
+  gl_SIGNAL_H
+  gl_SIGNALBLOCKING
+  gl_SIGNAL_MODULE_INDICATOR([sigprocmask])
   gl_SIZE_MAX
+  gl_FUNC_SLEEP
+  gl_UNISTD_MODULE_INDICATOR([sleep])
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
   gl_TYPE_SOCKLEN_T
@@ -78,16 +87,23 @@ AC_SUBST([LTALLOCA])
   gl_STDINT_H
   gl_STDIO_H
   gl_STDLIB_H
+  gl_STRCASE
   gl_FUNC_STRDUP
   gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
+  gl_HEADER_STRINGS_H
   gl_FUNC_STRPBRK
   gl_STRING_MODULE_INDICATOR([strpbrk])
+  gl_FUNC_STRPTIME
   gl_FUNC_STRSEP
   gl_STRING_MODULE_INDICATOR([strsep])
+  gl_HEADER_SYS_SELECT
+  AC_PROG_MKDIR_P
   gl_HEADER_SYS_SOCKET
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
+  AC_PROG_MKDIR_P
+  gl_HEADER_SYS_TIME_H
   AC_PROG_MKDIR_P
   gl_HEADER_TIME_H
   gl_TIME_R
@@ -261,18 +277,30 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/raise.c
+  lib/sig-handler.h
+  lib/sigaction.c
+  lib/signal.in.h
+  lib/sigprocmask.c
   lib/size_max.h
+  lib/sleep.c
   lib/snprintf.c
   lib/stdbool.in.h
   lib/stdint.in.h
   lib/stdio.in.h
   lib/stdlib.in.h
+  lib/strcasecmp.c
   lib/strdup.c
   lib/string.in.h
+  lib/strings.in.h
+  lib/strncasecmp.c
   lib/strpbrk.c
+  lib/strptime.c
   lib/strsep.c
+  lib/sys_select.in.h
   lib/sys_socket.in.h
   lib/sys_stat.in.h
+  lib/sys_time.in.h
   lib/time.in.h
   lib/time_r.c
   lib/unistd.in.h
@@ -307,7 +335,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/onceonly.m4
   m4/pathmax.m4
   m4/printf.m4
+  m4/sigaction.m4
+  m4/signal_h.m4
+  m4/signalblocking.m4
   m4/size_max.m4
+  m4/sleep.m4
   m4/snprintf.m4
   m4/socklen.m4
   m4/sockpfaf.m4
@@ -316,14 +348,20 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdint_h.m4
   m4/stdio_h.m4
   m4/stdlib_h.m4
+  m4/strcase.m4
   m4/strdup.m4
   m4/string_h.m4
+  m4/strings_h.m4
   m4/strpbrk.m4
+  m4/strptime.m4
   m4/strsep.m4
+  m4/sys_select_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
+  m4/sys_time_h.m4
   m4/time_h.m4
   m4/time_r.m4
+  m4/tm_gmtoff.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/wchar.m4
@@ -336,14 +374,19 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-arpa_inet.c
   tests/test-getaddrinfo.c
   tests/test-netinet_in.c
+  tests/test-sigaction.c
+  tests/test-sleep.c
   tests/test-snprintf.c
   tests/test-stdbool.c
   tests/test-stdint.c
   tests/test-stdio.c
   tests/test-stdlib.c
   tests/test-string.c
+  tests/test-strings.c
+  tests/test-sys_select.c
   tests/test-sys_socket.c
   tests/test-sys_stat.c
+  tests/test-sys_time.c
   tests/test-time.c
   tests/test-unistd.c
   tests/test-vasnprintf.c

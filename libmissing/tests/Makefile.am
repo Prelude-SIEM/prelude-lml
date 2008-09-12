@@ -94,6 +94,23 @@ EXTRA_DIST += test-netinet_in.c
 
 ## end   gnulib module netinet_in-tests
 
+## begin gnulib module sigaction-tests
+
+TESTS += test-sigaction
+check_PROGRAMS += test-sigaction
+EXTRA_DIST += test-sigaction.c
+
+## end   gnulib module sigaction-tests
+
+## begin gnulib module sleep-tests
+
+TESTS += test-sleep
+check_PROGRAMS += test-sleep
+
+EXTRA_DIST += test-sleep.c
+
+## end   gnulib module sleep-tests
+
 ## begin gnulib module snprintf-tests
 
 TESTS += test-snprintf
@@ -148,6 +165,24 @@ EXTRA_DIST += test-string.c
 
 ## end   gnulib module string-tests
 
+## begin gnulib module strings-tests
+
+TESTS += test-strings
+check_PROGRAMS += test-strings
+
+EXTRA_DIST += test-strings.c
+
+## end   gnulib module strings-tests
+
+## begin gnulib module sys_select-tests
+
+TESTS += test-sys_select
+check_PROGRAMS += test-sys_select
+
+EXTRA_DIST += test-sys_select.c
+
+## end   gnulib module sys_select-tests
+
 ## begin gnulib module sys_socket-tests
 
 TESTS += test-sys_socket
@@ -165,6 +200,15 @@ check_PROGRAMS += test-sys_stat
 EXTRA_DIST += test-sys_stat.c
 
 ## end   gnulib module sys_stat-tests
+
+## begin gnulib module sys_time-tests
+
+TESTS += test-sys_time
+check_PROGRAMS += test-sys_time
+
+EXTRA_DIST += test-sys_time.c
+
+## end   gnulib module sys_time-tests
 
 ## begin gnulib module time-tests
 
