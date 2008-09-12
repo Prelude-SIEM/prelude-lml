@@ -31,8 +31,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/utsname.h>
-#include <netdb.h>
 #include <assert.h>
 
 #if TIME_WITH_SYS_TIME
