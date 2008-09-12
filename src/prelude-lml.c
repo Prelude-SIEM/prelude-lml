@@ -31,7 +31,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -114,6 +113,7 @@ static void server_close(void)
 }
 
 
+#ifndef WIN32
 static void handle_sigquit(void)
 {
         struct timeval end;
@@ -158,6 +158,7 @@ static void handle_sighup(void)
                 return;
         }
 }
+#endif
 
 
 
@@ -171,10 +172,12 @@ void _lml_handle_signal_if_needed(void)
         signo = got_signal;
         got_signal = 0;
 
+#ifndef WIN32
         if ( signo == SIGQUIT || signo == SIGUSR1 ) {
                 handle_sigquit();
                 return;
         }
+#endif
 
         server_close();
 
@@ -183,10 +186,12 @@ void _lml_handle_signal_if_needed(void)
 
         prelude_deinit();
 
+#ifndef WIN32
         if ( signo == SIGHUP ) {
                 prelude_log(PRELUDE_LOG_WARN, "signal %d received, restarting (%s).\n", signo, get_restart_string());
                 handle_sighup();
         }
+#endif
 
         prelude_log(PRELUDE_LOG_WARN, "signal %d received, terminating prelude-lml.\n", signo);
         exit(2);
@@ -319,10 +324,12 @@ int main(int argc, char **argv)
         /*
          * make sure we ignore sighup until acceptable.
          */
+#ifndef WIN32
         action.sa_flags = 0;
         action.sa_handler = SIG_IGN;
         sigemptyset(&action.sa_mask);
         sigaction(SIGHUP, &action, NULL);
+#endif
 
         memset(&start, 0, sizeof(start));
         memset(&end, 0, sizeof(end));
@@ -359,11 +366,12 @@ int main(int argc, char **argv)
 
         sigaction(SIGTERM, &action, NULL);
         sigaction(SIGINT, &action, NULL);
-        sigaction(SIGQUIT, &action, NULL);
         sigaction(SIGABRT, &action, NULL);
+#ifndef WIN32
         sigaction(SIGUSR1, &action, NULL);
         sigaction(SIGQUIT, &action, NULL);
         sigaction(SIGHUP, &action, NULL);
+#endif
 
         file_server_start_monitoring();
 

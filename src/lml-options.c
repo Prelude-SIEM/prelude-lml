@@ -30,13 +30,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <grp.h>
-#include <pwd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
 #include <glob.h>
+
+#ifndef WIN32
+# include <grp.h>
+# include <pwd.h>
+#endif
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
@@ -58,7 +61,7 @@ static prelude_bool_t have_file = FALSE;
 static const char *config_file = PRELUDE_LML_CONF;
 
 
-
+#ifndef WIN32
 static int drop_privilege(void)
 {
         int ret;
@@ -90,6 +93,7 @@ static int drop_privilege(void)
 
         return 0;
 }
+#endif
 
 
 static int set_conf_file(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
@@ -508,6 +512,7 @@ static int set_format(prelude_option_t *opt, const char *arg, prelude_string_t *
 
 
 
+#ifndef WIN32
 static int set_user(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         uid_t uid;
@@ -558,7 +563,7 @@ static int set_group(prelude_option_t *opt, const char *optarg, prelude_string_t
 
         return 0;
 }
-
+#endif
 
 
 int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
@@ -570,8 +575,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         memset(&config, 0, sizeof(config));
         config.warning_limit = -1;
+
+#ifndef WIN32
         config.wanted_uid = getuid();
         config.wanted_gid = getgid();
+#endif
 
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI, 'h', "help",
                            "Print this help", PRELUDE_OPTION_ARGUMENT_NONE, print_help, NULL);
@@ -582,6 +590,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            print_version, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
 
+#ifndef WIN32
         prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_CLI, 0, "user",
                            "Set the user ID used by prelude-lml", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_user, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
@@ -589,6 +598,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_CLI, 0, "group",
                            "Set the group ID used by prelude-lml", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_group, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
+#endif
 
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 'q', "quiet",
                            "Quiet mode", PRELUDE_OPTION_ARGUMENT_NONE, set_quiet_mode, NULL);
@@ -704,9 +714,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
 
+#ifndef WIN32
         ret = drop_privilege();
         if ( ret < 0 )
                 return -1;
+#endif
 
         if ( config.dry_run )
                 return 0;

@@ -33,7 +33,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <assert.h>
-#include <sys/uio.h>
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -438,7 +437,9 @@ static int file_metadata_open(monitor_fd_t *monitor)
                 return -1;
         }
 
+#ifndef WIN32
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+#endif
 
         monitor->metadata_fd = fdopen(fd, "r+");
         if ( ! monitor->metadata_fd ) {
@@ -651,7 +652,9 @@ static int monitor_open(monitor_fd_t *monitor)
                         return -1;
 
                 fd = fileno(monitor->fd);
+#ifndef WIN32
                 fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+#endif
 
                 ret = monitor_set_position(monitor, filename, fd);
                 if ( ret < 0 )
