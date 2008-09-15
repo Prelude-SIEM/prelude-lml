@@ -410,7 +410,7 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 
         new->regex = pcre_compile(regex, 0, &err_ptr, &err_offset, NULL);
         if ( ! new->regex ) {
-                prelude_log(PRELUDE_LOG_WARN, "unable to compile regex: %s.\n", err_ptr);
+                prelude_log(PRELUDE_LOG_WARN, "unable to compile regex[offset:%d]: %s.\n", err_offset, err_ptr);
                 free(new);
                 return NULL;
         }
