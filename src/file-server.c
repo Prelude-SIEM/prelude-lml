@@ -109,14 +109,14 @@ typedef struct {
         FILE *metadata_fd;
         prelude_bool_t need_position;
 
-        off_t last_rotation_size;
+        uint64_t last_rotation_size;
         time_t last_rotation_time;
         time_t last_rotation_time_interval;
 
         prelude_string_t *buf;
 
-        off_t need_more_read;
-        off_t last_size;
+        uint64_t need_more_read;
+        uint64_t last_size;
 
         time_t last_mtime;
 
@@ -288,7 +288,7 @@ static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st)
 
 
 
-static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumline, size_t size)
+static int file_metadata_read(monitor_fd_t *monitor, uint64_t *start, char **sumline, size_t size)
 {
         int line = 0, ret;
         char *offptr, *buf;
@@ -325,7 +325,7 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, char **sumlin
 
 
 
-static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
+static int file_metadata_save(monitor_fd_t *monitor, uint64_t offset)
 {
         int len, ret;
         char buf[METADATA_MAXSIZE];
@@ -358,7 +358,7 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 
 static int file_metadata_get_position(monitor_fd_t *monitor)
 {
-        off_t offset;
+        uint64_t offset;
         struct stat st;
         const char *filename;
         int ret, have_metadata = 0;
