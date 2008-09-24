@@ -1,6 +1,6 @@
 SUBDIRS = include
 
-AM_CPPFLAGS = -I$(srcdir)/include/ -I$(top_srcdir)/libmissing @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@ @FAM_CFLAGS@
+AM_CPPFLAGS = -I$(srcdir)/include/ -I$(top_srcdir)/libmissing -I$(top_builddir)/libmissing @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@ @FAM_CFLAGS@
 AM_CFLAGS = @GLOBAL_CFLAGS@
 
 bin_PROGRAMS = prelude-lml

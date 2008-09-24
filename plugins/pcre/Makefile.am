@@ -1,6 +1,6 @@
 SUBDIRS = ruleset
 
-AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmissing @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@
+AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src/include -I$(top_srcdir)/libmissing -I$(top_builddir)/libmissing @LIBPRELUDE_CFLAGS@ @PCRE_CFLAGS@
 AM_CFLAGS = @GLOBAL_CFLAGS@
 
 noinst_HEADERS = pcre-mod.h rule-object.h rule-regex.h value-container.h
