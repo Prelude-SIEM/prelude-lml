@@ -437,7 +437,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
                 return -1;
         }
 
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 #endif
 
@@ -652,7 +652,7 @@ static int monitor_open(monitor_fd_t *monitor)
                         return -1;
 
                 fd = fileno(monitor->fd);
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
                 fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 #endif
 

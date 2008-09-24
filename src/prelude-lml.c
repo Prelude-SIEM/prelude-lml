@@ -113,7 +113,7 @@ static void server_close(void)
 }
 
 
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
 static void handle_sigquit(void)
 {
         struct timeval end;
@@ -172,7 +172,7 @@ void _lml_handle_signal_if_needed(void)
         signo = got_signal;
         got_signal = 0;
 
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         if ( signo == SIGQUIT || signo == SIGUSR1 ) {
                 handle_sigquit();
                 return;
@@ -186,7 +186,7 @@ void _lml_handle_signal_if_needed(void)
 
         prelude_deinit();
 
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         if ( signo == SIGHUP ) {
                 prelude_log(PRELUDE_LOG_WARN, "signal %d received, restarting (%s).\n", signo, get_restart_string());
                 handle_sighup();
@@ -324,7 +324,7 @@ int main(int argc, char **argv)
         /*
          * make sure we ignore sighup until acceptable.
          */
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         action.sa_flags = 0;
         action.sa_handler = SIG_IGN;
         sigemptyset(&action.sa_mask);
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
         sigaction(SIGTERM, &action, NULL);
         sigaction(SIGINT, &action, NULL);
         sigaction(SIGABRT, &action, NULL);
-#ifndef WIN32
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         sigaction(SIGUSR1, &action, NULL);
         sigaction(SIGQUIT, &action, NULL);
         sigaction(SIGHUP, &action, NULL);
