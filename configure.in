@@ -199,5 +199,4 @@ AC_OUTPUT
 
 echo
 echo "*** Dumping configuration ***"
-echo "    - Enable FAM support                  : $with_fam"
 echo "    - Enable unsupported rulesets:        : $enable_unsupported_rulesets"
