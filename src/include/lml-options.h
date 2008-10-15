@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -41,10 +41,11 @@ typedef struct {
         prelude_bool_t dry_run;
         prelude_bool_t ignore_metadata;
         prelude_bool_t no_resolve;
+        prelude_bool_t daemon_mode;
 
         size_t udp_nserver;
         udp_server_t **udp_server;
-        
+
         prelude_io_t *text_output_fd;
         unsigned long alert_count;
         unsigned long line_processed;

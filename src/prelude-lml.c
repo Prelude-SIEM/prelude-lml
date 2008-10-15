@@ -48,9 +48,12 @@
 # endif
 #endif
 
+#include "ev.h"
+
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
 #include <libprelude/prelude-timer.h>
+#include <libprelude/daemonize.h>
 
 #include "config.h"
 
@@ -83,6 +86,7 @@ extern lml_config_t config;
 static char **global_argv;
 static prelude_option_t *lml_root_optlist;
 static volatile sig_atomic_t got_signal = 0;
+static ev_async ev_interrupt;
 
 
 
@@ -97,10 +101,10 @@ static void print_stats(const char *prefix, struct timeval *end)
 }
 
 
-
 static RETSIGTYPE sig_handler(int signum)
 {
         got_signal = signum;
+        ev_async_send(EV_DEFAULT_ &ev_interrupt);
 }
 
 
@@ -198,15 +202,29 @@ void _lml_handle_signal_if_needed(void)
 }
 
 
+static void libev_timer_cb(struct ev_timer *w, int revents)
+{
+        prelude_timer_wake_up();
+}
+
+
+static void libev_udp_cb(struct ev_io *w, int revents)
+{
+        udp_server_process_event(w->data);
+}
+
+
+static void libev_interrupt_cb(EV_P_ ev_async *w, int revents)
+{
+        _lml_handle_signal_if_needed();
+}
+
 
 static void regex_match_cb(void *plugin, void *data)
 {
         struct regex_data *rdata = data;
-
         log_plugin_run(plugin, rdata->log_source, rdata->log_entry);
 }
-
-
 
 
 
@@ -242,75 +260,25 @@ void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
 }
 
 
-
 static void wait_for_event(void)
 {
-        int ret;
         size_t i;
-        fd_set fds;
-        struct timeval tv, lstart, end;
-        int file_event_fd, udp_event_fd, max = 0;
+        int udp_event_fd;
+        ev_io events[config.udp_nserver];
 
-        FD_ZERO(&fds);
-
-        file_event_fd = file_server_get_event_fd();
-        if ( file_event_fd >= 0 ) {
-                max = file_event_fd;
-                FD_SET(file_event_fd, &fds);
-        }
+        ev_async_init(&ev_interrupt, libev_interrupt_cb);
+        ev_async_start(&ev_interrupt);
 
         for ( i = 0; i < config.udp_nserver; i++ ) {
                 udp_event_fd = udp_server_get_event_fd(config.udp_server[i]);
 
-                FD_SET(udp_event_fd, &fds);
-                max = MAX(max, udp_event_fd);
+                ev_io_init(&events[i], libev_udp_cb, udp_event_fd, EV_READ);
+                events[i].data = config.udp_server[i];
+
+                ev_io_start(&events[i]);
         }
 
-        gettimeofday(&start, NULL);
-        gettimeofday(&lstart, NULL);
-
-        while ( 1 ) {
-                _lml_handle_signal_if_needed();
-
-                tv.tv_sec = 1;
-                tv.tv_usec = 0;
-
-                ret = select(max + 1, &fds, NULL, NULL, &tv);
-                if ( ret < 0 ) {
-                        if ( errno == EINTR )
-                                continue;
-
-                        prelude_log(PRELUDE_LOG_ERR, "select returned an error: %s.\n", strerror(errno));
-                        break;
-                }
-
-                gettimeofday(&end, NULL);
-
-                if ( ret == 0 || end.tv_sec - lstart.tv_sec >= 1 ) {
-                        gettimeofday(&lstart, NULL);
-                        prelude_timer_wake_up();
-
-                        if ( file_event_fd < 0 )
-                                file_server_wake_up();
-                }
-
-                for ( i = 0; i < config.udp_nserver; i++ ) {
-                        udp_event_fd = udp_server_get_event_fd(config.udp_server[i]);
-
-                        if ( FD_ISSET(udp_event_fd, &fds) )
-                                udp_server_process_event(config.udp_server[i]);
-                        else
-                                FD_SET(udp_event_fd, &fds);
-                }
-
-                if ( file_event_fd < 0 )
-                        continue;
-
-                if ( FD_ISSET(file_event_fd, &fds) )
-                        file_server_wake_up();
-                else
-                        FD_SET(file_event_fd, &fds);
-        }
+        ev_loop(0);
 }
 
 
@@ -318,8 +286,14 @@ static void wait_for_event(void)
 int main(int argc, char **argv)
 {
         int ret;
+        ev_timer evt;
         struct timeval end;
         struct sigaction action;
+
+        /*
+         * Initialize libev.
+         */
+        ev_default_loop(EVFLAG_AUTO);
 
         /*
          * make sure we ignore sighup until acceptable.
@@ -373,29 +347,42 @@ int main(int argc, char **argv)
         sigaction(SIGHUP, &action, NULL);
 #endif
 
-        file_server_start_monitoring();
+        ret = file_server_start_monitoring();
+        if ( ret < 0 && ! config.udp_nserver ) {
+                prelude_log(PRELUDE_LOG_WARN, "No file or UDP server available for monitoring: terminating.\n");
+                return -1;
+        }
+
+        if ( config.daemon_mode ) {
+                prelude_daemonize(config.pidfile);
+                if ( config.pidfile )
+                        free(config.pidfile);
+
+                ev_default_fork();
+        }
+
+        ev_timer_init(&evt, libev_timer_cb, 1, 1);
+        ev_timer_start(&evt);
+
+        /*
+         * Whether we are using batch-mode or file notification, we need
+         * to process the currently un-processed entry.
+         */
+        gettimeofday(&start, NULL);
+
+        do {
+                ret = file_server_read_once();
+                prelude_timer_wake_up();
+        } while ( ret > 0 );
 
         /*
          * if either FAM or UDP server is enabled, we use polling to know
          * if there are data available for reading. if batch_mode is set,
          * then we revert to reading every data at once.
          */
-        if ( (config.udp_nserver || file_server_get_event_fd() > 0) && ! config.batch_mode )
+        if ( ! config.batch_mode )
                 wait_for_event();
         else {
-                gettimeofday(&start, NULL);
-
-                do {
-                        _lml_handle_signal_if_needed();
-                        ret = file_server_wake_up();
-
-                        if ( ! config.batch_mode )
-                                sleep(1);
-
-                        prelude_timer_wake_up();
-
-                } while ( ! config.batch_mode || ret > 0 );
-
                 gettimeofday(&end, NULL);
 
                 /*

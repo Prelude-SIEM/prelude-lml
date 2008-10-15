@@ -30,18 +30,13 @@ typedef enum {
 } file_server_metadata_flags_t;
 
 
-
-int file_server_get_event_fd(void);
-
-void file_server_set_batch_mode(void);
-
 void file_server_set_metadata_flags(file_server_metadata_flags_t flags);
 
-int file_server_wake_up(void);
+int file_server_read_once(void);
 
 int file_server_monitor_file(lml_log_source_t *ls);
 
-void file_server_start_monitoring(void);
+int file_server_start_monitoring(void);
 
 unsigned int file_server_get_max_rotation_time_offset(void);
 

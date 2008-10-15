@@ -131,48 +131,17 @@ AM_CONDITIONAL(ENABLE_UNSUPPORTED_RULESETS, test x$enable_unsupported_rulesets =
 
 
 
-dnl **************************************************
-dnl * Check for FAM.                                 *
-dnl **************************************************
+dnl ********************************************************
+dnl * Configure embedded libev                             *
+dnl ********************************************************
 
-AC_ARG_WITH(fam, AC_HELP_STRING(--with-fam@<:@=PATH@:>@, Path where FAM is installed @<:@default=auto@:>@),
-            fam_required=true, with_fam=yes)
+AC_DEFINE_UNQUOTED(EV_PERIODIC_ENABLE, 0, Disable unused libev periodic timers)
+AC_DEFINE_UNQUOTED(EV_IDLE_ENABLE, 0, Disable unused libev idle watchers)
+AC_DEFINE_UNQUOTED(EV_FORK_ENABLE, 0, Disable unused libev fork watchers)
+AC_DEFINE_UNQUOTED(EV_EMBED_ENABLE, 0, Disable unused libev embed watchers)
+AC_DEFINE_UNQUOTED(EV_MULTIPLICITY, 0, Disable support for multiple libev event loop)
 
-if test x$with_fam != xno; then
-   old_LIBS=$LIBS
-   old_LDFLAGS=$LDFLAGS
-   old_CPPFLAGS=$CPPFLAGS
-
-   if test x$with_fam != xyes; then
-      FAM_LIBS="-L$with_fam/lib"
-      FAM_CFLAGS="-I$with_fam/include"
-      LDFLAGS="$LDFLAGS -L$with_fam/lib"
-      CPPFLAGS="$CPPFLAGS -I$with_fam/include"
-   fi
-
-   AC_CHECK_HEADER(fam.h, , fam_header_ok="no")
-   AC_CHECK_LIB(fam, FAMOpen, , fam_lib_ok="no")
-
-   LIBS="$old_LIBS"
-   LDFLAGS="$old_LDFLAGS"
-   CPPFLAGS="$old_CPPFLAGS"
-
-   if test "$fam_header_ok" = "no" -o "$fam_lib_ok" = "no"; then
-        FAM_LIBS=""
-        FAM_CFLAGS=""
-        FAM_LDFLAGS=""
-        with_fam=no;
-   else
-        with_fam=yes;
-        FAM_LIBS="-lfam"
-        AC_DEFINE(HAVE_FAM, , Tell whether FAM support should be compiled in)
-   fi
-fi
-
-AC_SUBST(FAM_LIBS)
-AC_SUBST(FAM_CFLAGS)
-AC_SUBST(FAM_LDFLAGS)
-AM_CONDITIONAL(HAVE_FAM, test x$with_fam = xyes)
+m4_include([libev/libev.m4])
 
 
 dnl **************************************************
@@ -208,6 +177,7 @@ prelude-lml.conf
 plugins.rules
 
 Makefile
+libev/Makefile
 libmissing/Makefile
 libmissing/tests/Makefile
 

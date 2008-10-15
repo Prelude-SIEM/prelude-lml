@@ -57,7 +57,6 @@
 
 
 lml_config_t config;
-static prelude_bool_t have_file = FALSE;
 static const char *config_file = PRELUDE_LML_CONF;
 
 
@@ -122,7 +121,6 @@ static int print_help(prelude_option_t *opt, const char *optarg, prelude_string_
 static int set_batch_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         config.batch_mode = TRUE;
-        file_server_set_batch_mode();
         return 0;
 }
 
@@ -247,12 +245,9 @@ static int set_debug_mode(prelude_option_t *opt, const char *optarg, prelude_str
 
 static int set_daemon_mode(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
-        prelude_daemonize(config.pidfile);
-        if ( config.pidfile )
-                free(config.pidfile);
-
         prelude_log_set_flags(prelude_log_get_flags()|PRELUDE_LOG_FLAGS_QUIET|PRELUDE_LOG_FLAGS_SYSLOG);
 
+        config.daemon_mode = TRUE;
         return 0;
 }
 
@@ -316,48 +311,45 @@ static int set_text_output(prelude_option_t *opt, const char *arg, prelude_strin
 }
 
 
-static int check_file_access(const char *filename)
-{
-        int ret;
-        struct stat st;
-
-        ret = stat(filename, &st);
-        if ( ret < 0 ) {
-                if ( errno == ENOENT )
-                        prelude_log(PRELUDE_LOG_WARN, "%s does not exist.\n", filename);
-
-                else if ( errno == EACCES )
-                        goto out;
-
-                else prelude_log(PRELUDE_LOG_WARN, "could not stat %s: %s.\n", filename, strerror(errno));
-
-                return -1;
-        }
-
-        if ( config.wanted_uid == 0 )
-                return 0;
-
-        if ( st.st_uid == config.wanted_uid && st.st_mode & S_IRUSR )
-                return 0;
-
-        if ( st.st_gid == config.wanted_gid && st.st_mode & S_IRGRP )
-                return 0;
-
-        if ( st.st_mode & S_IROTH )
-                return 0;
-
- out:
-        prelude_log(PRELUDE_LOG_WARN, "%s is not available for reading to uid %d/gid %d.\n",
-                    filename, config.wanted_uid, config.wanted_gid);
-
-        return -1;
-}
-
-
 static int glob_errfunc_cb(const char *epath, int eerrno)
 {
         prelude_log(PRELUDE_LOG_WARN, "error with '%s': %s.\n", epath, strerror(eerrno));
         return 0;
+}
+
+
+static prelude_bool_t isglob(const char *pattern)
+{
+        int i;
+        const char *ptr;
+        char chlist[] = { '*', '?', '[', '~' };
+
+        for ( i = 0; i < sizeof(chlist) / sizeof(*chlist); i++ ) {
+                ptr = strchr(pattern, chlist[i]);
+                if ( ! ptr )
+                        continue;
+
+                if ( ptr == pattern || *(ptr - 1) != '\\' )
+                        return TRUE;
+        }
+
+        return FALSE;
+}
+
+
+static int add_file(void *context, const char *filename)
+{
+        int ret;
+        lml_log_source_t *ls;
+
+        ret = lml_log_source_new(&ls, context, filename);
+        if ( ret < 0 )
+                return -1;
+
+        else if ( ret == 1 )
+                return 0;
+
+        return file_server_monitor_file(ls);
 }
 
 
@@ -366,31 +358,21 @@ static int get_file_from_pattern(void *context, const char *pattern)
         int ret;
         size_t i;
         glob_t gl;
-        lml_log_source_t *ls;
 
-        ret = glob(pattern, GLOB_NOCHECK | GLOB_TILDE, glob_errfunc_cb, &gl);
+        ret = glob(pattern, GLOB_TILDE, glob_errfunc_cb, &gl);
         if ( ret != 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "glob failed: %s.\n", strerror(errno));
+                if ( ret == GLOB_NOMATCH )
+                        prelude_log(PRELUDE_LOG_WARN, "%s: not found, no monitoring will occur.\n", pattern);
+                else
+                        prelude_log(PRELUDE_LOG_ERR, "%s glob failed: %s.\n", pattern, strerror(errno));
+
                 return ret;
         }
 
         for ( i = 0; i < gl.gl_pathc; i++ ) {
-                ret = check_file_access(gl.gl_pathv[i]);
-                if ( ret < 0 )
-                        continue; /* ignore error */
-
-                ret = lml_log_source_new(&ls, context, gl.gl_pathv[i]);
+                ret = add_file(context, gl.gl_pathv[i]);
                 if ( ret < 0 )
                         break;
-
-                else if ( ret == 1 )
-                        continue;
-
-                ret = file_server_monitor_file(ls);
-                if ( ret < 0 )
-                        break;
-
-                have_file = TRUE;
         }
 
         globfree(&gl);
@@ -399,28 +381,21 @@ static int get_file_from_pattern(void *context, const char *pattern)
 }
 
 
+
 static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         int ret;
-        lml_log_source_t *ls;
 
-        if ( *arg != '-' ) {
+        if ( strcmp(arg, "-") == 0 )
+                return add_file(context, arg);
+
+        else if ( ! isglob(arg) )
+                return add_file(context, arg);
+
+        else {
                 ret = get_file_from_pattern(context, arg);
                 if ( ret < 0 )
                         return 0; /* ignore error */
-        } else {
-                ret = lml_log_source_new(&ls, context, arg);
-                if ( ret < 0 )
-                        return prelude_error_from_errno(errno);
-
-                if ( ret == 1 )
-                        return 0;
-
-                ret = file_server_monitor_file(ls);
-                if ( ret < 0 )
-                        return ret;
-
-                have_file = TRUE;
         }
 
         return 0;
@@ -709,10 +684,6 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                 return -1;
         }
 
-        if ( ! have_file && ! config.udp_nserver ) {
-                prelude_log(PRELUDE_LOG_WARN, "No file or UDP server available for monitoring: terminating.\n");
-                return -1;
-        }
 
 #if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         ret = drop_privilege();

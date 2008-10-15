@@ -1,7 +1,7 @@
 DISTCHECK_CONFIGURE_FLAGS = --enable-unsupported-rulesets
 
 ACLOCAL_AMFLAGS = -I m4 -I libmissing/m4
-SUBDIRS = libmissing plugins src tests
+SUBDIRS = libev libmissing plugins src tests
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \

@@ -140,8 +140,8 @@ static int regex_create_entry(regex_list_t *list, regex_table_item_t *rt, const 
         }
 
         plugin = prelude_plugin_instance_get_plugin(entry->plugin);
-        prelude_log(PRELUDE_LOG_INFO, "Monitoring %s through %s[%s]\n",
-                    source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
+        prelude_log_debug(1, "Will route %s data through %s[%s]\n",
+                          source, plugin->name, prelude_plugin_instance_get_name(entry->plugin));
 
         prelude_log(PRELUDE_LOG_DEBUG, "[REGEX] rule found: plugin: %s - pattern: %s\n", rt->plugin, rt->regex);
 
