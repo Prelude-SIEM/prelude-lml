@@ -126,7 +126,7 @@ typedef struct {
 
 
 static void libev_stat_cb(ev_stat *st, int revents);
-static int check_logfile_data(monitor_fd_t *monitor, struct stat *st);
+static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st);
 void _lml_handle_signal_if_needed(void);
 
 extern lml_config_t config;
@@ -140,7 +140,7 @@ static file_server_metadata_flags_t metadata_flags = FILE_SERVER_METADATA_FLAGS_
 
 
 
-static int stat_to_file(monitor_fd_t *fd, struct stat *st, idmef_target_t *target, idmef_file_category_t category)
+static int stat_to_file(monitor_fd_t *fd, ev_statdata *st, idmef_target_t *target, idmef_file_category_t category)
 {
         int ret;
         idmef_time_t *time;
@@ -191,7 +191,7 @@ static int stat_to_file(monitor_fd_t *fd, struct stat *st, idmef_target_t *targe
 }
 
 
-static void logfile_alert(monitor_fd_t *fd, struct stat *st_old, struct stat *st_new,
+static void logfile_alert(monitor_fd_t *fd, ev_statdata *st_old, ev_statdata *st_new,
                           idmef_classification_t *classification, idmef_impact_t *impact)
 {
         int ret;
@@ -244,7 +244,7 @@ static void logfile_alert(monitor_fd_t *fd, struct stat *st_old, struct stat *st
 
 
 
-static void logfile_modified_alert(monitor_fd_t *monitor, struct stat *st_old, struct stat *st_new)
+static void logfile_modified_alert(monitor_fd_t *monitor, ev_statdata *st_old, ev_statdata *st_new)
 {
         int ret;
         prelude_string_t *str;
@@ -501,7 +501,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t available)
 
 
 
-static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
+static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
 {
         off_t len, ret;
         int eventno = 0;
@@ -630,9 +630,11 @@ static int monitor_open(monitor_fd_t *monitor)
                         if ( errno == ENOENT && monitor->prev_errno != errno )
                                 prelude_log(PRELUDE_LOG_WARN, "%s does not exist.\n", filename);
 
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
                         else if ( errno == EACCES && monitor->prev_errno != errno )
                                 prelude_log(PRELUDE_LOG_WARN, "%s is not available for reading to uid %d/gid %d.\n",
                                             filename, getuid(), getgid());
+#endif
 
                         monitor->prev_errno = errno;
                         return -1;
@@ -687,7 +689,7 @@ static void monitor_close(monitor_fd_t *monitor)
  * cause heavy performance problem. The best solution may be to centralize
  * the logging on a remote host.
  */
-static void check_modification_time(monitor_fd_t *monitor, struct stat *prev, struct stat *st)
+static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, ev_statdata *st)
 {
         int ret;
 
@@ -714,7 +716,7 @@ static void check_modification_time(monitor_fd_t *monitor, struct stat *prev, st
 }
 
 
-static int get_rotation_size_offset(monitor_fd_t *monitor, struct stat *st)
+static int get_rotation_size_offset(monitor_fd_t *monitor, ev_statdata *st)
 {
         off_t diff;
         int prev = 0;
@@ -731,7 +733,7 @@ static int get_rotation_size_offset(monitor_fd_t *monitor, struct stat *st)
 }
 
 
-static int get_rotation_time_offset(monitor_fd_t *monitor, struct stat *st)
+static int get_rotation_time_offset(monitor_fd_t *monitor, ev_statdata *st)
 {
         int prev = 0;
         time_t interval, now, offset;
@@ -754,7 +756,7 @@ static int get_rotation_time_offset(monitor_fd_t *monitor, struct stat *st)
 
 
 
-static int is_file_already_used(monitor_fd_t *monitor, struct stat *st_old, struct stat *st_new)
+static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_statdata *st_new)
 {
         int ret;
         char buf[1024];
