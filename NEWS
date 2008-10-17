@@ -1,3 +1,26 @@
+* 2008-10-17, prelude-lml-0.9.14:
+
+- Fix log file permission error, that could happen thought the user 
+  Prelude-LML was running as could access the file (#291).
+
+- ModSecurity ruleset update, by Dan Kopecek <dkopecek@redhat.com>:
+  provides much more descriptive classification.text, add regexps for
+  [file ..], [line ...], [tag ...] fields and fine tune targets/types
+  (#321).
+
+- Deprecate Gamin/FAM support in favor of libev: the previous implementation 
+  had problem on SELinux enabled system due to Gamin server startup being 
+  triggered by other program, and thus using improper role for Prelude-LML.
+  (#326).
+
+- Improved polling architecture by using Operating System specific backend 
+  when possible.
+
+- We now monitor files that are not immediately available for reading on 
+  startup: once the file can be monitored, libev provide us with a notification. 
+
+
+
 * 2008-08-21, prelude-lml-0.9.13:
 
 - ModSecurity ruleset rewrite, by Peter Vrabec <pvrabec@redhat.com> and
