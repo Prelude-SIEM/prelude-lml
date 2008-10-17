@@ -41,7 +41,6 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='libmissing'
-  gl_EOVERFLOW
 changequote(,)dnl
 LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 changequote([, ])dnl
@@ -49,14 +48,29 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_ALLOCA
   gl_HEADER_ARPA_INET
   AC_PROG_MKDIR_P
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([winsock])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([bind])
+  gl_FUNC_CLOSE
+  gl_UNISTD_MODULE_INDICATOR([close])
   gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
   gl_FUNC_DIRFD
+  gl_HEADER_ERRNO_H
+  gl_FUNC_FCLOSE
+  gl_STDIO_MODULE_INDICATOR([fclose])
   gl_FLOAT_H
   # No macro. You should also use one of fnmatch-posix or fnmatch-gnu.
   gl_FUNC_FNMATCH_GNU
   gl_GETADDRINFO
   gl_GETLOGIN_R
   gl_UNISTD_MODULE_INDICATOR([getlogin_r])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([winsock])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([getpeername])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_GLOB
@@ -72,6 +86,11 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_PATHMAX
   AC_REPLACE_FUNCS(raise)
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([winsock])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([recvfrom])
   gl_SIGACTION
   gl_SIGNAL_MODULE_INDICATOR([sigaction])
   gl_SIGNAL_H
@@ -82,6 +101,11 @@ AC_SUBST([LTALLOCA])
   gl_UNISTD_MODULE_INDICATOR([sleep])
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    AC_LIBOBJ([winsock])
+  fi
+  gl_SYS_SOCKET_MODULE_INDICATOR([socket])
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
   gl_STDINT_H
@@ -100,6 +124,7 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_SELECT
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_SOCKET
+  gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -250,9 +275,12 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/alloca.in.h
   lib/arpa_inet.in.h
   lib/asnprintf.c
+  lib/close.c
   lib/dirfd.c
   lib/dirfd.h
   lib/dummy.c
+  lib/errno.in.h
+  lib/fclose.c
   lib/float+.h
   lib/float.in.h
   lib/fnmatch.c
@@ -287,6 +315,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/snprintf.c
   lib/stdbool.in.h
   lib/stdint.in.h
+  lib/stdio-write.c
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/strcasecmp.c
@@ -308,13 +337,16 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.h
   lib/wchar.in.h
   lib/wctype.in.h
+  lib/winsock.c
   lib/xsize.h
   m4/alloca.m4
   m4/arpa_inet_h.m4
+  m4/close.m4
   m4/d-type.m4
   m4/dirfd.m4
-  m4/eoverflow.m4
+  m4/errno_h.m4
   m4/extensions.m4
+  m4/fclose.m4
   m4/float_h.m4
   m4/fnmatch.m4
   m4/getaddrinfo.m4
@@ -355,6 +387,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/strpbrk.m4
   m4/strptime.m4
   m4/strsep.m4
+  m4/sys_ioctl_h.m4
   m4/sys_select_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
@@ -369,9 +402,9 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wctype.m4
   m4/wint_t.m4
   m4/xsize.m4
-  tests/test-EOVERFLOW.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
+  tests/test-errno.c
   tests/test-getaddrinfo.c
   tests/test-netinet_in.c
   tests/test-sigaction.c

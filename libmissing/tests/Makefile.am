@@ -42,14 +42,6 @@ libtests_a_DEPENDENCIES = $(gltests_LIBOBJS)
 EXTRA_libtests_a_SOURCES =
 AM_LIBTOOLFLAGS = --preserve-dup-deps
 
-## begin gnulib module EOVERFLOW-tests
-
-TESTS += test-EOVERFLOW
-check_PROGRAMS += test-EOVERFLOW
-EXTRA_DIST += test-EOVERFLOW.c
-
-## end   gnulib module EOVERFLOW-tests
-
 ## begin gnulib module alloca-opt-tests
 
 TESTS += test-alloca-opt
@@ -67,6 +59,15 @@ check_PROGRAMS += test-arpa_inet
 EXTRA_DIST += test-arpa_inet.c
 
 ## end   gnulib module arpa_inet-tests
+
+## begin gnulib module errno-tests
+
+TESTS += test-errno
+check_PROGRAMS += test-errno
+
+EXTRA_DIST += test-errno.c
+
+## end   gnulib module errno-tests
 
 ## begin gnulib module getaddrinfo-tests
 

@@ -44,10 +44,10 @@
 #endif
 
 #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
-# define USE_WIN32
+# define WINDOWS32
 #endif
 
-#ifndef USE_WIN32
+#ifndef WINDOWS32
 # include <pwd.h>
 #endif
 
@@ -87,7 +87,7 @@
 
 /* If the system has the `struct dirent64' type we use it internally.  */
 #if defined _LIBC && !defined COMPILE_GLOB64
-# if (defined POSIX || defined USE_WIN32) && !defined __GNU_LIBRARY__
+# if (defined POSIX || defined WINDOWS32) && !defined __GNU_LIBRARY__
 #  define CONVERT_D_INO(d64, d32)
 # else
 #  define CONVERT_D_INO(d64, d32) \
@@ -108,7 +108,7 @@
 #endif
 
 
-#if (defined POSIX || defined USE_WIN32) && !defined __GNU_LIBRARY__
+#if (defined POSIX || defined WINDOWS32) && !defined __GNU_LIBRARY__
 /* Posix does not require that the d_ino field be present, and some
    systems do not provide it. */
 # define REAL_DIR_ENTRY(dp) 1
@@ -429,14 +429,14 @@ glob (pattern, flags, errfunc, pglob)
 
   /* Find the filename.  */
   filename = strrchr (pattern, '/');
-#if defined __MSDOS__ || defined USE_WIN32
+#if defined __MSDOS__ || defined WINDOWS32
   /* The case of "d:pattern".  Since `:' is not allowed in
      file names, we can safely assume that wherever it
      happens in pattern, it signals the filename part.  This
      is so we could some day support patterns like "[a-z]:foo".  */
   if (filename == NULL)
     filename = strchr (pattern, ':');
-#endif /* __MSDOS__ || USE_WIN32 */
+#endif /* __MSDOS__ || WINDOWS32 */
   dirname_modified = 0;
   if (filename == NULL)
     {
@@ -476,7 +476,7 @@ glob (pattern, flags, errfunc, pglob)
     {
       char *newp;
       dirlen = filename - pattern;
-#if defined __MSDOS__ || defined USE_WIN32
+#if defined __MSDOS__ || defined WINDOWS32
       if (*filename == ':'
 	  || (filename > pattern + 1 && filename[-1] == ':'))
 	{
@@ -500,7 +500,7 @@ glob (pattern, flags, errfunc, pglob)
       ++filename;
 
       if (filename[0] == '\0'
-#if defined __MSDOS__ || defined USE_WIN32
+#if defined __MSDOS__ || defined WINDOWS32
           && dirname[dirlen - 1] != ':'
 	  && (dirlen < 3 || dirname[dirlen - 2] != ':'
 	      || dirname[dirlen - 1] != '/')
@@ -566,27 +566,31 @@ glob (pattern, flags, errfunc, pglob)
 	{
 	  /* Look up home directory.  */
 	  const char *home_dir = getenv ("HOME");
-#ifdef USE_WIN32
-          char win_homedir[PATH_MAX];
-#endif
-
 # ifdef _AMIGA
 	  if (home_dir == NULL || home_dir[0] == '\0')
 	    home_dir = "SYS:";
 # else
-#  ifdef USE_WIN32
-	  if (home_dir == NULL || home_dir[0] == '\0') {
-            char  *hdrv, *hpath;
-            hdrv = getenv("HOMEDRIVE");
-            hpath = getenv("HOMEPATH");
-            if ( hdrv && hpath ) { 
-              snprintf(win_homedir, sizeof(win_homedir), "%s%s", hdrv, hpath);
-              home_dir = win_homedir;
-            }
-                  
-            else
-              home_dir = "c:/users/default"; /* poor default */
-          }
+#  ifdef WINDOWS32
+	  /* Windows NT defines HOMEDRIVE and HOMEPATH.  But give preference
+	     to HOME, because the user can change HOME.  */
+	  if (home_dir == NULL || home_dir[0] == '\0')
+	    {
+	      const char *home_drive = getenv ("HOMEDRIVE");
+	      const char *home_path = getenv ("HOMEPATH");
+
+	      if (home_drive != NULL && home_path != NULL)
+		{
+		  size_t home_drive_len = strlen (home_drive);
+		  size_t home_path_len = strlen (home_path);
+		  char *mem = alloca (home_drive_len + home_path_len + 1);
+
+		  memcpy (mem, home_drive, home_drive_len);
+		  memcpy (mem + home_drive_len, home_path, home_path_len + 1);
+		  home_dir = mem;
+		}
+	      else
+		home_dir = "c:/users/default"; /* poor default */
+	    }
 #  else
 	  if (home_dir == NULL || home_dir[0] == '\0')
 	    {
@@ -649,7 +653,7 @@ glob (pattern, flags, errfunc, pglob)
 	      else
 		home_dir = "~"; /* No luck.  */
 	    }
-#  endif /* USE_WIN32 */
+#  endif /* WINDOWS32 */
 # endif
 	  /* Now construct the full directory.  */
 	  if (dirname[1] == '\0')
@@ -669,7 +673,7 @@ glob (pattern, flags, errfunc, pglob)
 	    }
 	  dirname_modified = 1;
 	}
-# if !defined _AMIGA && !defined USE_WIN32
+# if !defined _AMIGA && !defined WINDOWS32
       else
 	{
 	  char *end_name = strchr (dirname, '/');
@@ -785,7 +789,7 @@ glob (pattern, flags, errfunc, pglob)
 		 home directory.  */
 	      return GLOB_NOMATCH;
 	}
-# endif	/* Not Amiga && not USE_WIN32.  */
+# endif	/* Not Amiga && not WINDOWS32.  */
     }
 
   /* Now test whether we looked for "~" or "~NAME".  In this case we
@@ -1133,7 +1137,7 @@ prefix_array (const char *dirname, char **array, size_t n)
 {
   register size_t i;
   size_t dirlen = strlen (dirname);
-#if defined __MSDOS__ || defined USE_WIN32
+#if defined __MSDOS__ || defined WINDOWS32
   int sep_char = '/';
 # define DIRSEP_CHAR sep_char
 #else
@@ -1144,7 +1148,7 @@ prefix_array (const char *dirname, char **array, size_t n)
     /* DIRNAME is just "/", so normal prepending would get us "//foo".
        We want "/foo" instead, so don't prepend any chars from DIRNAME.  */
     dirlen = 0;
-#if defined __MSDOS__ || defined USE_WIN32
+#if defined __MSDOS__ || defined WINDOWS32
   else if (dirlen > 1)
     {
       if (dirname[dirlen - 1] == '/' && dirname[dirlen - 2] == ':')
