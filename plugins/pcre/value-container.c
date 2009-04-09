@@ -117,7 +117,7 @@ static int parse_value(value_container_t *vcont, const char *line)
                         i = 0;
                         str++;
 
-                        while ( isdigit((int) *str) && i < sizeof(num) )
+                        while ( isdigit((int) *str) && i < (sizeof(num) - 1) )
                                 num[i++] = *str++;
 
                         if ( ! i )
