@@ -88,7 +88,7 @@ static idmef_value_t *build_message_object_value(pcre_rule_t *rule, rule_object_
         str = idmef_path_get_name(rule_object->object, idmef_path_get_depth(rule_object->object) - 1);
 
         ret = strcmp(str, "port");
-        if ( ret != 0 || (ret == 0 && isdigit((int) *valstr)) )
+        if ( ret != 0 || isdigit((int) *valstr) )
                 ret = idmef_value_new_from_path(&value, rule_object->object, valstr);
 
         else {
