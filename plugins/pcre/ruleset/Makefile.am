@@ -39,6 +39,7 @@ ruleset_DATA = \
 	pcre.rules		\
 	portsentry.rules	\
 	postfix.rules		\
+	ppp.rules		\
 	proftpd.rules		\
 	qpopper.rules		\
 	rishi.rules		\
