@@ -54,7 +54,7 @@
 
 struct rule_regex {
         PRELUDE_LINKED_OBJECT;
-        
+
         pcre *regex;
         pcre_extra *extra;
         char *regex_string;
@@ -79,21 +79,21 @@ static int do_pcre_exec(rule_regex_t *item, int *real_ret,
                         const char *subject, int length, int *ovector, int ovecsize)
 {
         int cnt = 0, i;
-        
+
         *real_ret = pcre_exec(item->regex, item->extra, subject, length, 0, 0, ovector, ovecsize);
-        
+
         prelude_log_debug(5, "match %s ret %d\n", item->regex_string, *real_ret);
-        
+
         if ( *real_ret <= 0 && ! item->optreg )
                 return *real_ret;
-        
+
         pcre_fullinfo(item->regex, item->extra, PCRE_INFO_CAPTURECOUNT, &cnt);
         if ( cnt == 0 )
                 return *real_ret;
-        
+
         for ( i = (*real_ret * 2); (i + 2) < (MIN(ovecsize, cnt + 1) * 2); i += 2 )
                 ovector[i] = ovector[i + 1] = -1;
- 
+
         return cnt + 1;
 }
 
@@ -105,42 +105,42 @@ static int exec_regex(pcre_rule_t *rule, const lml_log_entry_t *log_entry, int *
         prelude_list_t *tmp;
         int tmpovector[size];
         int optional_match = 0, real_ret = 0, ret, retval = 0, i = 0;
-        
+
         prelude_list_for_each(&rule->regex_list, tmp) {
                 item = prelude_linked_object_get_object(tmp);
-                                
+
                 ret = do_pcre_exec(item, &real_ret, lml_log_entry_get_message(log_entry),
                                    lml_log_entry_get_message_len(log_entry),
                                    tmpovector, sizeof(tmpovector) / sizeof(int));
                 prelude_log_debug(5, "id=%d match=%s ret=%d (real=%d)\n", rule->id, item->regex_string, ret, real_ret);
                 if ( ret <= 0 && ! item->optreg )
                         return -1;
-                
+
                 ovector[0] = MIN(tmpovector[0], ovector[0]);
                 ovector[1] = MAX(tmpovector[1], ovector[1]);
-                
+
                 if ( item->optreg && real_ret > 0 )
                         optional_match++;
-                
+
                 if ( ret == 1 )
                         continue;
-                
+
                 for ( i = 2; i < (ret * 2); i += 2 ) {
                         prelude_log_debug(10, "assign %d-%d\n", retval * 2 + i, retval * 2 + i + 1);
                         ovector[(retval * 2) + i] = tmpovector[i];
                         ovector[(retval * 2) + i + 1] = tmpovector[i + 1];
                 }
-                
+
                 retval += (ret - 1);
         }
-        
+
         retval++;
-         
+
         if ( rule->min_optregex_match ) {
                 prelude_log_debug(10, "optmatch=%d >= wanted=%d\n", optional_match, rule->min_optregex_match);
                 return (optional_match >= rule->min_optregex_match) ? retval : -1;
         }
-        
+
         return retval;
 }
 
@@ -151,14 +151,14 @@ static pcre_context_t *lookup_context(value_container_t *vcont, pcre_plugin_t *p
 {
         pcre_context_t *ctx;
         prelude_string_t *str;
-        
+
         str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
         if ( ! str )
                 return NULL;
-                                
-        ctx = pcre_context_search(plugin, prelude_string_get_string(str));        
+
+        ctx = pcre_context_search(plugin, prelude_string_get_string(str));
         prelude_string_destroy(str);
-                
+
         return ctx;
 }
 
@@ -170,38 +170,38 @@ static int alert_add_rule_infos(pcre_rule_t *rule, idmef_message_t *idmef)
         idmef_alert_t *alert;
         prelude_string_t *str;
         idmef_additional_data_t *ad;
-        
+
         ret = idmef_message_new_alert(idmef, &alert);
         if ( ret < 0 )
                 return ret;
-        
+
         if ( rule->id ) {
                 ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
                 if ( ret < 0 )
                         return ret;
-                
+
                 ret = idmef_additional_data_new_meaning(ad, &str);
                 if ( ret < 0 )
                         return ret;
-                
+
                 prelude_string_set_constant(str, "Rule ID");
                 idmef_additional_data_set_integer(ad, rule->id);
         }
-        
+
         if ( rule->revision ) {
                 ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
                 if ( ret < 0 )
                         return ret;
-                
+
                 ret = idmef_additional_data_new_meaning(ad, &str);
                 if ( ret < 0 )
                         return ret;
-                
+
                 prelude_string_set_constant(str, "Rule Revision");
                 idmef_additional_data_set_integer(ad, rule->revision);
         }
-        
-        return 0;    
+
+        return 0;
 }
 
 
@@ -213,10 +213,10 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
         prelude_list_t *tmp;
         pcre_context_t *ctx;
         value_container_t *vcont;
-        
+
         ovector[0] = 0x7fffffff;
         ovector[1] = 0;
-        
+
         *osize = exec_regex(rule, log_entry, ovector, (size_t) *osize);
         if ( *osize < 0 )
                 return -1;
@@ -226,7 +226,7 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
                 if ( lookup_context(vcont, plugin, rule, log_entry, ovector, *osize) )
                         return -1;
         }
-        
+
         if ( rule->required_context ) {
                 ctx = lookup_context(rule->required_context, plugin, rule, log_entry, ovector, *osize);
                 if ( ! ctx )
@@ -238,10 +238,10 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
 
         if ( rule->optional_context ) {
                 ctx = lookup_context(rule->optional_context, plugin, rule, log_entry, ovector, *osize);
-                if ( ctx && pcre_context_get_idmef(ctx) )       
+                if ( ctx && pcre_context_get_idmef(ctx) )
                         state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
         }
-        
+
         ret = rule_object_build_message(rule, rule->object_list, &state->idmef, log_entry, ovector, *osize);
         if ( ret < 0 )
                 return ret;
@@ -275,16 +275,16 @@ static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, p
         prelude_string_t *str;
         value_container_t *vcont;
         pcre_context_setting_t *pcs;
-        
+
         prelude_list_for_each(&rule->create_context_list, tmp) {
                 vcont = prelude_linked_object_get_object(tmp);
-                        
+
                 str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
                 if ( ! str )
                         continue;
 
                 pcs = value_container_get_data(vcont);
-                        
+
                 pcre_context_new(plugin, prelude_string_get_string(str), state->idmef, pcs);
                 prelude_string_destroy(str);
         }
@@ -298,10 +298,10 @@ static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
         prelude_list_t *tmp;
         prelude_string_t *str;
         value_container_t *vcont;
-        
+
         prelude_list_for_each(&rule->destroy_context_list, tmp) {
                 vcont = prelude_linked_object_get_object(tmp);
-                
+
                 str = value_container_resolve(vcont, rule, log_entry, ovector, osize);
                 if ( ! str )
                         continue;
@@ -310,7 +310,7 @@ static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
                 prelude_string_destroy(str);
                 if ( ! ctx )
                         continue;
-                
+
                 pcre_context_destroy(ctx);
         }
 }
@@ -332,11 +332,11 @@ static int match_rule_list(pcre_plugin_t *plugin,
         ret = match_rule_single(plugin, rule, state, ls, log_entry, ovector, &osize);
         if ( ret < 0 )
                 return -1;
-                
+
         prelude_list_for_each(&rule->rule_list, tmp) {
                 child = prelude_list_entry(tmp, pcre_rule_container_t, list);
-                
-                ret = match_rule_list(plugin, child, state, ls, log_entry, &gl);                
+
+                ret = match_rule_list(plugin, child, state, ls, log_entry, &gl);
                 if ( ret < 0 && ! child->optional ) {
                         destroy_idmef_state(state);
                         return -1;
@@ -344,7 +344,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
 
                 if ( child->optional )
                         optmatch++;
-                                
+
                 *match_flags |= gl;
                 if ( gl & PCRE_MATCH_FLAGS_LAST )
                         break;
@@ -354,25 +354,25 @@ static int match_rule_list(pcre_plugin_t *plugin,
                 destroy_idmef_state(state);
                 return -1;
         }
-        
+
         create_context_if_needed(plugin, rule, state, log_entry, ovector, osize);
-        
-        if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) && state->idmef ) {                
+
+        if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) && state->idmef ) {
                 prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
                                   rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
                                   lml_log_entry_get_message(log_entry));
-                
+
                 lml_alert_emit(NULL, NULL, state->idmef);
                 destroy_idmef_state(state);
-                
+
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
         }
 
         if ( rule->flags & PCRE_RULE_FLAGS_LAST )
                 *match_flags |= PCRE_MATCH_FLAGS_LAST;
-        
+
         destroy_context_if_needed(plugin, rule, log_entry, ovector, osize);
-                
+
         return 0;
 }
 
@@ -383,11 +383,11 @@ int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
 {
         int ret;
         pcre_state_t state;
-        
+
         memset(&state, 0, sizeof(state));
-        
+
         ret = match_rule_list(plugin, rc, &state, ls, log_entry, match_flags);
-        
+
         if ( state.idmef )
                 idmef_message_destroy(state.idmef);
 
@@ -396,7 +396,7 @@ int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
 
 
 
-rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional) 
+rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 {
         int err_offset;
         rule_regex_t *new;
@@ -425,7 +425,7 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 
         new->optreg = optional;
         new->extra = pcre_study(new->regex, 0, &err_ptr);
-        
+
         return new;
 }
 
