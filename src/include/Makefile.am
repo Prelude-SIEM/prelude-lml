@@ -14,3 +14,5 @@ noinst_HEADERS = 	\
 
 include_HEADERS = prelude-lml.h
 
+
+-include $(top_srcdir)/git.mk

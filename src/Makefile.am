@@ -20,3 +20,5 @@ prelude_lml_SOURCES = 	\
         file-server.c 	\
         lml-alert.c
 
+
+-include $(top_srcdir)/git.mk

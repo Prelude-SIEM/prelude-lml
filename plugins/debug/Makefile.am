@@ -5,3 +5,5 @@ debug_la_SOURCES = debug.c
 debug_la_LDFLAGS = -module -avoid-version
 debugdir = $(libdir)/prelude-lml
 debug_LTLIBRARIES = debug.la
+
+-include $(top_srcdir)/git.mk

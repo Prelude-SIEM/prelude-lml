@@ -66,3 +66,5 @@ ruleset_DATA = \
 rulesetdir = $(configdir)/ruleset
 
 EXTRA_DIST = $(ruleset_DATA)
+
+-include $(top_srcdir)/git.mk

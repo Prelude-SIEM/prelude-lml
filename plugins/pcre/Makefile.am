@@ -9,3 +9,5 @@ pcre_la_SOURCES = pcre-mod.c rule-object.c rule-regex.c value-container.c
 pcre_la_LDFLAGS = -module -avoid-version
 pcredir = $(libdir)/prelude-lml
 pcre_LTLIBRARIES = pcre.la
+
+-include $(top_srcdir)/git.mk

@@ -181,6 +181,8 @@ libev/Makefile
 libmissing/Makefile
 libmissing/tests/Makefile
 
+m4/Makefile
+
 src/Makefile
 src/include/Makefile
 

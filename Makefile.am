@@ -1,11 +1,31 @@
 DISTCHECK_CONFIGURE_FLAGS = --enable-unsupported-rulesets
 
 ACLOCAL_AMFLAGS = -I m4 -I libmissing/m4
-SUBDIRS = libev libmissing plugins src tests
+SUBDIRS = libev libmissing m4 plugins src tests
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
              AUTHORS COPYING HACKING.README INSTALL NEWS README 
+
+MAINTAINERCLEANFILES = \
+        $(srcdir)/INSTALL \
+        $(srcdir)/aclocal.m4 \
+        $(srcdir)/autoscan.log \
+        $(srcdir)/compile \
+        $(srcdir)/config.guess \
+        $(srcdir)/config.h.in \
+        $(srcdir)/config.sub \
+        $(srcdir)/configure.scan \
+        $(srcdir)/depcomp \
+        $(srcdir)/install-sh \
+        $(srcdir)/ltmain.sh \
+        $(srcdir)/missing \
+        $(srcdir)/mkinstalldirs \
+        $(srcdir)/omf.make \
+        $(srcdir)/xmldocs.make \
+        $(srcdir)/gtk-doc.make \
+        $(srcdir)/ChangeLog \
+        `find "$(srcdir)" -type f -name Makefile.in -print`
 
 install-data-local:
 	$(INSTALL) -m 700 -d $(DESTDIR)$(metadata_dir)
@@ -36,3 +56,5 @@ install-data-local:
 uninstall-local:
 	rm -f $(DESTDIR)$(configdir)/prelude-lml.conf;	\
 	rm -f $(DESTDIR)$(configdir)/plugin.rules;
+
+-include $(top_srcdir)/git.mk
