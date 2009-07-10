@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -80,9 +80,9 @@ static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls,
                 goto err;
         }
         prelude_string_set_constant(str, "LML debug Alert");
-                
+
         lml_alert_emit(ls, log_entry, message);
-        
+
         if ( plugin->out_stderr )
                 fprintf(stderr, "Debug: log received, log=%s\n", lml_log_entry_get_original_log(log_entry));
 
@@ -95,13 +95,13 @@ static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls,
 static int debug_activate(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         debug_plugin_t *new;
-                
+
         new = calloc(1, sizeof(*new));
-        if ( ! new ) 
+        if ( ! new )
                 return prelude_error_from_errno(errno);
 
         prelude_plugin_instance_set_plugin_data(context, new);
-        
+
         return 0;
 }
 
@@ -127,7 +127,7 @@ static int debug_get_output_stderr(prelude_option_t *opt, prelude_string_t *out,
 static int debug_set_output_stderr(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
 {
         debug_plugin_t *plugin = prelude_plugin_instance_get_plugin_data(context);
-        
+
         plugin->out_stderr = ! plugin->out_stderr;
 
         return 0;
@@ -140,22 +140,22 @@ int debug_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist
         int ret;
         prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG;
-        
+
         ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
                                  PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
         prelude_plugin_set_activation_option(pe, opt, NULL);
-        
+
         prelude_option_add(opt, NULL, hook, 's', "stderr",
                            "Output to stderr when plugin is called", PRELUDE_OPTION_ARGUMENT_NONE,
                            debug_set_output_stderr, debug_get_output_stderr);
-        
+
         plugin.run = debug_run;
         prelude_plugin_set_name(&plugin, "Debug");
         prelude_plugin_set_destroy_func(&plugin, debug_destroy);
-        
+
         prelude_plugin_entry_set_plugin(pe, (void *) &plugin);
-        
+
         return 0;
 }
 

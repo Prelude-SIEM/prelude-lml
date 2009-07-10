@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -73,11 +73,11 @@ extern lml_config_t config;
 
 
 static char *my_strnchr(char *input, char wanted, size_t size)
-{        
+{
         while ( *input && size-- ) {
                 if ( *input == 0 )
                         break;
-                
+
                 if ( *input == wanted )
                         return input;
 
@@ -96,7 +96,7 @@ void udp_server_process_event(udp_server_t *server)
         char src[512];
         struct sockaddr_in addr;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL;
-        
+
         len = sizeof(struct sockaddr);
 
         ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr *) &addr, &len);
@@ -107,10 +107,10 @@ void udp_server_process_event(udp_server_t *server)
 
         if ( ret == 0 )
                 return;
-        
+
         buf[ret] = '\0';
-        
-        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);        
+
+        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);
         lml_log_source_set_name(server->ls, src);
 
         /*
@@ -126,14 +126,14 @@ void udp_server_process_event(udp_server_t *server)
                         ret -= (ptr - buf);
                 }
         }
-        
+
         lml_dispatch_log(server->ls, ptr ? ptr : buf, ret);
 }
 
 
 
 void udp_server_close(udp_server_t *server)
-{        
+{
         lml_log_source_destroy(server->ls);
 
         close(server->sockfd);
@@ -155,11 +155,11 @@ unsigned int udp_server_get_port(udp_server_t *server)
 }
 
 
-int udp_server_get_event_fd(udp_server_t *server) 
+int udp_server_get_event_fd(udp_server_t *server)
 {
         if ( ! server )
                 return -1;
-        
+
         return server->sockfd;
 }
 
@@ -171,28 +171,28 @@ udp_server_t *udp_server_new(lml_log_source_t *ls,  const char *addr, unsigned i
         udp_server_t *server;
         char buf[sizeof("65535")];
         struct addrinfo hints, *ai;
-        
+
         memset(&hints, 0, sizeof(hints));
         snprintf(buf, sizeof(buf), "%u", port);
-        
+
         hints.ai_family = PF_UNSPEC;
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_protocol = IPPROTO_UDP;
-        
+
         ret = getaddrinfo(addr, buf, &hints, &ai);
         if ( ret != 0 ) {
                 fprintf(stderr, "could not resolve %s: %s.\n", addr,
                         (ret == EAI_SYSTEM) ? strerror(errno) : gai_strerror(ret));
                 return NULL;
         }
-        
+
         sockfd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
         if ( sockfd < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "couldn't create socket.\n");
                 freeaddrinfo(ai);
                 return NULL;
         }
-        
+
         ret = bind(sockfd, ai->ai_addr, ai->ai_addrlen);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "couldn't bind to socket: %s.\n", strerror(errno));
@@ -202,7 +202,7 @@ udp_server_t *udp_server_new(lml_log_source_t *ls,  const char *addr, unsigned i
         }
 
         freeaddrinfo(ai);
-        
+
         server = malloc(sizeof(*server));
         if ( ! server ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -214,6 +214,6 @@ udp_server_t *udp_server_new(lml_log_source_t *ls,  const char *addr, unsigned i
         server->port = port;
         server->sockfd = sockfd;
         server->ls = ls;
-        
+
         return server;
 }

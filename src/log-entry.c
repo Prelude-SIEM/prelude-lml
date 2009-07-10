@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -49,7 +49,7 @@
 struct lml_log_entry {
         char *original_log;
         size_t original_log_len;
-        
+
         char *message;
         size_t message_len;
 
@@ -68,12 +68,12 @@ static void lml_log_entry_destroy_substring(lml_log_entry_t *log_entry)
                 free(log_entry->target_hostname);
                 log_entry->target_hostname = NULL;
         }
-        
+
         if ( log_entry->target_process ) {
                 free(log_entry->target_process);
                 log_entry->target_process = NULL;
         }
-        
+
         if ( log_entry->target_process_pid ) {
                 free(log_entry->target_process_pid);
                 log_entry->target_process_pid = NULL;
@@ -82,14 +82,14 @@ static void lml_log_entry_destroy_substring(lml_log_entry_t *log_entry)
 
 
 
-static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *string, void **out) 
+static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *string, void **out)
 {
         time_t now;
         struct tm *lt;
         const char *end;
         struct timeval *tv = *out;
         const char *ts_fmt = lml_log_format_get_ts_fmt(format);
-        
+
         /*
          * We first get the localtime from this system,
          * so that all the struct tm member are filled.
@@ -98,16 +98,16 @@ static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *
          * avoid us some computation error.
          */
         now = time(NULL);
-        
+
         lt = localtime(&now);
         if ( ! lt )
                 goto err;
 
         /*
          * strptime() return a pointer to the first non matched character.
-         */        
+         */
         end = strptime(string, ts_fmt, lt);
-        if ( ! end ) 
+        if ( ! end )
                 goto err;
 
         /*
@@ -143,7 +143,7 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
                 { "timestamp", parse_ts, (void **) &tv                                     },
                 { NULL, NULL, NULL                                                         },
         };
-        
+
         matches = pcre_exec(prefix_regex, lml_log_format_get_prefix_regex_extra(format),
                             log_entry->original_log, log_entry->original_log_len, 0, 0, ovector,
                             sizeof(ovector) / sizeof(int));
@@ -153,7 +153,7 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
         for ( i = 0; tbl[i].field != NULL; i++ ) {
                 ret = pcre_get_named_substring(prefix_regex, log_entry->original_log,
                                                ovector, matches, tbl[i].field, (const char **) &string);
-                
+
                 if ( ret == PCRE_ERROR_NOSUBSTRING )
                         continue;
 
@@ -161,14 +161,14 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
                         prelude_log(PRELUDE_LOG_WARN, "could not get referenced string: %d.\n", ret);
                         return -1;
                 }
-                
+
                 if ( ! tbl[i].cb )
                         *tbl[i].ptr = string;
-                
+
                 else {
                         ret = tbl[i].cb(format, ls, string, tbl[i].ptr);
                         free(string);
-                        
+
                         if ( ret < 0 )
                                 return -1;
                 }
@@ -179,15 +179,15 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
 
 
 
-static char *get_hostname(void) 
+static char *get_hostname(void)
 {
         int ret;
         char out[256];
-                
+
         ret = gethostname(out, sizeof(out));
         if ( ret < 0 )
                 return NULL;
-        
+
         return strdup(out);
 }
 
@@ -253,21 +253,21 @@ lml_log_entry_t *lml_log_entry_new(void)
         }
 
         gettimeofday(&log_entry->tv, NULL);
-        
+
         return log_entry;
 }
 
 
 
 
-int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, const char *entry, size_t size) 
+int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, const char *entry, size_t size)
 {
         int ret = -1;
         prelude_list_t *tmp;
         lml_log_format_container_t *fc;
-        
+
         log_entry->original_log_len = size;
-        
+
         log_entry->original_log = strdup(entry);
         if ( ! log_entry->original_log ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -276,26 +276,26 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
 
         log_entry->message = log_entry->original_log;
         log_entry->message_len = log_entry->original_log_len;
-        
+
         prelude_list_for_each(lml_log_source_get_format_list(ls), tmp) {
                 fc = prelude_linked_object_get_object(tmp);
-                
+
                 ret = parse_prefix(lml_log_format_container_get_format(fc), ls, log_entry);
                 if ( ret == 0 )
                         break;
 
                 lml_log_entry_destroy_substring(log_entry);
         }
-        
+
         if ( ! log_entry->target_hostname )
                 log_entry->target_hostname = get_hostname();
-        
+
         if ( ret != 0 ) {
                 lml_log_source_warning(ls, "no appropriate format defined for log entry: '%s'.\n", log_entry->original_log);
                 gettimeofday(&log_entry->tv, NULL);
                 return -1;
         }
-        
+
         return 0;
 }
 
@@ -305,7 +305,7 @@ void lml_log_entry_destroy(lml_log_entry_t *log_entry)
 {
         if ( log_entry->original_log )
                 free(log_entry->original_log);
-        
+
         lml_log_entry_destroy_substring(log_entry);
 
         free(log_entry);

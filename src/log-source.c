@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -71,7 +71,7 @@ struct lml_log_format_container {
 
 struct lml_log_source {
         prelude_list_t list;
-        
+
         char *name;
         regex_list_t *rlist;
 
@@ -92,13 +92,13 @@ static PRELUDE_LIST(source_list);
  * Log format stuff
  */
 static void lml_log_format_destroy(lml_log_format_t *format)
-{        
+{
         if ( --format->refcount != 0 )
                 return;
- 
+
         if ( format->ts_fmt )
                 free(format->ts_fmt);
-        
+
         if ( format->prefix_regex)
                 free(format->prefix_regex);
 
@@ -123,13 +123,13 @@ lml_log_format_t *lml_log_format_new(const char *name)
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return NULL;
         }
-        
+
         new->name = strdup(name);
         if ( ! new->name ) {
                 free(new);
                 return NULL;
         }
-        
+
         if ( lml_log_format_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log timestamp format.\n");
                 return NULL;
@@ -139,7 +139,7 @@ lml_log_format_t *lml_log_format_new(const char *name)
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log message prefix.\n");
                 return NULL;
         }
-        
+
         return new;
 }
 
@@ -153,13 +153,13 @@ const char *lml_log_format_get_name(lml_log_format_t *lf)
 
 
 int lml_log_format_set_prefix_regex(lml_log_format_t *ls, const char *regex)
-{       
+{
         int erroffset;
         const char *errptr;
 
         if ( ls->prefix_regex )
                 free(ls->prefix_regex);
-        
+
         ls->prefix_regex = pcre_compile(regex, 0, &errptr, &erroffset, NULL);
         if ( ! ls->prefix_regex ) {
                 prelude_log(PRELUDE_LOG_WARN, "Unable to compile regex: %s : %s.\n", regex, errptr);
@@ -179,10 +179,10 @@ int lml_log_format_set_prefix_regex(lml_log_format_t *ls, const char *regex)
 
 
 int lml_log_format_set_ts_fmt(lml_log_format_t *ls, const char *fmt)
-{        
+{
         if ( ls->ts_fmt )
                 free(ls->ts_fmt);
-        
+
         ls->ts_fmt = strdup(fmt);
         if ( ! ls->ts_fmt ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
@@ -228,10 +228,10 @@ static lml_log_source_t *search_source(const char *name)
 {
         prelude_list_t *tmp;
         lml_log_source_t *ls;
-        
+
         prelude_list_for_each(&source_list, tmp) {
                 ls = prelude_linked_object_get_object(tmp);
-                
+
                 if ( strcmp(lml_log_source_get_name(ls), name) == 0 )
                         return ls;
         }
@@ -243,7 +243,7 @@ static lml_log_source_t *search_source(const char *name)
 static int source_set_format(lml_log_source_t *ls, lml_log_format_t *format)
 {
         lml_log_format_container_t *fc;
-        
+
         fc = malloc(sizeof(*fc));
         if ( ! fc )
                 return -1;
@@ -263,17 +263,17 @@ regex_list_t *lml_log_source_get_regex_list(lml_log_source_t *ls)
 
 
 
-int lml_log_source_set_name(lml_log_source_t *ls, const char *name) 
+int lml_log_source_set_name(lml_log_source_t *ls, const char *name)
 {
         if ( ls->name )
                 free(ls->name);
-        
+
         ls->name = strdup(name);
         if ( ! ls->name ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
-        
+
         return 0;
 }
 
@@ -287,23 +287,23 @@ int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const ch
                 ret = source_set_format(*ls, format);
                 if ( ret < 0 )
                         return -1;
-                
+
                 return 1;
         }
-        
+
         *ls = calloc(1, sizeof(**ls));
         if ( ! *ls ) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 return -1;
         }
-        
+
         (*ls)->name = strdup(name);
         if ( ! (*ls)->name) {
                 prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
                 free(*ls);
                 return -1;
         }
-        
+
         (*ls)->rlist = regex_init(name);
         if ( ! (*ls)->rlist ) {
                 free((*ls)->name);
@@ -311,7 +311,7 @@ int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const ch
                 return -1;
         }
 
-        (*ls)->warning_limit = config.warning_limit;        
+        (*ls)->warning_limit = config.warning_limit;
         prelude_list_init(&(*ls)->format_list);
 
         ret = source_set_format(*ls, format);
@@ -319,14 +319,14 @@ int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const ch
                 return ret;
 
         prelude_list_add_tail(&source_list, &(*ls)->list);
-        
+
         return 0;
 }
 
 
 
 const char *lml_log_source_get_name(const lml_log_source_t *ls)
-{        
+{
         return ls->name;
 }
 
@@ -336,7 +336,7 @@ void lml_log_source_destroy(lml_log_source_t *source)
 {
         prelude_list_t *tmp, *bkp;
         lml_log_format_container_t *fc;
-        
+
         prelude_list_for_each_safe(&source->format_list, tmp, bkp) {
                 fc = prelude_linked_object_get_object(tmp);
                 prelude_linked_object_del((prelude_linked_object_t *) fc);
@@ -344,13 +344,13 @@ void lml_log_source_destroy(lml_log_source_t *source)
                 lml_log_format_destroy(fc->format);
                 free(fc);
         }
-        
+
         if ( source->rlist )
                 regex_destroy(source->rlist);
-        
+
         if ( source->name )
                 free(source->name);
-        
+
         free(source);
 }
 
@@ -365,7 +365,7 @@ void lml_log_source_warning(lml_log_source_t *ls, const char *fmt, ...)
          */
         if ( ls->warning_limit > 0 && ls->warning_count == ls->warning_limit ) {
                 ls->warning_count++;
-                
+
                 prelude_log(PRELUDE_LOG_WARN, "Limit of %d errors for source %s reached. Further errors will be supressed.\n",
                             ls->warning_limit, lml_log_source_get_name(ls));
                 return;
@@ -375,7 +375,7 @@ void lml_log_source_warning(lml_log_source_t *ls, const char *fmt, ...)
                 return;
 
         ls->warning_count++;
-        
+
         va_start(ap, fmt);
         prelude_log_v(PRELUDE_LOG_WARN, fmt, ap);
         va_end(ap);

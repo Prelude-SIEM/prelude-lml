@@ -1,6 +1,6 @@
 * 2008-10-17, prelude-lml-0.9.14:
 
-- Fix log file permission error, that could happen thought the user 
+- Fix log file permission error, that could happen thought the user
   Prelude-LML was running as could access the file (#291).
 
 - ModSecurity ruleset update, by Dan Kopecek <dkopecek@redhat.com>:
@@ -8,16 +8,16 @@
   [file ..], [line ...], [tag ...] fields and fine tune targets/types
   (#321).
 
-- Deprecate Gamin/FAM support in favor of libev: the previous implementation 
-  had problem on SELinux enabled system due to Gamin server startup being 
+- Deprecate Gamin/FAM support in favor of libev: the previous implementation
+  had problem on SELinux enabled system due to Gamin server startup being
   triggered by other program, and thus using improper role for Prelude-LML.
   (#326).
 
-- Improved polling architecture by using Operating System specific backend 
+- Improved polling architecture by using Operating System specific backend
   when possible.
 
-- We now monitor files that are not immediately available for reading on 
-  startup: once the file can be monitored, libev provide us with a notification. 
+- We now monitor files that are not immediately available for reading on
+  startup: once the file can be monitored, libev provide us with a notification.
 
 
 
@@ -30,10 +30,10 @@
 - New rulesets for FreeBSD su attempts, by Alexander Afonyashin <firm@iname.com>
   (Fix #304).
 
-- Add additional format to the default configuration to deal with apache 
+- Add additional format to the default configuration to deal with apache
   error_log file format, by Alexander Afonyashin <firm@iname.com> (Fix #307).
 
-- Normalize some classification: introduce Remote Login, and 
+- Normalize some classification: introduce Remote Login, and
   Credentials Change. Cleanup SSH ruleset, and remove duplicated rules.
 
 - Automated regression tests on make check.
