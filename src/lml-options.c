@@ -423,8 +423,8 @@ static int add_server(lml_log_source_t *ls, const char *addr, unsigned int port)
 static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         int ret;
-        unsigned int port;
         lml_log_source_t *ls;
+        unsigned int port = 0;
         char *addr, source[512];
 
         if ( arg && *arg ) {
