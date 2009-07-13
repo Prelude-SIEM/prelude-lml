@@ -93,13 +93,22 @@ void udp_server_process_event(udp_server_t *server)
 {
         ssize_t ret;
         socklen_t len;
-        char src[512];
-        struct sockaddr_in addr;
-        char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL;
+        void *in_addr;
+        union {
+                struct sockaddr sa;
+                struct sockaddr_in sa4;
+#ifdef HAVE_IPV6
+                struct sockaddr_in6 sa6;
+# define SOCKADDR_PORT_MEMBER(x) (x.sa6.sin6_port)
+#else
+# define SOCKADDR_PORT_MEMBER(x) (x.sa4.sin_port)
+#endif
+        } addr;
+        char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL, src[512];
 
-        len = sizeof(struct sockaddr);
+        len = sizeof(addr);
 
-        ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr *) &addr, &len);
+        ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, &addr.sa, &len);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error receiving syslog message.\n");
                 return;
@@ -110,7 +119,11 @@ void udp_server_process_event(udp_server_t *server)
 
         buf[ret] = '\0';
 
-        snprintf(src, sizeof(src), "%s:%d", inet_ntoa(addr.sin_addr), addr.sin_port);
+        in_addr = prelude_sockaddr_get_inaddr(&addr.sa);
+        prelude_return_if_fail(in_addr);
+        prelude_return_if_fail(inet_ntop(addr.sa.sa_family, in_addr, src, sizeof(src)));
+
+        snprintf(src + strlen(src), sizeof(src) - strlen(src), ":%d", SOCKADDR_PORT_MEMBER(addr));
         lml_log_source_set_name(server->ls, src);
 
         /*
