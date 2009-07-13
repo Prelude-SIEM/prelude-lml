@@ -709,7 +709,7 @@ regex=-313003: Invalid destination for ICMP error message: icmp src (\S+):([\d\.
  last
 
 #LOG: 06-30-2009 17:25:09 Local0.Debug 172.19.1.1 Jun 30 2009 07:08:20: %ASA-7-710005: TCP request discarded from 172.19.1.6/1303 to inside:172.19.1.1/2601
-regex=-710005: (TCP|UDP) request discarded from ([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+)
+regex=-710005: (TCP|UDP) request discarded from ([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+); \
  classification.text=$1 request discarded; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
