@@ -58,6 +58,8 @@ struct lml_log_entry {
         char *target_hostname;
         char *target_process;
         char *target_process_pid;
+
+        lml_log_format_t *format;
 };
 
 
@@ -281,8 +283,10 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, cons
                 fc = prelude_linked_object_get_object(tmp);
 
                 ret = parse_prefix(lml_log_format_container_get_format(fc), ls, log_entry);
-                if ( ret == 0 )
+                if ( ret == 0 ) {
+                        log_entry->format = lml_log_format_container_get_format(fc);
                         break;
+                }
 
                 lml_log_entry_destroy_substring(log_entry);
         }
@@ -311,3 +315,9 @@ void lml_log_entry_destroy(lml_log_entry_t *log_entry)
         free(log_entry);
 }
 
+
+
+const lml_log_format_t *lml_log_entry_get_format(const lml_log_entry_t *log_entry)
+{
+        return log_entry->format;
+}

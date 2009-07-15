@@ -486,6 +486,18 @@ static int set_format(prelude_option_t *opt, const char *arg, prelude_string_t *
 }
 
 
+static int set_idmef_alter_force(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        return lml_log_format_set_idmef(context, arg, TRUE);
+}
+
+
+static int set_idmef_alter(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        return lml_log_format_set_idmef(context, arg, FALSE);
+}
+
+
 
 #if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
 static int set_user(prelude_option_t *opt, const char *optarg, prelude_string_t *err, void *context)
@@ -657,6 +669,14 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-server",
                            "address:port pair to listen to syslog to UDP messages (default port 514)",
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
+
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "idmef-alter", "Assign specific IDMEF path/value to matching log entry",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_idmef_alter, NULL);
+
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "idmef-alter-force", "Assign specific IDMEF path/value to matching log entry, even if path is already used",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_idmef_alter_force, NULL);
 
         ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
         if ( ret < 0 ) {

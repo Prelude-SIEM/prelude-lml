@@ -54,12 +54,22 @@
 
 
 
+typedef struct {
+        prelude_list_t list;
+        prelude_bool_t force;
+        idmef_path_t *path;
+        idmef_value_t *value;
+} lml_format_idmef_t;
+
+
 struct lml_log_format {
         int refcount;
         char *name;
         char *ts_fmt;
         pcre *prefix_regex;
         pcre_extra *prefix_regex_extra;
+
+        prelude_list_t idmef_list;
 };
 
 
@@ -140,6 +150,7 @@ lml_log_format_t *lml_log_format_new(const char *name)
                 return NULL;
         }
 
+        prelude_list_init(&new->idmef_list);
         return new;
 }
 
@@ -193,6 +204,81 @@ int lml_log_format_set_ts_fmt(lml_log_format_t *ls, const char *fmt)
 }
 
 
+
+
+
+int lml_log_format_set_idmef(lml_log_format_t *format, const char *idmef_s, prelude_bool_t force)
+{
+        int ret;
+        size_t len;
+        char *idmef, tmp;
+        lml_format_idmef_t *entry;
+
+        len = strcspn(idmef_s, " =");
+        if ( len == 0 )
+                return -1;
+
+        idmef = strdup(idmef_s);
+        if ( ! idmef )
+                return -1;
+
+        entry = malloc(sizeof(*entry));
+        if ( ! entry ) {
+                free(idmef);
+                return -1;
+        }
+
+        entry->force = force;
+
+        tmp = idmef[len];
+        idmef[len] = 0;
+
+        ret = idmef_path_new_fast(&entry->path, idmef);
+        if ( ret < 0 ) {
+                free(idmef);
+                free(entry);
+                return ret;
+        }
+
+        idmef[len] = tmp;
+
+        ret = idmef_value_new_from_path(&entry->value, entry->path, idmef + len + strspn(idmef + len, " ="));
+        if ( ret < 0 ) {
+                free(idmef);
+                idmef_path_destroy(entry->path);
+                free(entry);
+                return ret;
+        }
+
+        free(idmef);
+        prelude_list_add_tail(&format->idmef_list, &entry->list);
+
+        return 0;
+}
+
+
+
+void lml_log_format_apply_idmef(const lml_log_format_t *format, idmef_message_t *idmef)
+{
+        int ret;
+        prelude_list_t *tmp;
+        idmef_value_t *value;
+        lml_format_idmef_t *entry;
+
+        prelude_list_for_each(&format->idmef_list, tmp) {
+                entry = prelude_list_entry(tmp, lml_format_idmef_t, list);
+
+                if ( ! entry->force ) {
+                        ret = idmef_path_get(entry->path, idmef, &value);
+                        if ( ret > 0 ) {
+                                idmef_value_destroy(value);
+                                continue;
+                        }
+                }
+
+                idmef_path_set(entry->path, idmef, entry->value);
+        }
+}
 
 
 const char *lml_log_format_get_ts_fmt(const lml_log_format_t *source)
@@ -387,3 +473,4 @@ prelude_list_t *lml_log_source_get_format_list(lml_log_source_t *source)
 {
         return &source->format_list;
 }
+

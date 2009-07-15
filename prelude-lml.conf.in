@@ -9,9 +9,9 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # if value is "127.0.0.1", the connection will occur throught
 # an UNIX socket.
 #
-# This entry is disabled. The default is to use the entry 
-# located in the Prelude system wide clients.conf. You may 
-# overwrite the default address for this sensor by uncommenting 
+# This entry is disabled. The default is to use the entry
+# located in the Prelude system wide clients.conf. You may
+# overwrite the default address for this sensor by uncommenting
 # this entry.
 #
 # [prelude]
@@ -21,8 +21,9 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #
 # Files to monitor
 #
-# You should define the log message prefix-regex and time-format within a
-# [format] section. If not specified, the default syslog format will be used.
+# You should define the log message prefix-regex and time-format within
+# a [format] section. If not specified, the default syslog format will
+# be used.
 #
 # The prefix-regex should contain PCRE named subpatterns to pick out the
 # information available in your syslog's prefix.
@@ -34,26 +35,37 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #   - timestamp
 #
 # Please see pcrepattern(3) manpage for help writing the prefix-regex
-# In order to set the time-format, please have a look at the strptime(3) manpage.
+# In order to set the time-format, please have a look at the strptime(3)
+# manpage.
 #
 # Example configuration for syslog output:
 #
 # Each [format] section might have several file entry.
 # Each [format] section might have several udp-server entry.
 #
-# The same file or udp-server entry might be duplicated accross
-# differents formats.
+# If a file or udp-server entry might is listed accross differents
+# formats, then the first matching format for a given log entry will be
+# used.
 #
-# Additionally, you can specify a pattern in a file entry. LML will then searches 
-# for all the pathnames matching pattern according to the rules used by the shell 
-# (see glob(7)).
+# Additionally, you can specify a pattern in a file entry. LML will then
+# searches for all the pathnames matching pattern according to the rules
+# used by the shell (see glob(7)).
 #
 # Example: file = /var/log/*/*.log
-
+#
+#
+# Within each format, you might use the 'idmef-alter' option to modify
+# generated events:
+#
+# Example: idmef-alter = alert.analyzer(-1).node.location = MyLocation;
+#
+# Note that 'idmef-alter' will never overwrite an IDMEF path that is
+# already set. Use 'idmef-alter-force' if this is what you intend to do.
+#
 
 
 [format=syslog]
-time-format = "%b %d %H:%M:%S" 
+time-format = "%b %d %H:%M:%S"
 prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])?: )?"
 file = /var/log/messages
 # udp-server = 0.0.0.0
@@ -64,7 +76,7 @@ file = /var/log/messages
 #
 [format=metalog]
 prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
-time-format = "%b %d %H:%M:%S" 
+time-format = "%b %d %H:%M:%S"
 file = /var/log/everything/current
 # udp-server = 0.0.0.0
 
@@ -97,7 +109,7 @@ file = /var/log/apache2/error_log
 
 #
 # Specifies the maximum difference, in seconds, between
-# the interval of two logfiles' rotation. If this difference 
+# the interval of two logfiles' rotation. If this difference
 # is reached, a high severity alert will be emited
 #
 #max-rotation-size-offset = 1024
@@ -105,11 +117,11 @@ file = /var/log/apache2/error_log
 
 
 #
-# Maximum number of warning a given source should emit in case it can not
-# parse log entry with the provided prefix_regex and time_format. 
+# Maximum number of warning a given source should emit in case it can
+# not parse log entry with the provided prefix_regex and time_format.
 #
 # -1 == unlimited number of warning
-#  0 == no warning at all 
+#  0 == no warning at all
 #  X == print at most X warnings.
 #
 # warning-limit = -1
@@ -128,7 +140,7 @@ ruleset=@configdir@/ruleset/pcre.rules
 #
 # This plugin issue an alert for each packet.
 # Carefull to the loging activity it generate.
-# 
+#
 # Triger Report to the console.
 # stderr
 

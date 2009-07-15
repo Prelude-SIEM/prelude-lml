@@ -319,6 +319,9 @@ int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, cons
                         return -1;
         }
 
+        if ( lml_log_entry_get_format(log) )
+                lml_log_format_apply_idmef(lml_log_entry_get_format(log), message);
+
         return 0;
 }
 

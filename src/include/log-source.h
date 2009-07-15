@@ -49,6 +49,10 @@ int lml_log_format_set_ts_fmt(lml_log_format_t *lf, const char *fmt);
 
 const char *lml_log_format_get_ts_fmt(const lml_log_format_t *ls);
 
+int lml_log_format_set_idmef(lml_log_format_t *format, const char *idmef_s, prelude_bool_t force);
+
+void lml_log_format_apply_idmef(const lml_log_format_t *format, idmef_message_t *idmef);
+
 /*
  *
  */

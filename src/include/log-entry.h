@@ -33,4 +33,6 @@ int lml_log_entry_set_log(lml_log_entry_t *lc, lml_log_source_t *ls, const char 
 
 void lml_log_entry_destroy(lml_log_entry_t *lc);
 
+const lml_log_format_t *lml_log_entry_get_format(const lml_log_entry_t *log);
+
 #endif /* _LOG_ENTRY_H */
