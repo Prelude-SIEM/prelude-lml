@@ -1,5 +1,5 @@
-/* Declare dirfd, if necessary.
-   Copyright (C) 2001, 2002, 2006 Free Software Foundation, Inc.
+/* Find the length of STRING + 1, but scan at most MAXLEN bytes.
+   Copyright (C) 2005 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -12,17 +12,28 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-   Written by Jim Meyering.  */
+#ifndef _STRNLEN1_H
+#define _STRNLEN1_H
 
-#include <sys/types.h>
+#include <stddef.h>
 
-#include <dirent.h>
 
-#ifndef HAVE_DECL_DIRFD
-"this configure-time declaration test was not run"
+#ifdef __cplusplus
+extern "C" {
 #endif
-#if !HAVE_DECL_DIRFD && !defined dirfd
-int dirfd (DIR const *);
+
+
+/* Find the length of STRING + 1, but scan at most MAXLEN bytes.
+   If no '\0' terminator is found in that many characters, return MAXLEN.  */
+/* This is the same as strnlen (string, maxlen - 1) + 1.  */
+extern size_t strnlen1 (const char *string, size_t maxlen);
+
+
+#ifdef __cplusplus
+}
 #endif
+
+
+#endif /* _STRNLEN1_H */

@@ -1,6 +1,6 @@
 /* Provide a sys/socket header file for systems lacking it (read: MinGW)
    and for systems where it is incomplete.
-   Copyright (C) 2005-2008 Free Software Foundation, Inc.
+   Copyright (C) 2005-2009 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,9 @@
 
 #if @HAVE_SYS_SOCKET_H@
 
+# if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
+# endif
 
 /* On many platforms, <sys/socket.h> assumes prior inclusion of
    <sys/types.h>.  */
@@ -40,6 +42,30 @@
 
 #ifndef _GL_SYS_SOCKET_H
 #define _GL_SYS_SOCKET_H
+
+#if !@HAVE_SA_FAMILY_T@
+typedef unsigned short  sa_family_t;
+#endif
+
+#if !@HAVE_STRUCT_SOCKADDR_STORAGE@
+# include <alignof.h>
+/* Code taken from glibc sysdeps/unix/sysv/linux/bits/socket.h on
+   2009-05-08, licensed under LGPLv2.1+, plus portability fixes. */
+# define __ss_aligntype unsigned long int
+# define _SS_SIZE 256
+# define _SS_PADSIZE \
+    (_SS_SIZE - ((sizeof (sa_family_t) >= alignof (__ss_aligntype)	\
+		  ? sizeof (sa_family_t)				\
+		  : alignof (__ss_aligntype))				\
+		 + sizeof (__ss_aligntype)))
+
+struct sockaddr_storage
+{
+  sa_family_t ss_family;      /* Address family, etc.  */
+  __ss_aligntype __ss_align;  /* Force desired alignment.  */
+  char __ss_padding[_SS_PADSIZE];
+};
+#endif
 
 #if @HAVE_SYS_SOCKET_H@
 
@@ -118,9 +144,9 @@ extern "C" {
 /* Re-define FD_ISSET to avoid a WSA call while we are not using
    network sockets.  */
 static inline int
-rpl_fd_isset (int fd, fd_set * set)
+rpl_fd_isset (SOCKET fd, fd_set * set)
 {
-  int i;
+  u_int i;
   if (set == NULL)
     return 0;
 
@@ -141,6 +167,11 @@ rpl_fd_isset (int fd, fd_set * set)
 # if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
 #  undef close
 #  define close close_used_without_including_unistd_h
+# endif
+
+# if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
+#  undef gethostname
+#  define gethostname gethostname_used_without_including_unistd_h
 # endif
 
 # if @GNULIB_SOCKET@
@@ -249,7 +280,7 @@ extern int rpl_getsockname (int, struct sockaddr *, int *);
 #  if @HAVE_WINSOCK2_H@
 #   undef getsockopt
 #   define getsockopt		rpl_getsockopt
-extern int rpl_getsockopt (int, int, int, void *, int *);
+extern int rpl_getsockopt (int, int, int, void *, socklen_t *);
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef getsockopt
@@ -351,7 +382,7 @@ extern int rpl_sendto (int, const void *, int, int, struct sockaddr *, int);
 #  if @HAVE_WINSOCK2_H@
 #   undef setsockopt
 #   define setsockopt		rpl_setsockopt
-extern int rpl_setsockopt (int, int, int, const void *, int);
+extern int rpl_setsockopt (int, int, int, const void *, socklen_t);
 #  endif
 # elif @HAVE_WINSOCK2_H@
 #  undef setsockopt
@@ -384,12 +415,6 @@ extern int rpl_shutdown (int, int);
 # if @HAVE_WINSOCK2_H@
 #  undef select
 #  define select		select_used_without_including_sys_select_h
-# endif
-
-# if @GNULIB_CLOSE@ && @HAVE_WINSOCK2_H@
-/* gnulib internal function.  */
-#  define HAVE__GL_CLOSE_FD_MAYBE_SOCKET 1
-extern int _gl_close_fd_maybe_socket (int fd);
 # endif
 
 # ifdef __cplusplus

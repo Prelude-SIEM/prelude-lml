@@ -1,6 +1,5 @@
-/* Provide a non-threads replacement for the POSIX raise function.
-
-   Copyright (C) 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
+/* Find the length of STRING + 1, but scan at most MAXLEN bytes.
+   Copyright (C) 2005-2006 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -15,16 +14,22 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* written by Jim Meyering */
-
 #include <config.h>
 
-#include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
+/* Specification.  */
+#include "strnlen1.h"
 
-int
-raise (int sig)
+#include <string.h>
+
+/* Find the length of STRING + 1, but scan at most MAXLEN bytes.
+   If no '\0' terminator is found in that many characters, return MAXLEN.  */
+/* This is the same as strnlen (string, maxlen - 1) + 1.  */
+size_t
+strnlen1 (const char *string, size_t maxlen)
 {
-  return kill (getpid (), sig);
+  const char *end = (const char *) memchr (string, '\0', maxlen);
+  if (end != NULL)
+    return end - string + 1;
+  else
+    return maxlen;
 }

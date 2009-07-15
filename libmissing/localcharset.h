@@ -1,7 +1,6 @@
-/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004, 2006, 2007 Free
-   Software Foundation, Inc.
-
-   This file is part of the GNU C Library.
+/* Determine a canonical name for the current locale's character encoding.
+   Copyright (C) 2000-2003 Free Software Foundation, Inc.
+   This file is part of the GNU CHARSET Library.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -17,39 +16,26 @@
    with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef _LIBC
-# include <config.h>
+#ifndef _LOCALCHARSET_H
+#define _LOCALCHARSET_H
+
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-/* Get specification.  */
-#include <string.h>
 
-#include <stdlib.h>
+/* Determine the current locale's character encoding, and canonicalize it
+   into one of the canonical names listed in config.charset.
+   The result must not be freed; it is statically allocated.
+   If the canonical name cannot be determined, the result is a non-canonical
+   name.  */
+extern const char * locale_charset (void);
 
-#undef __strdup
-#ifdef _LIBC
-# undef strdup
-#endif
 
-#ifndef weak_alias
-# define __strdup strdup
-#endif
-
-/* Duplicate S, returning an identical malloc'd string.  */
-char *
-__strdup (const char *s)
-{
-  size_t len = strlen (s) + 1;
-  void *new = malloc (len);
-
-  if (new == NULL)
-    return NULL;
-
-  return (char *) memcpy (new, s, len);
+#ifdef __cplusplus
 }
-#ifdef libc_hidden_def
-libc_hidden_def (__strdup)
 #endif
-#ifdef weak_alias
-weak_alias (__strdup, strdup)
-#endif
+
+
+#endif /* _LOCALCHARSET_H */

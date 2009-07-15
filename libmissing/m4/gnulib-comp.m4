@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2008 Free Software Foundation, Inc.
+# Copyright (C) 2002-2009 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -50,47 +50,65 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([winsock])
+    AC_LIBOBJ([bind])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([bind])
   gl_FUNC_CLOSE
   gl_UNISTD_MODULE_INDICATOR([close])
   gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
+  gl_DIRENT_H
   gl_FUNC_DIRFD
+  gl_DIRENT_MODULE_INDICATOR([dirfd])
   gl_HEADER_ERRNO_H
   gl_FUNC_FCLOSE
   gl_STDIO_MODULE_INDICATOR([fclose])
   gl_FLOAT_H
-  # No macro. You should also use one of fnmatch-posix or fnmatch-gnu.
+  gl_FUNC_FNMATCH_POSIX
   gl_FUNC_FNMATCH_GNU
   gl_GETADDRINFO
+  gl_NETDB_MODULE_INDICATOR([getaddrinfo])
   gl_GETLOGIN_R
   gl_UNISTD_MODULE_INDICATOR([getlogin_r])
+  gl_FUNC_GETPAGESIZE
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([winsock])
+    AC_LIBOBJ([getpeername])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([getpeername])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_GLOB
+  gl_HOSTENT
   gl_INET_NTOP
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
+  gl_LOCALCHARSET
+  LOCALCHARSET_TESTS_ENVIRONMENT="CHARSETALIASDIR=\"\$(top_builddir)/$gl_source_base\""
+  AC_SUBST([LOCALCHARSET_TESTS_ENVIRONMENT])
   gl_FUNC_MALLOC_POSIX
   gl_STDLIB_MODULE_INDICATOR([malloc-posix])
+  gl_FUNC_MBRTOWC
+  gl_WCHAR_MODULE_INDICATOR([mbrtowc])
+  gl_FUNC_MBSINIT
+  gl_WCHAR_MODULE_INDICATOR([mbsinit])
+  gl_FUNC_MBSRTOWCS
+  gl_WCHAR_MODULE_INDICATOR([mbsrtowcs])
+  gl_FUNC_MEMCHR
+  gl_STRING_MODULE_INDICATOR([memchr])
   gl_FUNC_MEMPCPY
   gl_STRING_MODULE_INDICATOR([mempcpy])
-  gl_FUNC_MEMSET
   gl_FUNC_MKTIME
+  gl_MULTIARCH
+  gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
   gl_PATHMAX
-  AC_REPLACE_FUNCS(raise)
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([winsock])
+    AC_LIBOBJ([recvfrom])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([recvfrom])
+  gl_SERVENT
   gl_SIGACTION
   gl_SIGNAL_MODULE_INDICATOR([sigaction])
   gl_SIGNAL_H
@@ -103,7 +121,7 @@ AC_SUBST([LTALLOCA])
   gl_STDIO_MODULE_INDICATOR([snprintf])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
-    AC_LIBOBJ([winsock])
+    AC_LIBOBJ([socket])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([socket])
   gl_TYPE_SOCKLEN_T
@@ -112,19 +130,14 @@ AC_SUBST([LTALLOCA])
   gl_STDIO_H
   gl_STDLIB_H
   gl_STRCASE
-  gl_FUNC_STRDUP
-  gl_STRING_MODULE_INDICATOR([strdup])
   gl_HEADER_STRING_H
   gl_HEADER_STRINGS_H
-  gl_FUNC_STRPBRK
-  gl_STRING_MODULE_INDICATOR([strpbrk])
   gl_FUNC_STRPTIME
   gl_FUNC_STRSEP
   gl_STRING_MODULE_INDICATOR([strsep])
   gl_HEADER_SYS_SELECT
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_SOCKET
-  gl_MODULE_INDICATOR([sys_socket])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -176,9 +189,22 @@ AC_SUBST([LTALLOCA])
   m4_pushdef([gltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='libmissing/tests'
+  gt_LOCALE_FR
+  gt_LOCALE_FR_UTF8
+  gt_LOCALE_JA
+  gt_LOCALE_ZH_CN
+  gt_LOCALE_FR_UTF8
+  gt_LOCALE_FR
+  gt_LOCALE_FR_UTF8
+  gt_LOCALE_JA
+  gt_LOCALE_ZH_CN
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
+  gl_FUNC_STRERROR
+  gl_STRING_MODULE_INDICATOR([strerror])
   AC_CHECK_FUNCS([shutdown])
+  gl_FUNC_WCTOB
+  gl_WCHAR_MODULE_INDICATOR([wctob])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]gltests_LIBSOURCES_LIST[ ; do
@@ -271,14 +297,18 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/link-warning.h
+  lib/alignof.h
   lib/alloca.c
   lib/alloca.in.h
   lib/arpa_inet.in.h
   lib/asnprintf.c
+  lib/bind.c
+  lib/close-hook.c
+  lib/close-hook.h
   lib/close.c
+  lib/config.charset
+  lib/dirent.in.h
   lib/dirfd.c
-  lib/dirfd.h
-  lib/dummy.c
   lib/errno.in.h
   lib/fclose.c
   lib/float+.h
@@ -288,24 +318,35 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/fnmatch_loop.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
-  lib/getaddrinfo.h
   lib/getlogin_r.c
+  lib/getpagesize.c
+  lib/getpeername.c
   lib/gettext.h
   lib/glob-libc.h
   lib/glob.c
   lib/glob.in.h
   lib/inet_ntop.c
+  lib/localcharset.c
+  lib/localcharset.h
   lib/malloc.c
+  lib/mbrtowc.c
+  lib/mbsinit.c
+  lib/mbsrtowcs-state.c
+  lib/mbsrtowcs.c
+  lib/memchr.c
+  lib/memchr.valgrind
   lib/mempcpy.c
-  lib/memset.c
   lib/mktime.c
+  lib/netdb.in.h
   lib/netinet_in.in.h
   lib/pathmax.h
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-parse.c
   lib/printf-parse.h
-  lib/raise.c
+  lib/recvfrom.c
+  lib/ref-add.sin
+  lib/ref-del.sin
   lib/sig-handler.h
   lib/sigaction.c
   lib/signal.in.h
@@ -313,17 +354,19 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/size_max.h
   lib/sleep.c
   lib/snprintf.c
+  lib/socket.c
   lib/stdbool.in.h
   lib/stdint.in.h
   lib/stdio-write.c
   lib/stdio.in.h
   lib/stdlib.in.h
   lib/strcasecmp.c
-  lib/strdup.c
+  lib/streq.h
   lib/string.in.h
   lib/strings.in.h
   lib/strncasecmp.c
-  lib/strpbrk.c
+  lib/strnlen1.c
+  lib/strnlen1.h
   lib/strptime.c
   lib/strsep.c
   lib/sys_select.in.h
@@ -335,14 +378,18 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
+  lib/verify.h
+  lib/w32sock.h
   lib/wchar.in.h
   lib/wctype.in.h
-  lib/winsock.c
   lib/xsize.h
+  m4/00gnulib.m4
   m4/alloca.m4
   m4/arpa_inet_h.m4
   m4/close.m4
+  m4/codeset.m4
   m4/d-type.m4
+  m4/dirent_h.m4
   m4/dirfd.m4
   m4/errno_h.m4
   m4/extensions.m4
@@ -351,22 +398,36 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fnmatch.m4
   m4/getaddrinfo.m4
   m4/getlogin_r.m4
+  m4/getpagesize.m4
+  m4/glibc21.m4
   m4/glob.m4
   m4/gnulib-common.m4
+  m4/hostent.m4
   m4/include_next.m4
   m4/inet_ntop.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
+  m4/localcharset.m4
+  m4/locale-fr.m4
+  m4/locale-ja.m4
+  m4/locale-zh.m4
   m4/longlong.m4
   m4/malloc.m4
+  m4/mbrtowc.m4
+  m4/mbsinit.m4
+  m4/mbsrtowcs.m4
   m4/mbstate_t.m4
+  m4/memchr.m4
   m4/mempcpy.m4
-  m4/memset.m4
   m4/mktime.m4
+  m4/mmap-anon.m4
+  m4/multiarch.m4
+  m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/onceonly.m4
   m4/pathmax.m4
   m4/printf.m4
+  m4/servent.m4
   m4/sigaction.m4
   m4/signal_h.m4
   m4/signalblocking.m4
@@ -381,13 +442,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdio_h.m4
   m4/stdlib_h.m4
   m4/strcase.m4
-  m4/strdup.m4
+  m4/strerror.m4
   m4/string_h.m4
   m4/strings_h.m4
-  m4/strpbrk.m4
   m4/strptime.m4
   m4/strsep.m4
-  m4/sys_ioctl_h.m4
   m4/sys_select_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
@@ -399,21 +458,41 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/vasnprintf.m4
   m4/wchar.m4
   m4/wchar_t.m4
+  m4/wctob.m4
   m4/wctype.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
   tests/test-errno.c
+  tests/test-fnmatch.c
   tests/test-getaddrinfo.c
+  tests/test-glob.c
+  tests/test-mbrtowc.c
+  tests/test-mbrtowc1.sh
+  tests/test-mbrtowc2.sh
+  tests/test-mbrtowc3.sh
+  tests/test-mbrtowc4.sh
+  tests/test-mbsinit.c
+  tests/test-mbsinit.sh
+  tests/test-mbsrtowcs.c
+  tests/test-mbsrtowcs1.sh
+  tests/test-mbsrtowcs2.sh
+  tests/test-mbsrtowcs3.sh
+  tests/test-mbsrtowcs4.sh
+  tests/test-memchr.c
+  tests/test-netdb.c
   tests/test-netinet_in.c
   tests/test-sigaction.c
+  tests/test-signal.c
   tests/test-sleep.c
   tests/test-snprintf.c
   tests/test-stdbool.c
   tests/test-stdint.c
   tests/test-stdio.c
   tests/test-stdlib.c
+  tests/test-strerror.c
   tests/test-string.c
   tests/test-strings.c
   tests/test-sys_select.c
@@ -425,7 +504,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-vasnprintf.c
   tests/test-wchar.c
   tests/test-wctype.c
+  tests/zerosize-ptr.h
   tests=lib/dummy.c
   tests=lib/intprops.h
-  tests=lib/verify.h
+  tests=lib/strerror.c
+  tests=lib/wctob.c
 ])

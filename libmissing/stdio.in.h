@@ -1,6 +1,6 @@
 /* A GNU-like <stdio.h>.
 
-   Copyright (C) 2004, 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2007-2009 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,9 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
+#if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
+#endif
 
 #if defined __need_FILE || defined __need___FILE
 /* Special invocation convention inside glibc header files.  */
@@ -214,6 +216,38 @@ extern int vsprintf (char *str, const char *format, va_list args)
      vsprintf (b, f, a))
 #endif
 
+#if @GNULIB_DPRINTF@
+# if @REPLACE_DPRINTF@
+#  define dprintf rpl_dprintf
+# endif
+# if @REPLACE_DPRINTF@ || !@HAVE_DPRINTF@
+extern int dprintf (int fd, const char *format, ...)
+       __attribute__ ((__format__ (__printf__, 2, 3)));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef dprintf
+# define dprintf(d,f,a) \
+    (GL_LINK_WARNING ("dprintf is unportable - " \
+                      "use gnulib module dprintf for portability"), \
+     dprintf (d, f, a))
+#endif
+
+#if @GNULIB_VDPRINTF@
+# if @REPLACE_VDPRINTF@
+#  define vdprintf rpl_vdprintf
+# endif
+# if @REPLACE_VDPRINTF@ || !@HAVE_VDPRINTF@
+extern int vdprintf (int fd, const char *format, va_list args)
+       __attribute__ ((__format__ (__printf__, 2, 0)));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef vdprintf
+# define vdprintf(d,f,a) \
+    (GL_LINK_WARNING ("vdprintf is unportable - " \
+                      "use gnulib module vdprintf for portability"), \
+     vdprintf (d, f, a))
+#endif
+
 #if @GNULIB_VASPRINTF@
 # if @REPLACE_VASPRINTF@
 #  define asprintf rpl_asprintf
@@ -371,6 +405,24 @@ extern long rpl_ftell (FILE *fp);
                      "use gnulib module fflush for portable " \
                      "POSIX compliance"), \
     fflush (f))
+#endif
+
+#if @GNULIB_FPURGE@
+# if @REPLACE_FPURGE@
+#  define fpurge rpl_fpurge
+# endif
+# if @REPLACE_FPURGE@ || !@HAVE_DECL_FPURGE@
+  /* Discard all pending buffered I/O data on STREAM.
+     STREAM must not be wide-character oriented.
+     Return 0 if successful.  Upon error, return -1 and set errno.  */
+  extern int fpurge (FILE *gl_stream);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef fpurge
+# define fpurge(f) \
+   (GL_LINK_WARNING ("fpurge is not always present - " \
+                     "use gnulib module fpurge for portability"), \
+    fpurge (f))
 #endif
 
 #if @GNULIB_FCLOSE@

@@ -1,5 +1,5 @@
 /* close replacement.
-   Copyright (C) 2008 Free Software Foundation, Inc.
+   Copyright (C) 2008-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -19,10 +19,7 @@
 /* Specification.  */
 #include <unistd.h>
 
-#if GNULIB_SYS_SOCKET
-# include <sys/socket.h>
-#endif
-
+#include "close-hook.h"
 
 /* Override close() to call into other gnulib modules.  */
 
@@ -30,8 +27,8 @@ int
 rpl_close (int fd)
 #undef close
 {
-#if HAVE__GL_CLOSE_FD_MAYBE_SOCKET
-  int retval = _gl_close_fd_maybe_socket (fd);
+#if WINDOWS_SOCKETS
+  int retval = execute_all_close_hooks (fd);
 #else
   int retval = close (fd);
 #endif
