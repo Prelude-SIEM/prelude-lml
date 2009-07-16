@@ -109,6 +109,10 @@ static int do_pcre_exec(rule_regex_t *item, const char *in, size_t len, int *omi
         optr[1] = obkp1;
 
         ovector_index += (item->capture_count * 2);
+        if ( ovector_index > OVECSIZE ) {
+                prelude_log(PRELUDE_LOG_ERR, "backward references vector is too small: %u entry required.\n", ovector_index);
+                return -1;
+        }
 
         return ret;
 }
