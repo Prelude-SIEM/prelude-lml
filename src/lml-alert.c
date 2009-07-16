@@ -22,16 +22,15 @@
 *****/
 
 #include "config.h"
-#include "libmissing.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <assert.h>
+#include <netdb.h>
+
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -66,15 +65,22 @@ static idmef_analyzer_t *idmef_analyzer;
 
 static int resolve_failed_fallback(idmef_node_t *node, const char *hostname)
 {
-        int ret;
+        int ret, family;
         idmef_address_t *address;
         prelude_string_t *string;
+        struct addrinfo hints, *res;
+
 
         /*
          * we want to know if it's an ip address or an hostname.
          */
-        ret = inet_addr(hostname);
-        if ( ret < 0 ) {
+
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC;
+        hints.ai_flags  = AI_NUMERICHOST;
+
+        ret = getaddrinfo(hostname, NULL, &hints, &res);
+        if ( ret != 0 ) {
                 /*
                  * hostname.
                  */
@@ -82,6 +88,9 @@ static int resolve_failed_fallback(idmef_node_t *node, const char *hostname)
                 if ( ret < 0 )
                         return ret;
         } else {
+                family = res->ai_family;
+                freeaddrinfo(res);
+
                 ret = idmef_node_new_address(node, &address, IDMEF_LIST_APPEND);
                 if ( ret < 0 )
                         return ret;
@@ -89,6 +98,8 @@ static int resolve_failed_fallback(idmef_node_t *node, const char *hostname)
                 ret = idmef_address_new_address(address, &string);
                 if ( ret < 0 )
                         return ret;
+
+                idmef_address_set_category(address, (family == AF_INET) ? IDMEF_ADDRESS_CATEGORY_IPV4_ADDR : IDMEF_ADDRESS_CATEGORY_IPV6_ADDR);
         }
 
         return prelude_string_set_dup(string, hostname);
