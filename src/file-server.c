@@ -22,7 +22,6 @@
 *****/
 
 #include "config.h"
-#include "libmissing.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -61,6 +60,7 @@
 #include "file-server.h"
 #include "lml-alert.h"
 #include "lml-options.h"
+#include "pathmax.h"
 
 
 #ifndef MIN
