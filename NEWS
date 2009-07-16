@@ -1,3 +1,39 @@
+* 2009-07-16, prelude-lml-0.9.15:
+
+- Make the Prelude-LML UDP server IPv6 compatible.
+
+- Implement 'idmef-alter' and 'idmef-alter-force' option, alloing
+  to include static values into IDMEF events generated using a given
+  format.
+
+- New PPP/PPTPD/L2TP ruleset, by Alexander Afonyashin <firm@iname.com>,
+  with slight modification from Pierre Chifflier <p.chifflier@inl.fr>.
+  Close #340.
+
+- Fix CISCO VPN ruleset so that the 'Authentication rejected' rule will
+  trigger even if the 'server' field does not contain a word (fix #328).
+
+- Remove dos-style end-of-lines (Closes #338)
+
+- Fixes possible off by one when parsing variable reference number, and
+  remove un-needed check that would always evaluate to TRUE.Thanks
+  Steve Grubb <sgrubb@redhat.com> for reporting this problem (and
+  running flexelint on the Prelude sources)!
+
+- Update for libtool 2.x compatibility.
+
+- This simplify the whole regular expression handling a lot, making the
+  code much easier to read, and fixing potential problem with ovector
+  assignement. This code should also improve performance by a small
+  factor.
+
+- Change CISCO references urls to their new location, add CISCO ASA rule
+  to handle discarded tcp or udp packets.
+
+- Various fixes and update.
+
+
+
 * 2008-10-17, prelude-lml-0.9.14:
 
 - Fix log file permission error, that could happen thought the user
