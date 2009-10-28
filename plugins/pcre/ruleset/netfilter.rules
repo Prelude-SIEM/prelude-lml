@@ -62,10 +62,11 @@ regex=[Aa][Cc][Cc][Ee][Pp][Tt].*PROTO=(UDP|TCP|ICMP|AH|ESP); id=1311; \
 
 
 #LOG: Oct 16 11:16:51 blah kernel: Drop IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=48 TOS=0x00 PREC=0x00 TTL=113 ID=12776 DF PROTO=TCP SPT=3979 DPT=139 WINDOW=65535 RES=0x00 SYN URGP=0
+#LOG: Oct 16 11:16:51 blah kernel: Drop IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=48 TOS=0x00 PREC=0x00 TTL=113 ID=12776 DF PROTO=TCP SPT=3979 DPT=139 WINDOW=65535 SYN URGP=0
 
 #LOG: Oct 16 11:16:51 blah kernel: IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=48 TOS=0x00 PREC=0x00 TTL=113 ID=12776 DF PROTO=TCP SPT=3979 DPT=139 WINDOW=65535 RES=0x00 SYN URGP=0
 
-optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=TCP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) (SEQ=\d+ ACK=\d+ )?WINDOW=(\d+) RES=(\w+) (CWR )?(ECE )?(URG )?(ACK )?(PSH )?(RST )?(SYN )?(FIN )?URGP=(\d+); \
+optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)?\s+SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=TCP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) (SEQ=\d+ ACK=\d+ )?WINDOW=(\d+) (RES=(\w+) )?(CWR )?(ECE )?(URG )?(ACK )?(PSH )?(RST )?(SYN )?(FIN )?URGP=(\d+); \
  classification.text=TCP packet matched; \
  id=1300; \
  revision=1; \
@@ -73,7 +74,7 @@ optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=(
  analyzer(0).manufacturer=www.netfilter.org; \
  analyzer(0).class=Firewall; \
  assessment.impact.type=other; \
- assessment.impact.description=Netfilter matched a TCP packet $5:$18 -> $6:$19 [$25 $26 $27 $28 $29 $30] on interface $1$2 [ TTL=$10 ]; \
+ assessment.impact.description=Netfilter matched a TCP packet $5:$18 -> $6:$19 [$26 $27 $28 $29 $30 $31] on interface $1$2 [ TTL=$10 ]; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$5; \
  source(0).service.port=$18; \
@@ -92,7 +93,7 @@ optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=(
 
 #LOG: Oct 16 07:53:44 blah kernel: IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=78 TOS=0x00 PREC=0x00 TTL=128 ID=59110 PROTO=UDP SPT=137 DPT=137 LEN=58
 
-optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=UDP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) LEN=(\d+); \
+optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)?\s+SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=UDP (INCOMPLETE \[\d+ bytes\] )?SPT=(\d+) DPT=(\d+) LEN=(\d+); \
  classification.text=UDP packet matched; \
  id=1301; \
  revision=1; \
@@ -118,7 +119,7 @@ optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=(
 
 #LOG: Oct 20 23:59:41 blah kernel: IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=84 TOS=0x00 PREC=0x00 TTL=58 ID=9 DF PROTO=ICMP TYPE=8 CODE=0 ID=51318 SEQ=10
 
-optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=ICMP (INCOMPLETE \[\d+ bytes\] )?TYPE=(\d+) CODE=(\d+) (INCOMPLETE \[\d+ bytes\] )?(ID=\d+ SEQ=\d+ )?(PARAMETER=\d+ )?(GATEWAY=[\d\.]+ )?(\[\w+\])?(MTU=\d+ )?; \
+optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)?\s+SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=ICMP (INCOMPLETE \[\d+ bytes\] )?TYPE=(\d+) CODE=(\d+) (INCOMPLETE \[\d+ bytes\] )?(ID=\d+ SEQ=\d+ )?(PARAMETER=\d+ )?(GATEWAY=[\d\.]+ )?(\[\w+\])?(MTU=\d+ )?; \
  classification.text=ICMP packet matched; \
  id=1302; \
  revision=1; \
@@ -143,7 +144,7 @@ optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=(
 
 #LOG: Oct 20 17:13:25 blah kernel: IN=ppp0 OUT= MAC= SRC=1.1.1.1 DST=2.2.2.2 LEN=128 TOS=0x00 PREC=0x00 TTL=234 ID=15586 PROTO=ESP SPI=0xa7d839
 
-optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(AH|ESP) (INCOMPLETE \[\d+ bytes\] )?SPI=(\w+); \
+optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)?\s+SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(AH|ESP) (INCOMPLETE \[\d+ bytes\] )?SPI=(\w+); \
 classification.text=$17 packet matched; \
 id=1303; \
  revision=1; \
@@ -163,7 +164,7 @@ id=1303; \
  last
 
 
-optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(\d+); \
+optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)?\s+SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(\d+); \
  classification.text=$17 packet matched; \
  id=1304; \
  revision=1; \

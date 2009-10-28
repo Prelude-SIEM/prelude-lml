@@ -81,7 +81,7 @@ regex=\[(SSHChannel|SSHService);        include = kojoney.rules
 # entries (in which case we won't have the process name to match against)
 regex=(\[error\]|Pass|httpd);           include = httpd.rules; \
                                         include = modsecurity.rules;
-regex=kernel;                           include = ipchains.rules; \
+regex=(kernel|ulogd);                   include = ipchains.rules; \
                                         include = netfilter.rules; \
                                         include = bonding.rules;
 regex=ipfw;                             include = ipfw.rules;
