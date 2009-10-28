@@ -2,13 +2,13 @@
 #
 # Copyright (C) 2005 PreludeIDS Technologies. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
-# 
+#
 # Based on original implementation from Laurent Oudot, John Green <j.green@ukerna.ac.uk>
 #
 # This file is part of the Prelude-LML program.
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by 
+# it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2, or (at your option)
 # any later version.
 #
@@ -24,41 +24,41 @@
 #####
 
 
-# Linux Netfilter support for Prelude-LML. 
+# Linux Netfilter support for Prelude-LML.
 
 ## Packet Matching with improved pattern research
-#  
-#  Owing to a specific way of writing iptables rules, you can improve 
-#  the pattern matching of prelude-lml in your logs by specifying few things 
-#  like : was the packet dropped or accepted ? 
-#  
-#  In order to benefit from this improvement, you have to pay attention 
-#  for netfilter rules that you will create. 
+#
+#  Owing to a specific way of writing iptables rules, you can improve
+#  the pattern matching of prelude-lml in your logs by specifying few things
+#  like : was the packet dropped or accepted ?
+#
+#  In order to benefit from this improvement, you have to pay attention
+#  for netfilter rules that you will create.
 #  If you want to log packet using the LOG target with iptables,
-#  just respect this proposition 
+#  just respect this proposition
 #  (that you can change if you master all of that) :
 #
-#  If you use a LOG target for a packet that you Accept 
+#  If you use a LOG target for a packet that you Accept
 #  then add a prefix containing the word "Accept" to your rules:
 #     -j LOG --log-prefix "Accept "
 #
-#  If you use a LOG target for a packet that you Drop 
+#  If you use a LOG target for a packet that you Drop
 #  then add a prefix containing the word "Drop" to your rules:
 #     -j LOG --log-prefix "Drop "
 #
 
 
 regex=[Dd][Rr][Oo][Pp].*PROTO=(UDP|TCP|ICMP|AH|ESP); id=1310; \
-	classification.text = $1 packet dropped;   \
-	assessment.impact.completion = failed; \
- 	assessment.impact.type = other; \
-	assessment.impact.severity = medium; chained; silent;
+        classification.text = $1 packet dropped;   \
+        assessment.impact.completion = failed; \
+        assessment.impact.type = other; \
+        assessment.impact.severity = medium; chained; silent;
 
 regex=[Aa][Cc][Cc][Ee][Pp][Tt].*PROTO=(UDP|TCP|ICMP|AH|ESP); id=1311; \
-	classification.text = $1 packet accepted; \
-	assessment.impact.completion = succeeded; \
- 	assessment.impact.type = other; \
-	assessment.impact.severity = low; chained; silent;
+        classification.text = $1 packet accepted; \
+        assessment.impact.completion = succeeded; \
+        assessment.impact.type = other; \
+        assessment.impact.severity = low; chained; silent;
 
 
 #LOG: Oct 16 11:16:51 blah kernel: Drop IN=eth0 OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:00:00 SRC=1.1.1.1 DST=2.2.2.2 LEN=48 TOS=0x00 PREC=0x00 TTL=113 ID=12776 DF PROTO=TCP SPT=3979 DPT=139 WINDOW=65535 RES=0x00 SYN URGP=0
@@ -139,9 +139,9 @@ optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=(
  last
 
 
-#LOG: Oct 20 17:13:25 blah kernel: Drop IN=ppp0 OUT= MAC= SRC=1.1.1.1 DST=2.2.2.2 LEN=128 TOS=0x00 PREC=0x00 TTL=234 ID=15586 PROTO=ESP SPI=0xa7d839 
+#LOG: Oct 20 17:13:25 blah kernel: Drop IN=ppp0 OUT= MAC= SRC=1.1.1.1 DST=2.2.2.2 LEN=128 TOS=0x00 PREC=0x00 TTL=234 ID=15586 PROTO=ESP SPI=0xa7d839
 
-#LOG: Oct 20 17:13:25 blah kernel: IN=ppp0 OUT= MAC= SRC=1.1.1.1 DST=2.2.2.2 LEN=128 TOS=0x00 PREC=0x00 TTL=234 ID=15586 PROTO=ESP SPI=0xa7d839 
+#LOG: Oct 20 17:13:25 blah kernel: IN=ppp0 OUT= MAC= SRC=1.1.1.1 DST=2.2.2.2 LEN=128 TOS=0x00 PREC=0x00 TTL=234 ID=15586 PROTO=ESP SPI=0xa7d839
 
 optgoto=1310-1311; regex=IN=(\w*) OUT=(\w*)( MAC=)?([\w:]+)? SRC=([\d\.]+) DST=([\d\.]+) LEN=(\d+) TOS=(\w+) PREC=(\w+) TTL=(\d+) ID=(\d+) (CE )?(DF )?(MF )?(FRAG:\d+ )?(OPT \(\w+\) )?PROTO=(AH|ESP) (INCOMPLETE \[\d+ bytes\] )?SPI=(\w+); \
 classification.text=$17 packet matched; \
