@@ -262,19 +262,14 @@ lml_log_entry_t *lml_log_entry_new(void)
 
 
 
-int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, const char *entry, size_t size)
+int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, char *entry, size_t size)
 {
         int ret = -1;
         prelude_list_t *tmp;
         lml_log_format_container_t *fc;
 
         log_entry->original_log_len = size;
-
-        log_entry->original_log = strdup(entry);
-        if ( ! log_entry->original_log ) {
-                prelude_log(PRELUDE_LOG_ERR, "memory exhausted.\n");
-                return -1;
-        }
+        log_entry->original_log = entry;
 
         log_entry->message = log_entry->original_log;
         log_entry->message_len = log_entry->original_log_len;

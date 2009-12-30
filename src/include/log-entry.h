@@ -29,7 +29,7 @@
 
 lml_log_entry_t *lml_log_entry_new(void);
 
-int lml_log_entry_set_log(lml_log_entry_t *lc, lml_log_source_t *ls, const char *entry, size_t size);
+int lml_log_entry_set_log(lml_log_entry_t *lc, lml_log_source_t *ls, char *entry, size_t size);
 
 void lml_log_entry_destroy(lml_log_entry_t *lc);
 

@@ -56,6 +56,8 @@ void lml_log_format_apply_idmef(const lml_log_format_t *format, idmef_message_t 
 /*
  *
  */
+int lml_log_source_preprocess_input(lml_log_source_t *source, const char *in, size_t inlen, char **out, size_t *olen);
+
 const char *lml_log_source_get_format(lml_log_source_t *ls);
 
 const char *lml_log_source_get_source(lml_log_source_t *ls);
@@ -64,7 +66,7 @@ const char *lml_log_source_get_name(const lml_log_source_t *ls);
 
 regex_list_t *lml_log_source_get_regex_list(lml_log_source_t *ls);
 
-int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const char *name);
+int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const char *name, const char *encoding);
 
 void lml_log_source_destroy(lml_log_source_t *source);
 

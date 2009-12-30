@@ -42,7 +42,7 @@ AC_DEFUN([gl_INIT],
   gl_COMMON
   gl_source_base='libmissing'
 changequote(,)dnl
-LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
+LTALLOCA=`echo "$ALLOCA" | sed -e 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 changequote([, ])dnl
 AC_SUBST([LTALLOCA])
   gl_FUNC_ALLOCA
@@ -69,8 +69,6 @@ AC_SUBST([LTALLOCA])
   gl_NETDB_MODULE_INDICATOR([getaddrinfo])
   gl_GETLOGIN_R
   gl_UNISTD_MODULE_INDICATOR([getlogin_r])
-  gl_FUNC_GETPAGESIZE
-  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([getpeername])
@@ -80,8 +78,10 @@ AC_SUBST([LTALLOCA])
   AC_SUBST([LTLIBINTL])
   gl_GLOB
   gl_HOSTENT
+  AM_ICONV
   gl_INET_NTOP
   gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
+  gl_LANGINFO_H
   gl_LOCALCHARSET
   LOCALCHARSET_TESTS_ENVIRONMENT="CHARSETALIASDIR=\"\$(top_builddir)/$gl_source_base\""
   AC_SUBST([LOCALCHARSET_TESTS_ENVIRONMENT])
@@ -102,6 +102,8 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
   AC_PROG_MKDIR_P
+  gl_FUNC_NL_LANGINFO
+  gl_LANGINFO_MODULE_INDICATOR([nl_langinfo])
   gl_PATHMAX
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -123,9 +125,20 @@ AC_SUBST([LTALLOCA])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([socket])
   fi
+  # When this module is used, sockets may actually occur as file descriptors,
+  # hence it is worth warning if the modules 'close' and 'ioctl' are not used.
+  m4_ifdef([gl_UNISTD_H_DEFAULTS], [AC_REQUIRE([gl_UNISTD_H_DEFAULTS])])
+  m4_ifdef([gl_SYS_IOCTL_H_DEFAULTS], [AC_REQUIRE([gl_SYS_IOCTL_H_DEFAULTS])])
+  AC_REQUIRE([gl_PREREQ_SYS_H_WINSOCK2])
+  if test "$ac_cv_header_winsock2_h" = yes; then
+    UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=1
+    SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=1
+  fi
   gl_SYS_SOCKET_MODULE_INDICATOR([socket])
+  gl_SOCKETS
   gl_TYPE_SOCKLEN_T
   AM_STDBOOL_H
+  gl_STDDEF_H
   gl_STDINT_H
   gl_STDIO_H
   gl_STDLIB_H
@@ -172,7 +185,7 @@ AC_SUBST([LTALLOCA])
     if test -n "$gl_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         gl_libobjs="$gl_libobjs $i.$ac_objext"
         gl_ltlibobjs="$gl_ltlibobjs $i.lo"
       done
@@ -190,6 +203,9 @@ AC_SUBST([LTALLOCA])
   gl_COMMON
   gl_source_base='libmissing/tests'
   gt_LOCALE_FR
+  gt_LOCALE_TR_UTF8
+  AC_C_BIGENDIAN
+  gt_LOCALE_FR
   gt_LOCALE_FR_UTF8
   gt_LOCALE_JA
   gt_LOCALE_ZH_CN
@@ -198,11 +214,14 @@ AC_SUBST([LTALLOCA])
   gt_LOCALE_FR_UTF8
   gt_LOCALE_JA
   gt_LOCALE_ZH_CN
+  gt_LOCALE_FR
+  gt_LOCALE_FR_UTF8
+  AC_CHECK_DECLS_ONCE([alarm])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   gl_FUNC_STRERROR
   gl_STRING_MODULE_INDICATOR([strerror])
-  AC_CHECK_FUNCS([shutdown])
+  AC_CHECK_FUNCS_ONCE([shutdown])
   gl_FUNC_WCTOB
   gl_WCHAR_MODULE_INDICATOR([wctob])
   m4_ifval(gltests_LIBSOURCES_LIST, [
@@ -227,7 +246,7 @@ AC_SUBST([LTALLOCA])
     if test -n "$gltests_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gltests_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $gltests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         gltests_libobjs="$gltests_libobjs $i.$ac_objext"
         gltests_ltlibobjs="$gltests_ltlibobjs $i.lo"
       done
@@ -296,6 +315,8 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
+  build-aux/arg-nonnull.h
+  build-aux/config.rpath
   build-aux/link-warning.h
   lib/alignof.h
   lib/alloca.c
@@ -319,13 +340,13 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getlogin_r.c
-  lib/getpagesize.c
   lib/getpeername.c
   lib/gettext.h
   lib/glob-libc.h
   lib/glob.c
   lib/glob.in.h
   lib/inet_ntop.c
+  lib/langinfo.in.h
   lib/localcharset.c
   lib/localcharset.h
   lib/malloc.c
@@ -336,9 +357,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/memchr.c
   lib/memchr.valgrind
   lib/mempcpy.c
+  lib/mktime-internal.h
   lib/mktime.c
   lib/netdb.in.h
   lib/netinet_in.in.h
+  lib/nl_langinfo.c
   lib/pathmax.h
   lib/printf-args.c
   lib/printf-args.h
@@ -355,7 +378,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sleep.c
   lib/snprintf.c
   lib/socket.c
+  lib/sockets.c
+  lib/sockets.h
   lib/stdbool.in.h
+  lib/stddef.in.h
   lib/stdint.in.h
   lib/stdio-write.c
   lib/stdio.in.h
@@ -394,22 +420,28 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/errno_h.m4
   m4/extensions.m4
   m4/fclose.m4
+  m4/fcntl-o.m4
   m4/float_h.m4
   m4/fnmatch.m4
   m4/getaddrinfo.m4
   m4/getlogin_r.m4
-  m4/getpagesize.m4
   m4/glibc21.m4
   m4/glob.m4
   m4/gnulib-common.m4
   m4/hostent.m4
+  m4/iconv.m4
   m4/include_next.m4
   m4/inet_ntop.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
+  m4/langinfo_h.m4
+  m4/lib-ld.m4
+  m4/lib-link.m4
+  m4/lib-prefix.m4
   m4/localcharset.m4
   m4/locale-fr.m4
   m4/locale-ja.m4
+  m4/locale-tr.m4
   m4/locale-zh.m4
   m4/longlong.m4
   m4/malloc.m4
@@ -424,6 +456,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
+  m4/nl_langinfo.m4
   m4/onceonly.m4
   m4/pathmax.m4
   m4/printf.m4
@@ -434,9 +467,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/size_max.m4
   m4/sleep.m4
   m4/snprintf.m4
+  m4/sockets.m4
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/stdbool.m4
+  m4/stddef_h.m4
   m4/stdint.m4
   m4/stdint_h.m4
   m4/stdio_h.m4
@@ -462,13 +497,23 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wctype.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/macros.h
+  tests/signature.h
   tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
+  tests/test-c-ctype.c
+  tests/test-c-strcase.sh
+  tests/test-c-strcasecmp.c
+  tests/test-c-strncasecmp.c
+  tests/test-dirent.c
   tests/test-errno.c
   tests/test-fnmatch.c
   tests/test-getaddrinfo.c
   tests/test-glob.c
+  tests/test-iconv.c
+  tests/test-inet_ntop.c
+  tests/test-langinfo.c
   tests/test-mbrtowc.c
   tests/test-mbrtowc1.sh
   tests/test-mbrtowc2.sh
@@ -484,11 +529,15 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-memchr.c
   tests/test-netdb.c
   tests/test-netinet_in.c
+  tests/test-nl_langinfo.c
+  tests/test-nl_langinfo.sh
   tests/test-sigaction.c
   tests/test-signal.c
   tests/test-sleep.c
   tests/test-snprintf.c
+  tests/test-sockets.c
   tests/test-stdbool.c
+  tests/test-stddef.c
   tests/test-stdint.c
   tests/test-stdio.c
   tests/test-stdlib.c
@@ -505,7 +554,11 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/test-wctype.c
   tests/zerosize-ptr.h
-  tests=lib/dummy.c
+  tests=lib/c-ctype.c
+  tests=lib/c-ctype.h
+  tests=lib/c-strcase.h
+  tests=lib/c-strcasecmp.c
+  tests=lib/c-strncasecmp.c
   tests=lib/intprops.h
   tests=lib/strerror.c
   tests=lib/wctob.c

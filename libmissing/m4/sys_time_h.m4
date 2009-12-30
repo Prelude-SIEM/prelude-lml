@@ -1,6 +1,6 @@
 # Configure a replacement for <sys/time.h>.
 
-# Copyright (C) 2007 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2009 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -30,12 +30,12 @@ AC_DEFUN([gl_HEADER_SYS_TIME_H_BODY],
   AC_CACHE_CHECK([for struct timeval], [gl_cv_sys_struct_timeval],
     [AC_COMPILE_IFELSE(
        [AC_LANG_PROGRAM(
-	  [[#if HAVE_SYS_TIME_H
-	     #include <sys/time.h>
-	    #endif
-	    #include <time.h>
-	  ]],
-	  [[static struct timeval x; x.tv_sec = x.tv_usec;]])],
+          [[#if HAVE_SYS_TIME_H
+             #include <sys/time.h>
+            #endif
+            #include <time.h>
+          ]],
+          [[static struct timeval x; x.tv_sec = x.tv_usec;]])],
        [gl_cv_sys_struct_timeval=yes],
        [gl_cv_sys_struct_timeval=no])])
   if test $gl_cv_sys_struct_timeval = yes; then

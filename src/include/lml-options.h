@@ -34,6 +34,9 @@ typedef struct {
         char *pidfile;
         char *logfile_prefix_regex;
         char *logfile_ts_format;
+        const char *system_charset;
+        char *charset;
+        int charset_ref;
 
         prelude_client_t *lml_client;
 

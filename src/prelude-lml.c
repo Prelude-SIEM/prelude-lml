@@ -238,16 +238,22 @@ static void regex_match_cb(void *plugin, void *data)
  */
 void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
 {
+        int ret;
+        char *out;
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
 
-        prelude_log_debug(3, "[LOG] %s\n", str);
+        ret = lml_log_source_preprocess_input(ls, str, size, &out, &size);
+        if ( ret < 0 )
+                return;
+
+        prelude_log_debug(3, "[LOG] %s\n", out);
 
         log_entry = lml_log_entry_new();
         if ( ! log_entry )
                 return;
 
-        lml_log_entry_set_log(log_entry, ls, str, size);
+        lml_log_entry_set_log(log_entry, ls, out, size);
 
         rdata.log_source = ls;
         rdata.log_entry = log_entry;

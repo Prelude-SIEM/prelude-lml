@@ -92,6 +92,17 @@ AM_PATH_LIBPRELUDE(0.9.8, ,
 
 
 dnl **************************************************
+dnl * Check for libICU                               *
+dnl **************************************************
+
+PKG_CHECK_MODULES([ICU], [icu >= 3.0], [enable_icu=yes],
+                  [AC_CHECK_ICU(3.8, enable_icu=yes, enable_icu=no)])
+if test x$enable_icu = xyes; then
+        AC_DEFINE_UNQUOTED(HAVE_LIBICU, , Tell whether libicu is available for encoding convertion)
+fi
+
+
+dnl **************************************************
 dnl * Check for PCRE                                 *
 dnl **************************************************
 
@@ -201,4 +212,5 @@ AC_OUTPUT
 
 echo
 echo "*** Dumping configuration ***"
-echo "    - Enable unsupported rulesets:        : $enable_unsupported_rulesets"
+echo "    - Favor libICU over Iconv    : $enable_icu"
+echo "    - Enable unsupported rulesets: $enable_unsupported_rulesets"

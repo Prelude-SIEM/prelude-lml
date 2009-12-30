@@ -409,6 +409,27 @@ int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
 }
 
 
+static prelude_bool_t has_utf8(const char *regex)
+{
+        int support;
+        unsigned char c;
+
+        pcre_config(PCRE_CONFIG_UTF8, &support);
+        if ( ! support )
+                return FALSE;
+
+        while ( (c = (unsigned char) *regex) ) {
+                if ( (c >= 0xC2 && c <= 0xDF) ||
+                     (c >= 0xE0 && c <= 0xEF) ||
+                     (c >= 0xF0 && c <= 0xF4) )
+                        return TRUE;
+
+                regex++;
+        }
+
+        return FALSE;
+}
+
 
 rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 {
@@ -422,7 +443,7 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
                 return NULL;
         }
 
-        new->regex = pcre_compile(regex, 0, &err_ptr, &err_offset, NULL);
+        new->regex = pcre_compile(regex, has_utf8(regex) ? PCRE_UTF8 : 0, &err_ptr, &err_offset, NULL);
         if ( ! new->regex ) {
                 prelude_log(PRELUDE_LOG_WARN, "unable to compile regex[offset:%d]: %s.\n", err_offset, err_ptr);
                 free(new);

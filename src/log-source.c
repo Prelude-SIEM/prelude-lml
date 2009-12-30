@@ -43,6 +43,7 @@
 #include "prelude-lml.h"
 #include "log-source.h"
 #include "lml-options.h"
+#include "lml-charset.h"
 
 
 /*
@@ -82,6 +83,8 @@ struct lml_log_source {
         prelude_list_t list;
 
         char *name;
+        lml_charset_t *charset;
+
         regex_list_t *rlist;
 
         int warning_limit;
@@ -120,6 +123,31 @@ static lml_log_format_t *lml_log_format_ref(lml_log_format_t *lf)
 {
         lf->refcount++;
         return lf;
+}
+
+
+static inline int _fallback_preprocess_input(lml_log_source_t *source, const char *in, size_t inlen, char **out, size_t *outlen)
+{
+        *out = strdup(in);
+        if ( ! *out )
+                return -1;
+
+        *outlen = inlen;
+        return 0;
+}
+
+
+int lml_log_source_preprocess_input(lml_log_source_t *source, const char *in, size_t inlen, char **out, size_t *outlen)
+{
+        int ret = -1;
+
+        if ( source->charset )
+                ret = lml_charset_convert(source->charset, in, inlen, out, outlen);
+
+        if ( ret < 0 )
+                ret = _fallback_preprocess_input(source, in, inlen, out, outlen);
+
+        return ret;
 }
 
 
@@ -363,7 +391,35 @@ int lml_log_source_set_name(lml_log_source_t *ls, const char *name)
 }
 
 
-int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const char *name)
+static prelude_bool_t is_charset(const char *charset, const char *wanted)
+{
+        char tmp[32];
+        size_t ok = 0, i;
+        const char *separator = "-_ ";
+        prelude_bool_t is_separator;
+
+        while ( *charset && ok != (sizeof(tmp) - 1) ) {
+                is_separator = FALSE;
+
+                for ( i = 0; separator[i]; i++ ) {
+                        if ( *charset == separator[i] ) {
+                                is_separator = TRUE;
+                                break;
+                        }
+                }
+
+                if ( ! is_separator )
+                        tmp[ok++] = *charset;
+
+                charset++;
+        }
+
+        tmp[ok] = 0;
+        return strcasecmp(tmp, wanted) == 0;
+}
+
+
+int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const char *name, const char *charset)
 {
         int ret = -1;
 
@@ -403,8 +459,13 @@ int lml_log_source_new(lml_log_source_t **ls, lml_log_format_t *format, const ch
         if ( ret < 0 )
                 return ret;
 
-        prelude_list_add_tail(&source_list, &(*ls)->list);
+        if ( charset && ! is_charset(charset, "UTF8") ) {
+                ret = lml_charset_open(&(*ls)->charset, charset);
+                if ( ret < 0 )
+                        return ret;
+        }
 
+        prelude_list_add_tail(&source_list, &(*ls)->list);
         return 0;
 }
 
@@ -435,6 +496,9 @@ void lml_log_source_destroy(lml_log_source_t *source)
 
         if ( source->name )
                 free(source->name);
+
+        if ( source->charset )
+                lml_charset_close(source->charset);
 
         free(source);
 }

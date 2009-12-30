@@ -1,5 +1,5 @@
 # glob.m4 serial 10
-dnl Copyright (C) 2005-2007 Free Software Foundation, Inc.
+dnl Copyright (C) 2005-2007, 2009 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -27,8 +27,8 @@ AC_DEFUN([gl_GLOB],
 [     AC_COMPILE_IFELSE(
 [[#include <gnu-versions.h>
 char a[_GNU_GLOB_INTERFACE_VERSION == 1 ? 1 : -1];]],
-	[gl_cv_gnu_glob_interface_version_1=yes],
-	[gl_cv_gnu_glob_interface_version_1=no])])
+        [gl_cv_gnu_glob_interface_version_1=yes],
+        [gl_cv_gnu_glob_interface_version_1=no])])
 
     if test "$gl_cv_gnu_glob_interface_version_1" = "no"; then
       GLOB_H=glob.h

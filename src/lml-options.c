@@ -33,6 +33,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <locale.h>
+#include <langinfo.h>
 #include <glob.h>
 
 #if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
@@ -51,6 +53,7 @@
 #include "lml-alert.h"
 #include "file-server.h"
 #include "udp-server.h"
+#include "lml-charset.h"
 
 #define DEFAULT_UDP_SERVER_PORT 514
 
@@ -336,12 +339,47 @@ static prelude_bool_t isglob(const char *pattern)
 }
 
 
+static const char *guess_charset(const char *filename)
+{
+        size_t fret;
+        FILE *fd;
+        int ret, confidence;
+        char buf[1024*1024];
+        const char *charset = NULL;
+
+        fd = fopen(filename, "r");
+        if ( ! fd )
+                return NULL;
+
+        fret = fread(buf, 1, sizeof(buf), fd);
+        fclose(fd);
+
+        ret = lml_charset_detect(buf, fret, &charset, &confidence);
+        if ( ret >= 0 && confidence >= 80 ) {
+                prelude_log(PRELUDE_LOG_DEBUG, "%s: using detected '%s' charset with %d%% confidence.\n", filename, charset, confidence);
+        } else {
+                prelude_log(PRELUDE_LOG_DEBUG, "%s: using system '%s' over detected '%s' charset with %d%% confidence.\n", filename, config.system_charset, charset, confidence);
+                charset = config.system_charset;
+        }
+
+        return charset;
+}
+
 static int add_file(void *context, const char *filename)
 {
         int ret;
+        const char *charset;
         lml_log_source_t *ls;
 
-        ret = lml_log_source_new(&ls, context, filename);
+        if ( ! config.charset ) {
+                charset = guess_charset(filename);
+        } else {
+                config.charset_ref++;
+                charset = config.charset;
+                prelude_log(PRELUDE_LOG_DEBUG, "%s: using charset '%s' specified by user configuration.\n", filename, charset);
+        }
+
+        ret = lml_log_source_new(&ls, context, filename, charset);
         if ( ret < 0 )
                 return -1;
 
@@ -380,10 +418,26 @@ static int get_file_from_pattern(void *context, const char *pattern)
 }
 
 
+static int set_charset(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        if ( config.charset )
+                free(config.charset);
+
+        config.charset_ref = 0;
+
+        config.charset = strdup(arg);
+        if ( ! config.charset )
+                return -1;
+
+        return 0;
+}
+
 
 static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         int ret;
+
+        config.charset_ref++;
 
         if ( strcmp(arg, "-") == 0 )
                 return add_file(context, arg);
@@ -439,7 +493,7 @@ static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string
 
         snprintf(source, sizeof(source), "%s:%u/udp", addr, port);
 
-        ret = lml_log_source_new(&ls, context, source);
+        ret = lml_log_source_new(&ls, context, source, config.charset ? config.charset : NULL);
         if ( ret < 0 || ret == 1 ) {
                 free(addr);
                 return ret;
@@ -476,6 +530,17 @@ static int set_format(prelude_option_t *opt, const char *arg, prelude_string_t *
 {
         lml_log_format_t *format;
         prelude_option_context_t *octx;
+
+        if ( config.charset ) {
+                if ( config.charset_ref == 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "'charset=%s' is defined after any 'file' definition.\n", config.charset);
+                        return -1;
+                }
+
+                free(config.charset);
+                config.charset = NULL;
+                config.charset_ref = 0;
+        }
 
         format = lml_log_format_new(arg);
         if ( ! format )
@@ -561,6 +626,9 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
 
         memset(&config, 0, sizeof(config));
         config.warning_limit = -1;
+
+        setlocale(LC_CTYPE, "");
+        config.system_charset = nl_langinfo(CODESET);
 
 #if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
         config.wanted_uid = getuid();
@@ -670,6 +738,10 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
 
         prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           'c', "charset", "Specify the charset used by the input file",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_charset, NULL);
+
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            0, "idmef-alter", "Assign specific IDMEF path/value to matching log entry",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_idmef_alter, NULL);
 
@@ -678,6 +750,10 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_idmef_alter_force, NULL);
 
         ret = prelude_option_read(ropt, &config_file, &argc, argv, &err, NULL);
+
+        if ( config.charset )
+                free(config.charset);
+
         if ( ret < 0 ) {
                 if ( prelude_error_get_code(ret) == PRELUDE_ERROR_EOF )
                         return -1;

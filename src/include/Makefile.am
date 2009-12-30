@@ -3,6 +3,7 @@ includedir = $(prefix)/include/prelude-lml
 noinst_HEADERS = 	\
         common.h 	\
 	lml-alert.h	\
+	lml-charset.h	\
         lml-options.h 	\
 	log-entry.h	\
 	log-source.h	\

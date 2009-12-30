@@ -28,7 +28,7 @@ int a[] = { SHUT_RD, SHUT_WR, SHUT_RDWR };
 #endif
 
 int
-main ()
+main (void)
 {
   struct sockaddr_storage x;
   sa_family_t i;
@@ -47,7 +47,7 @@ main ()
     }
 
   x.ss_family = 42;
-  i = 4711;
+  i = 42;
 
   return 0;
 }
