@@ -25,9 +25,9 @@
 #####
 
 
-#LOG: Dec  4 23:01:24 beorc pptpd[24795]: CTRL: Client 1.2.3.4 control connection started
-#LOG: Dec  4 23:01:24 beorc pptpd[24795]: CTRL: Starting call (launching pppd, opening GRE)
-#LOG: Dec  4 23:01:25 beorc ppp[24796]: tun2: IPCP: Selected IP address 5.6.7.8
+# Dec  4 23:01:24 beorc pptpd[24795]: CTRL: Client 1.2.3.4 control connection started
+# Dec  4 23:01:24 beorc pptpd[24795]: CTRL: Starting call (launching pppd, opening GRE)
+# Dec  4 23:01:25 beorc ppp[24796]: tun2: IPCP: Selected IP address 5.6.7.8
 
 # Logging succeed
 
@@ -52,6 +52,16 @@ regex=ppp\[(\d+)\]: \S+: Phase: \S+ Output: SUCCESS; \
  assessment.impact.type=user; \
  silent;
 
+#LOG: Dec  4 23:01:36 beorc ppp[24796]: tun2: Phase: Chap Output: FAILURE
+regex=ppp\[(\d+)\]: \S+: Phase: \S+ Output: FAILURE; \
+ require_context=PPP_$1; \
+ id=10101; \
+ revision=1; \
+ assessment.impact.severity=medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=user; \
+ silent;
+
 #LOG: Dec  4 23:01:49 beorc pptpd[24795]: CTRL: Reaping child PPP[24796]
 regex=pptpd\[(\d+)\]: CTRL: \S+ \S+ PPP\[(\d+)\]; \
  require_context=PPP_$2; \
@@ -67,16 +77,4 @@ regex=pptpd\[(\d+)\]: CTRL: Client (\S+) control; \
  source(0).node.address(0).category=ipv4-addr; \
  source(0).node.address(0).address=$2; \
  last;
-
-# Logging failed
-
-#LOG: Dec  4 23:01:36 beorc ppp[24796]: tun2: Phase: Chap Output: FAILURE
-regex=ppp\[(\d+)\]: \S+: Phase: \S+ Output: FAILURE; \
- require_context=PPP_$1; \
- id=10101; \
- revision=1; \
- assessment.impact.severity=medium; \
- assessment.impact.completion=failed; \
- assessment.impact.type=user; \
- silent;
 
