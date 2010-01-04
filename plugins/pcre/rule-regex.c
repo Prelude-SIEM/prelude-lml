@@ -371,15 +371,18 @@ static int match_rule_list(pcre_plugin_t *plugin,
 
         create_context_if_needed(plugin, rule, state, log_entry);
 
-        if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) && state->idmef ) {
-                prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
-                                  rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
-                                  lml_log_entry_get_message(log_entry));
-
-                lml_alert_emit(NULL, NULL, state->idmef);
-                destroy_idmef_state(state);
-
+        if ( state->idmef ) {
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
+
+                if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) ) {
+                        prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
+                                          rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
+                                          lml_log_entry_get_message(log_entry));
+
+                        lml_alert_emit(NULL, NULL, state->idmef);
+                        destroy_idmef_state(state);
+                }
+
         }
 
         if ( rule->flags & PCRE_RULE_FLAGS_LAST )
