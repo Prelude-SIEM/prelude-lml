@@ -20,7 +20,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #####
-# The rules developed using mod_security-2.5.6 (tested with 2.1.7 and 2.5.6) 
+# The rules developed using mod_security-2.5.6 (tested with 2.1.7 and 2.5.6)
 #####
 
 # Here are some example log entries that should match against rules defined below:
@@ -40,9 +40,9 @@ regex=\[id "(960911|950012|960912|960016|960011|960012|960013|950107|950801|9501
  id=3167; \
  classification.text=HTTP Protocol violation; \
  assessment.impact.severity=medium; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -51,9 +51,9 @@ regex=\[id "(960019|960008|960015|960009|960904|960913)"\]; \
  id=3168; \
  classification.text=HTTP Protocol anomaly; \
  assessment.impact.severity=low; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -62,9 +62,9 @@ regex=\[id "(960335)"\]; \
  id=3169; \
  classification.text=HTTP Request limit exceeded; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -73,9 +73,9 @@ regex=\[id "(960032|960010|960034|960035|960038|960902|960903)"\]; \
  id=3170; \
  classification.text=HTTP policy violation; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -84,9 +84,9 @@ regex=\[id "(990002|990901|990902|990012|990011)"\]; \
  id=3171; \
  classification.text=Bad HTTP robot; \
  assessment.impact.severity=info; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -95,9 +95,9 @@ regex=\[id "(959009|950007|959007|950904|959904|950001|959001|950901|959901|9509
  id=3172; \
  classification.text=Generic HTTP attack; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -105,9 +105,9 @@ regex=\[id "(950921|950922)"\]; \
  id=3173; \
  classification.text=HTTP trojan; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -116,9 +116,9 @@ regex=\[id "(970003|970004|970904|970007|970008|970009|970010|970012|970013|9700
  id=3174; \
  classification.text=HTTP outbound policy violation; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \   
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=$1; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=$1; \
  classification.reference(0).name=$1; \
  chained; silent;
 
@@ -133,9 +133,9 @@ regex=\[id "950005"\]; optgoto=3177; min-optgoto-match=1; \
  id=3175; \
  classification.text=Generic HTTP attack; \
  assessment.impact.severity=high; \
- additional_data(1).type=integer; \
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=950005; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=950005; \
  classification.reference(0).name=950005; \
  chained; silent;
 
@@ -143,9 +143,9 @@ regex=\[id "960017"\]; \
  id=3176; \
  classification.text=HTTP Protocol anomaly; \
  assessment.impact.severity=low; \
- additional_data(1).type=integer; \
- additional_data(1).meaning=ModSec Rule ID; \
- additional_data(1).data=960017; \
+ additional_data(>>).type=integer; \
+ additional_data(-1).meaning=ModSec Rule ID; \
+ additional_data(-1).data=960017; \
  classification.reference(0).name=960017; \
  assessment.impact.type=recon; \
  chained; silent;
@@ -158,7 +158,7 @@ regex=\[file "([^"]+)"\]; \
  additional_data(>>).type=string; \
  additional_data(-1).meaning=ModSec Ruleset File; \
  additional_data(-1).data=$1; \
- chained; silent; 
+ chained; silent;
 
 regex=\[line "(\d+)"\]; \
  id=3161; \
@@ -172,14 +172,14 @@ regex=\[tag "(\S+)"\]; \
  additional_data(>>).type=string; \
  additional_data(-1).meaning=ModSec Rule Tag; \
  additional_data(-1).data=$1; \
- chained; silent; 
+ chained; silent;
 
 regex=\[severity "(\S+)"\]; \
  id=3163; \
  additional_data(>>).type=string; \
  additional_data(-1).meaning=ModSec Severity; \
  additional_data(-1).data=$1; \
- chained; silent; 
+ chained; silent;
 
 regex=\[msg "([^"]+)"\]; optgoto=3167-3176; min-optgoto-match=1; \
  id=3164; \
@@ -203,7 +203,7 @@ regex=\[unique_id "(\S+)"\]; \
 regex=Match of "(.+)" against "(\S+)" required\.; optgoto=3160-3166; \
  id=3120; \
  assessment.impact.description=ModSecurity found pattern match "$1" in HTTP object $2.; \
- chained; silent; 
+ chained; silent;
 
 regex=Operator ([A-Z]{2}) match: (\d+)\.; optgoto=3160-3166; \
  id=3121; \
@@ -213,7 +213,7 @@ regex=Operator ([A-Z]{2}) match: (\d+)\.; optgoto=3160-3166; \
 regex=Pattern match "(.+)" at (.+?)\.; optgoto=3160-3166; \
  id=3122; \
  assessment.impact.description=ModSecurity found pattern match "$1" in HTTP object $2.; \
- chained; silent;  
+ chained; silent;
 
 regex=Operator ([A-Z]{2}) matched (\d+) at (\S+)\.; optgoto=3160-3166; \
  id=3123; \
@@ -235,20 +235,20 @@ regex=with code (\d+) \(phase \d\)\.; optgoto=3120-3125; \
  id=3130; \
  assessment.action(0).category = block-installed; \
  assessment.action(0).description = Access was blocked with HTTP response code $1.; \
- chained; silent;  
+ chained; silent;
 
 regex=using proxy to \(phase (\d+)\) (\S+)\.; optgoto=3120-3125; \
  id=3131; \
  assessment.action(0).category = block-installed; \
  assessment.action(0).description = Access was denied using proxy to $2.; \
- chained; silent; 
+ chained; silent;
 
 regex=with redirection to (\S+) using status (\d+) \(phase (\d+)\)\.; optgoto=3120-3125; \
  id=3132; \
  assessment.action(0).category = block-installed; \
  assessment.action(0).description = Access was redirected to $1.; \
  chained; silent;
- 
+
 regex=with connection close \(phase (\d+)\).; optgoto=3120-3125; \
  id=3133; \
  assessment.action(0).category = block-installed; \
@@ -293,8 +293,6 @@ regex=\[client ([\d\.]+)\] ModSecurity:.*\[uri "([^"]+)"\]; optgoto=3101-3103; \
  target(0).service.iana_protocol_name=tcp; \
  target(0).service.iana_protocol_number=6; \
  target(0).service.name=http; \
- additional_data(0).type=string; \
- additional_data(0).meaning=URI; \
- additional_data(0).data=$2; \
+ target(0).service.web_service.url = $2; \
  classification.reference(0).url=http://www.modsecurity.org/projects/rules/index.html; \
  last
