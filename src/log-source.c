@@ -169,11 +169,15 @@ lml_log_format_t *lml_log_format_new(const char *name)
 
         if ( lml_log_format_set_ts_fmt(new, SYSLOG_TS_FMT) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log timestamp format.\n");
+                free(new->name);
+                free(new);
                 return NULL;
         }
 
         if ( lml_log_format_set_prefix_regex(new, SYSLOG_PREFIX_REGEX) < 0 ) {
                 prelude_log(PRELUDE_LOG_WARN, "failed to set log message prefix.\n");
+                free(new->name);
+                free(new);
                 return NULL;
         }
 
