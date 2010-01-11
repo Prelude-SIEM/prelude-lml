@@ -18,8 +18,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 # server-addr = 127.0.0.1
 
 
-#
-# Files to monitor
+# FILES TO MONITOR
 #
 # You should define the log message prefix-regex and time-format within
 # a [format] section. If not specified, the default syslog format will
@@ -53,6 +52,32 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 #
 # Example: file = /var/log/*/*.log
 #
+
+
+# CHARACTER ENCODING
+#
+# For each files added to a format, a character encoding can be specified
+# using the 'charset' option. Example:
+#
+# [format=MyFormat]
+# charset = ISO-8859-1
+# file = /var/log/log1
+# file = /var/log/log2
+# charset = UTF-8
+# file = /var/log/log3
+# file = /var/log/*.log
+# udp-server = 0.0.0.0
+#
+# This will set the character set for 'log1' and 'log2' to ISO-8859-1, and
+# to UTF-8 for 'log3', any files that match '/var/log/*.log', and any log
+# entry read from the '0.0.0.0' integrated UDP server.
+#
+# Note that if no character encoding is specified, the system will attempt
+# to automatically detect the encoding used. If the detection fail, then
+# system wide default (retrieved from locale LC_CTYPE) will be used.
+#
+
+# ALTERING GENERATED IDMEF Events
 #
 # Within each format, you might use the 'idmef-alter' option to modify
 # generated events:
