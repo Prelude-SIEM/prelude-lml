@@ -41,6 +41,7 @@
 #include "log-source.h"
 #include "udp-server.h"
 #include "lml-options.h"
+#include <ctype.h>
 
 #ifndef MIN
 # define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -66,24 +67,46 @@ struct udp_server {
 };
 
 
+typedef struct {
+        int pri;
+} syslog_header_t;
+
 
 extern lml_config_t config;
 
 
 
-static char *my_strnchr(char *input, char wanted, size_t size)
+static int logparse_pri(syslog_header_t *hdr, char **src, ssize_t *len)
 {
-        while ( *input && size-- ) {
-                if ( *input == 0 )
-                        break;
+        size_t i = 0;
+        char *ptr = *src;
 
-                if ( *input == wanted )
-                        return input;
+        hdr->pri = 0;
 
-                input++;
+        if ( ptr[i++] != '<' )
+                goto error;
+
+        while ( ptr[i] != '>' ) {
+                if ( ! isdigit(ptr[i]) )
+                        goto error;
+
+                hdr->pri = hdr->pri * 10 + (ptr[i++] - '0');
         }
 
-        return NULL;
+        if ( ptr[i] == '>' && i >= 3 && i <= 4 ) {
+                *len -= i + 1;
+                *src += i + 1;
+                return 0;
+        }
+
+error:
+        /*
+         * If the relay receives a syslog message without a PRI, or with an
+         * unidentifiable PRI, then it MUST insert a PRI with a Priority value
+         * of 13
+         */
+        hdr->pri = 13;
+        return -1;
 }
 
 
@@ -103,6 +126,7 @@ void udp_server_process_event(udp_server_t *server)
 # define SOCKADDR_PORT_MEMBER(x) (x.sa4.sin_port)
 #endif
         } addr;
+        syslog_header_t hdr;
         char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL, src[512];
 
         len = sizeof(addr);
@@ -125,21 +149,10 @@ void udp_server_process_event(udp_server_t *server)
         snprintf(src + strlen(src), sizeof(src) - strlen(src), ":%d", SOCKADDR_PORT_MEMBER(addr));
         lml_log_source_set_name(server->ls, src);
 
-        /*
-         * We don't care about syslog priority / facility. From RFC 3164:
-         *
-         * - If the first character is not a less-than sign: no valid PRI.
-         * - If the 3rd, 4th, or 5th character is not a right angle bracket character: no valid PRI.
-         */
-        if ( buf[0] == '<' && ret > 2 ) {
-                ptr = my_strnchr(buf + 2, '>', MIN(ret - 2, 3));
-                if ( ptr ) {
-                        ptr++;
-                        ret -= (ptr - buf);
-                }
-        }
+        ptr = buf;
 
-        lml_dispatch_log(server->ls, ptr ? ptr : buf, ret);
+        logparse_pri(&hdr, &ptr, &ret);
+        lml_dispatch_log(server->ls, ptr, ret);
 }
 
 
