@@ -272,37 +272,58 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
 
 
 
-static int generate_additional_data(idmef_alert_t *alert, const char *meaning, const char *data)
+static int generate_additional_data(idmef_additional_data_t **adata, const char *meaning, const char *data)
 {
         int ret;
         prelude_string_t *str;
-        idmef_additional_data_t *adata;
 
-        ret = idmef_alert_new_additional_data(alert, &adata, IDMEF_LIST_APPEND);
+        ret = idmef_additional_data_new(adata);
         if ( ret < 0 )
                 return ret;
 
-        ret = idmef_additional_data_new_meaning(adata, &str);
+        ret = idmef_additional_data_new_meaning(*adata, &str);
         if ( ret < 0 )
                 return ret;
 
         prelude_string_set_ref(str, meaning);
 
-        return idmef_additional_data_set_string_dup(adata, data);
+        return idmef_additional_data_set_string_dup(*adata, data);
 }
 
 
 
-int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, const lml_log_entry_t *log)
+int lml_additional_data_prepare(prelude_list_t *adlist, const lml_log_source_t *ls, const lml_log_entry_t *log)
+{
+        const char *ptr, *source;
+        idmef_additional_data_t *adata;
+
+        source = lml_log_source_get_name(ls);
+        if ( generate_additional_data(&adata, "Log received from", source) < 0 )
+                return -1;
+
+        prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
+
+        ptr = lml_log_entry_get_original_log(log);
+        if ( ptr ) {
+                if ( generate_additional_data(&adata, "Original Log", ptr) < 0 )
+                        return -1;
+
+                prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
+        }
+
+        return 0;
+}
+
+
+int lml_alert_set_infos(idmef_message_t *message, const lml_log_entry_t *log)
 {
         int ret;
         idmef_time_t *time;
         idmef_alert_t *alert;
-        const char *ptr, *source;
         idmef_analyzer_t *cur_analyzer;
 
-        alert = idmef_message_get_alert(message);
-        if ( ! alert )
+        ret = idmef_message_new_alert(message, &alert);
+        if ( ret < 0 )
                 return -1;
 
         ret = idmef_alert_new_detect_time(alert, &time);
@@ -320,18 +341,45 @@ int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, cons
                         return -1;
         }
 
-        source = lml_log_source_get_name(ls);
-        if ( generate_additional_data(alert, "Log received from", source) < 0 )
-                return -1;
-
-        ptr = lml_log_entry_get_original_log(log);
-        if ( ptr ) {
-                if ( generate_additional_data(alert, "Original Log", ptr) < 0 )
-                        return -1;
-        }
-
         if ( lml_log_entry_get_format(log) )
                 lml_log_format_apply_idmef(lml_log_entry_get_format(log), message);
+
+        return 0;
+}
+
+
+
+int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, const lml_log_entry_t *log)
+{
+        int ret;
+        idmef_alert_t *alert;
+        const char *ptr, *source;
+        idmef_additional_data_t *adata;
+
+        ret = idmef_message_new_alert(message, &alert);
+        if ( ret < 0 )
+                return -1;
+
+        if ( ls ) {
+                source = lml_log_source_get_name(ls);
+
+                if ( generate_additional_data(&adata, "Log received from", source) < 0 )
+                        return -1;
+
+                idmef_alert_set_additional_data(alert, adata, IDMEF_LIST_APPEND);
+        }
+
+        if ( log ) {
+                ptr = lml_log_entry_get_original_log(log);
+                if ( ptr ) {
+                        if ( generate_additional_data(&adata, "Original Log", ptr) < 0 )
+                                return -1;
+
+                        idmef_alert_set_additional_data(alert, adata, IDMEF_LIST_APPEND);
+                }
+
+                lml_alert_set_infos(message, log);
+        }
 
         return 0;
 }
@@ -344,11 +392,9 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
         idmef_time_t *time;
         idmef_alert_t *alert;
 
-        if ( ls && log ) {
-                ret = lml_alert_prepare(message, ls, log);
-                if ( ret < 0 )
-                        return;
-        }
+        ret = lml_alert_prepare(message, ls, log);
+        if ( ret < 0 )
+                return;
 
         alert = idmef_message_get_alert(message);
         if ( ! alert )
