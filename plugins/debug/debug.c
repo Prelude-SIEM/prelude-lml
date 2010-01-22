@@ -46,7 +46,7 @@ extern prelude_option_t *lml_root_optlist;
 
 
 
-static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
+static void debug_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, lml_log_entry_t *log_entry)
 {
         int ret;
         debug_plugin_t *plugin;

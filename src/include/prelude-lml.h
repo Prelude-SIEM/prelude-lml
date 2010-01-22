@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -32,9 +32,14 @@ typedef struct lml_log_source lml_log_source_t;
 
 
 typedef struct {
-	PRELUDE_PLUGIN_GENERIC;
-	void (*run)(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log);
+        PRELUDE_PLUGIN_GENERIC;
+        void (*run)(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, lml_log_entry_t *log);
 } lml_log_plugin_t;
+
+
+void lml_log_entry_destroy(lml_log_entry_t *lc);
+
+lml_log_entry_t *lml_log_entry_ref(lml_log_entry_t *log_entry);
 
 
 const char *lml_log_entry_get_message(const lml_log_entry_t *log_entry);

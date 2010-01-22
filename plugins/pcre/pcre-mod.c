@@ -831,7 +831,7 @@ static int parse_ruleset(prelude_list_t *head, pcre_plugin_t *plugin, const char
 
 
 
-static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
+static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, lml_log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;

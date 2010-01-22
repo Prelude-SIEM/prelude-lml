@@ -47,6 +47,8 @@
 
 
 struct lml_log_entry {
+        int refcount;
+
         char *original_log;
         size_t original_log_len;
 
@@ -254,6 +256,7 @@ lml_log_entry_t *lml_log_entry_new(void)
                 return NULL;
         }
 
+        log_entry->refcount = 1;
         gettimeofday(&log_entry->tv, NULL);
 
         return log_entry;
@@ -300,8 +303,18 @@ int lml_log_entry_set_log(lml_log_entry_t *log_entry, lml_log_source_t *ls, char
 
 
 
+lml_log_entry_t *lml_log_entry_ref(lml_log_entry_t *log_entry)
+{
+        log_entry->refcount++;
+        return log_entry;
+}
+
+
 void lml_log_entry_destroy(lml_log_entry_t *log_entry)
 {
+        if ( --log_entry->refcount > 0 )
+                return;
+
         if ( log_entry->original_log )
                 free(log_entry->original_log);
 
