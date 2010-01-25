@@ -47,6 +47,7 @@ ruleset_DATA = \
 	sendmail.rules		\
 	shadow-utils.rules	\
 	single.rules		\
+	snare_windows.rules	\
 	sonicwall.rules		\
 	spamassassin.rules	\
 	squid.rules		\
