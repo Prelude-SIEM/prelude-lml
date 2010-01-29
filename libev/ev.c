@@ -1,7 +1,7 @@
 /*
  * libev event processing core, watcher management
  *
- * Copyright (c) 2007,2008,2009 Marc Alexander Lehmann <libev@schmorp.de>
+ * Copyright (c) 2007,2008,2009,2010 Marc Alexander Lehmann <libev@schmorp.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modifica-
@@ -112,7 +112,7 @@ extern "C" {
 # endif
    
 # ifndef EV_USE_KQUEUE
-#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H && HAVE_SYS_QUEUE_H
+#  if HAVE_KQUEUE && HAVE_SYS_EVENT_H
 #   define EV_USE_KQUEUE 1
 #  else
 #   define EV_USE_KQUEUE 0
@@ -165,6 +165,7 @@ extern "C" {
 #include <errno.h>
 #include <sys/types.h>
 #include <time.h>
+#include <limits.h>
 
 #include <signal.h>
 
@@ -346,6 +347,12 @@ extern "C" {
 
 /* this block fixes any misconfiguration where we know we run into trouble otherwise */
 
+#ifdef _AIX
+/* AIX has a completely broken poll.h header */
+# undef EV_USE_POLL
+# define EV_USE_POLL 0
+#endif
+
 #ifndef CLOCK_MONOTONIC
 # undef EV_USE_MONOTONIC
 # define EV_USE_MONOTONIC 0
@@ -507,7 +514,7 @@ static EV_ATOMIC_T have_monotonic; /* did clock_gettime (CLOCK_MONOTONIC) work? 
 # define EV_FD_TO_WIN32_HANDLE(fd) _get_osfhandle (fd)
 #endif
 #ifndef EV_WIN32_HANDLE_TO_FD
-# define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (fd, 0)
+# define EV_WIN32_HANDLE_TO_FD(handle) _open_osfhandle (handle, 0)
 #endif
 #ifndef EV_WIN32_CLOSE_FD
 # define EV_WIN32_CLOSE_FD(fd) close (fd)
@@ -966,7 +973,7 @@ inline_size int
 fd_valid (int fd)
 {
 #ifdef _WIN32
-  return _get_osfhandle (fd) != -1;
+  return EV_FD_TO_WIN32_HANDLE (fd) != -1;
 #else
   return fcntl (fd, F_GETFD) != -1;
 #endif
@@ -1181,7 +1188,7 @@ fd_intern (int fd)
 {
 #ifdef _WIN32
   unsigned long arg = 1;
-  ioctlsocket (_get_osfhandle (fd), FIONBIO, &arg);
+  ioctlsocket (EV_FD_TO_WIN32_HANDLE (fd), FIONBIO, &arg);
 #else
   fcntl (fd, F_SETFD, FD_CLOEXEC);
   fcntl (fd, F_SETFL, O_NONBLOCK);
@@ -1296,7 +1303,7 @@ ev_sighandler (int signum)
   EV_P = signals [signum - 1].loop;
 #endif
 
-#if _WIN32
+#ifdef _WIN32
   signal (signum, ev_sighandler);
 #endif
 
@@ -2159,7 +2166,7 @@ timers_reschedule (EV_P_ ev_tstamp adjust)
 }
 
 /* fetch new monotonic and realtime times from the kernel */
-/* also detetc if there was a timejump, and act accordingly */
+/* also detect if there was a timejump, and act accordingly */
 inline_speed void
 time_update (EV_P_ ev_tstamp max_block)
 {
@@ -2749,7 +2756,7 @@ ev_signal_start (EV_P_ ev_signal *w)
     if (sigfd < 0) /*TODO*/
 # endif
       {
-# if _WIN32
+# ifdef _WIN32
         evpipe_init (EV_A);
 
         signal (w->signum, ev_sighandler);
@@ -2855,7 +2862,9 @@ ev_child_stop (EV_P_ ev_child *w)
 static void noinline stat_timer_cb (EV_P_ ev_timer *w_, int revents);
 
 #if EV_USE_INOTIFY
-# define EV_INOTIFY_BUFSIZE 8192
+
+/* the * 2 is to allow for alignment padding, which for some reason is >> 8 */
+# define EV_INOTIFY_BUFSIZE (sizeof (struct inotify_event) * 2 + NAME_MAX)
 
 static void noinline
 infy_add (EV_P_ ev_stat *w)
@@ -2974,12 +2983,15 @@ static void
 infy_cb (EV_P_ ev_io *w, int revents)
 {
   char buf [EV_INOTIFY_BUFSIZE];
-  struct inotify_event *ev = (struct inotify_event *)buf;
   int ofs;
   int len = read (fs_fd, buf, sizeof (buf));
 
-  for (ofs = 0; ofs < len; ofs += sizeof (struct inotify_event) + ev->len)
-    infy_wd (EV_A_ ev->wd, ev->wd, ev);
+  for (ofs = 0; ofs < len; )
+    {
+      struct inotify_event *ev = (struct inotify_event *)(buf + ofs);
+      infy_wd (EV_A_ ev->wd, ev->wd, ev);
+      ofs += sizeof (struct inotify_event) + ev->len;
+    }
 }
 
 inline_size void
