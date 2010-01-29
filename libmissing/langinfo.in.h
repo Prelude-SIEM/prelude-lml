@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <langinfo.h>.
-   Copyright (C) 2009 Free Software Foundation, Inc.
+   Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -123,7 +123,7 @@ typedef int nl_item;
 
 #endif
 
-/* The definition of GL_LINK_WARNING is copied here.  */
+/* The definition of _GL_WARN_ON_USE is copied here.  */
 
 /* Declare overridden functions.  */
 
@@ -146,10 +146,10 @@ extern char *nl_langinfo (nl_item item);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef nl_langinfo
-# define nl_langinfo(i)                      \
-    (GL_LINK_WARNING ("nl_langinfo is not portable - " \
-                      "use gnulib module nl_langinfo for portability"), \
-     nl_langinfo (i))
+# if HAVE_RAW_DECL_NL_LANGINFO
+_GL_WARN_ON_USE (nl_langinfo, "nl_langinfo is not portable - "
+                 "use gnulib module nl_langinfo for portability");
+# endif
 #endif
 
 

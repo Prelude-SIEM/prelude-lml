@@ -1,24 +1,30 @@
 dnl A placeholder for ISO C99 <wchar.h>, for platforms that have issues.
 
-dnl Copyright (C) 2007-2009 Free Software Foundation, Inc.
+dnl Copyright (C) 2007-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 dnl Written by Eric Blake.
 
-# wchar.m4 serial 27
+# wchar.m4 serial 31
 
 AC_DEFUN([gl_WCHAR_H],
 [
   AC_REQUIRE([gl_WCHAR_H_DEFAULTS])
   AC_REQUIRE([gl_WCHAR_H_INLINE_OK])
-  AC_CACHE_CHECK([whether <wchar.h> is standalone],
-    [gl_cv_header_wchar_h_standalone],
-    [AC_COMPILE_IFELSE([[#include <wchar.h>
-wchar_t w;]],
-      [gl_cv_header_wchar_h_standalone=yes],
-      [gl_cv_header_wchar_h_standalone=no])])
+  dnl Prepare for creating substitute <wchar.h>.
+  dnl Check for <wchar.h> (missing in Linux uClibc when built without wide
+  dnl character support).
+  dnl <wchar.h> is always overridden, because of GNULIB_POSIXCHECK.
+  AC_CHECK_HEADERS_ONCE([wchar.h])
+  gl_CHECK_NEXT_HEADERS([wchar.h])
+  if test $ac_cv_header_wchar_h = yes; then
+    HAVE_WCHAR_H=1
+  else
+    HAVE_WCHAR_H=0
+  fi
+  AC_SUBST([HAVE_WCHAR_H])
 
   AC_REQUIRE([gt_TYPE_WINT_T])
   if test $gt_cv_c_wint_t = yes; then
@@ -28,27 +34,18 @@ wchar_t w;]],
   fi
   AC_SUBST([HAVE_WINT_T])
 
-  dnl If <stddef.h> is replaced, then <wchar.h> must also be replaced.
-  AC_REQUIRE([gl_STDDEF_H])
-
-  if test $gl_cv_header_wchar_h_standalone != yes || test $gt_cv_c_wint_t != yes || test -n "$STDDEF_H"; then
-    WCHAR_H=wchar.h
-  fi
-
-  dnl Prepare for creating substitute <wchar.h>.
-  dnl Do it always: WCHAR_H may be empty here but can be set later.
-  dnl Check for <wchar.h> (missing in Linux uClibc when built without wide
-  dnl character support).
-  AC_CHECK_HEADERS_ONCE([wchar.h])
-  if test $ac_cv_header_wchar_h = yes; then
-    HAVE_WCHAR_H=1
-  else
-    HAVE_WCHAR_H=0
-  fi
-  AC_SUBST([HAVE_WCHAR_H])
-  dnl Execute this unconditionally, because WCHAR_H may be set by other
-  dnl modules, after this code is executed.
-  gl_CHECK_NEXT_HEADERS([wchar.h])
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use.
+  gl_WARN_ON_USE_PREPARE([[
+/* Some systems require additional headers.  */
+#ifndef __GLIBC__
+# include <stddef.h>
+# include <stdio.h>
+# include <time.h>
+#endif
+#include <wchar.h>
+    ]], [btowc wctob mbsinit mbrtowc mbrlen mbsrtowcs mbsnrtowcs wcrtomb
+    wcsrtombs wcsnrtombs wcwidth])
 ])
 
 dnl Check whether <wchar.h> is usable at all.
@@ -102,8 +99,8 @@ Configuration aborted.])
 dnl Unconditionally enables the replacement of <wchar.h>.
 AC_DEFUN([gl_REPLACE_WCHAR_H],
 [
-  AC_REQUIRE([gl_WCHAR_H_DEFAULTS])
-  WCHAR_H=wchar.h
+  dnl This is a no-op, because <wchar.h> is always overridden.
+  :
 ])
 
 AC_DEFUN([gl_WCHAR_MODULE_INDICATOR],
@@ -150,5 +147,4 @@ AC_DEFUN([gl_WCHAR_H_DEFAULTS],
   REPLACE_WCSRTOMBS=0;  AC_SUBST([REPLACE_WCSRTOMBS])
   REPLACE_WCSNRTOMBS=0; AC_SUBST([REPLACE_WCSNRTOMBS])
   REPLACE_WCWIDTH=0;    AC_SUBST([REPLACE_WCWIDTH])
-  WCHAR_H='';           AC_SUBST([WCHAR_H])
 ])
