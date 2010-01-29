@@ -1,3 +1,30 @@
+* 2010-01-29, prelude-lml-1.0.0rc1:
+
+- Support for character encoding and convertion to UTF-8. The user
+  can specify a different character encoding for each files.
+
+- Automatic character set detection if none is specified by the user,
+  the implementation will attempt to detect the character set used for a
+  given file. In case the detection fail, the system default will be
+  used.
+
+- Log entry are now converted to UTF-8 before processing. This fixes a
+  problem where user could see incorrect characters in reported alert,
+  since they were carrying data that could involve differents character
+  set.
+
+- Include Snare ruleset, courtesy of Nicholas Nachefski
+  <nnachefski@gmail.com>.
+
+- [ModSecurity]: Events generated were missing some AdditionalData
+  information.
+
+- [NetFilters]: ruleset compatibility Ulogd, various improvement.
+
+- Various bug fixes.
+
+
+
 * 2009-07-16, prelude-lml-0.9.15:
 
 - Make the Prelude-LML UDP server IPv6 compatible.
