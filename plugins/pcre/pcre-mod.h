@@ -103,11 +103,20 @@ typedef struct {
 } pcre_context_setting_t;
 
 
+typedef struct {
+        idmef_message_t *idmef;
+        prelude_list_t additional_data_list;
+        prelude_bool_t le_added;
+        lml_log_entry_t *le;
+} pcre_state_t;
+
 
 pcre_context_t *pcre_context_search(pcre_plugin_t *plugin, const char *name);
 
-int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *idmef, pcre_context_setting_t *setting);
+int pcre_context_new(pcre_plugin_t *plugin, const char *name, pcre_state_t *idmef, pcre_context_setting_t *setting);
 
 void pcre_context_destroy(pcre_context_t *ctx);
+
+pcre_state_t *pcre_context_get_state(pcre_context_t *ctx);
 
 idmef_message_t *pcre_context_get_idmef(pcre_context_t *ctx);

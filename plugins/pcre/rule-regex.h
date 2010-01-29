@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -27,5 +27,16 @@ void rule_regex_destroy(rule_regex_t *ptr);
 
 rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optionnal);
 
+rule_regex_t *rule_search_new(const char *regex, prelude_bool_t optional);
+
 int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
-                     const lml_log_source_t *ls, const lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags);
+                     const lml_log_source_t *ls, lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags);
+
+
+int pcre_state_push_idmef(pcre_state_t *state, idmef_message_t *idmef);
+
+int pcre_state_clone(pcre_state_t *state, pcre_state_t **nstate);
+
+pcre_state_t *pcre_state_ref(pcre_state_t *state);
+
+void pcre_state_destroy(pcre_state_t *state);

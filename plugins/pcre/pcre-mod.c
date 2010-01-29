@@ -60,7 +60,7 @@ struct pcre_context {
         prelude_timer_t timer;
         pcre_context_setting_t *setting;
 
-        idmef_message_t *idmef;
+        pcre_state_t *state;
 };
 
 
@@ -982,8 +982,8 @@ static void _pcre_context_destroy(pcre_context_t *ctx)
         if ( ctx->setting )
                 pcre_context_setting_destroy(ctx->setting);
 
-        if ( ctx->idmef )
-                idmef_message_destroy(ctx->idmef);
+        if ( ctx->state )
+                pcre_state_destroy(ctx->state);
 
         prelude_timer_destroy(&ctx->timer);
         prelude_list_del(&ctx->list);
@@ -994,11 +994,23 @@ static void _pcre_context_destroy(pcre_context_t *ctx)
 
 
 
+static void alert_from_context(pcre_state_t *state)
+{
+        pcre_state_push_idmef(state, state->idmef);
+
+        /*
+         * Set various information, detect_time/analyzer.
+         */
+        lml_alert_set_infos(state->idmef, state->le);
+        lml_alert_emit(NULL, NULL, state->idmef);
+}
+
+
 void pcre_context_destroy(pcre_context_t *ctx)
 {
-        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY && ctx->idmef ) {
+        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_DESTROY && ctx->state->idmef ) {
                 prelude_log_debug(1, "[%s]: emit alert on destroy.\n", ctx->name);
-                lml_alert_emit(NULL, NULL, ctx->idmef);
+                alert_from_context(ctx->state);
         }
 
         _pcre_context_destroy(ctx);
@@ -1010,9 +1022,9 @@ static void pcre_context_expire(void *data)
 {
         pcre_context_t *ctx = data;
 
-        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE && ctx->idmef ) {
+        if ( ctx->setting->flags & PCRE_CONTEXT_SETTING_FLAGS_ALERT_ON_EXPIRE && ctx->state->idmef ) {
                 prelude_log_debug(1, "[%s]: emit alert on expire.\n", ctx->name);
-                lml_alert_emit(NULL, NULL, ctx->idmef);
+                alert_from_context(ctx->state);
         }
 
         _pcre_context_destroy(ctx);
@@ -1022,13 +1034,19 @@ static void pcre_context_expire(void *data)
 
 idmef_message_t *pcre_context_get_idmef(pcre_context_t *ctx)
 {
-        return ctx->idmef;
+        return ctx->state->idmef;
 }
 
 
-
-int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *idmef, pcre_context_setting_t *setting)
+pcre_state_t *pcre_context_get_state(pcre_context_t *ctx)
 {
+        return ctx->state;
+}
+
+
+int pcre_context_new(pcre_plugin_t *plugin, const char *name, pcre_state_t *state, pcre_context_setting_t *setting)
+{
+        int ret;
         pcre_context_t *ctx;
 
         if ( ! (setting->flags & PCRE_CONTEXT_SETTING_FLAGS_QUEUE) ) {
@@ -1059,6 +1077,13 @@ int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *i
                 return -1;
         }
 
+        ret = pcre_state_clone(state, &ctx->state);
+        if ( ret < 0 ) {
+                free(ctx->name);
+                free(ctx);
+                return -1;
+        }
+
         setting->refcount += 1;
         ctx->setting = setting;
         prelude_timer_init_list(&ctx->timer);
@@ -1069,9 +1094,6 @@ int pcre_context_new(pcre_plugin_t *plugin, const char *name, idmef_message_t *i
                 prelude_timer_set_callback(&ctx->timer, pcre_context_expire);
                 prelude_timer_init(&ctx->timer);
         }
-
-        if ( idmef )
-                ctx->idmef = idmef_message_ref(idmef);
 
         prelude_list_add_tail(&plugin->context_list, &ctx->list);
 

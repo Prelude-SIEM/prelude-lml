@@ -63,12 +63,6 @@ struct rule_regex {
 };
 
 
-typedef struct {
-        idmef_message_t *idmef;
-        prelude_bool_t log_added;
-} pcre_state_t;
-
-
 
 #define OVECSIZE MAX_REFERENCE_PER_RULE * 3
 
@@ -177,20 +171,40 @@ static pcre_context_t *lookup_context(value_container_t *vcont, pcre_plugin_t *p
 }
 
 
+static void pcre_state_init(pcre_state_t *state)
+{
+        state->le = NULL;
+        state->idmef = NULL;
+        state->le_added = FALSE;
+        prelude_list_init(&state->additional_data_list);
+}
 
-static int alert_add_rule_infos(pcre_rule_t *rule, idmef_message_t *idmef)
+
+static int pcre_state_new(pcre_state_t **state)
+{
+        *state = malloc(sizeof(**state));
+        if ( ! *state )
+                return -1;
+
+        pcre_state_init(*state);
+
+        return 0;
+}
+
+
+static int pcre_state_add_rule_infos(pcre_state_t *state, pcre_rule_t *rule, const lml_log_source_t *ls, const lml_log_entry_t *le)
 {
         int ret;
-        idmef_alert_t *alert;
         prelude_string_t *str;
         idmef_additional_data_t *ad;
 
-        ret = idmef_message_new_alert(idmef, &alert);
-        if ( ret < 0 )
-                return ret;
+        if ( ! state->le_added ) {
+                state->le_added = TRUE;
+                lml_additional_data_prepare(&state->additional_data_list, ls, le);
+        }
 
         if ( rule->id ) {
-                ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
+                ret = idmef_additional_data_new(&ad);
                 if ( ret < 0 )
                         return ret;
 
@@ -200,10 +214,12 @@ static int alert_add_rule_infos(pcre_rule_t *rule, idmef_message_t *idmef)
 
                 prelude_string_set_constant(str, "Rule ID");
                 idmef_additional_data_set_integer(ad, rule->id);
+
+                prelude_linked_object_add_tail(&state->additional_data_list, (prelude_linked_object_t *) ad);
         }
 
         if ( rule->revision ) {
-                ret = idmef_alert_new_additional_data(alert, &ad, IDMEF_LIST_APPEND);
+                ret = idmef_additional_data_new(&ad);
                 if ( ret < 0 )
                         return ret;
 
@@ -213,14 +229,104 @@ static int alert_add_rule_infos(pcre_rule_t *rule, idmef_message_t *idmef)
 
                 prelude_string_set_constant(str, "Rule Revision");
                 idmef_additional_data_set_integer(ad, rule->revision);
+
+                prelude_linked_object_add_tail(&state->additional_data_list, (prelude_linked_object_t *) ad);
         }
 
         return 0;
 }
 
 
+int pcre_state_push_idmef(pcre_state_t *state, idmef_message_t *idmef)
+{
+        int ret;
+        idmef_alert_t *alert;
+        idmef_additional_data_t *ad;
+        prelude_list_t *tmp, *bkp;
 
-static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
+        ret = idmef_message_new_alert(idmef, &alert);
+        if ( ret < 0 )
+                return ret;
+
+        prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
+                ad = prelude_linked_object_get_object(tmp);
+                prelude_linked_object_del((prelude_linked_object_t *)ad);
+                idmef_alert_set_additional_data(alert, ad, IDMEF_LIST_APPEND);
+        }
+
+        return 0;
+}
+
+
+static void pcre_state_destroy_internal(pcre_state_t *state)
+{
+        idmef_additional_data_t *ad;
+        prelude_list_t *tmp, *bkp;
+
+        state->le_added = FALSE;
+
+        prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
+                ad = prelude_linked_object_get_object(tmp);
+                prelude_linked_object_del((prelude_linked_object_t *) ad);
+                idmef_additional_data_destroy(ad);
+        }
+
+        if ( state->idmef ) {
+                idmef_message_destroy(state->idmef);
+                state->idmef = NULL;
+        }
+}
+
+
+
+void pcre_state_destroy(pcre_state_t *state)
+{
+        if ( state->le )
+                lml_log_entry_destroy(state->le);
+
+        pcre_state_destroy_internal(state);
+        free(state);
+}
+
+
+int pcre_state_clone(pcre_state_t *state, pcre_state_t **new)
+{
+        int ret;
+        idmef_additional_data_t *ad;
+        prelude_list_t *tmp, *bkp;
+
+        ret = pcre_state_new(new);
+        if ( ret < 0 )
+                return ret;
+
+        if ( state->idmef ) {
+                ret = idmef_message_clone(state->idmef, &(*new)->idmef);
+                if ( ret < 0 ) {
+                        pcre_state_destroy(*new);
+                        return ret;
+                }
+        }
+
+        prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
+                ad = prelude_linked_object_get_object(tmp);
+
+                ret = idmef_additional_data_clone(ad, &ad);
+                if ( ret < 0 ) {
+                        pcre_state_destroy(*new);
+                        return ret;
+                }
+
+                prelude_linked_object_add_tail(&(*new)->additional_data_list, (prelude_linked_object_t *) ad);
+        }
+
+        if ( state->le )
+                (*new)->le = lml_log_entry_ref(state->le);
+
+        return 0;
+}
+
+
+static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t **state,
                              const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
 {
         int ret;
@@ -247,50 +353,38 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
                 if ( ! ctx )
                         return -1;
 
-                if ( pcre_context_get_idmef(ctx) )
-                        state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
+                if ( pcre_context_get_state(ctx) ) {
+                        *state = pcre_context_get_state(ctx);
+                        (*state)->le_added = FALSE;
+                }
         }
 
         if ( rule->optional_context ) {
                 ctx = lookup_context(rule->optional_context, plugin, rule, log_entry);
-                if ( ctx && pcre_context_get_idmef(ctx) )
-                        state->idmef = idmef_message_ref(pcre_context_get_idmef(ctx));
+                if ( ctx && pcre_context_get_state(ctx) ) {
+                        *state = pcre_context_get_state(ctx);
+                        (*state)->le_added = FALSE;
+                }
         }
 
-        ret = rule_object_build_message(rule, rule->object_list, &state->idmef, log_entry, ovector, ovector_index);
+        ret = rule_object_build_message(rule, rule->object_list, &(*state)->idmef, log_entry, ovector, ovector_index);
         if ( ret < 0 )
                 return ret;
-
-        if ( state->idmef && ! state->log_added ) {
-                state->log_added = TRUE;
-                lml_alert_prepare(state->idmef, ls, log_entry);
-                alert_add_rule_infos(rule, state->idmef);
-        }
 
         return ret;
 }
 
 
-
-static void destroy_idmef_state(pcre_state_t *state)
-{
-        if ( state->idmef ) {
-                idmef_message_destroy(state->idmef);
-                state->idmef = NULL;
-                state->log_added = FALSE;
-        }
-}
-
-
-
 static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
-                                     const lml_log_entry_t *log_entry)
+                                     const lml_log_source_t *ls, lml_log_entry_t *log_entry)
 {
         prelude_list_t *tmp;
         prelude_string_t *str;
         value_container_t *vcont;
         pcre_context_setting_t *pcs;
+        lml_log_entry_t *prev = state->le;
 
+        state->le = log_entry;
         prelude_list_for_each(&rule->create_context_list, tmp) {
                 vcont = prelude_linked_object_get_object(tmp);
 
@@ -300,9 +394,10 @@ static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, p
 
                 pcs = value_container_get_data(vcont);
 
-                pcre_context_new(plugin, prelude_string_get_string(str), state->idmef, pcs);
+                pcre_context_new(plugin, prelude_string_get_string(str), state, pcs);
                 prelude_string_destroy(str);
         }
+        state->le = prev;
 }
 
 
@@ -334,7 +429,7 @@ static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
 
 static int match_rule_list(pcre_plugin_t *plugin,
                            pcre_rule_container_t *rc, pcre_state_t *state,
-                           const lml_log_source_t *ls, const lml_log_entry_t *log_entry,
+                           const lml_log_source_t *ls, lml_log_entry_t *log_entry,
                            pcre_match_flags_t *match_flags)
 {
         prelude_list_t *tmp;
@@ -343,7 +438,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
         pcre_rule_t *rule = rc->rule;
         pcre_rule_container_t *child;
 
-        ret = match_rule_single(plugin, rule, state, ls, log_entry);
+        ret = match_rule_single(plugin, rule, &state, ls, log_entry);
         if ( ret < 0 )
                 return -1;
 
@@ -352,7 +447,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
 
                 ret = match_rule_list(plugin, child, state, ls, log_entry, &gl);
                 if ( ret < 0 && ! child->optional ) {
-                        destroy_idmef_state(state);
+                        pcre_state_destroy_internal(state);
                         return -1;
                 }
 
@@ -365,11 +460,12 @@ static int match_rule_list(pcre_plugin_t *plugin,
         }
 
         if ( optmatch < rule->min_optgoto_match ) {
-                destroy_idmef_state(state);
+                pcre_state_destroy_internal(state);
                 return -1;
         }
 
-        create_context_if_needed(plugin, rule, state, log_entry);
+        pcre_state_add_rule_infos(state, rule, ls, log_entry);
+        create_context_if_needed(plugin, rule, state, ls, log_entry);
 
         if ( state->idmef ) {
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
@@ -379,8 +475,18 @@ static int match_rule_list(pcre_plugin_t *plugin,
                                           rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
                                           lml_log_entry_get_message(log_entry));
 
+                        /*
+                         * Move additionalData part, to IDMEF message
+                         */
+                        pcre_state_push_idmef(state, state->idmef);
+
+                        /*
+                         * Set various information, detect_time/analyzer.
+                         */
+                        lml_alert_set_infos(state->idmef, log_entry);
+
                         lml_alert_emit(NULL, NULL, state->idmef);
-                        destroy_idmef_state(state);
+                        pcre_state_destroy_internal(state);
                 }
 
         }
@@ -394,19 +500,15 @@ static int match_rule_list(pcre_plugin_t *plugin,
 }
 
 
-
 int rule_regex_match(pcre_plugin_t *plugin, pcre_rule_container_t *rc,
-                     const lml_log_source_t *ls, const lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags)
+                     const lml_log_source_t *ls, lml_log_entry_t *log_entry, pcre_match_flags_t *match_flags)
 {
         int ret;
         pcre_state_t state;
 
-        memset(&state, 0, sizeof(state));
-
+        pcre_state_init(&state);
         ret = match_rule_list(plugin, rc, &state, ls, log_entry, match_flags);
-
-        if ( state.idmef )
-                idmef_message_destroy(state.idmef);
+        pcre_state_destroy_internal(&state);
 
         return ret;
 }
@@ -468,7 +570,6 @@ rule_regex_t *rule_regex_new(const char *regex, prelude_bool_t optional)
 
         return new;
 }
-
 
 
 void rule_regex_destroy(rule_regex_t *ptr)
