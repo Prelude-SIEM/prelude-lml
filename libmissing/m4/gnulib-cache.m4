@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --tests-base=libmissing/tests --aux-dir=. --with-tests --lgpl --libtool --macro-prefix=gl --no-vc-files bind close fnmatch-gnu getaddrinfo glob iconv inet_ntop mktime nl_langinfo pathmax recvfrom servent sigaction sleep snprintf socket socklen strptime strsep sys_select
+#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --tests-base=libmissing/tests --aux-dir=. --with-tests --lgpl --libtool --macro-prefix=gl --no-vc-files bind close fnmatch-gnu getaddrinfo glob iconv inet_ntop ioctl mktime nl_langinfo pathmax recvfrom servent sigaction sleep snprintf socket socklen strptime strsep sys_select
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
@@ -27,6 +27,7 @@ gl_MODULES([
   glob
   iconv
   inet_ntop
+  ioctl
   mktime
   nl_langinfo
   pathmax

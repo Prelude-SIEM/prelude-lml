@@ -395,6 +395,14 @@ EXTRA_DIST += test-strings.c
 
 ## end   gnulib module strings-tests
 
+## begin gnulib module sys_ioctl-tests
+
+TESTS += test-sys_ioctl
+check_PROGRAMS += test-sys_ioctl
+EXTRA_DIST += test-sys_ioctl.c
+
+## end   gnulib module sys_ioctl-tests
+
 ## begin gnulib module sys_select-tests
 
 TESTS += test-sys_select

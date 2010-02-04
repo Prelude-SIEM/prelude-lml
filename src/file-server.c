@@ -28,12 +28,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <assert.h>
 
 #include <gcrypt.h>
+
+#ifdef HAVE_SYS_FILIO_H
+# include <sys/filio.h>
+#endif
 
 #if TIME_WITH_SYS_TIME
 # include <sys/time.h>
@@ -120,11 +125,16 @@ typedef struct {
         uint64_t need_more_read;
         uint64_t last_size;
 
-        ev_stat event;
+        union {
+                ev_stat st;
+                ev_io io;
+        } event;
+
         int prev_errno;
 } monitor_fd_t;
 
 
+static void libev_io_cb(ev_io *io, int revents);
 static void libev_stat_cb(ev_stat *st, int revents);
 static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st);
 void _lml_handle_signal_if_needed(void);
@@ -506,7 +516,7 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
         off_t len, ret;
         int eventno = 0;
 
-        if ( monitor->fd != stdin && ! monitor->need_more_read && st->st_size == monitor->last_size )
+        if ( ! monitor->need_more_read && st->st_size == monitor->last_size )
                 return 0;
 
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
@@ -550,6 +560,44 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
 }
 
 
+static int check_stdin_data(monitor_fd_t *monitor)
+{
+        size_t slen;
+        off_t ret, len = LOG_LINE_MAXSIZE;
+        int eventno = 0, bytes;
+
+        if ( config.batch_mode )
+                len = 8192;
+        else {
+                ret = ioctl(STDIN_FILENO, FIONREAD, &bytes);
+                if ( ret < 0 ) {
+                        prelude_log(PRELUDE_LOG_ERR, "FIONREAD failed on stdin: %s.\n", strerror(errno));
+                        return -1;
+                }
+
+                len = bytes;
+        }
+
+        while ( (ret = read_logfile(monitor, len)) >= 0 ) {
+
+                eventno++;
+                config.line_processed++;
+
+                /*
+                 * If the line we read only contained a '\n', string and len will be 0.
+                 */
+                if ( (slen = prelude_string_get_len(monitor->buf)) ) {
+                        lml_dispatch_log(monitor->source, prelude_string_get_string(monitor->buf), slen);
+                }
+
+                prelude_string_clear(monitor->buf);
+                _lml_handle_signal_if_needed();
+        }
+
+        return eventno;
+}
+
+
 
 static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 {
@@ -571,10 +619,16 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
                 return NULL;
         }
 
-        ev_stat_init(&new->event, libev_stat_cb, lml_log_source_get_name(new->source), 1);
-        new->event.data = new;
+        if ( strcmp(lml_log_source_get_name(ls), STDIN_FILENAME) != 0 ) {
+                ev_stat_init(&new->event.st, libev_stat_cb, lml_log_source_get_name(new->source), 1);
+                new->event.st.data = new;
+                ev_stat_start(&new->event.st);
+        } else {
+                ev_io_init(&new->event.io, libev_io_cb, STDIN_FILENO, EV_READ);
+                new->event.io.data = new;
+                ev_io_start(&new->event.io);
+        }
 
-        ev_stat_start(&new->event);
         prelude_list_add(&inactive_fd_list, &new->list);
 
         return new;
@@ -832,6 +886,15 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
 }
 
 
+static void libev_io_cb(ev_io *io, int revents)
+{
+        int ret;
+
+        ret = check_stdin_data(io->data);
+        if ( ret <= 0 )
+                ev_io_stop(io);
+}
+
 
 static void libev_stat_cb(ev_stat *st, int revents)
 {
@@ -842,11 +905,9 @@ static void libev_stat_cb(ev_stat *st, int revents)
                 if ( monitor_open(monitor) < 0 )
                         return;
 
-        if ( monitor->fd != stdin ) {
-                ret = is_file_already_used(monitor, &st->prev, &st->attr);
-                if ( ret < 0 )
-                        return;
-        }
+        ret = is_file_already_used(monitor, &st->prev, &st->attr);
+        if ( ret < 0 )
+                return;
 
         /*
          * check mtime consistency.
@@ -881,7 +942,11 @@ int file_server_read_once(void)
         prelude_list_for_each_safe(&active_fd_list, tmp, bkp) {
                 monitor = prelude_list_entry(tmp, monitor_fd_t, list);
 
-                event = check_logfile_data(monitor, &monitor->event.attr);
+                if ( monitor->fd != stdin )
+                        event = check_logfile_data(monitor, &monitor->event.st.attr);
+                else
+                        event = check_stdin_data(monitor);
+
                 if ( event > 0 )
                         ret = event;
         }
