@@ -128,11 +128,16 @@ static lml_log_format_t *lml_log_format_ref(lml_log_format_t *lf)
 
 static inline int _fallback_preprocess_input(lml_log_source_t *source, const char *in, size_t inlen, char **out, size_t *outlen)
 {
-        *out = strdup(in);
+        if ( inlen + 1 < inlen )
+                return -1;
+
+        *out = malloc(inlen + 1);
         if ( ! *out )
                 return -1;
 
         *outlen = inlen;
+        memcpy(*out, in, inlen + 1);
+
         return 0;
 }
 
