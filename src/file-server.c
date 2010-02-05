@@ -99,7 +99,7 @@
 
 #define LOGFILE_RENAME_CLASS   "Log file rename"
 #define LOGFILE_DELETION_CLASS "Log file deletion"
-#define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile,"               \
+#define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile, "               \
                                 "or a log rotation program may have rotated the logfile."
 
 #define LOGFILE_MODIFICATION_CLASS "Log file inconsistency"
@@ -232,10 +232,10 @@ static void logfile_alert(monitor_fd_t *fd, ev_statdata *st_old, ev_statdata *st
         if ( ret < 0 )
                 goto err;
 
-        if ( stat_to_file(fd, st_old, target, IDMEF_FILE_CATEGORY_ORIGINAL) < 0 )
+        if ( st_old && stat_to_file(fd, st_old, target, IDMEF_FILE_CATEGORY_ORIGINAL) < 0 )
                 goto err;
 
-        if ( stat_to_file(fd, st_new, target, IDMEF_FILE_CATEGORY_CURRENT) < 0 )
+        if ( st_new && stat_to_file(fd, st_new, target, IDMEF_FILE_CATEGORY_CURRENT) < 0 )
                 goto err;
 
         ret = idmef_alert_new_assessment(alert, &assessment);
@@ -734,10 +734,14 @@ static void monitor_close(monitor_fd_t *monitor)
 static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, ev_statdata *st)
 {
         int ret;
+        const char *filename;
 
         if ( st->st_mtime >= prev->st_mtime && st->st_size >= monitor->last_size )
                 return; /* everythings sound okay */
 
+        filename = lml_log_source_get_name(monitor->source);
+
+        prelude_log(PRELUDE_LOG_INFO, "%s: has been %s.\n", filename, (st->st_size >= monitor->last_size) ? "modidifed" : "truncated");
         logfile_modified_alert(monitor, prev, st);
 
         /*
@@ -747,8 +751,7 @@ static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, ev
         if ( st->st_size < monitor->last_size ) {
                 ret = fseek(monitor->fd, 0, SEEK_END);
                 if ( ret < 0 ) {
-                        prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to end of file: %s.\n",
-                                    lml_log_source_get_name(monitor->source), strerror(errno));
+                        prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to end of file: %s.\n", filename, strerror(errno));
                         return;
                 }
 
@@ -809,6 +812,7 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
         idmef_impact_t *impact;
         idmef_classification_t *classification;
         prelude_string_t *str;
+        prelude_bool_t is_deleted;
 
         filename = lml_log_source_get_name(monitor->source);
 
@@ -823,9 +827,11 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
         if ( st.st_nlink > 0 && st_new->st_nlink == 0 ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: has been renamed.\n", filename);
                 ctxt = LOGFILE_RENAME_CLASS;
+                is_deleted = FALSE;
         } else {
                 prelude_log(PRELUDE_LOG_INFO, "%s: has been deleted.\n", filename);
                 ctxt = LOGFILE_DELETION_CLASS;
+                is_deleted = TRUE;
         }
 
         monitor_close(monitor);
@@ -869,7 +875,10 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
                 prelude_string_set_ref(str, buf);
         }
 
-        logfile_alert(monitor, st_old, st_new, classification, impact);
+        if ( is_deleted )
+                logfile_alert(monitor, st_new, NULL, classification, impact);
+        else
+                logfile_alert(monitor, st_old, st_new, classification, impact);
 
         return -1;
 }
