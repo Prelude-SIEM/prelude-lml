@@ -137,7 +137,6 @@ typedef struct {
 
 static void libev_io_cb(ev_io *io, int revents);
 static void libev_stat_cb(ev_stat *st, int revents);
-static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st);
 void _lml_handle_signal_if_needed(void);
 
 extern lml_config_t config;
