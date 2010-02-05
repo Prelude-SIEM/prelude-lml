@@ -254,7 +254,7 @@ static void logfile_alert(monitor_fd_t *fd, ev_statdata *st_old, ev_statdata *st
 
 
 
-static void logfile_modified_alert(monitor_fd_t *monitor, ev_statdata *st_old, ev_statdata *st_new)
+static void logfile_modified_alert(monitor_fd_t *monitor, ev_statdata *st_old, struct stat *st_new)
 {
         int ret;
         prelude_string_t *str;
@@ -507,7 +507,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
 }
 
 
-static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
+static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
 {
         off_t len, ret;
         int eventno = 0;
@@ -731,7 +731,7 @@ static void monitor_close(monitor_fd_t *monitor)
  * cause heavy performance problem. The best solution may be to centralize
  * the logging on a remote host.
  */
-static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, ev_statdata *st)
+static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, struct stat *st)
 {
         int ret;
         const char *filename;
@@ -802,12 +802,11 @@ static int get_rotation_time_offset(monitor_fd_t *monitor, ev_statdata *st)
 
 
 
-static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_statdata *st_new)
+static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_prev, ev_statdata *st_cur, struct stat *st_now)
 {
         int ret;
         char buf[1024];
         int toff, soff;
-        struct stat st;
         const char *filename, *ctxt;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
@@ -816,15 +815,19 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
 
         filename = lml_log_source_get_name(monitor->source);
 
-        if ( st_new->st_nlink > 0 )
+        /*
+         * rename = 1 - 0
+         * rename + re-create = 1 - 1 - !=
+         * delete = 0 - 0
+         * delete + re-create = 0 - 1
+         */
+        if ( st_now->st_nlink > 0 && st_cur->st_nlink > 0 && st_now->st_ino == st_cur->st_ino )
                 return 0;
-
-        fstat(fileno(monitor->fd), &st);
 
         /*
          * test if the file has been removed
          */
-        if ( st.st_nlink > 0 && st_new->st_nlink == 0 ) {
+        if ( st_now->st_nlink > 0 ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: has been renamed.\n", filename);
                 ctxt = LOGFILE_RENAME_CLASS;
                 is_deleted = FALSE;
@@ -833,6 +836,12 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
                 ctxt = LOGFILE_DELETION_CLASS;
                 is_deleted = TRUE;
         }
+
+        /*
+         * Before closing the monitor, handle any unread data.
+         */
+        if ( st_now->st_size > monitor->last_size )
+                check_logfile_data(monitor, st_now);
 
         monitor_close(monitor);
 
@@ -857,8 +866,8 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
         idmef_impact_set_type(impact, IDMEF_IMPACT_TYPE_FILE);
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
-        soff = get_rotation_size_offset(monitor, st_new);
-        toff = get_rotation_time_offset(monitor, st_new);
+        soff = get_rotation_size_offset(monitor, st_now);
+        toff = get_rotation_time_offset(monitor, st_now);
 
         if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
@@ -876,9 +885,9 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_old, ev_s
         }
 
         if ( is_deleted )
-                logfile_alert(monitor, st_new, NULL, classification, impact);
+                logfile_alert(monitor, st_now, NULL, classification, impact);
         else
-                logfile_alert(monitor, st_old, st_new, classification, impact);
+                logfile_alert(monitor, st_prev, st_now, classification, impact);
 
         return -1;
 }
@@ -897,25 +906,47 @@ static void libev_io_cb(ev_io *io, int revents)
 static void libev_stat_cb(ev_stat *st, int revents)
 {
         int ret;
+        struct stat fst;
         monitor_fd_t *monitor = st->data;
 
         if ( ! monitor->fd )
                 if ( monitor_open(monitor) < 0 )
                         return;
 
-        ret = is_file_already_used(monitor, &st->prev, &st->attr);
-        if ( ret < 0 )
-                return;
+        /*
+         * Do not rely on libev statistics gathered by stat().
+         *
+         * If a file is written then deleted, but re-created very fast,
+         * only fstat() can report an st_nlink of 0.
+         *
+         * If a file is deleted from libev point of view, only fstat()
+         * will be able to provide latest information about the stat of
+         * the file.
+         */
+        fstat(fileno(monitor->fd), &fst);
+
+        ret = is_file_already_used(monitor, &st->prev, &st->attr, &fst);
+        if ( ret < 0 ) {
+                if ( st->attr.st_nlink == 0 )
+                        return;
+                else {
+                        /*
+                         * The file has been deleted then created again: trigger opening/reading of the new dfile.
+                         */
+                        return libev_stat_cb(st, revents);
+                }
+        }
 
         /*
-         * check mtime consistency.
+         * check mtime/size consistency.
          */
-        check_modification_time(monitor, &st->prev, &st->attr);
+        check_modification_time(monitor, &st->prev, &fst);
+
 
         /*
          * read and analyze available data.
          */
-        check_logfile_data(monitor, &st->attr);
+        check_logfile_data(monitor, &fst);
 }
 
 
