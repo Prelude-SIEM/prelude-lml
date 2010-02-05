@@ -127,16 +127,14 @@ static int _charset_convert(lml_charset_t *lc, const char *in, size_t inlen, cha
                 return -1;
         }
 
-        ucnv_convertEx(lc->to, lc->from, &target, *out + maxlen, &in, in + inlen, NULL, NULL, NULL, NULL, 0, TRUE, &status);
-        if ( U_FAILURE(status) ) {
+        ucnv_convertEx(lc->to, lc->from, &target, *out + maxlen + 1, &in, in + inlen, NULL, NULL, NULL, NULL, 0, TRUE, &status);
+        if ( U_FAILURE(status) || status == U_STRING_NOT_TERMINATED_WARNING ) {
                 prelude_log(PRELUDE_LOG_ERR, "ICU: failed converting input to UTF-8: %s.\n", u_errorName(status));
                 free(*out);
                 return -1;
         }
 
         *outlen = target - *out;
-        target[*outlen] = '\0';
-
         return 0;
 }
 
@@ -197,7 +195,7 @@ static int _charset_convert(lml_charset_t *lc, const char *in, size_t inlen, cha
         }
 
         *outlen = (bkpolen - olen);
-        outp[0] = '\0';
+        *outp = '\0';
 
         return 0;
 }
