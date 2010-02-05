@@ -124,6 +124,7 @@ typedef struct {
 
         uint64_t need_more_read;
         uint64_t last_size;
+        size_t current_line_len;
 
         union {
                 ev_stat st;
@@ -296,6 +297,52 @@ static void logfile_modified_alert(monitor_fd_t *monitor, ev_statdata *st_old, e
 }
 
 
+/*
+ * This function return -2 if it couldn't read a full syslog line,
+ * or -1 if an error occured.
+ *
+ * The number of character that has been read is returned otherwise.
+ */
+static off_t read_logfile(monitor_fd_t *fd, off_t *available)
+{
+        int ret;
+        size_t i = 0;
+
+        while ( 1 ) {
+                ret = getc(fd->fd);
+                if ( ret == EOF ) {
+                        clearerr(fd->fd);
+                        *available -= i;
+                        return -1;
+                }
+
+                i++;
+                fd->current_line_len++;
+
+                if ( ret == '\n' )
+                        break;
+
+                if ( fd->current_line_len <= LOG_LINE_MAXSIZE ) {
+                        ret = prelude_string_ncat(fd->buf, (const char *) &ret, 1);
+                        if ( ret < 0 )
+                                prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
+                }
+
+                else if ( fd->current_line_len == LOG_LINE_MAXSIZE + 1 )
+                        prelude_log(PRELUDE_LOG_WARN, "line too long (internal limit of %u characters).\n", LOG_LINE_MAXSIZE);
+
+                if ( i == *available ) {
+                        *available = 0;
+                        return -2;
+                }
+        }
+
+        *available -= i;
+        return i;
+}
+
+
+
 static int file_metadata_read(monitor_fd_t *monitor, uint64_t *start, unsigned char **buf)
 {
         ssize_t ret;
@@ -353,12 +400,12 @@ static int file_metadata_save(monitor_fd_t *monitor, uint64_t offset)
 
 
 
-static int verify_metadata_checksum(const char *log, unsigned char *metadata_sum)
+static int verify_metadata_checksum(prelude_string_t *log, unsigned char *metadata_sum)
 {
         unsigned char sum[METADATA_CHECKSUM_SIZE];
 
         assert(gcry_md_get_algo_dlen(METADATA_CHECKSUM_TYPE) == sizeof(sum));
-        gcry_md_hash_buffer(METADATA_CHECKSUM_TYPE, sum, log, strlen(log) - 1);
+        gcry_md_hash_buffer(METADATA_CHECKSUM_TYPE, sum, prelude_string_get_string(log), prelude_string_get_len(log));
 
         return memcmp(sum, metadata_sum, sizeof(sum));
 }
@@ -366,10 +413,10 @@ static int verify_metadata_checksum(const char *log, unsigned char *metadata_sum
 static int file_metadata_get_position(monitor_fd_t *monitor)
 {
         uint64_t offset = 0;
-        char buf[8192];
         struct stat st;
         const char *filename;
         int ret, have_metadata = 0;
+        off_t available = LOG_LINE_MAXSIZE;
         unsigned char msum[METADATA_SIZE], *sumptr = msum;
 
         filename = lml_log_source_get_name(monitor->source);
@@ -407,14 +454,17 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         /*
          * If the metadata checksum does not match, the file was probably rotated.
          */
-        if ( ! fgets(buf, sizeof(buf), monitor->fd) || verify_metadata_checksum(buf, sumptr) != 0 ) {
+        if ( read_logfile(monitor, &available) < 0 || verify_metadata_checksum(monitor->buf, sumptr) != 0 ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: log file was rotated, starting from head.\n", filename);
                 monitor->last_size = 0;
+                monitor->current_line_len = 0;
+                prelude_string_clear(monitor->buf);
                 return fseek(monitor->fd, 0, SEEK_SET);
         }
 
-        monitor->last_size = offset;
-        monitor->last_size += strlen(buf);
+        prelude_string_clear(monitor->buf);
+        monitor->last_size = offset + monitor->current_line_len;
+        monitor->current_line_len = 0;
 
         prelude_log(PRELUDE_LOG_INFO, "%s: resuming log analyzis at offset %" PRELUDE_PRIu64 ".\n",
                     filename, monitor->last_size);
@@ -458,63 +508,11 @@ static int file_metadata_open(monitor_fd_t *monitor)
 }
 
 
-
-
-/*
- * This function return -1 if it couldn't read a full syslog line,
- * or if an error occured.
- *
- * The size of the whole syslog line is returned otherwise (not only what
- * has been read uppon this call).
- */
-static off_t read_logfile(monitor_fd_t *fd, off_t available)
-{
-        char c;
-        int ret;
-        size_t i = 0;
-        prelude_bool_t ignore_remaining = FALSE;
-
-        while ( 1 ) {
-                if ( i == LOG_LINE_MAXSIZE ) {
-                        prelude_log(PRELUDE_LOG_WARN, "line too long (internal limit of %u characters).\n",
-                                    LOG_LINE_MAXSIZE);
-                        ignore_remaining = TRUE;
-                }
-
-                ret = getc(fd->fd);
-                if ( ret == EOF ) {
-                        clearerr(fd->fd);
-                        return -1;
-                }
-
-                i++;
-
-                if ( ret == '\n' )
-                        break;
-
-                if ( ! ignore_remaining ) {
-                        c = (char) ret;
-
-                        ret = prelude_string_ncat(fd->buf, &c, 1);
-                        if ( ret < 0 ) {
-                                prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
-                                return -1;
-                        }
-                }
-
-                if ( i == available )
-                        return -2;
-        }
-
-        return i;
-}
-
-
-
 static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
 {
         off_t len, ret;
         int eventno = 0;
+        size_t slen = 0;
 
         if ( ! monitor->need_more_read && st->st_size == monitor->last_size )
                 return 0;
@@ -522,7 +520,7 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
         len = (st->st_size - monitor->last_size) + monitor->need_more_read;
         monitor->last_size = st->st_size;
 
-        while ( (ret = read_logfile(monitor, len)) >= 0 ) {
+        while ( len && (ret = read_logfile(monitor, &len)) >= 0 ) {
 
                 eventno++;
                 config.line_processed++;
@@ -530,32 +528,23 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
                 /*
                  * If the line we read only contained a '\n', string and len will be 0.
                  */
-                if ( prelude_string_get_len(monitor->buf) ) {
-                        lml_dispatch_log(monitor->source,
-                                         prelude_string_get_string(monitor->buf),
-                                         prelude_string_get_len(monitor->buf));
-
-                        file_metadata_save(monitor, st->st_size - len);
+                if ( (slen = prelude_string_get_len(monitor->buf)) ) {
+                        lml_dispatch_log(monitor->source, prelude_string_get_string(monitor->buf), slen);
+                        file_metadata_save(monitor, ftell(monitor->fd) - monitor->current_line_len);
                 }
 
-                len -= prelude_string_get_len(monitor->buf) + 1; /* +1 account for the '\n' */
+                monitor->current_line_len = 0;
 
                 prelude_string_clear(monitor->buf);
                 _lml_handle_signal_if_needed();
-
-                if ( len == 0 )
-                        break;
         }
 
-        if ( ret == -2 )
-                len = 0; /* everything has been read, but line is not complete */
-
         /*
-         * if len isn't 0, it mean we got EOF before reading every new byte,
-         * we want to retry reading even if st_size isn't modified then.
+         * if len is not 0, we got EOF before reading every new byte, we
+         * will try reading the data on next invocation, even if st_size
+         * isn't modified.
          */
         monitor->need_more_read = len;
-
         return eventno;
 }
 
@@ -563,11 +552,11 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
 static int check_stdin_data(monitor_fd_t *monitor)
 {
         size_t slen;
-        off_t ret, len = LOG_LINE_MAXSIZE;
+        off_t ret, len;
         int eventno = 0, bytes;
 
         if ( config.batch_mode )
-                len = 8192;
+                len = LOG_LINE_MAXSIZE;
         else {
                 ret = ioctl(STDIN_FILENO, FIONREAD, &bytes);
                 if ( ret < 0 ) {
@@ -575,10 +564,10 @@ static int check_stdin_data(monitor_fd_t *monitor)
                         return -1;
                 }
 
-                len = bytes;
+                len = (off_t) bytes;
         }
 
-        while ( (ret = read_logfile(monitor, len)) >= 0 ) {
+        while ( len && (ret = read_logfile(monitor, &len)) >= 0 ) {
 
                 eventno++;
                 config.line_processed++;
@@ -672,9 +661,13 @@ static int monitor_set_position(monitor_fd_t *monitor, const char *filename, int
 static int monitor_open(monitor_fd_t *monitor)
 {
         int ret, fd;
-        const char *filename;
+        const char *filename = lml_log_source_get_name(monitor->source);
 
-        filename = lml_log_source_get_name(monitor->source);
+        ret = prelude_string_new(&monitor->buf);
+        if ( ret < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "could not create string object: %s.\n", prelude_strerror(ret));
+                return ret;
+        }
 
         if ( strcmp(filename, STDIN_FILENAME) == 0 )
                 monitor->fd = stdin;
@@ -691,6 +684,7 @@ static int monitor_open(monitor_fd_t *monitor)
 #endif
 
                         monitor->prev_errno = errno;
+                        prelude_string_destroy(monitor->buf);
                         return -1;
                 }
 
@@ -701,17 +695,13 @@ static int monitor_open(monitor_fd_t *monitor)
 #endif
 
                 ret = monitor_set_position(monitor, filename, fd);
-                if ( ret < 0 )
+                if ( ret < 0 ) {
+                        prelude_string_destroy(monitor->buf);
                         return -1;
+                }
 
                 if ( ret == 0 )
                         prelude_log(PRELUDE_LOG_INFO, "%s: now available for monitoring.\n", filename);
-        }
-
-        ret = prelude_string_new(&monitor->buf);
-        if ( ret < 0 ) {
-                prelude_log(PRELUDE_LOG_ERR, "could not create string object: %s.\n", prelude_strerror(ret));
-                return ret;
         }
 
         monitor->need_more_read = 0;
@@ -730,6 +720,7 @@ static void monitor_close(monitor_fd_t *monitor)
         fclose(monitor->fd);
         monitor->fd = NULL;
         monitor->last_size = 0;
+        monitor->current_line_len = 0;
 
         prelude_list_del(&monitor->list);
         prelude_list_add_tail(&inactive_fd_list, &monitor->list);
@@ -766,6 +757,7 @@ static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, ev
 
                 monitor->need_more_read = 0;
                 monitor->last_size = st->st_size;
+                monitor->current_line_len = 0;
         }
 }
 
