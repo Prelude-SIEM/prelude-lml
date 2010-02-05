@@ -272,7 +272,7 @@ static int generate_target(const lml_log_entry_t *log_entry, idmef_alert_t *aler
 
 
 
-static int generate_additional_data(idmef_additional_data_t **adata, const char *meaning, const char *data)
+static int generate_additional_data(idmef_additional_data_t **adata, const char *meaning, const char *data, size_t len)
 {
         int ret;
         prelude_string_t *str;
@@ -287,7 +287,7 @@ static int generate_additional_data(idmef_additional_data_t **adata, const char 
 
         prelude_string_set_ref(str, meaning);
 
-        return idmef_additional_data_set_string_dup(*adata, data);
+        return idmef_additional_data_set_string_dup_fast(*adata, data, len);
 }
 
 
@@ -298,14 +298,14 @@ int lml_additional_data_prepare(prelude_list_t *adlist, const lml_log_source_t *
         idmef_additional_data_t *adata;
 
         source = lml_log_source_get_name(ls);
-        if ( generate_additional_data(&adata, "Log received from", source) < 0 )
+        if ( generate_additional_data(&adata, "Log received from", source, strlen(source)) < 0 )
                 return -1;
 
         prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
 
         ptr = lml_log_entry_get_original_log(log);
         if ( ptr ) {
-                if ( generate_additional_data(&adata, "Original Log", ptr) < 0 )
+                if ( generate_additional_data(&adata, "Original Log", ptr, lml_log_entry_get_original_log_len(log)) < 0 )
                         return -1;
 
                 prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
@@ -363,7 +363,7 @@ int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, cons
         if ( ls ) {
                 source = lml_log_source_get_name(ls);
 
-                if ( generate_additional_data(&adata, "Log received from", source) < 0 )
+                if ( generate_additional_data(&adata, "Log received from", source, strlen(source)) < 0 )
                         return -1;
 
                 idmef_alert_set_additional_data(alert, adata, IDMEF_LIST_APPEND);
@@ -372,7 +372,7 @@ int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, cons
         if ( log ) {
                 ptr = lml_log_entry_get_original_log(log);
                 if ( ptr ) {
-                        if ( generate_additional_data(&adata, "Original Log", ptr) < 0 )
+                        if ( generate_additional_data(&adata, "Original Log", ptr, lml_log_entry_get_original_log_len(log)) < 0 )
                                 return -1;
 
                         idmef_alert_set_additional_data(alert, adata, IDMEF_LIST_APPEND);
