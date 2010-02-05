@@ -523,7 +523,6 @@ static int check_logfile_data(monitor_fd_t *monitor, ev_statdata *st)
         while ( len && (ret = read_logfile(monitor, &len)) >= 0 ) {
 
                 eventno++;
-                config.line_processed++;
 
                 /*
                  * If the line we read only contained a '\n', string and len will be 0.
@@ -570,7 +569,6 @@ static int check_stdin_data(monitor_fd_t *monitor)
         while ( len && (ret = read_logfile(monitor, &len)) >= 0 ) {
 
                 eventno++;
-                config.line_processed++;
 
                 /*
                  * If the line we read only contained a '\n', string and len will be 0.

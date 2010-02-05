@@ -262,6 +262,7 @@ void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
                    lml_log_entry_get_message(log_entry), lml_log_entry_get_message_len(log_entry));
 
         lml_log_entry_destroy(log_entry);
+        config.line_processed++;
 }
 
 
