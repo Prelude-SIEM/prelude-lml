@@ -126,7 +126,7 @@ static lml_log_format_t *lml_log_format_ref(lml_log_format_t *lf)
 }
 
 
-static inline int _fallback_preprocess_input(lml_log_source_t *source, const char *in, size_t inlen, char **out, size_t *outlen)
+static inline int _fallback_preprocess_input(const char *in, size_t inlen, char **out, size_t *outlen)
 {
         if ( inlen + 1 < inlen )
                 return -1;
@@ -150,7 +150,7 @@ int lml_log_source_preprocess_input(lml_log_source_t *source, const char *in, si
                 ret = lml_charset_convert(source->charset, in, inlen, out, outlen);
 
         if ( ret < 0 )
-                ret = _fallback_preprocess_input(source, in, inlen, out, outlen);
+                ret = _fallback_preprocess_input(in, inlen, out, outlen);
 
         return ret;
 }

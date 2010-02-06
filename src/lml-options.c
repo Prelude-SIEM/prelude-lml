@@ -143,7 +143,7 @@ static char *const2char(const char *val)
 
 static int set_metadata_flags(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
-        int i;
+        unsigned int i;
         file_server_metadata_flags_t flags = 0;
         char *name, *value = const2char(arg);
         struct {
@@ -322,7 +322,7 @@ static int glob_errfunc_cb(const char *epath, int eerrno)
 
 static prelude_bool_t isglob(const char *pattern)
 {
-        int i;
+        unsigned int i;
         const char *ptr;
         char chlist[] = { '*', '?', '[', '~' };
 

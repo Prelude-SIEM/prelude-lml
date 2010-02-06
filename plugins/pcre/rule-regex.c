@@ -326,8 +326,7 @@ int pcre_state_clone(pcre_state_t *state, pcre_state_t **new)
 }
 
 
-static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t **state,
-                             const lml_log_source_t *ls, const lml_log_entry_t *log_entry)
+static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t **state, const lml_log_entry_t *log_entry)
 {
         int ret;
         prelude_list_t *tmp;
@@ -375,8 +374,7 @@ static int match_rule_single(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_stat
 }
 
 
-static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state,
-                                     const lml_log_source_t *ls, lml_log_entry_t *log_entry)
+static void create_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule, pcre_state_t *state, lml_log_entry_t *log_entry)
 {
         prelude_list_t *tmp;
         prelude_string_t *str;
@@ -438,7 +436,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
         pcre_rule_t *rule = rc->rule;
         pcre_rule_container_t *child;
 
-        ret = match_rule_single(plugin, rule, &state, ls, log_entry);
+        ret = match_rule_single(plugin, rule, &state, log_entry);
         if ( ret < 0 )
                 return -1;
 
@@ -465,7 +463,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
         }
 
         pcre_state_add_rule_infos(state, rule, ls, log_entry);
-        create_context_if_needed(plugin, rule, state, ls, log_entry);
+        create_context_if_needed(plugin, rule, state, log_entry);
 
         if ( state->idmef ) {
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;

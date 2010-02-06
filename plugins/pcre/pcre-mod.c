@@ -220,7 +220,7 @@ static int parse_rule_optregex(pcre_plugin_t *plugin, pcre_rule_t *rule, const c
 
 
 
-static pcre_rule_container_t *search_rule(prelude_list_t *head, int id)
+static pcre_rule_container_t *search_rule(prelude_list_t *head, unsigned int id)
 {
         prelude_list_t *tmp;
         pcre_rule_container_t *cur;
@@ -241,7 +241,7 @@ static pcre_rule_container_t *search_rule(prelude_list_t *head, int id)
 
 
 
-static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, prelude_bool_t optional)
+static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, unsigned int id, prelude_bool_t optional)
 {
         pcre_rule_container_t *new, *cur;
 
@@ -269,9 +269,10 @@ static int add_goto_single(pcre_plugin_t *plugin, pcre_rule_t *rule, int id, pre
 
 static int add_goto(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *idstr, prelude_bool_t optional)
 {
-        int ret, i, idmin = 0, idmax = 0;
+        int ret;
+        unsigned int i, idmin = 0, idmax = 0;
 
-        ret = sscanf(idstr, "%d-%d", &idmin, &idmax);
+        ret = sscanf(idstr, "%u-%u", &idmin, &idmax);
         if ( ret < 1 ) {
                 prelude_log(PRELUDE_LOG_WARN, "could not parse goto value '%s'.\n", idstr);
                 return -1;
@@ -571,7 +572,7 @@ static int parse_rule_keyword(pcre_plugin_t *plugin, pcre_rule_t *rule,
                               const char *filename, int line,
                               const char *keyword, const char *value)
 {
-        int i;
+        unsigned int i;
         struct {
                 const char *keyword;
                 int (*func)(pcre_plugin_t *plugin, pcre_rule_t *rule, const char *value);

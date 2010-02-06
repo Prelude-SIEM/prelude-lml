@@ -103,8 +103,9 @@ static int add_fixed_object_value(value_container_t *vcont, prelude_string_t *bu
 
 static int parse_value(value_container_t *vcont, const char *line)
 {
-        int i, ret;
+        int ret;
         char num[10];
+        unsigned int i;
         const char *str;
         prelude_string_t *strbuf;
 
