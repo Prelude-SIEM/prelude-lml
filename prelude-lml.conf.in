@@ -133,9 +133,10 @@ file = /var/log/apache2/error_log
 
 
 #
-# Specifies the maximum difference, in seconds, between
-# the interval of two logfiles' rotation. If this difference
-# is reached, a high severity alert will be emited
+# Specifies the maximum difference, in seconds and/or size, between
+# the interval of two logfiles' rotation. If this difference is reached,
+# a high severity alert will be emited. The K (kbytes) or M (mbytes)
+# suffix might be used for size definition.
 #
 #max-rotation-size-offset = 1024
 #max-rotation-time-offset = 300

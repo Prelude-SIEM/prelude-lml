@@ -38,10 +38,10 @@ int file_server_monitor_file(lml_log_source_t *ls);
 
 int file_server_start_monitoring(void);
 
-unsigned int file_server_get_max_rotation_time_offset(void);
+time_t file_server_get_max_rotation_time_offset(void);
 
-void file_server_set_max_rotation_time_offset(unsigned int val);
+void file_server_set_max_rotation_time_offset(time_t val);
 
-unsigned int file_server_get_max_rotation_size_offset(void);
+off_t file_server_get_max_rotation_size_offset(void);
 
-void file_server_set_max_rotation_size_offset(unsigned int val);
+void file_server_set_max_rotation_size_offset(off_t val);

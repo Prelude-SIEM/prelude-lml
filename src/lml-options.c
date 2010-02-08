@@ -203,22 +203,36 @@ static int set_rotation_time_offset(prelude_option_t *opt, const char *optarg, p
 
 static int get_rotation_time_offset(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
-        return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_time_offset());
+        return prelude_string_sprintf(out, "%jd", (intmax_t) file_server_get_max_rotation_time_offset());
 }
 
 
 static int set_rotation_size_offset(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
-        char *endptr;
-        unsigned long int off;
+        char *eptr = NULL;
+        unsigned long long int value;
 
-        off = strtoul(arg, &endptr, 10);
-        if ( *endptr != '\0' ) {
-                prelude_string_sprintf(err, "Invalid max rotation size offset specified: %s", arg);
+        value = strtoull(arg, &eptr, 10);
+        if ( value == ULLONG_MAX || eptr == arg ) {
+                prelude_log(PRELUDE_LOG_ERR, "Invalid buffer size specified: '%s'.\n", arg);
                 return -1;
         }
 
-        file_server_set_max_rotation_size_offset(off);
+        if ( *eptr == 'K' || *eptr == 'k' )
+                value = value * 1024;
+
+        else if ( *eptr == 'M' || *eptr == 'm' )
+                value = value * 1024 * 1024;
+
+        else if ( *eptr == 'G' || *eptr == 'g' )
+                value = value * 1024 * 1024 * 1024;
+
+        else if ( eptr != arg ) {
+                prelude_string_sprintf(err, "Invalid max rotation size offset specified: %s.", arg);
+                return -1;
+        }
+
+        file_server_set_max_rotation_size_offset((off_t) value);
         return 0;
 }
 
@@ -226,7 +240,7 @@ static int set_rotation_size_offset(prelude_option_t *opt, const char *arg, prel
 
 static int get_rotation_size_offset(prelude_option_t *opt, prelude_string_t *out, void *context)
 {
-        return prelude_string_sprintf(out, "%u", file_server_get_max_rotation_size_offset());
+        return prelude_string_sprintf(out, "%jd", (intmax_t) file_server_get_max_rotation_size_offset());
 }
 
 
@@ -692,7 +706,7 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            set_rotation_time_offset, get_rotation_time_offset);
 
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-size-offset",
-                           "Specifies the maximum difference, in bytes, between two logfile "
+                           "Specifies the maximum size difference between two logfile "
                            "rotation. If this difference is reached, a high severity alert "
                            "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset,
                            get_rotation_size_offset);

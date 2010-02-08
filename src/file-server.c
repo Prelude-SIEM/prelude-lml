@@ -27,6 +27,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -91,8 +92,8 @@
 /*
  * Logfile metadata stuff.
  */
-#define METADATA_SIZE 12
 #define METADATA_CHECKSUM_SIZE 4
+#define METADATA_SIZE (sizeof(off_t) + METADATA_CHECKSUM_SIZE)
 #define METADATA_CHECKSUM_TYPE GCRY_MD_CRC32
 
 #define LOG_LINE_MAXSIZE 65535
@@ -116,14 +117,14 @@ typedef struct {
         FILE *metadata_fd;
         prelude_bool_t need_position;
 
-        uint64_t last_rotation_size;
+        off_t last_rotation_size;
         time_t last_rotation_time;
         time_t last_rotation_time_interval;
 
         prelude_string_t *buf;
 
-        uint64_t need_more_read;
-        uint64_t last_size;
+        off_t need_more_read;
+        off_t last_size;
         size_t current_line_len;
 
         union {
@@ -144,8 +145,8 @@ extern lml_config_t config;
 
 static PRELUDE_LIST(active_fd_list);
 static PRELUDE_LIST(inactive_fd_list);
-static unsigned int max_rotation_size_offset = DEFAULT_MAX_ROTATION_SIZE_OFFSET;
 static unsigned int max_rotation_time_offset = DEFAULT_MAX_ROTATION_TIME_OFFSET;
+static unsigned int max_rotation_size_offset = DEFAULT_MAX_ROTATION_SIZE_OFFSET;
 static file_server_metadata_flags_t metadata_flags = FILE_SERVER_METADATA_FLAGS_LAST;
 
 
@@ -305,7 +306,7 @@ static void logfile_modified_alert(monitor_fd_t *monitor, ev_statdata *st_old, s
 static off_t read_logfile(monitor_fd_t *fd, off_t *available)
 {
         int ret;
-        size_t i = 0;
+        off_t i = 0;
 
         while ( 1 ) {
                 ret = getc(fd->fd);
@@ -342,7 +343,7 @@ static off_t read_logfile(monitor_fd_t *fd, off_t *available)
 
 
 
-static int file_metadata_read(monitor_fd_t *monitor, uint64_t *start, unsigned char **buf)
+static int file_metadata_read(monitor_fd_t *monitor, off_t *start, unsigned char **buf)
 {
         ssize_t ret;
         struct stat st;
@@ -364,14 +365,14 @@ static int file_metadata_read(monitor_fd_t *monitor, uint64_t *start, unsigned c
         if ( ret != METADATA_SIZE )
                 return -1;
 
-        *start = prelude_align_uint64(*buf);
-        *buf = *buf + sizeof(uint64_t);
+        memcpy(start, *buf, sizeof(*start));
+        *buf = *buf + sizeof(off_t);
 
         return 0;
 }
 
 
-static int file_metadata_save(monitor_fd_t *monitor, uint64_t offset)
+static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 {
         int ret;
         unsigned char buf[METADATA_SIZE];
@@ -411,11 +412,10 @@ static int verify_metadata_checksum(prelude_string_t *log, unsigned char *metada
 
 static int file_metadata_get_position(monitor_fd_t *monitor)
 {
-        uint64_t offset = 0;
         struct stat st;
         const char *filename;
         int ret, have_metadata = 0;
-        off_t available = LOG_LINE_MAXSIZE;
+        off_t offset = 0, available = LOG_LINE_MAXSIZE;
         unsigned char msum[METADATA_SIZE], *sumptr = msum;
 
         filename = lml_log_source_get_name(monitor->source);
@@ -434,7 +434,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
 
         if ( ! have_metadata ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: No metadata available, starting from tail.\n", filename);
-                return fseek(monitor->fd, st.st_size, SEEK_SET);
+                return fseeko(monitor->fd, st.st_size, SEEK_SET);
         }
 
         if ( st.st_size < offset ) {
@@ -443,7 +443,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
                 return 0;
         }
 
-        ret = fseek(monitor->fd, offset, SEEK_SET);
+        ret = fseeko(monitor->fd, offset, SEEK_SET);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to offset %" PRELUDE_PRIu64 ": %s.\n",
                             filename, offset, strerror(errno));
@@ -622,7 +622,7 @@ static monitor_fd_t *monitor_new(lml_log_source_t *ls)
 
 
 
-static int monitor_set_position(monitor_fd_t *monitor, const char *filename, int fd)
+static int monitor_set_position(monitor_fd_t *monitor, const char *filename)
 {
         int ret = 0;
 
@@ -691,7 +691,7 @@ static int monitor_open(monitor_fd_t *monitor)
                 fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
 #endif
 
-                ret = monitor_set_position(monitor, filename, fd);
+                ret = monitor_set_position(monitor, filename);
                 if ( ret < 0 ) {
                         prelude_string_destroy(monitor->buf);
                         return -1;
@@ -762,51 +762,42 @@ static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, st
 }
 
 
-static int get_rotation_size_offset(monitor_fd_t *monitor, ev_statdata *st)
+static off_t get_rotation_size_offset(monitor_fd_t *monitor, ev_statdata *st)
 {
-        off_t diff;
-        int prev = 0;
-
-        diff = MAX(monitor->last_rotation_size, st->st_size) -
-               MIN(monitor->last_rotation_size, st->st_size);
+        off_t diff = 0;
 
         if ( monitor->last_rotation_size )
-                prev = 1;
+                diff = (off_t) imaxabs((intmax_t) monitor->last_rotation_size - st->st_size);
 
         monitor->last_rotation_size = st->st_size;
 
-        return prev ? diff : 0;
+        return diff;
 }
 
 
-static int get_rotation_time_offset(monitor_fd_t *monitor, ev_statdata *st)
+static time_t get_rotation_time_offset(monitor_fd_t *monitor)
 {
-        int prev = 0;
-        time_t interval, now, offset;
+        time_t interval = 0, diff = 0, now = time(NULL);
 
-        now = time(NULL);
-        interval = now - monitor->last_rotation_time;
+        if ( monitor->last_rotation_time )
+                interval = now - monitor->last_rotation_time;
 
-        offset = MAX(monitor->last_rotation_time_interval, interval) -
-                 MIN(monitor->last_rotation_time_interval, interval);
-
-        if ( monitor->last_rotation_time ) {
-                prev = 1;
-                monitor->last_rotation_time_interval = interval;
-        }
+        if ( interval && monitor->last_rotation_time_interval )
+                diff = (time_t) imaxabs((intmax_t) monitor->last_rotation_time_interval - interval);
 
         monitor->last_rotation_time = now;
+        monitor->last_rotation_time_interval = interval;
 
-        return prev ? offset : 0;
+        return diff;
 }
-
 
 
 static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_prev, ev_statdata *st_cur, struct stat *st_now)
 {
         int ret;
         char buf[1024];
-        int toff, soff;
+        off_t soff;
+        time_t toff;
         const char *filename, *ctxt;
         idmef_impact_t *impact;
         idmef_classification_t *classification;
@@ -867,20 +858,25 @@ static int is_file_already_used(monitor_fd_t *monitor, ev_statdata *st_prev, ev_
         idmef_impact_set_completion(impact, IDMEF_IMPACT_COMPLETION_SUCCEEDED);
 
         soff = get_rotation_size_offset(monitor, st_now);
-        toff = get_rotation_time_offset(monitor, st_now);
+        toff = get_rotation_time_offset(monitor);
 
-        if ( toff <= max_rotation_time_offset|| soff <= max_rotation_size_offset ) {
+        if ( toff <= max_rotation_time_offset || soff <= max_rotation_size_offset ) {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_INFO);
                 ret = idmef_impact_new_description(impact, &str);
+                if ( ret < 0 )
+                        return ret;
                 prelude_string_set_constant(str, LOGFILE_DELETION_IMPACT);
         } else {
                 idmef_impact_set_severity(impact, IDMEF_IMPACT_SEVERITY_HIGH);
                 ret = idmef_impact_new_description(impact, &str);
+                if ( ret < 0 )
+                        return ret;
                 snprintf(buf, sizeof(buf), "An inconsistency has been observed in file rotation: "
-                        "The differences between the previously observed rotation time and size are higher "
-                        "than the allowed limits: size difference=%u bytes allowed=%u bytes, time "
-                        "difference=%u seconds allowed=%u seconds", soff, max_rotation_size_offset,
-                         toff, max_rotation_time_offset);
+                        "the differences between the previously observed rotation size and time are higher "
+                        "than allowed limits: %" PRELUDE_PRIu64 " bytes difference (%" PRELUDE_PRIu64" allowed), "
+                        "%" PRELUDE_PRIu64 " seconds difference (%" PRELUDE_PRIu64" allowed)",
+                         (intmax_t) soff, (intmax_t) max_rotation_size_offset,
+                         (intmax_t) toff, (intmax_t) max_rotation_time_offset);
                 prelude_string_set_ref(str, buf);
         }
 
@@ -985,27 +981,27 @@ int file_server_read_once(void)
 
 
 
-void file_server_set_max_rotation_time_offset(unsigned int val)
+void file_server_set_max_rotation_time_offset(time_t val)
 {
         max_rotation_time_offset = val;
 }
 
 
 
-unsigned int file_server_get_max_rotation_time_offset(void)
+time_t file_server_get_max_rotation_time_offset(void)
 {
         return max_rotation_time_offset;
 }
 
 
 
-void file_server_set_max_rotation_size_offset(unsigned int val)
+void file_server_set_max_rotation_size_offset(off_t val)
 {
         max_rotation_size_offset = val;
 }
 
 
-unsigned int file_server_get_max_rotation_size_offset(void)
+off_t file_server_get_max_rotation_size_offset(void)
 {
         return max_rotation_size_offset;
 }
