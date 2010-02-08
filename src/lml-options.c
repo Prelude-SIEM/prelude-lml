@@ -474,7 +474,7 @@ static int add_server(lml_log_source_t *ls, const char *addr, unsigned int port)
 {
         config.udp_nserver++;
 
-        config.udp_server = _prelude_realloc(config.udp_server, sizeof(*config.udp_server) * config.udp_nserver);
+        config.udp_server = realloc(config.udp_server, sizeof(*config.udp_server) * config.udp_nserver);
         if ( ! config.udp_server )
                 return -1;
 

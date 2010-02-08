@@ -138,6 +138,10 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_PRINTF_FREXP
   gl_FUNC_PRINTF_FREXPL
   m4_divert_text([INIT_PREPARE], [gl_printf_safe=yes])
+  AC_FUNC_REALLOC
+  AC_DEFINE([GNULIB_REALLOC_GNU], 1, [Define to indicate the 'realloc' module.])
+  gl_FUNC_REALLOC_POSIX
+  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     AC_LIBOBJ([recvfrom])
@@ -436,6 +440,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/printf-frexpl.h
   lib/printf-parse.c
   lib/printf-parse.h
+  lib/realloc.c
   lib/recvfrom.c
   lib/ref-add.sin
   lib/ref-del.sin
@@ -554,6 +559,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/printf-frexp.m4
   m4/printf-frexpl.m4
   m4/printf.m4
+  m4/realloc.m4
   m4/servent.m4
   m4/sigaction.m4
   m4/signal_h.m4
