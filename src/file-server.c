@@ -528,7 +528,7 @@ static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
                  */
                 if ( (slen = prelude_string_get_len(monitor->buf)) ) {
                         lml_dispatch_log(monitor->source, prelude_string_get_string(monitor->buf), slen);
-                        file_metadata_save(monitor, ftell(monitor->fd) - monitor->current_line_len);
+                        file_metadata_save(monitor, ftello(monitor->fd) - monitor->current_line_len);
                 }
 
                 monitor->current_line_len = 0;

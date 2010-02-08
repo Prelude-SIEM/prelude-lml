@@ -27,6 +27,8 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_PROG_RANLIB])
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([gl_FP_IEEE])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
+  AC_REQUIRE([AC_FUNC_FSEEKO])
 ])
 
 # This macro should be invoked from ./configure.in, in the section
@@ -70,6 +72,10 @@ AC_SUBST([LTALLOCA])
   gl_MATH_MODULE_INDICATOR([frexp])
   gl_FUNC_FREXPL_NO_LIBM
   gl_MATH_MODULE_INDICATOR([frexpl])
+  gl_FUNC_FSEEKO
+  gl_STDIO_MODULE_INDICATOR([fseeko])
+  gl_FUNC_FTELLO
+  gl_STDIO_MODULE_INDICATOR([ftello])
   gl_GETADDRINFO
   gl_NETDB_MODULE_INDICATOR([getaddrinfo])
   gl_GETLOGIN_R
@@ -106,6 +112,8 @@ AC_SUBST([LTALLOCA])
   gl_LOCALCHARSET
   LOCALCHARSET_TESTS_ENVIRONMENT="CHARSETALIASDIR=\"\$(top_builddir)/$gl_source_base\""
   AC_SUBST([LOCALCHARSET_TESTS_ENVIRONMENT])
+  gl_FUNC_LSEEK
+  gl_UNISTD_MODULE_INDICATOR([lseek])
   gl_FUNC_MALLOC_POSIX
   gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   gl_MATH_H
@@ -234,6 +242,8 @@ AC_SUBST([LTALLOCA])
   gl_source_base='libmissing/tests'
   gt_LOCALE_FR
   gt_LOCALE_TR_UTF8
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_UNGETC_WORKS
   AC_C_BIGENDIAN
   gl_DOUBLE_EXPONENT_LOCATION
   gl_FLOAT_EXPONENT_LOCATION
@@ -378,6 +388,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/fpucw.h
   lib/frexp.c
   lib/frexpl.c
+  lib/fseeko.c
+  lib/ftello.c
   lib/gai_strerror.c
   lib/getaddrinfo.c
   lib/getlogin_r.c
@@ -400,6 +412,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/langinfo.in.h
   lib/localcharset.c
   lib/localcharset.h
+  lib/lseek.c
   lib/malloc.c
   lib/math.in.h
   lib/mbrtowc.c
@@ -442,6 +455,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
+  lib/stdio-impl.h
   lib/stdio-write.c
   lib/stdio.in.h
   lib/stdlib.in.h
@@ -489,6 +503,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fpieee.m4
   m4/frexp.m4
   m4/frexpl.m4
+  m4/fseeko.m4
+  m4/ftello.m4
   m4/getaddrinfo.m4
   m4/getlogin_r.m4
   m4/glibc21.m4
@@ -517,6 +533,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/locale-tr.m4
   m4/locale-zh.m4
   m4/longlong.m4
+  m4/lseek.m4
   m4/malloc.m4
   m4/math_h.m4
   m4/mbrtowc.m4
@@ -569,6 +586,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/time_h.m4
   m4/time_r.m4
   m4/tm_gmtoff.m4
+  m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/warn-on-use.m4
@@ -584,6 +602,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
+  tests/test-binary-io.c
+  tests/test-binary-io.sh
   tests/test-c-ctype.c
   tests/test-c-strcase.sh
   tests/test-c-strcasecmp.c
@@ -593,6 +613,12 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-fnmatch.c
   tests/test-frexp.c
   tests/test-frexpl.c
+  tests/test-fseeko.c
+  tests/test-fseeko.sh
+  tests/test-fseeko2.sh
+  tests/test-ftello.c
+  tests/test-ftello.sh
+  tests/test-ftello2.sh
   tests/test-getaddrinfo.c
   tests/test-getlogin_r.c
   tests/test-glob.c
@@ -606,6 +632,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-isnanl-nolibm.c
   tests/test-isnanl.h
   tests/test-langinfo.c
+  tests/test-lseek.c
+  tests/test-lseek.sh
   tests/test-math.c
   tests/test-mbrtowc.c
   tests/test-mbrtowc1.sh
@@ -653,6 +681,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/test-wctype.c
   tests/zerosize-ptr.h
+  tests=lib/binary-io.h
   tests=lib/c-ctype.c
   tests=lib/c-ctype.h
   tests=lib/c-strcase.h

@@ -95,6 +95,21 @@ EXTRA_DIST += test-arpa_inet.c
 
 ## end   gnulib module arpa_inet-tests
 
+## begin gnulib module binary-io
+
+libtests_a_SOURCES += binary-io.h
+
+## end   gnulib module binary-io
+
+## begin gnulib module binary-io-tests
+
+TESTS += test-binary-io.sh
+check_PROGRAMS += test-binary-io
+
+EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
+
+## end   gnulib module binary-io-tests
+
 ## begin gnulib module c-ctype
 
 libtests_a_SOURCES += c-ctype.h c-ctype.c
@@ -167,6 +182,22 @@ test_frexpl_nolibm_SOURCES = test-frexpl.c
 EXTRA_DIST += test-frexpl.c signature.h macros.h
 
 ## end   gnulib module frexpl-nolibm-tests
+
+## begin gnulib module fseeko-tests
+
+TESTS += test-fseeko.sh test-fseeko2.sh
+check_PROGRAMS += test-fseeko
+EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh signature.h macros.h
+
+## end   gnulib module fseeko-tests
+
+## begin gnulib module ftello-tests
+
+TESTS += test-ftello.sh test-ftello2.sh
+check_PROGRAMS += test-ftello
+EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh signature.h macros.h
+
+## end   gnulib module ftello-tests
 
 ## begin gnulib module getaddrinfo-tests
 
@@ -261,6 +292,14 @@ check_PROGRAMS += test-langinfo
 EXTRA_DIST += test-langinfo.c
 
 ## end   gnulib module langinfo-tests
+
+## begin gnulib module lseek-tests
+
+TESTS += test-lseek.sh
+check_PROGRAMS += test-lseek
+EXTRA_DIST += test-lseek.c test-lseek.sh signature.h macros.h
+
+## end   gnulib module lseek-tests
 
 ## begin gnulib module math-tests
 
