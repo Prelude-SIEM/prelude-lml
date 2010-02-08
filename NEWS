@@ -1,3 +1,26 @@
+* 2010-02-08, prelude-lml-1.0.0rc2:
+
+- File notification improvement: some case where file notification was
+  not working appropriately were fixed. Improve handling of file
+  deletion (optionaly followed by file creation event).
+
+- There was various case where the previous code would mishandle the
+  metadata write/verification. All known issues are now fixed.
+
+- There was no monitoring for standard input, everything was read once
+  upon start and further input was ignored.
+
+- Fix possible truncation of dispatched log, when the string contained
+  multiples nul terminator. Fixes a regression of LML 1.0.0rc1.
+
+- Statistics were missing for UDP server input.
+
+- Minor events reporting improvement, and bug fixes.
+
+- Improve large file handling.
+
+
+
 * 2010-01-29, prelude-lml-1.0.0rc1:
 
 - Support for character encoding and convertion to UTF-8. The user
