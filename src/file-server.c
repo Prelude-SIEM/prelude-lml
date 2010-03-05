@@ -458,7 +458,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
                 monitor->last_size = 0;
                 monitor->current_line_len = 0;
                 prelude_string_clear(monitor->buf);
-                return fseek(monitor->fd, 0, SEEK_SET);
+                return fseeko(monitor->fd, 0, SEEK_SET);
         }
 
         prelude_string_clear(monitor->buf);
@@ -636,12 +636,12 @@ static int monitor_set_position(monitor_fd_t *monitor, const char *filename)
 
         else if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_HEAD ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: user requested starting from head.\n", filename);
-                ret = fseek(monitor->fd, 0, SEEK_SET);
+                ret = fseeko(monitor->fd, 0, SEEK_SET);
         }
 
         else if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_TAIL ) {
                 prelude_log(PRELUDE_LOG_INFO, "%s: user requested starting from tail.\n", filename);
-                ret = fseek(monitor->fd, 0, SEEK_END);
+                ret = fseeko(monitor->fd, 0, SEEK_END);
         }
 
         if ( ret < 0 ) {
@@ -749,7 +749,7 @@ static void check_modification_time(monitor_fd_t *monitor, ev_statdata *prev, st
          * descriptor to EOF, and start analyzing from this place.
          */
         if ( st->st_size < monitor->last_size ) {
-                ret = fseek(monitor->fd, 0, SEEK_END);
+                ret = fseeko(monitor->fd, 0, SEEK_END);
                 if ( ret < 0 ) {
                         prelude_log(PRELUDE_LOG_ERR, "%s: error seeking to end of file: %s.\n", filename, strerror(errno));
                         return;
