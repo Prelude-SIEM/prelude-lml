@@ -1,3 +1,8 @@
+* 2010-03-16, prelude-lml-1.0.0:
+
+- Minor changes since rc2.
+
+
 * 2010-02-08, prelude-lml-1.0.0rc2:
 
 - File notification improvement: some case where file notification was
