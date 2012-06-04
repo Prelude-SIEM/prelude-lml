@@ -6,8 +6,8 @@ Summary: The prelude log analyzer
 
 Group:  System Environment/Libraries
 License: GPLv2+
-URL:  http://prelude-ids.org/
-Source0: http://www.prelude-ids.org/download/releases/%{name}/%{name}-%{version}.tar.gz
+URL:  http://prelude-ids.com/
+Source0: http://www.prelude-ids.com/download/releases/%{name}/%{name}-%{version}.tar.gz
 Source1:        prelude-lml.init
 #Patch1:  prelude-lml-1.0.0rc1-pie.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
