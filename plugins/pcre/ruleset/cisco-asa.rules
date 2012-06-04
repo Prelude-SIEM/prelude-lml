@@ -109,6 +109,56 @@ regex=-111008: User '(\S+)' executed the 'enable' command; \
  target(0).user.user_id(0).name=enable_15; \
  last
 
+#LOG:Apr  3 15:00:08 192.168.161.72 Homero %ASA-7-111009: User 'user' executed cmd: show access-list
+regex=-111009: User '(\S+)' executed cmd: (\S+) (\S+); \
+ classification.text=User executed a command; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=111009; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1280203; \
+ id=516; \
+ revision=6; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=User $1 executed cmd: $2 $3; \
+ source(0).user.category=os-device; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
+ target(0).user.category=os-device; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=enable_15; \
+ last
+
+#LOG: Apr  3 15:14:44 192.168.161.72 Homero %ASA-6-113016: AAA credentials rejected : reason = Unspecified : server = 1.1.1.3 : user = user
+regex=-113016: AAA credentials rejected : reason = (\S+) : server = ([\d\.]+) : user = (\S+); \
+ classification.text=AAA credentials rejected; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=113016; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1280203; \
+ id=517; \
+ revision=6; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=low; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=reason $1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).user.category=os-device; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$3; \
+ target(0).user.category=os-device; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=enable_15; \
+ last
+
 #LOG:Nov  2 11:17:21 pix %PIX-5-111001: Begin configuration: console writing to memory
 regex=-111001: Begin configuration: (\S+) writing to (\S+); \
  classification.text=Configuration written to $2; \
@@ -185,7 +235,7 @@ regex=-605004: Login denied from ([\d\.]+)\/(\d+) to (\S+):([\d\.]+)\/(\S+) for 
  last
 
 #LOG:Nov  2 19:14:23 pix %PIX-6-308001: PIX console enable password incorrect for 3 tries (from ssh (remote 12.34.56.78))
-regex=-308001: PIX (\S+) enable password incorrect for (\d+) tries \(from (.+)\); \
+regex=-308001: ASA (\S+) enable password incorrect for (\d+) tries \(from (.+)\); \
  classification.text=Admin login; \
  classification.reference(0).origin=vendor-specific; \
  classification.reference(0).meaning=asa_id; \
@@ -199,7 +249,7 @@ regex=-308001: PIX (\S+) enable password incorrect for (\d+) tries \(from (.+)\)
  assessment.impact.severity=medium; \
  assessment.impact.type=admin; \
  assessment.impact.completion=failed; \
- assessment.impact.description=PIX enable password attempt on the $1 failed from $3; \
+ assessment.impact.description=ASA enable password attempt on the $1 failed from $3; \
  target(0).user.category=os-device; \
  target(0).user.user_id(0).type=target-user; \
  target(0).user.user_id(0).name=enable_15; \
@@ -503,6 +553,9 @@ regex=-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+)
  additional_data(1).data=$4; \
  last
 
+#
+#Uncomment the next rule if this useful for you:
+#
 #LOG:Dec 30 03:10:48 12.34.56.78 Dec 30 2003 02:13:28: %PIX-4-106023: Deny icmp src outside:64.89.17.26 dst inside:90.12.34.56 (type 3, code 3) by access-group "outside"
 #LOG:Jun  2 17:46:30 bombadil253 %PIX-4-106023: Deny udp src inside:12.34.56.78/18378 dst outside:90.12.34.56/12685 by access-group "acl_in"
 #regex=-106023: Deny (\w+) src (\S+):([\d\.]+)(/(\d+))? dst (\S+):([\d\.]+)(/(\d+))?.*by access-group "(\S+)"; \
@@ -533,6 +586,9 @@ regex=-313003: Invalid destination for ICMP error message: ICMP source ([\d\.]+)
 # additional_data(0).data=$8; \
 # last
 
+#
+#Uncomment the next rule if this useful for you:
+#
 #LOG:Nov  2 18:03:14 pix %PIX-2-106006: Deny inbound UDP from 9.0.1.2/10001 to 3.4.5.6/1026 on interface outside
 #regex=-106006: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) on interface (\S+); \
 # classification.text=Packet denied; \
@@ -587,6 +643,9 @@ regex=-106007: Deny inbound UDP from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) due to D
  target(0).service.port=$4; \
  last
 
+#
+#Uncomment the next rule if this useful for you:
+#
 #LOG:Nov  2 18:03:14 pix %PIX-2-106001: Inbound TCP connection denied from 1.2.3.4/1007 to 5.6.7.8/139 flags SYN  on interface outside
 #regex=-106001: Inbound TCP connection denied from ([\d\.]+)/(\d+) to ([\d\.]+)/(\d+) flags (.+)  on interface (\S+); \
 # classification.text=Packet denied; \
@@ -736,20 +795,1066 @@ regex=-710005: (TCP|UDP) request discarded from ([\d\.]+)/(\d+) to (\S+):([\d\.]
  last
 
 
-# Events taken from the Cisco System Log Messages List that will need rules
-# (include 'attack' || 'intrusion' || 'probe' || 'covert' in description; no log samples):
-# %PIX-1-106021: Deny protocol reverse path check from source_address to dest_address on interface interface_name
+#Dec  7 14:08:17 Name %ASA-4-733100: [ Scanning] drop rate-1 exceeded. Current burst rate is 160 per second, max configured rate is 350; Current average rate is 313 per second, max configured rate is 262; Cumulative total count is 188250
+regex=-733100: \[+.+\] drop rate-[1|2] exceeded\.; \
+ classification.text=Drop rate $1 exceeded.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=733100; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1281091; \
+ id=500; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The specified object in the syslog message has exceeded the specified burst threshold rate or average threshold rate. The object can be drop activity of a host, TCP/UDP port, IP protocol, or various drops caused by potential attacks. The message indicates that the system is under potential attack.; \
+ last
+
+#
+#Uncomment the next rule if this useful for you:
+#
+#ASA-1-106021: Deny TCP reverse path check from 10.10.10.101 to 65.58.240.105 on interface inside
+#regex=-106021: Deny TCP reverse path check from ([\d\.]+) to ([\d\.]+) on interface (\S+); \
+# classification.text=Deny $1 reverse path check; \
+# classification.reference(0).origin=Cisco; \
+# classification.reference(0).meaning=asa_id; \
+# classification.reference(0).name=106021; \
+# classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1279871; \
+# id=501; \
+# revision=5; \
+# analyzer(0).name=ASA; \
+# analyzer(0).manufacturer=Cisco; \
+# analyzer(0).class=Firewall; \
+# assessment.impact.severity = medium; \
+# assessment.impact.completion=failed; \
+# assessment.impact.type=recon; \
+# assessment.impact.description=An attack is in progress. Someone is attempting to spoof an IP address on an inbound connection.; \
+# source(0).interface=$3; \
+# source(0).node.address(0).category=ipv4-addr; \
+# source(0).node.address(0).address=$1; \
+# target(0).node.address(0).address=$2; \
+# last
+
+
 # %PIX-1-106022: Deny protocol connection spoof from source_address to dest_address on interface interface_name
+regex=-106022: Deny protocol connection spoof from ([\d\.]+) to ([\d\.]+) on interface (S+); \
+ classification.text=Deny $1 reverse path check; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=106022; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1279871; \
+ id=502; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=An attack is in progress. Someone is attempting to spoof an IP address on an inbound connection.; \
+ source(0).interface=$3; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).node.address(0).address=$2; \
+ last
+
+
+
 # %PIX-1-106101 The number of ACL log deny-flows has reached limit (number).
+regex=-106101: The number of ACL log deny-flows has reached limit (\d+); \
+ classification.text=deny-flows has reached limit $1 ; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=106101; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1279871; \
+ id=503; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = medium; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=An attack is in progress. Someone is attempting to spoof an IP address on an inbound connection.; \
+ additional_data(0).type=integer; \
+ additional_data(0).meaning=limit reached; \
+ additional_data(0).data=$1; \
+ last
+
+#Homero %ASA-5-111008: User 'f47177' executed the 'configure terminal' command.
+regex=-111008: User '(\S+)' executed the 'configure terminal' command; \
+ classification.text=The user $1 entered executed the 'configure terminal' command; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=111008; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=504; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The user entered any command, with the exception of a show command; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=User; \
+ additional_data(0).data=$1; \
+ source(0).user.category=os-device; \
+ source(0).user.user_id(0).type=current-user; \
+ source(0).user.user_id(0).name=$1; \
+ target(0).user.category=os-device; \
+ target(0).user.user_id(0).type=target-user; \
+ target(0).user.user_id(0).name=enable_15; \
+ last
+
+
 # %PIX-1-107001: RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name
+regex=-107001: RIP auth failed from ([\d\.]+): version=(\d+), type=(\S+), mode=(\S+), sequence=(\d+), on interface (\S+); \
+ classification.text=RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=107001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=505; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=RIP auth failed from IP_address: version=number, type=string, mode=string, sequence=number on interface interface_name; \
+ source(0).interface=$6; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=version; \
+ additional_data(0).data=$2; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=type; \
+ additional_data(0).data=$3; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=mode; \
+ additional_data(0).data=$4; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=sequence; \
+ additional_data(0).data=$5; \
+ last
+
+
+
 # %PIX-1-107002: RIP pkt failed from IP_address: version=number on interface interface_name
-# %PIX-4-109017: User at IP_address exceeded auth proxy connection limit (max)
-# %PIX-2-201003: Embryonic limit exceeded nconns/elimit for outside_address/outside_port (global_address) inside_address/inside_port on interface interface_name
+regex=-107002: RIP pkt failed from ([\d\.]+): version=(\d+) on interface (\S+); \  
+ classification.text=IP pkt failed from IP_address: version=number on interface interface_name; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=107002 \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=506 \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=RIP pkt failed from IP_address: version=number on interface interface_name; \
+ source(0).interface=$3; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=version; \
+ additional_data(0).data=$2; \
+ last
+
+
+#%PIX-4-109017: User at IP_address exceeded auth proxy connection limit (max)
+regex=-109017: User at ([\d\.]+) exceeded auth proxy connection limit; \
+ classification.text=User at IP_address exceeded auth proxy connection limit (max); \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=109017; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=507 \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=User at IP_address exceeded auth proxy connection limit (max); \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+
 # %PIX-3-320001: The subject name of the peer cert is not allowed for connection
+regex=-320001: The subject name of the peer cert is not allowed for connection; \
+ classification.text=The subject name of the peer cert is not allowed for connection; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=320001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=508 \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The subject name of the peer cert is not allowed for connection; \
+ last
+
 # %PIX-4-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number
-# %PIX-4-402102: decapsulate: packet missing {AH|ESP}, destadr=dest_address, actual prot=protocol
-# %PIX-4-405002: Received mac mismatch collision from IP_address/mac_address for authenticated host
-# %PIX-7-710006: protocol request discarded from source_address to interface_name:dest_address
-# %PIX-2-106020: Deny IP teardrop fragment (size = number, offset = number) from IP_address to IP_address
-# %PIX-4-209004: Invalid IP fragment, size = bytes exceeds maximum size = bytes: src = IP_address, dest = IP_address, proto = protocol, id = number
-# %PIX-4-209005: Discard IP fragment set with more than number elements: src = IP_address, dest = IP_address, proto = protocol, id = number
+regex=-402101: decaps: rec'd IPSEC packet has invalid spi for destaddr=([\d\.]+); \
+ classification.text=decaps: rec'd IPSEC packet has invalid spi for destaddr=dest_address, prot=protocol, spi=number; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=402101; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa72/system/message/logmsgs.html#wp1280203; \
+ id=509 \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity = low; \
+ assessment.impact.completion=failed; \
+ assessment.impact.type=recon; \
+ assessment.impact.description=The subject name of the peer cert is not allowed for connection; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$1; \
+ last
+
+#%ASA-4-419001: Dropping TCP packet from src_ifc:src_IP/src_port to dest_ifc:dest_IP/dest_port, reason: MSS exceeded, MSS size, data size
+regex=-419001: Dropping TCP packet from (\S+):([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+); \
+ classification.text=Dropping TCP packet; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=419001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=510; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Reason: MSS exceeded, MSS size, data size.; \
+ source(0).interface=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ last
+
+
+#Apr 10 15:40:15 192.168.161.72 xxx %ASA-4-419002: Duplicate TCP SYN from outside:xx.xx.xx.xx/xxx to inside:xx.xx.xx.xx/xxxx with different initial sequence number
+regex=-419002: Duplicate TCP SYN from (\S+):([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+); \
+ classification.text=Duplicate TCP SYN; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=419002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=511; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Duplicate TCP SYN with different initial sequence number.; \
+ source(0).interface=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ last
+
+#%ASA-4-419003: Cleared TCP urgent flag from in_ifc:src_ip/src_port to out_ifc:dest_ip/dest_port.
+regex=-419003: Cleared TCP urgent flag from (\S+):([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+); \
+ classification.text=Cleared TCP urgent flag; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=419003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=512; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Cleared TCP urgent flag from $1:$2/$3 to $4:$5/$6; \
+ source(0).interface=$1; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ last
+
+
+#############################
+## Cisco ASA Cluster Alerts##
+#############################
+
+#-101001: (Primary) Failover cable OK.
+regex=-101001: \((\S+)\); \
+ classification.text=Failover cable OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=101001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=513; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Failover cable OK.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+
+#-101002: (Primary) Bad failover cable.
+regex=-101002: \((\S+)\); \
+ classification.text=Bad failover cable.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=101002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=514; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Bad failover cable.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+
+#-101003: (Primary) Failover cable not connected (this unit).
+regex=-101003: \((\S+)\) Failover cable not connected \((\S+)\); \
+ classification.text=Failover cable not connected.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=101003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=515; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Failover cable not connected.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ last
+
+#-101004: (Primary) Failover cable not connected (other unit).
+regex=-101004: \((\S+)\) Failover cable not connected \((\S+)\); \
+ classification.text=Failover cable not connected.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=101004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=516; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Failover cable not connected.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$2; \
+ last
+
+#-101005: (Primary) Error reading failover cable status.
+regex=-101005: \((\S+)\); \
+ classification.text=Error reading failover cable status.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=101005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=517; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Error reading failover cable status.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-102001: (Primary) Power failure/System reload other side.
+regex=-102001: \((\S+)\); \
+ classification.text=Power failure/System reload other side.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=102001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=518; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Power failure/System reload other side.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-103001: (Primary) No response from other firewall (reason code = code).
+regex=-103001: \((\S+)\); \
+ classification.text=No response from other firewall.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=103001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=519; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=No response from other firewall.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-103002: (Primary) Other firewall network interface interface_number OK.
+regex=-103002: \((\S+)\); \
+ classification.text=Other firewall network interface OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=103002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=520; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Other firewall network interface OK.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-103003: (Primary) Other firewall network interface interface_number failed.
+regex=-103003: \((\S+)\); \
+ classification.text=Other firewall network interface failed.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=103003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=521; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Other firewall network interface failed.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-103004: (Primary) Other firewall reports this firewall failed.
+regex=-103004: \((\S+)\); \
+ classification.text=Other firewall reports this firewall failed.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=103004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=522; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Other firewall reports this firewall failed.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-103005: (Primary) Other firewall reporting failure.
+regex=-103005: \((\S+)\); \
+ classification.text=Other firewall reporting failure; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=103005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=523; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Other firewall reporting failure.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105001: (Primary) Disabling failover.
+regex=-105001: \((\S+)\); \
+ classification.text=Disabling failover; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=524; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Disabling failover.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+
+#-105002: (Primary) Enabling failover.
+regex=-105002: \((\S+)\); \
+ classification.text=Enabling failover; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=525; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Enabling failover.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105003: (Primary) Monitoring on interface interface_name waiting
+regex=-105003: \((\S+)\); \
+ classification.text=Monitoring on interface waiting; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=526; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Monitoring on interface waiting.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105004: (Primary) Monitoring on interface interface_name normal
+regex=-105004: \((\S+)\); \
+ classification.text=Monitoring on interface normal.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=527; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Monitoring on interface normal.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105005: (Primary) Lost Failover communications with mate on interface interface_name.
+regex=-105005: \((\S+)\); \
+ classification.text=Lost Failover communications with mate on interface.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=528; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Lost Failover communications with mate on interface.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105006: (Primary) Link status `Up' on interface interface_name.
+regex=-105006: \((\S+)\); \
+ classification.text=Link status Up on interface.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105006; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=529; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Link status Up on interface.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105007: (Primary) Link status `Down' on interface interface_name.
+regex=-105007: \((\S+)\); \
+ classification.text=Link status Down on interface.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105007; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=530; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Link status Down on interface.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105008: (Primary) Testing interface interface_name.
+regex=-105008: \((\S+)\); \
+ classification.text=Testing interface.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105008; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=531; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Testing interface.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105009: (Primary) Testing on interface interface_name {Passed|Failed}.
+regex=-105009: \((\S+)\); \
+ classification.text=Testing on interface Passed|Failed.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105009; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=532; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Testing interface Passed|Failed.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105011: (Primary) Failover cable communication failure
+regex=-105011: \((\S+)\); \
+ classification.text=Failover cable communication failure.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105011; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=533; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Failover cable communication failure.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105020: (Primary) Incomplete/slow config replication
+regex=-105020: \((\S+)\); \
+ classification.text=Incomplete/slow config replication.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105020; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=534; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Incomplete/slow config replication.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+#-105021: (failover_unit) Standby unit failed to sync due to a locked context_name config. Lock held by lock_owner_name 
+regex=-105021: \((\S+)\); \
+ classification.text=Standby unit failed to sync due to a locked config.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=105021; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=535; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=high; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Standby unit failed to sync due to a locked config.; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$1; \
+ last
+
+
+#######################
+## Cisco ASA Failover##
+#######################
+
+regex=-104004:; \
+ classification.text=Failover - Switching to OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=104004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=536; \
+ revision=6; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Posible Failover en Firewall Cisco ASA. Ver Log.; \
+ last
+
+#Alertas Cisco:
+regex=-104001:; \
+ classification.text=Failover - Switching to ACTIVE.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=104001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=537; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Posible Failover en Firewall Cisco ASA (Switching to ACTIVE). Ver Log.; \
+ last
+
+#Alertas Cisco:
+regex=-104002:; \
+ classification.text=Failover - Switching to STNDBY.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=104002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=538; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Posible Failover en Firewall Cisco ASA (Switching to STNDBY). Ver Log.; \
+ last
+
+#Alertas Cisco:
+regex=-104003:; \
+ classification.text=Failover - Switching to FAILED.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=104003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1285015; \
+ id=539; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.type=admin; \
+ assessment.impact.completion=succeeded; \
+ assessment.impact.description=Posible Failover en Firewall Cisco ASA (Switching to FAILED). Ver Log.; \
+ last
+
+###################
+##Cisco ASA Check##
+###################
+
+#-717049: Local CA Server certificate is due to expire in number days and a replacement certificate is available for export.
+regex=-717049:; \
+ classification.text=Local CA Server certificate is due to expire; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=717049; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=540; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Local CA Server certificate is due to expire in number days and a replacement certificate is available for export.; \
+ last
+
+#-735001 Cooling Fan var1: OK
+regex=-735001:; \
+ classification.text=Cooling Fan var1: OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735001; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=541; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Cooling Fan var1: OK.; \
+ last
+
+#-735002 Cooling Fan var1: Failure Detected
+regex=-735002:; \
+ classification.text=Cooling Fan var1: Failure Detected.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735002; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=542; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Cooling Fan var1: OK.; \
+ last
+
+#-735003 Power Supply var1: OK
+regex=-735003:; \
+ classification.text=Power Supply var1: OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=543; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Power Supply var1: OK.; \
+ last
+
+#-735004 Power Supply var1: Failure Detected
+regex=-735004:; \
+ classification.text=Power Supply var1: Failure Detected.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735004; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=544; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Power Supply var1: Failure Detected.; \
+ last
+
+#-735005 Power Supply Unit Redundancy OK
+regex=-735005:; \
+ classification.text=Power Supply Unit Redundancy OK.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=545; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Power Supply Unit Redundancy OK.; \
+ last
+
+#-735006 Power Supply Unit Redundancy Lost
+regex=-735006:; \
+ classification.text=Power Supply Unit Redundancy Lost.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735006; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=546; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=Power Supply Unit Redundancy Lost.; \
+ last
+
+#-735007 CPU var1: Temp: var2 var3, Critical
+regex=-735007:; \
+ classification.text=CPU: Temp: Critical.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735007; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=547; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=CPU var1: Temp: var2 var3, Critical.; \
+ last
+
+#-735022: CPU# is running beyond the max thermal operating temperature and the device will be shutting down immediately to prevent permanent damage to the CPU. 
+regex=-735022:; \
+ classification.text=CPU is running beyond the max thermal operating temperature.; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=735022; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279756; \
+ id=548; \
+ revision=1; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=CPU# is running beyond the max thermal operating temperature and the device will be shutting down immediately to prevent permanent damage to the CPU.; \
+ last
+
+#
+#Uncomment the next rule if this useful for you:
+#
+#Apr 27 14:50:30 xx.xx.xx.xx Name %ASA-4-507003: tcp flow from outside:xx.xx.xx.xx/xxxxx to inside:xx.xx.xx.xx/xxx terminated by inspection engine, reason - proxy inspector drop reset
+regex=-507003: tcp flow from (\S+):([\d\.]+)/(\d+) to (\S+):([\d\.]+)/(\d+) (\S+ ); \
+ classification.text=TCP flow terminated by inspection engine; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=507003; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279735; \
+ id=549; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=medium; \
+ assessment.impact.description=TCP flow terminated by inspection engine, reason - proxy inspector drop reset.; \
+ source(0).interface=$1; \
+ source(0).service.iana_protocol_name=TCP; \
+ source(0).service.iana_protocol_number=6; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$2; \
+ source(0).service.port=$3; \
+ target(0).interface=$4; \
+ target(0).service.iana_protocol_name=TCP; \
+ target(0).service.iana_protocol_number=6; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ target(0).service.port=$6; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Reason; \
+ additional_data(0).data=$7; \
+ last
+
+#May 3 15:30:52 xx.xx.xx.xx Name %ASA-3-305005: No translation group found for icmp src inside:zz.zz.zz.zz dst outside:zz.zz.zz.zz (type 8, code 0)
+regex=-305005: No translation group found for (\S+) src (\S+):([\d\.]+) dst (\S+):([\d\.]+); \
+ classification.text=No translation group found; \
+ classification.reference(0).origin=vendor-specific; \
+ classification.reference(0).meaning=asa_id; \
+ classification.reference(0).name=305005; \
+ classification.reference(0).url=http://www.cisco.com/en/US/docs/security/asa/asa70/system/message/logmsgs.html#wp1279735; \
+ id=550; \
+ revision=5; \
+ analyzer(0).name=ASA; \
+ analyzer(0).manufacturer=Cisco; \
+ analyzer(0).class=Firewall; \
+ assessment.impact.severity=low; \
+ assessment.impact.description=TCP flow terminated by inspection engine, reason - proxy inspector drop reset.; \
+ source(0).interface=$2; \
+ source(0).node.address(0).category=ipv4-addr; \
+ source(0).node.address(0).address=$3; \
+ target(0).interface=$4; \
+ target(0).node.address(0).category=ipv4-addr; \
+ target(0).node.address(0).address=$5; \
+ additional_data(0).type=string; \
+ additional_data(0).meaning=Proto; \
+ additional_data(0).data=$1; \
+ last
