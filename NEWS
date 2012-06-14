@@ -1,3 +1,15 @@
+* 2012-06-06, prelude-lml-1.0.1:
+
+- Changed copyrights
+
+- Added packaging for rhel6
+
+- Contributed rules by <operador@sesabe.mooo.com>
+  
+  Added rules for Cisco ips 4200, Juniper SSLVPN, Symantec SEP 12.1 AV, Freeradius
+  Updated rules for Cisco ASA
+
+
 * 2010-03-16, prelude-lml-1.0.0:
 
 - Minor changes since rc2.

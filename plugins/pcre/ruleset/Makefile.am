@@ -12,17 +12,20 @@ ruleset_DATA = \
 	cisco-common.rules	\
 	cisco-css.rules		\
 	cisco-ips.rules		\
+	cisco-ips-4200.rules	\
 	cisco-router.rules	\
 	cisco-vpn.rules		\
 	clamav.rules		\
 	dell-om.rules		\
 	f5-bigip.rules		\
+	freeradius.rules	\
 	grsecurity.rules	\
 	honeyd.rules		\
 	honeytrap.rules		\
 	httpd.rules		\
 	ipchains.rules		\
 	ipfw.rules		\
+	juniper.rules		\
 	kojoney.rules		\
 	modsecurity.rules	\
 	ms-cluster.rules	\
@@ -52,6 +55,7 @@ ruleset_DATA = \
 	spamassassin.rules	\
 	squid.rules		\
 	su.rules		\
+	symantec.rules		\
 	ssh.rules		\
 	sudo.rules		\
 	suhosin.rules		\
