@@ -93,6 +93,7 @@ include = @LIBPRELUDE_CONFIG_PREFIX@/default/idmef-client.conf
 time-format = "%b %d %H:%M:%S"
 prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])?: )?"
 file = /var/log/messages
+file = /var/log/secure
 # udp-server = 0.0.0.0
 
 
