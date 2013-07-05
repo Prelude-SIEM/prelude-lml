@@ -1,0 +1,12 @@
+Index: prelude-lml-0.9.10.1/plugins/pcre/ruleset/pcre.rules
+===================================================================
+--- prelude-lml-0.9.10.1.orig/plugins/pcre/ruleset/pcre.rules	2007-10-15 18:13:50.000000000 +0200
++++ prelude-lml-0.9.10.1/plugins/pcre/ruleset/pcre.rules	2007-10-15 18:14:24.000000000 +0200
+@@ -93,6 +93,7 @@
+ # This next regex isn't specific enough for my liking, but there doesn't seem
+ # to be a better solution based on the log samples
+ regex=[a-z\d]+:;			include = openhostapd.rules;
++regex=CRON;				include = cron.rules;
+ regex=[Pp][Aa][Mm]_;			include = pam.rules;
+ regex=pcanywhere;			include = pcanywhere.rules;
+ regex=portsentry;			include = portsentry.rules;

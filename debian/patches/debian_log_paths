@@ -1,0 +1,43 @@
+Index: prelude-lml/prelude-lml.conf.in
+===================================================================
+--- prelude-lml.orig/prelude-lml.conf.in	2013-07-02 15:13:38.384032847 +0200
++++ prelude-lml/prelude-lml.conf.in	2013-07-02 15:13:38.380032847 +0200
+@@ -93,16 +93,17 @@
+ time-format = "%b %d %H:%M:%S"
+ prefix-regex = "^(?P<timestamp>.{15}) (?P<hostname>\S+) (?:(?P<process>\S+?)(?:\[(?P<pid>[0-9]+)\])?: )?"
+ file = /var/log/messages
++file = /var/log/auth.log
+ # udp-server = 0.0.0.0
+ 
+ 
+ #
+ # Sample configuration for metalog:
+ #
+-[format=metalog]
+-prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
+-time-format = "%b %d %H:%M:%S"
+-file = /var/log/everything/current
++#[format=metalog]
++#prefix-regex = "^(?P<timestamp>.{15}) \[(?P<process>\S+)\] "
++#time-format = "%b %d %H:%M:%S"
++#file = /var/log/everything/current
+ # udp-server = 0.0.0.0
+ 
+ 
+@@ -112,14 +113,12 @@
+ [format=apache]
+ time-format = "%d/%b/%Y:%H:%M:%S"
+ prefix-regex = "(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
+-file = /var/log/httpd/access_log
+-file = /var/log/apache2/access_log
++file = /var/log/apache2/access.log
+ 
+ [format=apache-error]
+ time-format = "%a %b %d %H:%M:%S %Y"
+ prefix-regex = "^\[(?P<timestamp>.{24})\] \S+ (\[client (?P<hostname>\S+)\] )?"
+-file = /var/log/httpd/error_log
+-file = /var/log/apache2/error_log
++file = /var/log/apache2/error.log
+ 
+ 
+ 

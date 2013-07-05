@@ -1,0 +1,23 @@
+Prelude-LML specific changes for Debian
+=======================================
+
+Profile
+-------
+
+A Prelude profile must be created for prelude-lml.
+To create it, run (as root)::
+
+ prelude-admin register "prelude-lml" "idmef:w" <manager address> --uid 0 --gid 0
+
+Log files location
+------------------
+
+Log files locations have been adapted to Debian (and, more generally, FHS).
+Default logs include:
+ - /var/log/syslog
+ - /var/log/auth.log
+ - /var/log/apache2/acces.log
+
+To change this, edit /etc/prelude-lml/prelude-lml.conf
+
+ -- Enguerrand de MAUDUIT <enguerrand.de-mauduit@c-s.fr>  Thu, 04 Jul 2013 10:33:47 +0200

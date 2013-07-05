@@ -1,0 +1,13 @@
+Index: prelude-lml/src/prelude-lml.c
+===================================================================
+--- prelude-lml.orig/src/prelude-lml.c	2011-05-02 13:17:51.000000000 +0200
++++ prelude-lml/src/prelude-lml.c	2011-05-02 13:20:20.000000000 +0200
+@@ -36,6 +36,8 @@
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ 
++#include <ltdl.h>
++
+ #if TIME_WITH_SYS_TIME
+ # include <sys/time.h>
+ # include <time.h>
