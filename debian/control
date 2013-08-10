@@ -15,7 +15,7 @@ Standards-Version: 3.8.4
 Homepage: http://www.prelude-ids.com
 Package: prelude-lml
 Architecture: any
-Pre-Depends: multiarch-support
+Pre-Depends: binutils-multiarch
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: rsyslog | system-log-daemon
 Description: Security Information Management System [ Log Agent ]
