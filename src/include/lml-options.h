@@ -21,8 +21,8 @@
 *
 *****/
 
-#ifndef _LML_PCONFIG_H
-#define _LML_PCONFIG_H
+#ifndef LML_OPTIONS_H
+#define LML_OPTIONS_H
 
 #include <libprelude/prelude-inttypes.h>
 #include "regex.h"
@@ -58,4 +58,4 @@ typedef struct {
         gid_t wanted_gid;
 } lml_config_t;
 
-#endif /* _LML_PCONFIG_H */
+#endif

@@ -21,6 +21,11 @@
 *
 *****/
 
+#ifndef LOG_PLUGINS_H
+#define LOG_PLUGINS_H
+
 prelude_plugin_instance_t *log_plugin_register(const char *pname);
 void log_plugin_run(prelude_plugin_instance_t *pc, lml_log_source_t *ls, lml_log_entry_t *log);
 int log_plugins_init(const char *dirname, void *data);
+
+#endif

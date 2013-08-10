@@ -21,6 +21,9 @@
 *
 *****/
 
+#ifndef LML_CHARSET_H
+#define LML_CHARSET_H
+
 typedef struct lml_charset lml_charset_t;
 
 int lml_charset_open(lml_charset_t **lc, const char *from);
@@ -30,3 +33,5 @@ int lml_charset_convert(lml_charset_t *lc, const char *in, size_t inlen, char **
 int lml_charset_detect(const char *in, size_t inlen, const char **out, int *confidence);
 
 int lml_charset_close(lml_charset_t *lc);
+
+#endif

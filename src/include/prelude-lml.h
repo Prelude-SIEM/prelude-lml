@@ -21,8 +21,8 @@
 *
 *****/
 
-#ifndef _PRELUDE_LML_H
-#define _PRELUDE_LML_H
+#ifndef PRELUDE_LML_H
+#define PRELUDE_LML_H
 
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-log.h>
@@ -69,4 +69,5 @@ void lml_alert_emit(const lml_log_source_t *ls, const lml_log_entry_t *log, idme
 int lml_alert_prepare(idmef_message_t *message, const lml_log_source_t *ls, const lml_log_entry_t *log);
 
 int lml_additional_data_prepare(prelude_list_t *adlist, const lml_log_source_t *ls, const lml_log_entry_t *log);
+
 #endif

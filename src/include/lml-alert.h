@@ -21,6 +21,11 @@
 *
 *****/
 
+#ifndef LML_ALERT_H
+#define LML_ALERT_H
+
 #include <libprelude/prelude-client.h>
 
 int lml_alert_init(prelude_client_t *lml_client);
+
+#endif

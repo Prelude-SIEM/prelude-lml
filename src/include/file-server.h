@@ -21,6 +21,8 @@
 *
 *****/
 
+#ifndef FILE_SERVER_PR_H
+#define FILE_SERVER_PR_H
 
 typedef enum {
         FILE_SERVER_METADATA_FLAGS_HEAD     = 0x01,
@@ -45,3 +47,5 @@ void file_server_set_max_rotation_time_offset(time_t val);
 off_t file_server_get_max_rotation_size_offset(void);
 
 void file_server_set_max_rotation_size_offset(off_t val);
+
+#endif
