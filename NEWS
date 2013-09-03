@@ -1,3 +1,12 @@
+* 2013-09-03, prelude-lml-1.0.2:
+
+- Ajout de la protection d'inclusion recursive des headers
+
+- Fixed #520 : start problem with UDP and SELinux
+
+- Added /var/log/secure in the default monitored log files
+
+
 * 2012-06-06, prelude-lml-1.0.1:
 
 - Changed copyrights
