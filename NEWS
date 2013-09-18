@@ -1,6 +1,8 @@
-* 2013-09-03, prelude-lml-1.0.2:
+* 2013-09-18, prelude-lml-1.0.2:
 
-- Ajout de la protection d'inclusion recursive des headers
+- Removed ruleset. Ruleset are now shipped with the prelude-lml-rules module.
+
+- Fixed recursive inclusion of headers
 
 - Fixed #520 : start problem with UDP and SELinux
 

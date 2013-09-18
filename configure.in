@@ -133,16 +133,6 @@ AC_SUBST(PCRE_LIBS)
 AC_SUBST(PCRE_CFLAGS)
 
 
-dnl **************************************************
-dnl * Check for unsupported ruleset install request  *
-dnl **************************************************
-
-AC_ARG_ENABLE(unsupported-rulesets, AC_HELP_STRING(--enable-unsupported-rulesets, Enable install of unsupported rulesets [default=no]), enable_unsupported_rulesets="$enableval", enable_unsupported_rulesets="$enableval")
-
-AM_CONDITIONAL(ENABLE_UNSUPPORTED_RULESETS, test x$enable_unsupported_rulesets = xyes)
-
-
-
 dnl ********************************************************
 dnl * Configure embedded libev                             *
 dnl ********************************************************
@@ -203,8 +193,6 @@ plugins/Makefile
 plugins/debug/Makefile
 
 plugins/pcre/Makefile
-plugins/pcre/ruleset/Makefile
-plugins/pcre/ruleset/unsupported/Makefile
 
 tests/Makefile
 
@@ -214,4 +202,3 @@ AC_OUTPUT
 echo
 echo "*** Dumping configuration ***"
 echo "    - Favor libICU over Iconv    : $enable_icu"
-echo "    - Enable unsupported rulesets: $enable_unsupported_rulesets"

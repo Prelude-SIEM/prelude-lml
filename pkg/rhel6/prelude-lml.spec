@@ -1,23 +1,21 @@
 Name:  prelude-lml
 Epoch:  1
-Version: 1.0.1
+Version: 1.0.2
 Release: 1%{?dist}
 Summary: The prelude log analyzer
-
-Group:  System Environment/Libraries
+Group:  System Environment/Daemon
 License: GPLv2+
-URL:  http://prelude-ids.com/
-Source0: http://www.prelude-ids.com/download/releases/%{name}/%{name}-%{version}.tar.gz
-Source1:        prelude-lml.init
-#Patch1:  prelude-lml-1.0.0rc1-pie.patch
+URL:  http://www.prelude-ids.org/
+Source0: %{name}-%{version}.tar.gz
+Source1: prelude-lml.init
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
 BuildRequires: gamin-devel, pcre-devel
-BuildRequires: libprelude-devel >= 0.9.21.3
+BuildRequires: libprelude-devel >= 1.0.0
 Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
 Requires(postun): /sbin/service
+
 
 %description
 Prelude-LML is a log analyser that allows Prelude to collect and
@@ -26,19 +24,19 @@ syslog messages in order to detect suspicious activities and transform
 them into Prelude-IDMEF alerts. Prelude-LML handles events generated
 by a large set of applications,
 
+
 %package devel
 Summary: Header files and libraries for libprelude development
 Group: Development/Libraries
 Requires: libprelude-devel, prelude-lml = %{epoch}:%{version}-%{release}
 
+
 %description devel
 Libraries, include files, etc you can use to develop custom
 Prelude LML plugins.
 
-
 %prep
 %setup -q
-%patch1 -p1
 
 
 %build
@@ -48,8 +46,9 @@ make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/%{_initrddir}/
+mkdir -p %{buildroot}/%{_initrddir}
 mkdir -p %{buildroot}/var/lib/%{name}/
+mkdir -p %{buildroot}/%{_sysconfdir}/%{name}/
 make install DESTDIR=%{buildroot} INSTALL="%{__install} -c -p"
 install -m 755 %{SOURCE1} %{buildroot}/%{_initrddir}/%{name}
 rm -f %{buildroot}/%{_libdir}/%{name}/debug.la
@@ -77,12 +76,9 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING
+%doc COPYING NEWS HACKING.README README
 %attr(0750,root,root) %dir %{_sysconfdir}/%{name}/
-%config(noreplace) %attr(0640,root,root) %{_sysconfdir}/%{name}/*.conf
-%config(noreplace) %attr(0640,root,root) %{_sysconfdir}/%{name}/*.rules
-%attr(0750,root,root) %dir %{_sysconfdir}/%{name}/ruleset/
-%config(noreplace) %attr(0640,root,root)%{_sysconfdir}/%{name}/ruleset/*
+%config(noreplace) %{_sysconfdir}/%{name}/*
 %{_initrddir}/%{name}
 %{_bindir}/prelude-lml
 %dir %{_libdir}/%{name}/
@@ -97,6 +93,9 @@ fi
 
 
 %changelog
+* Wed Sep 18 2013 Jean-Charles ROGEZ <jean-charles.rogez@c-s.fr> - 1:1.0.2-1
+- Removed ruleset, added HACKING and README files
+
 * Wed Jun 15 2011 Vincent Quéméner <vincent.quemener@c-s.fr> - 1.0.0-5
 - Rebuilt for RHEL6
 
