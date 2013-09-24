@@ -20,7 +20,7 @@ rpm_prepare: sdist
 	mkdir -p $(PKG_DIR)/rpm/BUILD $(PKG_DIR)/rpm/BUILDROOT $(PKG_DIR)/rpm/RPMS $(PKG_DIR)/rpm/SOURCES $(PKG_DIR)/rpm/SPEC $(PKG_DIR)/rpm/SRPMS
 	cp $(OUT_DIR)/$(PKGNAME)-*.tar.gz $(PKG_DIR)/rpm/SOURCES/
 
-rhel6_prepare:
+rhel6_prepare: rpm_prepare
 	rm -rf $(OUT_DIR)/rhel6
 	mkdir $(OUT_DIR)/rhel6
 	cp rhel6/$(PKGNAME).spec $(PKG_DIR)/rpm/SPEC/

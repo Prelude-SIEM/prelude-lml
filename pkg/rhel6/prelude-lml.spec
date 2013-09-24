@@ -1,7 +1,7 @@
 Name:  prelude-lml
 Epoch:  1
 Version: 1.0.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: The prelude log analyzer
 Group:  System Environment/Daemon
 License: GPLv2+
@@ -15,7 +15,7 @@ Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
 Requires(preun): /sbin/service
 Requires(postun): /sbin/service
-
+Requires: prelude-lml-rules
 
 %description
 Prelude-LML is a log analyser that allows Prelude to collect and
@@ -93,6 +93,9 @@ fi
 
 
 %changelog
+* Tue Sep 24 2013 Jean-Charles ROGEZ <jean-charles.rogez@c-s.fr> - 1:1.0.2-2
+- Added prelude-lml-rules dependency
+
 * Wed Sep 18 2013 Jean-Charles ROGEZ <jean-charles.rogez@c-s.fr> - 1:1.0.2-1
 - Removed ruleset, added HACKING and README files
 
