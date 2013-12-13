@@ -284,7 +284,7 @@ static void wait_for_event(void)
                 ev_io_start(&events[i]);
         }
 
-        ev_loop(0);
+        ev_run(0);
 }
 
 
@@ -364,7 +364,7 @@ int main(int argc, char **argv)
                 if ( config.pidfile )
                         free(config.pidfile);
 
-                ev_default_fork();
+                ev_loop_fork(EV_DEFAULT);
         }
 
         ev_timer_init(&evt, libev_timer_cb, 1, 1);
