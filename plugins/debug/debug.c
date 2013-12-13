@@ -138,12 +138,11 @@ static int debug_set_output_stderr(prelude_option_t *opt, const char *optarg, pr
 
 int debug_LTX_lml_plugin_init(prelude_plugin_entry_t *pe, void *lml_root_optlist)
 {
-        int ret;
         prelude_option_t *opt;
         int hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG;
 
-        ret = prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
-                                 PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
+        prelude_option_add(lml_root_optlist, &opt, hook, 0, "debug", "Debug plugin option",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, debug_activate, NULL);
 
         prelude_plugin_set_activation_option(pe, opt, NULL);
 
