@@ -26,6 +26,7 @@ MAINTAINERCLEANFILES = \
         `find "$(srcdir)" -type f -name Makefile.in -print`
 
 install-data-local:
+	$(INSTALL) -m 700 -d $(DESTDIR)$(configdir);
 	$(INSTALL) -m 700 -d $(DESTDIR)$(metadata_dir)
 	@if test -f $(DESTDIR)$(configdir)/prelude-lml.conf; then         					\
 		echo "********************************************************************************"; 	\
@@ -53,7 +54,7 @@ install-data-local:
 
 uninstall-local:
 	rm -f $(DESTDIR)$(configdir)/prelude-lml.conf;	\
-	rm -f $(DESTDIR)$(configdir)/plugin.rules;
+	rm -f $(DESTDIR)$(configdir)/plugins.rules;
 
 dist-hook:
 	@if test -d "$(srcdir)/.git"; then      \

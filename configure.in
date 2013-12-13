@@ -1,10 +1,12 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT
+AC_INIT(prelude-lml, 1.0.2)
+
 AC_PREREQ(2.59)
-AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE(prelude-lml, 1.0.2)
+AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
+AC_CONFIG_MACRO_DIR([m4])
 AM_DISABLE_STATIC
 
 AM_MAINTAINER_MODE
@@ -14,17 +16,19 @@ dnl **********************************************************
 dnl * Check required program.
 dnl **********************************************************
 
-AC_PROG_CPP
 AC_PROG_CC
+gl_EARLY
+
+AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PATH_PROG(GREP, grep, no)
+
 
 dnl **********************************************************
 dnl * Setup GnuLib, libtool and libltdl.
 dnl **********************************************************
 
-gl_EARLY
 AC_LIBTOOL_DLOPEN
 AM_DISABLE_STATIC
 AC_PROG_LIBTOOL
@@ -67,20 +71,20 @@ case "$host_os" in
         # apparently-legal code won't compile with its precompiled
         # headers.
         AC_MSG_RESULT(Darwin: adding -no-cpp-precomp)
-        AX_C_CHECK_FLAG(-no-cpp-precomp, , , GLOBAL_CFLAGS="$GLOBAL_CFLAGS -no-cpp-precomp")
+        AX_CHECK_COMPILE_FLAG(-no-cpp-precomp, GLOBAL_CFLAGS="$GLOBAL_CFLAGS -no-cpp-precomp")
         ;;
  *)
         AC_MSG_RESULT(none needed)
         ;;
 esac
 
-AX_LD_CHECK_FLAG(-z relro, , , LDFLAGS="$LDFLAGS -z relro")
-AX_LD_CHECK_FLAG(-z now, , , LDFLAGS="$LDFLAGS -z now")
+AX_CHECK_LINK_FLAG(-z relro, LDFLAGS="$LDFLAGS -z relro")
+AX_CHECK_LINK_FLAG(-z now, LDFLAGS="$LDFLAGS -z now")
 
 for i in -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
          -Wbad-function-cast -Wcast-qual -Wcast-align -Wnested-externs -Wunused \
          -Wformat -Wformat-security; do
-        AX_C_CHECK_FLAG($i, , , GLOBAL_CFLAGS="$GLOBAL_CFLAGS $i")
+        AX_CHECK_COMPILE_FLAG($i, GLOBAL_CFLAGS="$GLOBAL_CFLAGS $i")
 done
 
 

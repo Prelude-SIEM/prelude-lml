@@ -1,5 +1,5 @@
 /* Test of getting user name.
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,11 +35,26 @@ main (void)
 {
   /* Test with a large enough buffer.  */
   char buf[1024];
+  int err;
 
-  if (getlogin_r (buf, sizeof (buf)) != 0)
+  err = getlogin_r (buf, sizeof (buf));
+  if (err != 0)
     {
+      if (errno == ENOENT)
+        {
+          /* This can happen on GNU/Linux.  */
+          fprintf (stderr, "Skipping test: no entry in utmp file.\n");
+          return 77;
+        }
+
       /* getlogin_r() fails when stdin is not connected to a tty.  */
+      ASSERT (err == ENOTTY
+              || errno == EINVAL /* seen on Linux/SPARC */
+              || errno == ENXIO
+             );
+#if !defined __hpux /* On HP-UX 11.11 it fails anyway.  */
       ASSERT (! isatty (0));
+#endif
       fprintf (stderr, "Skipping test: stdin is not a tty.\n");
       return 77;
     }
@@ -73,7 +88,13 @@ main (void)
     size_t i;
 
     for (i = 0; i <= n; i++)
-      ASSERT (getlogin_r (smallbuf, i) == ERANGE);
+      {
+        err = getlogin_r (smallbuf, i);
+        if (i == 0)
+          ASSERT (err == ERANGE || err == EINVAL);
+        else
+          ASSERT (err == ERANGE);
+      }
   }
 
   /* Test with a huge buffer.  */
