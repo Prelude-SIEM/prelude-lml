@@ -4,7 +4,7 @@ AC_INIT(prelude-lml, 1.0.2)
 
 AC_PREREQ(2.59)
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wall tar-pax 1.9])
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 AM_DISABLE_STATIC
@@ -23,6 +23,8 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PATH_PROG(GREP, grep, no)
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
 
 
 dnl **********************************************************
