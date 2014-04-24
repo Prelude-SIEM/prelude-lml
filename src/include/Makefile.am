@@ -9,6 +9,8 @@ noinst_HEADERS = 	\
 	log-source.h	\
 	log-plugins.h	\
         regex.h 	\
+        tcp-server.h    \
+        tcp-server-tls.h \
         udp-server.h 	\
         file-server.h 	
 

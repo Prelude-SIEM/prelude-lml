@@ -48,17 +48,6 @@
 #endif
 
 
-/*
- * From RFC 3164, section 4.1:
- *
- * The full format of a syslog message seen on the wire has three
- * discernable parts.  The first part is called the PRI, the second part
- * is the HEADER, and the third part is the MSG.  The total length of
- * the packet MUST be 1024 bytes or less.
- */
-#define SYSLOG_MSG_MAX_SIZE 1024
-
-
 struct udp_server {
         int sockfd;
         lml_log_source_t *ls;
@@ -67,47 +56,8 @@ struct udp_server {
 };
 
 
-typedef struct {
-        int pri;
-} syslog_header_t;
-
 
 extern lml_config_t config;
-
-
-
-static int logparse_pri(syslog_header_t *hdr, char **src, ssize_t *len)
-{
-        size_t i = 0;
-        char *ptr = *src;
-
-        hdr->pri = 0;
-
-        if ( ptr[i++] != '<' )
-                goto error;
-
-        while ( ptr[i] != '>' ) {
-                if ( ! isdigit(ptr[i]) )
-                        goto error;
-
-                hdr->pri = hdr->pri * 10 + (ptr[i++] - '0');
-        }
-
-        if ( ptr[i] == '>' && i >= 3 && i <= 4 ) {
-                *len -= i + 1;
-                *src += i + 1;
-                return 0;
-        }
-
-error:
-        /*
-         * If the relay receives a syslog message without a PRI, or with an
-         * unidentifiable PRI, then it MUST insert a PRI with a Priority value
-         * of 13
-         */
-        hdr->pri = 13;
-        return -1;
-}
 
 
 
@@ -126,12 +76,11 @@ void udp_server_process_event(udp_server_t *server)
 # define SOCKADDR_PORT_MEMBER(x) (x.sa4.sin_port)
 #endif
         } addr;
-        syslog_header_t hdr;
-        char buf[SYSLOG_MSG_MAX_SIZE], *ptr = NULL, src[512];
+        char src[512];
 
         len = sizeof(addr);
 
-        ret = recvfrom(server->sockfd, buf, sizeof(buf) - 1, 0, &addr.sa, &len);
+        ret = recvfrom(server->sockfd, config.log_buffer, config.log_max_length - 1, 0, &addr.sa, &len);
         if ( ret < 0 ) {
                 prelude_log(PRELUDE_LOG_ERR, "error receiving syslog message.\n");
                 return;
@@ -140,7 +89,7 @@ void udp_server_process_event(udp_server_t *server)
         if ( ret == 0 )
                 return;
 
-        buf[ret] = '\0';
+        config.log_buffer[ret] = '\0';
 
         in_addr = prelude_sockaddr_get_inaddr(&addr.sa);
         prelude_return_if_fail(in_addr);
@@ -149,10 +98,7 @@ void udp_server_process_event(udp_server_t *server)
         snprintf(src + strlen(src), sizeof(src) - strlen(src), ":%d", SOCKADDR_PORT_MEMBER(addr));
         lml_log_source_set_name(server->ls, src);
 
-        ptr = buf;
-
-        logparse_pri(&hdr, &ptr, &ret);
-        lml_dispatch_log(server->ls, ptr, ret);
+        lml_dispatch_log(server->ls, config.log_buffer, ret);
 }
 
 

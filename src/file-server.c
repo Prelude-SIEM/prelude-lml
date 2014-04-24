@@ -96,8 +96,6 @@
 #define METADATA_SIZE (sizeof(off_t) + METADATA_CHECKSUM_SIZE)
 #define METADATA_CHECKSUM_TYPE GCRY_MD_CRC32
 
-#define LOG_LINE_MAXSIZE 65535
-
 #define LOGFILE_RENAME_CLASS   "Log file rename"
 #define LOGFILE_DELETION_CLASS "Log file deletion"
 #define LOGFILE_DELETION_IMPACT "An attacker might have erased the logfile, "               \
@@ -319,17 +317,21 @@ static off_t read_logfile(monitor_fd_t *fd, off_t *available)
                 i++;
                 fd->current_line_len++;
 
-                if ( ret == '\n' )
+                if ( ret == '\n' ) {
+                        fd->current_line_len = 0;
                         break;
+                }
 
-                if ( fd->current_line_len <= LOG_LINE_MAXSIZE ) {
+                if ( fd->current_line_len <= config.log_max_length ) {
                         ret = prelude_string_ncat(fd->buf, (const char *) &ret, 1);
                         if ( ret < 0 )
                                 prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
                 }
 
-                else if ( fd->current_line_len == LOG_LINE_MAXSIZE + 1 )
-                        prelude_log(PRELUDE_LOG_WARN, "line too long (internal limit of %u characters).\n", LOG_LINE_MAXSIZE);
+                else if ( fd->current_line_len == config.log_max_length + 1 ) {
+                        prelude_log(PRELUDE_LOG_WARN, "line too long (configured limit of %u characters).\n", config.log_max_length);
+                        fd->current_line_len = 0;
+                }
 
                 if ( i == *available ) {
                         *available = 0;
@@ -415,7 +417,7 @@ static int file_metadata_get_position(monitor_fd_t *monitor)
         struct stat st;
         const char *filename;
         int ret, have_metadata = 0;
-        off_t offset = 0, available = LOG_LINE_MAXSIZE;
+        off_t offset = 0, available = 65535;
         unsigned char msum[METADATA_SIZE], *sumptr = msum;
 
         filename = lml_log_source_get_name(monitor->source);
@@ -554,7 +556,7 @@ static int check_stdin_data(monitor_fd_t *monitor)
         int eventno = 0, bytes;
 
         if ( config.batch_mode )
-                len = LOG_LINE_MAXSIZE;
+                len = (off_t) config.log_max_length;
         else {
                 ret = ioctl(STDIN_FILENO, FIONREAD, &bytes);
                 if ( ret < 0 ) {

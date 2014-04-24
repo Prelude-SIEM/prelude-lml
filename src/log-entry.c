@@ -131,7 +131,7 @@ static int parse_ts(lml_log_format_t *format, lml_log_source_t *ls, const char *
 
 static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_entry_t *log_entry)
 {
-        char *string;
+        const char *string;
         int ovector[5 * 3];
         int i, ret, matches = 0;
         void *tv = &log_entry->tv;
@@ -144,7 +144,7 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
                 { "hostname",  NULL,     (void **) (void *) &log_entry->target_hostname    },
                 { "process",   NULL,     (void **) (void *) &log_entry->target_process     },
                 { "pid",       NULL,     (void **) (void *) &log_entry->target_process_pid },
-                { "timestamp", parse_ts, (void **) &tv                                     },
+                { "timestamp", parse_ts, (void **) (void *) &tv                                     },
                 { NULL, NULL, NULL                                                         },
         };
 
@@ -156,7 +156,7 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
 
         for ( i = 0; tbl[i].field != NULL; i++ ) {
                 ret = pcre_get_named_substring(prefix_regex, log_entry->original_log,
-                                               ovector, matches, tbl[i].field, (const char **) &string);
+                                               ovector, matches, tbl[i].field, &string);
 
                 if ( ret == PCRE_ERROR_NOSUBSTRING )
                         continue;
@@ -171,7 +171,7 @@ static int parse_prefix(lml_log_format_t *format, lml_log_source_t *ls, lml_log_
 
                 else {
                         ret = tbl[i].cb(format, ls, string, tbl[i].ptr);
-                        free(string);
+                        pcre_free_substring(string);
 
                         if ( ret < 0 )
                                 return -1;

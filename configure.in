@@ -103,6 +103,25 @@ AM_PATH_LIBPRELUDE(0.9.8, ,
 
 
 dnl **************************************************
+dnl * Check for GnuTLS.                              *
+dnl **************************************************
+GNUTLS_MIN_VERSION=1.0.17
+
+PKG_CHECK_MODULES([LIBGNUTLS], [gnutls >= $GNUTLS_MIN_VERSION], [],
+                  [AM_PATH_LIBGNUTLS($GNUTLS_MIN_VERSION, enable_gnutls=yes, enable_gnutls=no)])
+
+AC_CHECK_HEADER(gnutls/gnutls.h, enable_gnutls=yes, enable_gnutls=no)
+
+if test x$enable_gnutls = xyes; then
+        AC_DEFINE_UNQUOTED(HAVE_GNUTLS, , Tell whether GnuTLS is available for TCP-TLS support)
+	AC_CHECK_LIB(gnutls, gnutls_hash_get_len,
+             AC_DEFINE_UNQUOTED(HAVE_GNUTLS_HASH_GET_LEN, , Define whether GnuTLS provides gnutls_hash_get_len function,))
+fi
+
+AM_CONDITIONAL(HAVE_GNUTLS, test x$enable_gnutls = xyes)
+
+
+dnl **************************************************
 dnl * Check for libICU                               *
 dnl **************************************************
 
@@ -170,15 +189,18 @@ prelude_lml_conf=$configdir/prelude-lml.conf
 regex_conf=$configdir/plugins.rules
 metadata_dir=$LOCALSTATEDIR/lib/prelude-lml
 plugindir=$LIBDIR/prelude-lml
+lml_run_dir=$LOCALSTATEDIR/run/prelude-lml
 
 AC_DEFINE_UNQUOTED(PRELUDE_LML_CONF, "$prelude_lml_conf", Path to the LML configuration file)
 AC_DEFINE_UNQUOTED(LOG_PLUGIN_DIR, "$plugindir", Prelude-LML report plugin directory)
 AC_DEFINE_UNQUOTED(REGEX_CONF, "$regex_conf", Prelude-LML plugin regex configuration)
 AC_DEFINE_UNQUOTED(METADATA_DIR, "$metadata_dir", Prelude-LML Metadata directory)
+AC_DEFINE_UNQUOTED(LML_RUN_DIR, "$lml_run_dir", Prelude-LML run directory)
 
 AC_SUBST(configdir)
 AC_SUBST(metadata_dir)
 AC_SUBST(localstatedir)
+AC_SUBST(lml_run_dir)
 
 AC_SUBST(GLOBAL_CFLAGS)
 
@@ -211,4 +233,5 @@ AC_OUTPUT
 
 echo
 echo "*** Dumping configuration ***"
+echo "    - Enable TLS support         : $enable_gnutls"
 echo "    - Favor libICU over Iconv    : $enable_icu"

@@ -6,7 +6,7 @@
 * This file is part of the Prelude-LML program.
 *
 * This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by 
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2, or (at your option)
 * any later version.
 *
@@ -28,4 +28,4 @@
 
 void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size);
 
-#endif				/* COMMON_H */
+#endif                          /* COMMON_H */

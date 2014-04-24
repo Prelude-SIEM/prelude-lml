@@ -27,6 +27,7 @@ MAINTAINERCLEANFILES = \
 
 install-data-local:
 	$(INSTALL) -m 700 -d $(DESTDIR)$(configdir);
+	$(INSTALL) -m 700 -d $(DESTDIR)$(lml_run_dir);
 	$(INSTALL) -m 700 -d $(DESTDIR)$(metadata_dir)
 	@if test -f $(DESTDIR)$(configdir)/prelude-lml.conf; then         					\
 		echo "********************************************************************************"; 	\

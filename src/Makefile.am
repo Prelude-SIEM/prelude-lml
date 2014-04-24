@@ -9,8 +9,14 @@ prelude_lml_LDFLAGS = @LIBPRELUDE_LDFLAGS@ -export-dynamic \
         "-dlopen" $(top_builddir)/plugins/debug/debug.la \
         "-dlopen" $(top_builddir)/plugins/pcre/pcre.la
 
+if HAVE_GNUTLS
+ GNUTLS_DEPS = tcp-server-tls.c
+endif
+
 prelude_lml_SOURCES = 	\
         prelude-lml.c 	\
+        tcp-server.c    \
+        $(GNUTLS_DEPS)  \
         udp-server.c 	\
         regex.c 	\
         log-entry.c 	\

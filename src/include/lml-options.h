@@ -27,16 +27,18 @@
 #include <libprelude/prelude-inttypes.h>
 #include "regex.h"
 #include "udp-server.h"
+#include "tcp-server.h"
 
 int lml_options_init(prelude_option_t *lml_optlist, int argc, char **argv);
 
 typedef struct {
         char *pidfile;
-        char *logfile_prefix_regex;
-        char *logfile_ts_format;
         const char *system_charset;
         char *charset;
         int charset_ref;
+
+        char *log_buffer;
+        unsigned int log_max_length;
 
         prelude_client_t *lml_client;
 
@@ -48,6 +50,12 @@ typedef struct {
 
         size_t udp_nserver;
         udp_server_t **udp_server;
+
+        size_t tcp_nserver;
+        tcp_server_t **tcp_server;
+
+        unsigned int tls_dh_bits;
+        unsigned int tls_dh_regenerate;
 
         prelude_io_t *text_output_fd;
         unsigned long alert_count;

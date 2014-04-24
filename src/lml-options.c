@@ -53,14 +53,39 @@
 #include "lml-alert.h"
 #include "file-server.h"
 #include "udp-server.h"
+#include "tcp-server.h"
 #include "lml-charset.h"
 
+
 #define DEFAULT_UDP_SERVER_PORT 514
+#define DEFAULT_TCP_SERVER_PORT 514
+#define DEFAULT_TCP_TLS_SERVER_PORT 6514
+
+
+/*
+ * RFC 3164 (BSD Syslog protocol), section 4.1:
+ * The total length of the packet MUST be 1024 bytes or less.
+ *
+ * RFC 5424 (The Syslog protocol), section 6.1:
+ * All transport receiver implementations SHOULD be able to accept
+ * messages of up to and including 2048 octets in length.  Transport
+ * receivers MAY receive messages larger than 2048 octets in length.
+ *
+ * RFC 5425 (TLS Transport Mapping for Syslog), section 4.3.1:
+ * Transport receivers SHOULD be able to process messages with lengths
+ * up to and including 8192 octets.
+ *
+ * RFC 5426 (Transmission of Syslog Messages over UDP), section 3.2:
+ * All syslog receivers SHOULD be able to receive datagrams with message
+ * sizes of up to and including 2048 octets. The ability to receive
+ * larger messages is encouraged.
+ */
+#define DEFAULT_SYSLOG_MSG_MAX_LENGTH 8192
 
 
 lml_config_t config;
+tcp_tls_config_t tls_config;
 static const char *config_file = PRELUDE_LML_CONF;
-
 
 #if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
 static int drop_privilege(void)
@@ -291,6 +316,22 @@ static int set_logfile_ts_format(prelude_option_t *opt, const char *arg, prelude
 
 
 
+static int set_max_line_length(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        config.log_max_length = atoi(arg);
+        if ( config.log_buffer )
+                free(config.log_buffer);
+
+        config.log_buffer = malloc(config.log_max_length);
+        if ( ! config.log_buffer ) {
+                prelude_log(PRELUDE_LOG_ERR, "error allocating LML read buffer of %u bytes.\n", config.log_max_length);
+                return -1;
+        }
+
+        return 0;
+}
+
+
 static int set_dry_run(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         config.dry_run = TRUE;
@@ -470,7 +511,7 @@ static int set_file(prelude_option_t *opt, const char *arg, prelude_string_t *er
 
 
 
-static int add_server(lml_log_source_t *ls, const char *addr, unsigned int port)
+static int add_udp_server(lml_log_source_t *ls, const char *addr, unsigned int port)
 {
         config.udp_nserver++;
 
@@ -487,44 +528,316 @@ static int add_server(lml_log_source_t *ls, const char *addr, unsigned int port)
 
 
 
-static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+static int add_tcp_server(lml_log_source_t *ls, const char *addr, unsigned int port, prelude_bool_t enable_tls)
 {
-        int ret;
-        lml_log_source_t *ls;
-        unsigned int port = 0;
-        char *addr, source[512];
+        config.tcp_nserver++;
 
-        if ( arg && *arg ) {
-                ret = prelude_parse_address(arg, &addr, &port);
-                if ( ret < 0 )
-                        return ret;
-
-                port = port ? port : DEFAULT_UDP_SERVER_PORT;
-        } else {
-                addr = strdup("0.0.0.0");
-                port = DEFAULT_UDP_SERVER_PORT;
-        }
-
-        snprintf(source, sizeof(source), "%s:%u/udp", addr, port);
-
-        ret = lml_log_source_new(&ls, context, source, config.charset ? config.charset : NULL);
-        if ( ret < 0 || ret == 1 ) {
-                free(addr);
-                return ret;
-        }
-
-        ret = add_server(ls, addr, port);
-        free(addr);
-
-        if ( ret < 0 )
+        config.tcp_server = realloc(config.tcp_server, sizeof(*config.tcp_server) * config.tcp_nserver);
+        if ( ! config.tcp_server )
                 return -1;
 
-        prelude_log(PRELUDE_LOG_INFO, "Listening for syslog message on %s.\n", source);
+        config.tcp_server[config.tcp_nserver - 1] = tcp_server_new(ls, addr, port, (enable_tls) ? &tls_config : NULL);
+        if ( ! config.tcp_server[config.tcp_nserver - 1] )
+                return -1;
 
         return 0;
 }
 
 
+
+static int parse_server_adress(void *context, const char *arg, const char *proto, lml_log_source_t **ls, char **addr, unsigned int *port)
+{
+        int ret;
+        char source[512];
+        unsigned int default_port = *port;
+
+        if ( arg && *arg ) {
+                ret = prelude_parse_address(arg, addr, port);
+                if ( ret < 0 )
+                        return ret;
+        } else {
+                *addr = strdup("0.0.0.0");
+                *port = default_port;
+        }
+
+        snprintf(source, sizeof(source), "%s:%u/%s", *addr, *port, proto);
+
+        ret = lml_log_source_new(ls, context, source, config.charset ? config.charset : NULL);
+        if ( ret < 0 || ret == 1 ) {
+                free(*addr);
+                return ret;
+        }
+
+        return 0;
+}
+
+
+static int set_udp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        int ret;
+        char *addr;
+        lml_log_source_t *ls;
+        unsigned int port = DEFAULT_UDP_SERVER_PORT;
+
+        ret = parse_server_adress(context, arg, "udp", &ls, &addr, &port);
+        if ( ret < 0 || ret == 1 )
+                return ret;
+
+        ret = add_udp_server(ls, addr, port);
+        free(addr);
+
+        if ( ret < 0 )
+                return -1;
+
+        prelude_log(PRELUDE_LOG_INFO, "Listening for syslog message on %s.\n", lml_log_source_get_name(ls));
+
+        return 0;
+}
+
+
+
+static int set_tcp_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        int ret;
+        char *addr;
+        lml_log_source_t *ls;
+        unsigned int port = DEFAULT_TCP_SERVER_PORT;
+
+        ret = parse_server_adress(context, arg, "tcp", &ls, &addr, &port);
+        if ( ret < 0 )
+                return ret;
+
+        ret = add_tcp_server(ls, addr, port, FALSE);
+        free(addr);
+
+        if ( ret < 0 )
+                return -1;
+
+        prelude_log(PRELUDE_LOG_INFO, "Listening for syslog message on %s.\n", lml_log_source_get_name(ls));
+
+        return 0;
+}
+
+
+#ifdef HAVE_GNUTLS
+static void reset_tls_config(tcp_tls_config_t *config)
+{
+        prelude_list_init(&config->trusted_name);
+        prelude_list_init(&config->trusted_fingerprint);
+        config->ca_path = config->key_path = config->cert_path = NULL;
+        config->authmode = 0;
+}
+
+
+static int set_tcp_tls_server(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        int ret;
+        char *addr;
+        lml_log_source_t *ls;
+        unsigned int port = DEFAULT_TCP_TLS_SERVER_PORT;
+
+        if ( tls_config.authmode & TCP_SERVER_TLS_AUTH_X509 && !(tls_config.authmode & TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL) ) {
+                if ( ! tls_config.ca_path || ! tls_config.cert_path || ! tls_config.key_path ) {
+                        prelude_log(PRELUDE_LOG_ERR, "TLS mode 'x509' with certificate verification require key, certificate, and CA file.\n");
+                        return -1;
+                }
+        }
+
+        if ( ! prelude_list_is_empty(&tls_config.trusted_name) ) {
+                if ( tls_config.authmode & TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL ) {
+                        prelude_log(PRELUDE_LOG_ERR, "'tls-verify' option need value 'client-cert-required' for 'tls-trusted-name' to work.\n");
+                        return -1;
+                }
+
+                if ( ! tls_config.ca_path || ! tls_config.cert_path || ! tls_config.key_path ) {
+                        prelude_log(PRELUDE_LOG_ERR, "'tls-trusted-name' option require key, certificate, and CA file.\n");
+                        return -1;
+                }
+        }
+
+        if ( ! prelude_list_is_empty(&tls_config.trusted_fingerprint) ) {
+                if ( tls_config.authmode & TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL ) {
+                        prelude_log(PRELUDE_LOG_ERR, "'tls-verify' option need value 'client-cert-required' for 'tls-trusted-fingerprint' to work.\n");
+                        return -1;
+                }
+
+                if ( ! tls_config.ca_path || ! tls_config.cert_path || ! tls_config.key_path ) {
+                        prelude_log(PRELUDE_LOG_ERR, "'tls-trusted-fingerprint' option require key, certificate, and CA file.\n");
+                        return -1;
+                }
+        }
+
+        else if ( tls_config.authmode & (TCP_SERVER_TLS_AUTH_X509|TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL) ) {
+                if ( ! tls_config.cert_path || ! tls_config.key_path ) {
+                        prelude_log(PRELUDE_LOG_ERR, "TLS mode 'x509' require key and certificate file.\n");
+                        return -1;
+                }
+        }
+
+        ret = parse_server_adress(context, arg, "tcp-tls", &ls, &addr, &port);
+        if ( ret < 0 )
+                return ret;
+
+        ret = add_tcp_server(ls, addr, port, TRUE);
+        free(addr);
+
+        if ( ret < 0 )
+                return -1;
+
+        prelude_log(PRELUDE_LOG_INFO, "Listening for syslog message on %s.\n", lml_log_source_get_name(ls));
+        reset_tls_config(&tls_config);
+        return 0;
+}
+
+
+static int set_tls_dh_regenerate(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        config.tls_dh_regenerate = atoi(arg) * 60 * 60;
+        return 0;
+}
+
+
+static int set_tls_dh_bits(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        config.tls_dh_bits = atoi(arg);
+        return 0;
+}
+
+
+
+static int set_tls_certificate_authority_path(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        tls_config.ca_path = strdup(arg);
+        if ( ! tls_config.ca_path )
+                return prelude_error_from_errno(errno);
+        return 0;
+}
+
+
+
+static int set_tls_key_client_path(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        tls_config.key_path = strdup(arg);
+        if ( ! tls_config.key_path )
+                return prelude_error_from_errno(errno);
+        return 0;
+}
+
+
+
+static int set_tls_certificate_client_path(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        tls_config.cert_path = strdup(arg);
+        if ( ! tls_config.cert_path )
+                return prelude_error_from_errno(errno);
+        return 0;
+}
+
+
+
+static int set_tls_certificate_trusted_name(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        tcp_tls_trusted_value_t *tv;
+
+        tv = malloc(sizeof(*tv));
+        if ( ! tv ) {
+                prelude_log(PRELUDE_LOG_ERR, "error allocating object.\n");
+                return -1;
+        }
+
+        tv->value = strdup(arg);
+        prelude_linked_object_add(&tls_config.trusted_name, (prelude_linked_object_t *) tv);
+
+        return 0;
+}
+
+
+
+static int set_tls_certificate_trusted_fingerprint(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        size_t len;
+        int want_algo = -1, i;
+        tcp_tls_trusted_fingerprint_t *tv;
+        struct {
+                const char *algo;
+                gnutls_digest_algorithm_t val;
+        } algo[] = {
+                        { "MD5", GNUTLS_DIG_MD5 },
+                        { "SHA1", GNUTLS_DIG_SHA1 }
+        };
+
+        for ( i = 0; i < sizeof(algo) / sizeof(*algo); i++ ) {
+                len = strlen(algo[i].algo);
+                if ( strncasecmp(arg, algo[i].algo, len) == 0 ) {
+                        arg += len;
+                        want_algo = algo[i].val;
+                        break;
+                }
+        }
+
+        if ( want_algo < 0 ) {
+                prelude_log(PRELUDE_LOG_ERR, "unknown fingerprint algorithm specified.\n");
+                return -1;
+        }
+
+        tv = malloc(sizeof(*tv));
+        if ( ! tv ) {
+                prelude_log(PRELUDE_LOG_ERR, "error allocating object.\n");
+                return -1;
+        }
+
+        tv->algo = want_algo;
+        tv->value = strdup(arg + 1);
+        prelude_linked_object_add(&tls_config.trusted_fingerprint, (prelude_linked_object_t *) tv);
+
+        return 0;
+}
+
+
+
+static int set_tls_authentification_mode(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        char *tok, *value = const2char(arg);
+
+        while ( (tok = strsep(&value, ", ")) ) {
+                if ( strcasecmp(tok, "x509") == 0 )
+                        tls_config.authmode |= TCP_SERVER_TLS_AUTH_X509;
+
+                else if ( strcasecmp(tok, "anonymous") == 0 )
+                        tls_config.authmode |= TCP_SERVER_TLS_AUTH_ANONYMOUS;
+
+                else {
+                        prelude_log(PRELUDE_LOG_ERR, "error: invalid authentication mode '%s'", tok);
+                        return -1;
+                }
+        }
+
+        return 0;
+}
+
+
+
+
+static int set_tls_verify_certificate(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
+{
+        char *tok, *value = const2char(arg);
+
+        while ( (tok = strsep(&value, ", ")) ) {
+                if ( strcasecmp(tok, "client-cert-required") == 0 )
+                        tls_config.authmode &= ~TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL;
+
+                else if ( strcasecmp(tok, "client-cert-optional") == 0 )
+                        tls_config.authmode |= TCP_SERVER_TLS_AUTH_CLIENT_CERT_OPTIONAL;
+
+                else {
+                        prelude_log(PRELUDE_LOG_ERR, "error: invalid authentication mode '%s'", tok);
+                        return -1;
+                }
+        }
+
+        return 0;
+}
+#endif
 
 static int set_warning_limit(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
@@ -639,7 +952,17 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         int all_hook = PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG|PRELUDE_OPTION_TYPE_WIDE;
 
         memset(&config, 0, sizeof(config));
+        memset(&tls_config, 0, sizeof(tls_config));
+        prelude_list_init(&tls_config.trusted_name);
+        prelude_list_init(&tls_config.trusted_fingerprint);
+
         config.warning_limit = -1;
+        config.tls_dh_bits = 1024;
+        config.tls_dh_regenerate = 24 * 60 * 60;
+
+#ifdef HAVE_GNUTLS
+        reset_tls_config(&tls_config);
+#endif
 
         setlocale(LC_CTYPE, "");
         config.system_charset = nl_langinfo(CODESET);
@@ -699,6 +1022,11 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            set_conf_file, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_IMMEDIATE);
 
+
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           'l', "log-max-length", "Specify maximum line length for log (default is 8192 bytes).", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           set_max_line_length, NULL);
+
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
@@ -731,6 +1059,14 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            "Do not attempt to resolve target address (useful for profiling)",
                            PRELUDE_OPTION_ARGUMENT_NONE, set_no_resolve, NULL);
 
+#ifdef HAVE_GNUTLS
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CFG, 0, "dh-parameters-regenerate",
+                           "How often to regenerate the Diffie Hellman parameters (in hours)",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_tls_dh_regenerate, NULL);
+        prelude_option_add(ropt, NULL, PRELUDE_OPTION_TYPE_CFG, 0, "dh-prime-length",
+                           "Number of bits for the Diffie Hellman prime (768, 1024, 2048, 3072 or 4096)",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_tls_dh_bits, NULL);
+#endif
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            0, "format", NULL, PRELUDE_OPTION_ARGUMENT_REQUIRED, set_format, NULL);
         prelude_option_set_priority(opt, PRELUDE_OPTION_PRIORITY_LAST);
@@ -747,10 +1083,45 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
                            'f', "file", "Specify a file to monitor (use \"-\" for standard input)",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_file, NULL);
 
-        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 's', "udp-server",
-                           "address:port pair to listen to syslog to UDP messages (default port 514)",
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           'u', "udp-server", "address:port pair to listen to syslog to UDP messages (default port 514) -- default protocol" ,
                            PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_udp_server, NULL);
 
+        prelude_option_t *nopt;
+        prelude_option_add(opt, &nopt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           'w', "tcp-server", "address:port pair to listen to syslog to TCP messages (default port 514)",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tcp_server, NULL);
+        prelude_option_set_priority(nopt, PRELUDE_OPTION_PRIORITY_LAST);
+
+#ifdef HAVE_GNUTLS
+        prelude_option_add(opt, &nopt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           's', "tcp-tls-server", "address:port pair to listen to syslog to TCP/TLS messages (default port 6514)",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tcp_tls_server, NULL);
+        prelude_option_set_priority(nopt, PRELUDE_OPTION_PRIORITY_LAST);
+
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-ca-file", "Access path of certificate authority file",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tls_certificate_authority_path, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-key-file", "Access path of private key file",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tls_key_client_path, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-cert-file", "Access path of certificate file",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tls_certificate_client_path, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-trusted-name", "List of trusted certificate name",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_tls_certificate_trusted_name, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-trusted-fingerprint", "List of trusted certificate fingerprint (MD5 and SHA1 supported)",
+                           PRELUDE_OPTION_ARGUMENT_REQUIRED, set_tls_certificate_trusted_fingerprint, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-mode", "TLS authentification mode, separated by space."
+                           "Supported mode are 'x509' and 'anonymous' (default value is 'x509').",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tls_authentification_mode, NULL);
+        prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
+                           0, "tls-verify", "Type of certificate verification : 'client-cert-required' or 'client-cert-optional'",
+                           PRELUDE_OPTION_ARGUMENT_OPTIONAL, set_tls_verify_certificate, NULL);
+#endif
         prelude_option_add(opt, NULL, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG,
                            'c', "charset", "Specify the charset used by the input file",
                            PRELUDE_OPTION_ARGUMENT_REQUIRED, set_charset, NULL);
@@ -783,14 +1154,24 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         while ( ret < argc )
                 prelude_log(PRELUDE_LOG_WARN, "Unhandled command line argument: '%s'.\n", argv[ret++]);
 
-        if ( config.batch_mode && config.udp_nserver ) {
-                prelude_log(PRELUDE_LOG_WARN, "UDP server and batch modes can't be used together.\n");
+        if ( config.batch_mode && (config.udp_nserver || config.tcp_nserver) ) {
+                prelude_log(PRELUDE_LOG_WARN, "TCP/UDP server and batch modes can't be used together.\n");
                 return -1;
         }
 
         if ( config.ignore_metadata && ! config.batch_mode ) {
                 prelude_log(PRELUDE_LOG_WARN, "--ignore-metadata is only supported in batch mode.\n");
                 return -1;
+        }
+
+        if ( ! config.log_buffer ) {
+                config.log_max_length = DEFAULT_SYSLOG_MSG_MAX_LENGTH;
+
+                config.log_buffer = malloc(config.log_max_length);
+                if ( ! config.log_buffer ) {
+                        prelude_log(PRELUDE_LOG_ERR, "error allocating default log buffer.\n");
+                        return -1;
+                }
         }
 
 

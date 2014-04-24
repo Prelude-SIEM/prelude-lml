@@ -62,6 +62,7 @@
 
 #include "lml-options.h"
 #include "udp-server.h"
+#include "tcp-server.h"
 #include "file-server.h"
 #include "log-entry.h"
 #include "log-plugins.h"
@@ -70,6 +71,12 @@
 #ifndef MAX
  #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #endif
+
+
+typedef struct {
+        int pri;
+} syslog_header_t;
+
 
 struct regex_data {
         lml_log_source_t *log_source;
@@ -113,6 +120,9 @@ static void server_close(void)
 
         for ( i = 0; i < config.udp_nserver; i++ )
                 udp_server_close(config.udp_server[i]);
+
+        for ( i = 0; i < config.tcp_nserver; i++ )
+                tcp_server_close(config.tcp_server[i]);
 }
 
 
@@ -197,6 +207,7 @@ void _lml_handle_signal_if_needed(void)
 #endif
 
         prelude_log(PRELUDE_LOG_WARN, "signal %d received, terminating prelude-lml.\n", signo);
+        ev_default_destroy();
         exit(2);
 }
 
@@ -210,6 +221,12 @@ static void libev_timer_cb(struct ev_timer *w, int revents)
 static void libev_udp_cb(struct ev_io *w, int revents)
 {
         udp_server_process_event(w->data);
+}
+
+
+static void libev_tcp_accept_cb(struct ev_io *w, int revents)
+{
+        tcp_server_accept(w->data);
 }
 
 
@@ -227,6 +244,41 @@ static void regex_match_cb(void *plugin, void *data)
 
 
 
+static int logparse_pri(syslog_header_t *hdr, const char **src, size_t *len)
+{
+        size_t i = 0;
+        const char *ptr = *src;
+
+        hdr->pri = 0;
+
+        if ( ptr[i++] != '<' )
+                goto error;
+
+        while ( ptr[i] != '>' ) {
+                if ( ! isdigit(ptr[i]) )
+                        goto error;
+
+                hdr->pri = hdr->pri * 10 + (ptr[i++] - '0');
+        }
+
+        if ( ptr[i] == '>' && i >= 3 && i <= 4 ) {
+                *len -= i + 1;
+                *src += i + 1;
+                return 0;
+        }
+
+error:
+        /*
+         * If the relay receives a syslog message without a PRI, or with an
+         * unidentifiable PRI, then it MUST insert a PRI with a Priority value
+         * of 13
+         */
+        hdr->pri = 13;
+        return -1;
+}
+
+
+
 /**
  * lml_dispatch_log:
  * @list: List of regex.
@@ -240,8 +292,11 @@ void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
 {
         int ret;
         char *out;
+        syslog_header_t hdr;
         struct regex_data rdata;
         lml_log_entry_t *log_entry;
+
+        logparse_pri(&hdr, &str, &size);
 
         ret = lml_log_source_preprocess_input(ls, str, size, &out, &size);
         if ( ret < 0 )
@@ -266,21 +321,32 @@ void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
 }
 
 
+
 static void wait_for_event(void)
 {
         size_t i;
         int udp_event_fd;
-        ev_io events[config.udp_nserver];
+        int tcp_event_fd;
+        size_t nb_server = config.udp_nserver + config.tcp_nserver;
+        ev_io events[nb_server];
 
+        /* 
+         *  Initialize callback function for SIGHUP/SIGTERM/... events for interrupted running (daemonize or standalone)
+         */
         ev_async_init(&ev_interrupt, libev_interrupt_cb);
         ev_async_start(&ev_interrupt);
 
         for ( i = 0; i < config.udp_nserver; i++ ) {
                 udp_event_fd = udp_server_get_event_fd(config.udp_server[i]);
-
                 ev_io_init(&events[i], libev_udp_cb, udp_event_fd, EV_READ);
                 events[i].data = config.udp_server[i];
+                ev_io_start(&events[i]);
+        }
 
+        for ( ; i < config.udp_nserver + config.tcp_nserver; i++ ) {
+                tcp_event_fd = tcp_server_get_event_fd(config.tcp_server[i - config.udp_nserver]);
+                ev_io_init(&events[i], libev_tcp_accept_cb, tcp_event_fd, EV_READ);
+                events[i].data = config.tcp_server[i - config.udp_nserver];
                 ev_io_start(&events[i]);
         }
 
@@ -354,8 +420,8 @@ int main(int argc, char **argv)
 #endif
 
         ret = file_server_start_monitoring();
-        if ( ret < 0 && ! config.udp_nserver ) {
-                prelude_log(PRELUDE_LOG_WARN, "No file or UDP server available for monitoring: terminating.\n");
+        if ( ret < 0 && ! config.udp_nserver && ! config.tcp_nserver ) {
+                prelude_log(PRELUDE_LOG_WARN, "No file or UDP/TCP server available for monitoring: terminating.\n");
                 return -1;
         }
 
