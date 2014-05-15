@@ -604,7 +604,7 @@ static int set_tcp_server(prelude_option_t *opt, const char *arg, prelude_string
         unsigned int port = DEFAULT_TCP_SERVER_PORT;
 
         ret = parse_server_adress(context, arg, "tcp", &ls, &addr, &port);
-        if ( ret < 0 )
+        if ( ret < 0 || ret == 1 )
                 return ret;
 
         ret = add_tcp_server(ls, addr, port, FALSE);
