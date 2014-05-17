@@ -317,10 +317,8 @@ static off_t read_logfile(monitor_fd_t *fd, off_t *available)
                 i++;
                 fd->current_line_len++;
 
-                if ( ret == '\n' ) {
-                        fd->current_line_len = 0;
+                if ( ret == '\n' )
                         break;
-                }
 
                 if ( fd->current_line_len <= config.log_max_length ) {
                         ret = prelude_string_ncat(fd->buf, (const char *) &ret, 1);
@@ -328,10 +326,8 @@ static off_t read_logfile(monitor_fd_t *fd, off_t *available)
                                 prelude_log(PRELUDE_LOG_ERR, "error buffering input: %s.\n", prelude_strerror(ret));
                 }
 
-                else if ( fd->current_line_len == config.log_max_length + 1 ) {
+                else if ( fd->current_line_len == config.log_max_length + 1 )
                         prelude_log(PRELUDE_LOG_WARN, "line too long (configured limit of %u characters).\n", config.log_max_length);
-                        fd->current_line_len = 0;
-                }
 
                 if ( i == *available ) {
                         *available = 0;
