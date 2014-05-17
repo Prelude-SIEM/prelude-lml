@@ -302,7 +302,7 @@ void lml_dispatch_log(lml_log_source_t *ls, const char *str, size_t size)
         if ( ret < 0 )
                 return;
 
-        prelude_log_debug(3, "[LOG] %s\n", out);
+        prelude_log_debug(3, "[LOG from=%s] %s\n", lml_log_source_get_name(ls), out);
 
         log_entry = lml_log_entry_new();
         if ( ! log_entry )
