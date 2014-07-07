@@ -1,3 +1,37 @@
+* 2014-07-07, prelude-lml-1.2.5:
+
+- Improve debugging output
+
+- Initial TCP/TCP-TLS support
+
+    * TCP server support has been added and can be activated using the
+    tcp-server option, the default port is 514.
+
+    * TCP-TLS server support has been added and can be activated using the
+    "tcp-tls-server" option, the defaut port is 6514. The system support
+    anonymous authentication using the (anon-(EC)DH) key exchange protocol as
+    well as x509 authentication, which might be used with or without client
+    certificate verification ("tls-verify option"). Certificate verification
+    may include fingerprint (MD5 or SHA1) and/or name verification with the
+    use of the "tls-trusted-fingerprint" and "tls-trusted-name" option.
+
+    Multiple TCP(/TLS) server might be configured, listening on different ports
+    with different options.
+
+- Removed rhel6 packaging
+
+- Fix compilation warning
+
+- Update libev
+  Update to latest libev version, some compatibility fixes
+
+- Autoconf / Automake fixes, GnuLib code update.
+  Update configure.in to fit latest autoconf and automake changes.
+  Remove obsolete autoconf macro, and update to newer one.
+  Configure script generation and distcheck target are now working again
+
+
+
 * 2013-09-18, prelude-lml-1.0.2:
 
 - Removed ruleset. Ruleset are now shipped with the prelude-lml-rules module.
