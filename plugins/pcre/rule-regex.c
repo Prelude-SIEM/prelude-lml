@@ -215,7 +215,7 @@ static int pcre_state_add_rule_infos(pcre_state_t *state, pcre_rule_t *rule, con
                 prelude_string_set_constant(str, "Rule ID");
                 idmef_additional_data_set_integer(ad, rule->id);
 
-                prelude_linked_object_add_tail(&state->additional_data_list, (prelude_linked_object_t *) ad);
+                idmef_object_add_tail(&state->additional_data_list, (idmef_object_t *) ad);
         }
 
         if ( rule->revision ) {
@@ -230,7 +230,7 @@ static int pcre_state_add_rule_infos(pcre_state_t *state, pcre_rule_t *rule, con
                 prelude_string_set_constant(str, "Rule Revision");
                 idmef_additional_data_set_integer(ad, rule->revision);
 
-                prelude_linked_object_add_tail(&state->additional_data_list, (prelude_linked_object_t *) ad);
+                idmef_object_add_tail(&state->additional_data_list, (idmef_object_t *) ad);
         }
 
         return 0;
@@ -249,8 +249,8 @@ int pcre_state_push_idmef(pcre_state_t *state, idmef_message_t *idmef)
                 return ret;
 
         prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
-                ad = prelude_linked_object_get_object(tmp);
-                prelude_linked_object_del((prelude_linked_object_t *)ad);
+                ad = idmef_object_get_list_entry(tmp);
+                idmef_object_del((idmef_object_t *)ad);
                 idmef_alert_set_additional_data(alert, ad, IDMEF_LIST_APPEND);
         }
 
@@ -266,8 +266,8 @@ static void pcre_state_destroy_internal(pcre_state_t *state)
         state->le_added = FALSE;
 
         prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
-                ad = prelude_linked_object_get_object(tmp);
-                prelude_linked_object_del((prelude_linked_object_t *) ad);
+                ad = idmef_object_get_list_entry(tmp);
+                idmef_object_del((idmef_object_t *) ad);
                 idmef_additional_data_destroy(ad);
         }
 
@@ -308,7 +308,7 @@ int pcre_state_clone(pcre_state_t *state, pcre_state_t **new)
         }
 
         prelude_list_for_each_safe(&state->additional_data_list, tmp, bkp) {
-                ad = prelude_linked_object_get_object(tmp);
+                ad = idmef_object_get_list_entry(tmp);
 
                 ret = idmef_additional_data_clone(ad, &ad);
                 if ( ret < 0 ) {
@@ -316,7 +316,7 @@ int pcre_state_clone(pcre_state_t *state, pcre_state_t **new)
                         return ret;
                 }
 
-                prelude_linked_object_add_tail(&(*new)->additional_data_list, (prelude_linked_object_t *) ad);
+                idmef_object_add_tail(&(*new)->additional_data_list, (idmef_object_t *) ad);
         }
 
         if ( state->le )

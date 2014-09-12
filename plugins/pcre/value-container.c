@@ -37,7 +37,7 @@
 
 
 struct value_container {
-        prelude_list_t list;
+        PRELUDE_LINKED_OBJECT;
         prelude_list_t value_item_list;
         void *data;
 };

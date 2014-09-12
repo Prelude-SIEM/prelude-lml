@@ -352,7 +352,7 @@ static lml_log_source_t *search_source(const char *name)
         lml_log_source_t *ls;
 
         prelude_list_for_each(&source_list, tmp) {
-                ls = prelude_linked_object_get_object(tmp);
+                ls = prelude_list_entry(tmp, lml_log_source_t, list);
 
                 if ( strcmp(lml_log_source_get_name(ls), name) == 0 )
                         return ls;

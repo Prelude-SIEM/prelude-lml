@@ -301,14 +301,14 @@ int lml_additional_data_prepare(prelude_list_t *adlist, const lml_log_source_t *
         if ( generate_additional_data(&adata, "Log received from", source, strlen(source)) < 0 )
                 return -1;
 
-        prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
+        idmef_object_add_tail(adlist, (idmef_object_t *) adata);
 
         ptr = lml_log_entry_get_original_log(log);
         if ( ptr ) {
                 if ( generate_additional_data(&adata, "Original Log", ptr, lml_log_entry_get_original_log_len(log)) < 0 )
                         return -1;
 
-                prelude_linked_object_add_tail(adlist, (prelude_linked_object_t *) adata);
+                idmef_object_add_tail(adlist, (idmef_object_t *) adata);
         }
 
         return 0;
