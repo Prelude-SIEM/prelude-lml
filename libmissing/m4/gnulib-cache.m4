@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2013 Free Software Foundation, Inc.
+# Copyright (C) 2002-2014 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --tests-base=libmissing/tests --aux-dir=. --with-tests --lgpl --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files bind close fnmatch-gnu fseeko ftello getaddrinfo glob iconv imaxabs inet_ntop ioctl mktime nl_langinfo pathmax realloc recvfrom servent sigaction sleep snprintf-posix socket socklen strptime strsep sys_select
+#   gnulib-tool --import --dir=. --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --tests-base=libmissing/tests --aux-dir=. --with-tests --lgpl --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files bind close fnmatch-gnu fseeko ftello getaddrinfo glob iconv imaxabs inet_ntop ioctl mktime nl_langinfo pathmax realloc-gnu recvfrom servent sigaction sleep snprintf-posix socket socklen strptime strsep sys_select
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
@@ -46,7 +46,7 @@ gl_MODULES([
   mktime
   nl_langinfo
   pathmax
-  realloc
+  realloc-gnu
   recvfrom
   servent
   sigaction

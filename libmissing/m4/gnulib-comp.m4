@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2013 Free Software Foundation, Inc.
+# Copyright (C) 2002-2014 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -111,6 +111,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module getpeername:
   # Code from module getpeername-tests:
   # Code from module gettext-h:
+  # Code from module gettimeofday:
+  # Code from module gettimeofday-tests:
   # Code from module glob:
   # Code from module glob-tests:
   # Code from module havelib:
@@ -190,7 +192,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module raise:
   # Code from module raise-tests:
   # Code from module readdir:
-  # Code from module realloc:
   # Code from module realloc-gnu:
   # Code from module realloc-gnu-tests:
   # Code from module realloc-posix:
@@ -416,6 +417,12 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([getpeername])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_FUNC_GETTIMEOFDAY
+  if test $HAVE_GETTIMEOFDAY = 0 || test $REPLACE_GETTIMEOFDAY = 1; then
+    AC_LIBOBJ([gettimeofday])
+    gl_PREREQ_GETTIMEOFDAY
+  fi
+  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   gl_GLOB
   if test -n "$GLOB_H"; then
     AC_LIBOBJ([glob])
@@ -743,6 +750,7 @@ changequote([, ])dnl
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
+  AC_CHECK_FUNCS_ONCE([ttyname])
   gl_FUNC_GETPAGESIZE
   if test $REPLACE_GETPAGESIZE = 1; then
     AC_LIBOBJ([getpagesize])
@@ -993,6 +1001,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getlogin_r.c
   lib/getpeername.c
   lib/gettext.h
+  lib/gettimeofday.c
   lib/glob-libc.h
   lib/glob.c
   lib/glob.in.h
@@ -1137,6 +1146,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getaddrinfo.m4
   m4/getlogin_r.m4
   m4/getpagesize.m4
+  m4/gettimeofday.m4
   m4/glibc21.m4
   m4/glob.m4
   m4/gnulib-common.m4
@@ -1316,6 +1326,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getaddrinfo.c
   tests/test-getlogin_r.c
   tests/test-getpeername.c
+  tests/test-gettimeofday.c
   tests/test-glob.c
   tests/test-iconv.c
   tests/test-imaxabs.c
