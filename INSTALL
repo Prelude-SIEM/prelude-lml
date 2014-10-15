@@ -9,20 +9,6 @@ are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.  This file is offered as-is,
 without warranty of any kind.
 
-Dependencies
-============
-
-   Libprelude must be installed first.
-
-   For Redhat based systems (CentOS, Fedora, etc.)
-       Minimal     :     pcre-devel
-       Lib ICU     :     libicu-devel
-
-   For Debian systems
-       Minimal     :     libpcre3-dev
-       Lib ICU     :     libicu-dev
-
-
 Basic Installation
 ==================
 
