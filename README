@@ -1,4 +1,4 @@
-Prelude-LML is brought to you by CS-SI (http://www.prelude-ids.com).
+Prelude-LML is brought to you by CS-SI (http://www.prelude-siem.com).
 
 
 Prelude-LML Overview
@@ -39,12 +39,12 @@ Get Support
 ===========
 
 
-Prelude-user mailing list archives can be accessed at:
-        https://www.prelude-ids.org/lists
+Prelude-user forums can be accessed at:
+       https://www.prelude-siem.org/projects/prelude/boards
 
 
 Commercial Support is available through the CS-SI company:
-        http://www.prelude-ids.com, info@prelude-ids.com
+        http://www.prelude-siem.com, contact.prelude@c-s.fr
 
 
 
@@ -54,22 +54,18 @@ Help development
 1. SUBMITTING PATCHES
 
 The Prelude source is constantly changing. If you want to submit a patch,
-please do so from the most recent CVS source tree, subscribe to the
-prelude-devel mailing list by sending a mail to:
-
-        prelude-devel-subscribe@prelude-ids.org
-
-and post your patch with a description of functionality.
+please do so from the most recent GIT source tree, subscribe to the
+prelude-devel forum and post your patch with a description of functionality.
 You can also attach patches to bugs on
 
-        https://www.prelude-ids.org
+        https://www.prelude-siem.org
 
 
 2. BUGS
 
 If you find any bugs, please report them to:
 
-        https://www.prelude-ids.org
+        https://www.prelude-siem.org
 
 Please make sure that what you're reporting is actually a BUG and not
 a problem on your side.
