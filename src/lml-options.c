@@ -625,7 +625,7 @@ static void reset_tls_config(tcp_tls_config_t *config)
         prelude_list_init(&config->trusted_name);
         prelude_list_init(&config->trusted_fingerprint);
         config->ca_path = config->key_path = config->cert_path = NULL;
-        config->authmode = 0;
+        config->authmode = TCP_SERVER_TLS_AUTH_X509;
 }
 
 
@@ -798,6 +798,8 @@ static int set_tls_certificate_trusted_fingerprint(prelude_option_t *opt, const 
 static int set_tls_authentification_mode(prelude_option_t *opt, const char *arg, prelude_string_t *err, void *context)
 {
         char *tok, *value = const2char(arg);
+
+        tls_config.authmode &= ~(TCP_SERVER_TLS_AUTH_ANONYMOUS | TCP_SERVER_TLS_AUTH_X509);
 
         while ( (tok = strsep(&value, ", ")) ) {
                 if ( strcasecmp(tok, "x509") == 0 )
