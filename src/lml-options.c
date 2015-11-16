@@ -1032,13 +1032,13 @@ int lml_options_init(prelude_option_t *ropt, int argc, char **argv)
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-time-offset",
                            "Specifies the maximum time difference, in seconds, between the time " \
                            "of logfiles rotation. If this amount is reached, a high "   \
-                           "severity alert will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED,
+                           "severity alert will be emitted", PRELUDE_OPTION_ARGUMENT_REQUIRED,
                            set_rotation_time_offset, get_rotation_time_offset);
 
         prelude_option_add(ropt, NULL, all_hook, 0, "max-rotation-size-offset",
                            "Specifies the maximum size difference between two logfile "
                            "rotation. If this difference is reached, a high severity alert "
-                           "will be emited", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset,
+                           "will be emitted", PRELUDE_OPTION_ARGUMENT_REQUIRED, set_rotation_size_offset,
                            get_rotation_size_offset);
 
         prelude_option_add(ropt, &opt, PRELUDE_OPTION_TYPE_CLI|PRELUDE_OPTION_TYPE_CFG, 0, "warning-limit",

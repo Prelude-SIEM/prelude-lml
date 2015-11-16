@@ -856,7 +856,7 @@ static void pcre_run(prelude_plugin_instance_t *pi, const lml_log_source_t *ls, 
         }
 
         if ( !(all_flags & PCRE_MATCH_FLAGS_ALERT) && plugin->dump_unmatched )
-                prelude_log(PRELUDE_LOG_WARN, "No alert emited for log entry \"%s\"\n",
+                prelude_log(PRELUDE_LOG_WARN, "No alert emitted for log entry \"%s\"\n",
                             lml_log_entry_get_message(log_entry));
 }
 

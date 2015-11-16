@@ -102,7 +102,7 @@ static void print_stats(const char *prefix, struct timeval *end)
 
         tdiv = (end->tv_sec + (double) end->tv_usec / 1000000) - (start.tv_sec + (double) start.tv_usec / 1000000);
 
-        prelude_log(PRELUDE_LOG_WARN, "%s%lu line processed in %.2f seconds (%.2f EPS), %lu alert emited.\n",
+        prelude_log(PRELUDE_LOG_WARN, "%s%lu line(s) processed in %.2f second(s) (%.2f EPS), %lu alert(s) emitted.\n",
                     prefix, config.line_processed, tdiv, config.line_processed / tdiv, config.alert_count);
 }
 
