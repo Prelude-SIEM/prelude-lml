@@ -3,7 +3,9 @@ SUBDIRS = libev libmissing m4 plugins src tests
 
 preludeconfdir = $(configdir)
 EXTRA_DIST = plugins.rules prelude-lml.conf config.h \
-             AUTHORS COPYING HACKING.README INSTALL NEWS README 
+             selinux/prelude-lml.te \
+             selinux/Makefile \
+             AUTHORS COPYING HACKING.README INSTALL NEWS README
 
 MAINTAINERCLEANFILES = \
         $(srcdir)/INSTALL \
