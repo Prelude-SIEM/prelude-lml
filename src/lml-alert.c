@@ -59,7 +59,7 @@ static idmef_analyzer_t *idmef_analyzer;
 
 #define ANALYZER_CLASS "Log Analyzer"
 #define ANALYZER_MODEL "Prelude LML"
-#define ANALYZER_MANUFACTURER "http://www.prelude-ids.com"
+#define ANALYZER_MANUFACTURER "http://www.prelude-siem.com"
 
 
 
