@@ -1,0 +1,19 @@
+
+module prelude-lml 1.0;
+
+require {
+    type prelude_lml_t;
+    type port_t;
+    class capability ipc_lock;
+    class tcp_socket { name_bind listen };
+}
+
+#============= prelude_lml_t ==============
+
+# Add policies for tcp server of prelude-lml
+allow prelude_lml_t port_t:tcp_socket name_bind;
+allow prelude_lml_t self:tcp_socket listen;
+
+# Allow locking shared memory segments and mlock/mlockall
+allow prelude_lml_t self:capability ipc_lock;
+
