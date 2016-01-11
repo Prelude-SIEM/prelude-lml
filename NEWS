@@ -1,3 +1,20 @@
+* 2016-01-11, prelude-lml-1.3.0alpha1:
+
+Author: Tran Song
+
+- Add SELinux policy
+
+Author: Antoine Luong
+
+- [#641] Fix crash when no authmode is defined in TLS configuration
+
+Author: Thomas Andrejak
+
+- Update from prelude-ids.org to prelude-siem.org
+  Change mailing lists to forums.
+
+
+
 * 2015-07-27, prelude-lml-1.2.6:
 
 No changes.
