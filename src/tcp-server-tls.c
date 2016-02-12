@@ -1,7 +1,7 @@
 /*****
 *
 * Copyright (C) 2003-2016 CS-SI. All Rights Reserved.
-* Author: Equipe Prelude <contact.prelude@c-s.fr>
+* Author: Prelude Team <support.prelude@c-s.fr>
 *
 * This file is part of the Prelude-LML program.
 *
