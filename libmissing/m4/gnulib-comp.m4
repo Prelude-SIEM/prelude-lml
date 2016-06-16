@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2014 Free Software Foundation, Inc.
+# Copyright (C) 2002-2016 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,11 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_ES$])dnl a valid locale name
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
+
+  # Pre-early section.
+  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   AC_REQUIRE([gl_PROG_AR_RANLIB])
+
   # Code from module absolute-header:
   # Code from module alloca:
   # Code from module alloca-opt:
@@ -58,6 +62,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module close-tests:
   # Code from module closedir:
   # Code from module configmake:
+  # Code from module ctype:
+  # Code from module ctype-tests:
   # Code from module d-type:
   # Code from module dirent:
   # Code from module dirent-tests:
@@ -67,7 +73,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module errno:
   # Code from module errno-tests:
   # Code from module extensions:
-  AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   # Code from module extern-inline:
   # Code from module fcntl-h:
   # Code from module fcntl-h-tests:
@@ -110,6 +115,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module gettimeofday-tests:
   # Code from module glob:
   # Code from module glob-tests:
+  # Code from module hard-locale:
   # Code from module havelib:
   # Code from module hostent:
   # Code from module iconv:
@@ -309,7 +315,8 @@ AC_SUBST([LTALLOCA])
   gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
   gl_DIRENT_H
   gl_FUNC_DIRFD
-  if test $ac_cv_func_dirfd = no && test $gl_cv_func_dirfd_macro = no; then
+  if test $ac_cv_func_dirfd = no && test $gl_cv_func_dirfd_macro = no \
+     || test $REPLACE_DIRFD = 1; then
     AC_LIBOBJ([dirfd])
     gl_PREREQ_DIRFD
   fi
@@ -388,6 +395,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([glob])
     gl_PREREQ_GLOB
   fi
+  gl_HARD_LOCALE
   gl_HOSTENT
   AM_ICONV
   m4_ifdef([gl_ICONV_MODULE_INDICATOR],
@@ -469,11 +477,11 @@ AC_SUBST([LTALLOCA])
     gl_PREREQ_MKTIME
   fi
   gl_TIME_MODULE_INDICATOR([mktime])
-  gl_MSVC_INVAL
+  AC_REQUIRE([gl_MSVC_INVAL])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-inval])
   fi
-  gl_MSVC_NOTHROW
+  AC_REQUIRE([gl_MSVC_NOTHROW])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-nothrow])
   fi
@@ -550,8 +558,8 @@ AC_SUBST([LTALLOCA])
     SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=1
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([socket])
-  gl_SOCKETLIB
-  gl_SOCKETS
+  AC_REQUIRE([gl_SOCKETLIB])
+  AC_REQUIRE([gl_SOCKETS])
   gl_TYPE_SOCKLEN_T
   gt_TYPE_SSIZE_T
   gl_STDALIGN_H
@@ -587,7 +595,7 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_SELECT
   AC_PROG_MKDIR_P
-  gl_HEADER_SYS_SOCKET
+  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
@@ -665,6 +673,7 @@ changequote([, ])dnl
   gt_LOCALE_FR_UTF8
   gt_LOCALE_FR
   gt_LOCALE_TR_UTF8
+  gl_CTYPE_H
   gl_ENVIRON
   gl_UNISTD_MODULE_INDICATOR([environ])
   gl_FCNTL_H
@@ -920,8 +929,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/glob-libc.h
   lib/glob.c
   lib/glob.in.h
+  lib/hard-locale.c
+  lib/hard-locale.h
   lib/imaxabs.c
   lib/inet_ntop.c
+  lib/intprops.h
   lib/inttypes.in.h
   lib/ioctl.c
   lib/itold.c
@@ -1018,6 +1030,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/closedir.m4
   m4/codeset.m4
   m4/configmake.m4
+  m4/ctype.m4
   m4/d-type.m4
   m4/dirent_h.m4
   m4/dirfd.m4
@@ -1045,6 +1058,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/glibc21.m4
   m4/glob.m4
   m4/gnulib-common.m4
+  m4/hard-locale.m4
   m4/hostent.m4
   m4/iconv.m4
   m4/imaxabs.m4
@@ -1169,6 +1183,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-c-strcasecmp.c
   tests/test-c-strncasecmp.c
   tests/test-close.c
+  tests/test-ctype.c
   tests/test-dirent.c
   tests/test-environ.c
   tests/test-errno.c
@@ -1233,6 +1248,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-mbrtowc2.sh
   tests/test-mbrtowc3.sh
   tests/test-mbrtowc4.sh
+  tests/test-mbrtowc5.sh
   tests/test-mbsinit.c
   tests/test-mbsinit.sh
   tests/test-mbsrtowcs.c
@@ -1303,6 +1319,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/c-strcase.h
   tests=lib/c-strcasecmp.c
   tests=lib/c-strncasecmp.c
+  tests=lib/ctype.in.h
   tests=lib/fcntl.in.h
   tests=lib/fdopen.c
   tests=lib/fpucw.h
@@ -1314,7 +1331,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/glthread/threadlib.c
   tests=lib/glthread/yield.h
   tests=lib/inet_pton.c
-  tests=lib/intprops.h
   tests=lib/localename.c
   tests=lib/localename.h
   tests=lib/malloca.c
