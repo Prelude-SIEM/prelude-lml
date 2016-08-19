@@ -1,3 +1,11 @@
+* 2016-08-19, prelude-lml-3.1.0rc2:
+
+Author: Thomas Andrejak
+
+- Allow the libev on system to be used
+
+
+
 * 2016-08-05, prelude-lml-3.1.0rc1:
 
 Author: Thomas Andrejak
