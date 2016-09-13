@@ -1,3 +1,4 @@
+* 2016-09-14, prelude-lml-3.1.0:
 * 2016-09-01, prelude-lml-3.1.0rc3:
 
 No new changes.
@@ -323,7 +324,7 @@ Author: Yoann Vandoorselaere
 * 2007-12-17, prelude-lml-0.9.11:
 
 - Asterisk log format and new ruleset for SIP REGISTER method, by
-  Sébastien Tricaud <toady@inl.fr>.
+  SÃ©bastien Tricaud <toady@inl.fr>.
 
 - Honeytrap ruleset, by Bjoern Weiland (Fix #244).
 
@@ -717,10 +718,10 @@ Author: Yoann Vandoorselaere
           This permit to handle, for example, the way ZyXel modem output the
           packet port.
 
-        - Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+        - StÃ©phane Loeuillet <stephane.loeuillet@tiscali.fr>:
           Add a new portsentry rule concerning dropped packets.
 
-        - Stéphane Loeuillet <stephane.loeuillet@tiscali.fr>:
+        - StÃ©phane Loeuillet <stephane.loeuillet@tiscali.fr>:
           New ZyXel rules for PPP logs, as well as ruleset improvment
           and bugfix.
 
@@ -831,7 +832,7 @@ Author: Yoann Vandoorselaere
         - Laurent Oudot <oudot.laurent@wanadoo.fr>:
           Exim ruleset.
 
-        - Stéphane Loeuillet <LeRoutier@wanadoo.fr>:
+        - StÃ©phane Loeuillet <LeRoutier@wanadoo.fr>:
           ProFTPD, vpopmail, qpopper rulesets.
 
         - Vincent Glaume <vglaume@exaprobe.com>:
