@@ -4,6 +4,7 @@ module prelude-lml 1.0;
 require {
     type prelude_lml_t;
     type port_t;
+    type unreserved_port_t;
     class capability ipc_lock;
     class tcp_socket { name_bind listen accept };
     class udp_socket name_bind;
@@ -20,3 +21,7 @@ allow prelude_lml_t port_t:udp_socket name_bind;
 
 # Allow locking shared memory segments and mlock/mlockall
 allow prelude_lml_t self:capability ipc_lock;
+
+# Allow prelude-lml to bind to unreserved network port (unreserved_port_t:rules for rhel7 only)
+allow prelude_lml_t unreserved_port_t:tcp_socket name_bind;
+allow prelude_lml_t unreserved_port_t:udp_socket name_bind;

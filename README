@@ -48,6 +48,15 @@ Commercial Support is available through the CS-SI company:
 
 
 
+For SELinux policy
+==================
+
+If you want to use SELinux policy on CentOS 6, you must delete lines containing
+'unreserved_port_t' in prelude-lml.te file. The 'unreserved_port_t' type is
+only available on CentOS 7
+
+
+
 Help development
 ================
 
