@@ -1,3 +1,11 @@
+* 2016-12-23, prelude-lml-4.0.0beta1:
+
+Author: Song Tran
+
+- Add SELinux policy for using unreserved ports on rhel7
+
+
+
 * 2016-09-14, prelude-lml-3.1.0:
 * 2016-09-01, prelude-lml-3.1.0rc3:
 
