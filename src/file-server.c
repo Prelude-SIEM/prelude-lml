@@ -35,8 +35,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <gcrypt.h>
-
 #ifdef HAVE_SYS_FILIO_H
 # include <sys/filio.h>
 #endif
@@ -54,6 +52,7 @@
 
 #include "ev.h"
 
+#include <libprelude/common.h>
 #include <libprelude/prelude.h>
 #include <libprelude/prelude-timer.h>
 #include <libprelude/prelude-log.h>
@@ -94,7 +93,6 @@
  */
 #define METADATA_CHECKSUM_SIZE 4
 #define METADATA_SIZE (sizeof(off_t) + METADATA_CHECKSUM_SIZE)
-#define METADATA_CHECKSUM_TYPE GCRY_MD_CRC32
 
 #define LOGFILE_RENAME_CLASS   "Log file rename"
 #define LOGFILE_DELETION_CLASS "Log file deletion"
@@ -370,6 +368,20 @@ static int file_metadata_read(monitor_fd_t *monitor, off_t *start, unsigned char
 }
 
 
+
+static void compute_checksum(const char *in, size_t insize, unsigned char *digest)
+{
+        uint32_t crc;
+
+        crc = prelude_crc32((const unsigned char *) in, insize);
+        digest[0] = (crc >> 24) & 0xff;
+        digest[1] = (crc >> 16) & 0xff;
+        digest[2] = (crc >>  8) & 0xff;
+        digest[3] = crc & 0xff;
+}
+
+
+
 static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
 {
         int ret;
@@ -378,12 +390,10 @@ static int file_metadata_save(monitor_fd_t *monitor, off_t offset)
         if ( metadata_flags & FILE_SERVER_METADATA_FLAGS_NO_WRITE )
                 return 0;
 
-        assert(gcry_md_get_algo_dlen(METADATA_CHECKSUM_TYPE) + sizeof(offset) == sizeof(buf));
+        assert(METADATA_CHECKSUM_SIZE + sizeof(offset) == sizeof(buf));
 
         memcpy(buf, &offset, sizeof(offset));
-        gcry_md_hash_buffer(METADATA_CHECKSUM_TYPE, buf + sizeof(offset),
-                            prelude_string_get_string(monitor->buf),
-                            prelude_string_get_len(monitor->buf));
+        compute_checksum(prelude_string_get_string(monitor->buf), prelude_string_get_len(monitor->buf), buf + sizeof(offset));
 
         rewind(monitor->metadata_fd);
 
@@ -402,11 +412,12 @@ static int verify_metadata_checksum(prelude_string_t *log, unsigned char *metada
 {
         unsigned char sum[METADATA_CHECKSUM_SIZE];
 
-        assert(gcry_md_get_algo_dlen(METADATA_CHECKSUM_TYPE) == sizeof(sum));
-        gcry_md_hash_buffer(METADATA_CHECKSUM_TYPE, sum, prelude_string_get_string(log), prelude_string_get_len(log));
+        compute_checksum(prelude_string_get_string(log), prelude_string_get_len(log), sum);
 
         return memcmp(sum, metadata_sum, sizeof(sum));
 }
+
+
 
 static int file_metadata_get_position(monitor_fd_t *monitor)
 {
@@ -503,6 +514,7 @@ static int file_metadata_open(monitor_fd_t *monitor)
 
         return 0;
 }
+
 
 
 static int check_logfile_data(monitor_fd_t *monitor, struct stat *st)
