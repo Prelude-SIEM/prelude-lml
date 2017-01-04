@@ -1,5 +1,5 @@
 /* Test of getting user name.
-   Copyright (C) 2010-2016 Free Software Foundation, Inc.
+   Copyright (C) 2010-2017 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,9 @@ SIGNATURE_CHECK (getlogin_r, int, (char *, size_t));
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <pwd.h>
+#if !((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__)
+# include <pwd.h>
+#endif
 
 #include <sys/stat.h>
 #include <sys/types.h>
