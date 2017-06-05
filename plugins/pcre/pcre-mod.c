@@ -730,6 +730,7 @@ static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, 
         char *value;
         char *ptr = NULL;
         int first_directive = 1;
+        prelude_bool_t include_only = FALSE;
         pcre_rule_t *rule = NULL;
         pcre_rule_container_t *rc = NULL;
 
@@ -753,10 +754,21 @@ static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, 
                         return -1;
                 }
 
+                if ( include_only ) {
+                       if ( strcmp(key, "include") == 0 ) {
+                               parse_include(NULL, plugin, value);
+                               continue;
+                       }
+
+                       prelude_log(PRELUDE_LOG_WARN, "%s:%d: ruleset starting with include should have only include directives.\n", filename, line);
+                       return -1;
+                }
+
                 if ( first_directive ) {
                         if ( strcmp(key, "include") == 0 ) {
                                 parse_include(NULL, plugin, value);
-                                return 0;
+                                include_only = TRUE;
+                                continue;
                         }
 
                         rule = create_rule();
