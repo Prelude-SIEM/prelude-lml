@@ -208,7 +208,8 @@ void _lml_handle_signal_if_needed(void)
 
         prelude_log(PRELUDE_LOG_WARN, "signal %d received, terminating prelude-lml.\n", signo);
         ev_default_destroy();
-        exit(2);
+
+        exit((signo == SIGTERM) ? 0 : 1);
 }
 
 
