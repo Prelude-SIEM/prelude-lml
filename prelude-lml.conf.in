@@ -142,6 +142,8 @@ file = /var/log/everything/current
 #
 # Sample configuration for apache:
 #
+# Note: For apache >= 2.4, you need to force ErrorLogFormat in apache configuration:
+#       ErrorLogFormat "[%t] [%l] [pid %P] %F: %E: [client %a] %M"
 [format=apache]
 time-format = "%d/%b/%Y:%H:%M:%S"
 prefix-regex = "(?P<hostname>\S+) \S+ \S+ \[(?P<timestamp>.{20}) [+-].{4}\] "
