@@ -189,8 +189,11 @@ convert_dirent (const struct dirent *source)
       struct readdir_result result = { NULL, };
       return result;
     }
-  struct readdir_result result = READDIR_RESULT_INITIALIZER (source);
-  return result;
+  else
+    {
+      struct readdir_result result = READDIR_RESULT_INITIALIZER (source);
+      return result;
+    }
 }
 
 #ifndef COMPILE_GLOB64
@@ -204,8 +207,11 @@ convert_dirent64 (const struct dirent64 *source)
       struct readdir_result result = { NULL, };
       return result;
     }
-  struct readdir_result result = READDIR_RESULT_INITIALIZER (source);
-  return result;
+  else
+    {
+      struct readdir_result result = READDIR_RESULT_INITIALIZER (source);
+      return result;
+    }
 }
 #endif
 
@@ -246,10 +252,6 @@ convert_dirent64 (const struct dirent64 *source)
     ((void) (buf), (void) (len), (void) (newlen), (void) (avar), (void *) 0)
 #endif
 
-#ifndef __has_builtin
-# define __has_builtin(x) 0
-#endif
-
 /* Set *R = A + B.  Return true if the answer is mathematically
    incorrect due to overflow; in this case, *R is the low order
    bits of the correct answer..  */
@@ -257,7 +259,7 @@ convert_dirent64 (const struct dirent64 *source)
 static bool
 size_add_wrapv (size_t a, size_t b, size_t *r)
 {
-#if 5 <= __GNUC__ || __has_builtin (__builtin_add_overflow)
+#if 5 <= __GNUC__
   return __builtin_add_overflow (a, b, r);
 #else
   *r = a + b;
@@ -709,12 +711,12 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
               if (success)
                 {
                   struct passwd *p;
+                  char *malloc_pwtmpbuf = NULL;
+                  char *pwtmpbuf;
 #   if defined HAVE_GETPWNAM_R || defined _LIBC
                   long int pwbuflenmax = GETPW_R_SIZE_MAX ();
                   size_t pwbuflen = pwbuflenmax;
-                  char *pwtmpbuf;
                   struct passwd pwbuf;
-                  char *malloc_pwtmpbuf = NULL;
                   int save = errno;
 
 #    ifndef _LIBC
@@ -730,6 +732,8 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
                       pwtmpbuf = malloc (pwbuflen);
                       if (pwtmpbuf == NULL)
                         {
+                          if (__glibc_unlikely (malloc_name))
+                            free (name);
                           retval = GLOB_NOSPACE;
                           goto out;
                         }
@@ -758,6 +762,8 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
                           if (newp == NULL)
                             {
                               free (malloc_pwtmpbuf);
+                              if (__glibc_unlikely (malloc_name))
+                                free (name);
                               retval = GLOB_NOSPACE;
                               goto out;
                             }
@@ -793,23 +799,30 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
                               malloc_home_dir = 1;
                             }
                           memcpy (home_dir, p->pw_dir, home_dir_len);
-
-                          free (pwtmpbuf);
                         }
                     }
+                  free (malloc_pwtmpbuf);
+                }
+              else
+                {
+                  if (__glibc_unlikely (malloc_name))
+                    free (name);
                 }
             }
           if (home_dir == NULL || home_dir[0] == '\0')
             {
+              if (__glibc_unlikely (malloc_home_dir))
+                free (home_dir);
               if (flags & GLOB_TILDE_CHECK)
                 {
-                  if (__glibc_unlikely (malloc_home_dir))
-                    free (home_dir);
                   retval = GLOB_NOMATCH;
                   goto out;
                 }
               else
-                home_dir = (char *) "~"; /* No luck.  */
+                {
+                  home_dir = (char *) "~"; /* No luck.  */
+                  malloc_home_dir = 0;
+                }
             }
 #  endif /* WINDOWS32 */
 # endif
@@ -851,6 +864,9 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
               dirname = newp;
               dirlen += home_len - 1;
               malloc_dirname = !use_alloca;
+
+              if (__glibc_unlikely (malloc_home_dir))
+                free (home_dir);
             }
           dirname_modified = 1;
         }
@@ -923,11 +939,11 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
           /* Look up specific user's home directory.  */
           {
             struct passwd *p;
+            char *malloc_pwtmpbuf = NULL;
 #  if defined HAVE_GETPWNAM_R || defined _LIBC
             long int buflenmax = GETPW_R_SIZE_MAX ();
             size_t buflen = buflenmax;
             char *pwtmpbuf;
-            char *malloc_pwtmpbuf = NULL;
             struct passwd pwbuf;
             int save = errno;
 
@@ -1052,6 +1068,8 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
           if (newcount > SIZE_MAX / sizeof (char *) - 2)
             {
             nospace:
+              if (__glibc_unlikely (malloc_dirname))
+                free (dirname);
               free (pglob->gl_pathv);
               pglob->gl_pathv = NULL;
               pglob->gl_pathc = 0;
@@ -1073,12 +1091,19 @@ glob (const char *pattern, int flags, int (*errfunc) (const char *, int),
               p = mempcpy (pglob->gl_pathv[newcount], dirname, dirlen);
               p[0] = '/';
               p[1] = '\0';
+              if (__glibc_unlikely (malloc_dirname))
+                free (dirname);
             }
           else
             {
-              pglob->gl_pathv[newcount] = strdup (dirname);
-              if (pglob->gl_pathv[newcount] == NULL)
-                goto nospace;
+              if (__glibc_unlikely (malloc_dirname))
+                pglob->gl_pathv[newcount] = dirname;
+              else
+                {
+                  pglob->gl_pathv[newcount] = strdup (dirname);
+                  if (pglob->gl_pathv[newcount] == NULL)
+                    goto nospace;
+                }
             }
           pglob->gl_pathv[++newcount] = NULL;
           ++pglob->gl_pathc;

@@ -113,8 +113,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module getpeername:
   # Code from module getpeername-tests:
   # Code from module gettext-h:
-  # Code from module gettimeofday:
-  # Code from module gettimeofday-tests:
   # Code from module glob:
   # Code from module glob-tests:
   # Code from module hard-locale:
@@ -265,6 +263,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module unistd-tests:
   # Code from module unsetenv:
   # Code from module unsetenv-tests:
+  # Code from module usleep:
+  # Code from module usleep-tests:
   # Code from module vasnprintf:
   # Code from module vasnprintf-tests:
   # Code from module verify:
@@ -358,6 +358,11 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_FSTAT
   if test $REPLACE_FSTAT = 1; then
     AC_LIBOBJ([fstat])
+    case "$host_os" in
+      mingw*)
+        AC_LIBOBJ([stat-w32])
+        ;;
+    esac
     gl_PREREQ_FSTAT
   fi
   gl_SYS_STAT_MODULE_INDICATOR([fstat])
@@ -394,12 +399,6 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([getpeername])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
-  gl_FUNC_GETTIMEOFDAY
-  if test $HAVE_GETTIMEOFDAY = 0 || test $REPLACE_GETTIMEOFDAY = 1; then
-    AC_LIBOBJ([gettimeofday])
-    gl_PREREQ_GETTIMEOFDAY
-  fi
-  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   gl_GLOB
   if test -n "$GLOB_H"; then
     AC_LIBOBJ([glob])
@@ -451,6 +450,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([malloc])
   fi
   gl_STDLIB_MODULE_INDICATOR([malloc-posix])
+  gl_MALLOCA
   gl_FUNC_MBRTOWC
   if test $HAVE_MBRTOWC = 0 || test $REPLACE_MBRTOWC = 1; then
     AC_LIBOBJ([mbrtowc])
@@ -496,6 +496,7 @@ AC_SUBST([LTALLOCA])
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-nothrow])
   fi
+  gl_MODULE_INDICATOR([msvc-nothrow])
   gl_MULTIARCH
   gl_HEADER_NETDB
   gl_HEADER_NETINET_IN
@@ -604,7 +605,7 @@ AC_SUBST([LTALLOCA])
   gl_STRING_MODULE_INDICATOR([strsep])
   gl_SYS_IOCTL_H
   AC_PROG_MKDIR_P
-  gl_HEADER_SYS_SELECT
+  AC_REQUIRE([gl_HEADER_SYS_SELECT])
   AC_PROG_MKDIR_P
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   AC_PROG_MKDIR_P
@@ -723,7 +724,7 @@ changequote([, ])dnl
   AC_CHECK_FUNCS_ONCE([newlocale])
   gl_LOCK
   gl_MODULE_INDICATOR([lock])
-  gl_MALLOCA
+  AC_CHECK_HEADERS_ONCE([semaphore.h])
   gt_LOCALE_FR
   gt_LOCALE_FR_UTF8
   gt_LOCALE_JA
@@ -790,6 +791,11 @@ changequote([, ])dnl
     gl_PREREQ_UNSETENV
   fi
   gl_STDLIB_MODULE_INDICATOR([unsetenv])
+  gl_FUNC_USLEEP
+  if test $HAVE_USLEEP = 0 || test $REPLACE_USLEEP = 1; then
+    AC_LIBOBJ([usleep])
+  fi
+  gl_UNISTD_MODULE_INDICATOR([usleep])
   gl_FUNC_WCRTOMB
   if test $HAVE_WCRTOMB = 0 || test $REPLACE_WCRTOMB = 1; then
     AC_LIBOBJ([wcrtomb])
@@ -906,15 +912,14 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.rpath
-  build-aux/snippet/_Noreturn.h
-  build-aux/snippet/arg-nonnull.h
-  build-aux/snippet/c++defs.h
-  build-aux/snippet/warn-on-use.h
+  lib/_Noreturn.h
   lib/alloca.c
   lib/alloca.in.h
+  lib/arg-nonnull.h
   lib/arpa_inet.in.h
   lib/asnprintf.c
   lib/bind.c
+  lib/c++defs.h
   lib/close.c
   lib/closedir.c
   lib/config.charset
@@ -942,7 +947,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getlogin_r.c
   lib/getpeername.c
   lib/gettext.h
-  lib/gettimeofday.c
   lib/glob-libc.h
   lib/glob.c
   lib/glob.in.h
@@ -962,6 +966,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/localeconv.c
   lib/lseek.c
   lib/malloc.c
+  lib/malloca.c
+  lib/malloca.h
+  lib/malloca.valgrind
   lib/mbrtowc.c
   lib/mbsinit.c
   lib/mbsrtowcs-impl.h
@@ -1002,6 +1009,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/socket.c
   lib/sockets.c
   lib/sockets.h
+  lib/stat-w32.c
+  lib/stat-w32.h
   lib/stdalign.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
@@ -1034,9 +1043,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.h
   lib/verify.h
   lib/w32sock.h
+  lib/warn-on-use.h
   lib/wchar.in.h
   lib/wctype-h.c
   lib/wctype.in.h
+  lib/xalloc-oversized.h
   lib/xsize.c
   lib/xsize.h
   m4/00gnulib.m4
@@ -1075,7 +1086,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getlogin.m4
   m4/getlogin_r.m4
   m4/getpagesize.m4
-  m4/gettimeofday.m4
   m4/glibc21.m4
   m4/glob.m4
   m4/gnulib-common.m4
@@ -1134,6 +1144,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/opendir.m4
   m4/pathmax.m4
   m4/printf.m4
+  m4/pthread_rwlock_rdlock.m4
   m4/putenv.m4
   m4/raise.m4
   m4/readdir.m4
@@ -1179,6 +1190,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/tm_gmtoff.m4
   m4/ungetc.m4
   m4/unistd_h.m4
+  m4/usleep.m4
   m4/vasnprintf.m4
   m4/warn-on-use.m4
   m4/wchar_h.m4
@@ -1242,7 +1254,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getaddrinfo.c
   tests/test-getlogin_r.c
   tests/test-getpeername.c
-  tests/test-gettimeofday.c
   tests/test-glob.c
   tests/test-iconv.c
   tests/test-imaxabs.c
@@ -1289,6 +1300,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-pathmax.c
   tests/test-raise.c
   tests/test-recvfrom.c
+  tests/test-rwlock1.c
   tests/test-setenv.c
   tests/test-setlocale1.c
   tests/test-setlocale1.sh
@@ -1322,7 +1334,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-time.c
   tests/test-unistd.c
   tests/test-unsetenv.c
+  tests/test-usleep.c
   tests/test-vasnprintf.c
+  tests/test-verify-try.c
   tests/test-verify.c
   tests/test-verify.sh
   tests/test-wchar.c
@@ -1336,9 +1350,12 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wcrtomb.sh
   tests/test-wctype-h.c
   tests/zerosize-ptr.h
+  tests=lib/_Noreturn.h
+  tests=lib/arg-nonnull.h
   tests=lib/binary-io.c
   tests=lib/binary-io.h
   tests=lib/btowc.c
+  tests=lib/c++defs.h
   tests=lib/c-ctype.c
   tests=lib/c-ctype.h
   tests=lib/c-strcase.h
@@ -1359,9 +1376,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/isblank.c
   tests=lib/localename.c
   tests=lib/localename.h
-  tests=lib/malloca.c
-  tests=lib/malloca.h
-  tests=lib/malloca.valgrind
   tests=lib/mbtowc-impl.h
   tests=lib/mbtowc.c
   tests=lib/putenv.c
@@ -1371,9 +1385,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/strerror-override.h
   tests=lib/strerror.c
   tests=lib/unsetenv.c
+  tests=lib/usleep.c
+  tests=lib/warn-on-use.h
   tests=lib/wcrtomb.c
   tests=lib/wctob.c
   tests=lib/wctomb-impl.h
   tests=lib/wctomb.c
-  tests=lib/xalloc-oversized.h
 ])
