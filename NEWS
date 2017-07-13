@@ -1,3 +1,16 @@
+* 2017-07-13, prelude-lml-4.1.0rc2:
+
+Author: Thomas Andrejak
+
+- Add info about milliseconds in Apache time-format
+- Fix lines with only include directives
+
+Author: Yoann Vandoorselaere
+
+- Update GnuLib code
+
+
+
 * 2017-06-30, prelude-lml-4.1.0rc1:
 * 2017-06-23, prelude-lml-4.1.0beta2:
 
