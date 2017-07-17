@@ -787,6 +787,9 @@ static int parse_ruleset_directive(prelude_list_t *head, pcre_plugin_t *plugin, 
                 }
         }
 
+        if ( include_only )
+                return 0;
+
         if ( prelude_list_is_empty(&rule->regex_list) ) {
                 prelude_log(PRELUDE_LOG_WARN, "%s:%d: rule does not provide a regex.\n", filename, line);
                 free_rule(rule);
