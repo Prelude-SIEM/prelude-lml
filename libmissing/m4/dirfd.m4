@@ -1,8 +1,8 @@
-# serial 25   -*- Autoconf -*-
+# serial 26   -*- Autoconf -*-
 
 dnl Find out how to get the file descriptor associated with an open DIR*.
 
-# Copyright (C) 2001-2006, 2008-2017 Free Software Foundation, Inc.
+# Copyright (C) 2001-2006, 2008-2018 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -26,15 +26,15 @@ AC_DEFUN([gl_FUNC_DIRFD],
   fi
 
   AC_CACHE_CHECK([whether dirfd is a macro],
-    gl_cv_func_dirfd_macro,
+    [gl_cv_func_dirfd_macro],
     [AC_EGREP_CPP([dirent_header_defines_dirfd], [
 #include <sys/types.h>
 #include <dirent.h>
 #ifdef dirfd
  dirent_header_defines_dirfd
 #endif],
-       gl_cv_func_dirfd_macro=yes,
-       gl_cv_func_dirfd_macro=no)])
+       [gl_cv_func_dirfd_macro=yes],
+       [gl_cv_func_dirfd_macro=no])])
 
   # Use the replacement if we have no function or macro with that name,
   # or if OS/2 kLIBC whose dirfd() does not work.
