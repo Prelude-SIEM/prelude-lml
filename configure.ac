@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(prelude-lml, 4.2.0rc1)
+AC_INIT(prelude-lml, 5.0.0beta1)
 
 AC_PREREQ(2.59)
 AC_CANONICAL_TARGET
