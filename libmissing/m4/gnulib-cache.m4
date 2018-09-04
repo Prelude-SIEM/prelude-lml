@@ -27,7 +27,43 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --lib=libmissing --source-base=libmissing --m4-base=libmissing/m4 --doc-base=libmissing/doc --tests-base=libmissing/tests --aux-dir=. --with-tests --lgpl --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files bind close fseeko ftello getaddrinfo glob iconv imaxabs inet_ntop ioctl mktime nl_langinfo pathmax realloc-posix recvfrom servent sigaction sleep snprintf socket socklen strptime strsep sys_select
+# gnulib-tool --import \
+#  --lib=libmissing \
+#  --source-base=libmissing \
+#  --m4-base=libmissing/m4 \
+#  --doc-base=libmissing/doc \
+#  --tests-base=libmissing/tests \
+#  --aux-dir=. \
+#  --with-tests \
+#  --lgpl \
+#  --no-conditional-dependencies \
+#  --libtool \
+#  --macro-prefix=gl \
+#  --no-vc-files \
+#  bind \
+#  close \
+#  fseeko \
+#  ftello \
+#  getaddrinfo \
+#  glob \
+#  iconv \
+#  imaxabs \
+#  inet_ntop \
+#  ioctl \
+#  mktime \
+#  nl_langinfo \
+#  pathmax \
+#  realloc-posix \
+#  recvfrom \
+#  servent \
+#  sigaction \
+#  sleep \
+#  snprintf \
+#  socket \
+#  socklen \
+#  strptime \
+#  strsep \
+#  sys_select
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])

@@ -3,16 +3,16 @@
    Copyright (C) 2000-2001, 2004-2006, 2009-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
+   it under the terms of the GNU Lesser General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
    From Paul Eggert and Jim Meyering.  */
@@ -20,9 +20,8 @@
 #ifndef _DOSNAME_H
 #define _DOSNAME_H
 
-#if (defined _WIN32 || defined __WIN32__ ||     \
-     defined __MSDOS__ || defined __CYGWIN__ || \
-     defined __EMX__ || defined __DJGPP__)
+#if (defined _WIN32 || defined __CYGWIN__ \
+     || defined __EMX__ || defined __MSDOS__ || defined __DJGPP__)
    /* This internal macro assumes ASCII, but all hosts that support drive
       letters use ASCII.  */
 # define _IS_DRIVE_LETTER(C) (((unsigned int) (C) | ('a' - 'A')) - 'a'  \

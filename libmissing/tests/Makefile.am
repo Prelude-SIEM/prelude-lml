@@ -251,13 +251,6 @@ EXTRA_DIST += test-dirent.c
 
 ## end   gnulib module dirent-tests
 
-## begin gnulib module dosname
-
-
-EXTRA_DIST += dosname.h
-
-## end   gnulib module dosname
-
 ## begin gnulib module dup2
 
 
@@ -385,6 +378,14 @@ check_PROGRAMS += test-float
 EXTRA_DIST += test-float.c macros.h
 
 ## end   gnulib module float-tests
+
+## begin gnulib module fnmatch-h-tests
+
+TESTS += test-fnmatch-h
+check_PROGRAMS += test-fnmatch-h
+EXTRA_DIST += test-fnmatch-h.c
+
+## end   gnulib module fnmatch-h-tests
 
 ## begin gnulib module fnmatch-tests
 
@@ -573,6 +574,14 @@ EXTRA_DIST += signature.h test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
 
+## begin gnulib module glob-h-tests
+
+TESTS += test-glob-h
+check_PROGRAMS += test-glob-h
+EXTRA_DIST += test-glob-h.c macros.h
+
+## end   gnulib module glob-h-tests
+
 ## begin gnulib module glob-tests
 
 TESTS += test-glob
@@ -716,6 +725,13 @@ EXTRA_DIST += test-listen.c signature.h macros.h
 
 ## end   gnulib module listen-tests
 
+## begin gnulib module localcharset-tests
+
+noinst_PROGRAMS += test-localcharset
+EXTRA_DIST += test-localcharset.c
+
+## end   gnulib module localcharset-tests
+
 ## begin gnulib module locale-tests
 
 TESTS += test-locale
@@ -767,11 +783,15 @@ libtests_a_SOURCES += glthread/lock.h glthread/lock.c
 
 ## begin gnulib module lock-tests
 
-TESTS += test-rwlock1 test-lock
-check_PROGRAMS += test-rwlock1 test-lock
+TESTS += test-rwlock1 test-lock test-once1 test-once2
+check_PROGRAMS += test-rwlock1 test-lock test-once1 test-once2
 test_rwlock1_LDADD = $(LDADD) @LIBMULTITHREAD@ @YIELD_LIB@
 test_lock_LDADD = $(LDADD) @LIBMULTITHREAD@ @YIELD_LIB@
-EXTRA_DIST += test-rwlock1.c test-lock.c
+test_once1_SOURCES = test-once.c
+test_once1_LDADD = $(LDADD) @LIBTHREAD@
+test_once2_SOURCES = test-once.c
+test_once2_LDADD = $(LDADD) @LIBMULTITHREAD@
+EXTRA_DIST += test-rwlock1.c test-lock.c test-once.c
 
 ## end   gnulib module lock-tests
 
@@ -782,15 +802,6 @@ check_PROGRAMS += test-lseek
 EXTRA_DIST += test-lseek.c test-lseek.sh signature.h macros.h
 
 ## end   gnulib module lseek-tests
-
-## begin gnulib module lstat
-
-
-EXTRA_DIST += lstat.c
-
-EXTRA_libtests_a_SOURCES += lstat.c
-
-## end   gnulib module lstat
 
 ## begin gnulib module lstat-tests
 
@@ -1021,6 +1032,15 @@ EXTRA_DIST += same-inode.h
 
 ## end   gnulib module same-inode
 
+## begin gnulib module scratch_buffer-tests
+
+TESTS += test-scratch-buffer
+check_PROGRAMS += test-scratch-buffer
+test_scratch_buffer_SOURCES = test-scratch-buffer.c
+EXTRA_DIST += test-scratch-buffer.c macros.h
+
+## end   gnulib module scratch_buffer-tests
+
 ## begin gnulib module select
 
 
@@ -1196,15 +1216,6 @@ test_sockets_LDADD = $(LDADD) @LIBSOCKET@
 EXTRA_DIST += test-sockets.c
 
 ## end   gnulib module sockets-tests
-
-## begin gnulib module stat
-
-
-EXTRA_DIST += stat-w32.c stat-w32.h stat.c
-
-EXTRA_libtests_a_SOURCES += stat-w32.c stat.c
-
-## end   gnulib module stat
 
 ## begin gnulib module stat-tests
 

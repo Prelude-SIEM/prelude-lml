@@ -68,7 +68,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module close:
   # Code from module close-tests:
   # Code from module closedir:
-  # Code from module configmake:
   # Code from module connect:
   # Code from module connect-tests:
   # Code from module ctype:
@@ -99,6 +98,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module float:
   # Code from module float-tests:
   # Code from module fnmatch:
+  # Code from module fnmatch-h:
+  # Code from module fnmatch-h-tests:
   # Code from module fnmatch-tests:
   # Code from module fpieee:
   AC_REQUIRE([gl_FP_IEEE])
@@ -135,6 +136,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module gettimeofday:
   # Code from module gettimeofday-tests:
   # Code from module glob:
+  # Code from module glob-h:
+  # Code from module glob-h-tests:
   # Code from module glob-tests:
   # Code from module hard-locale:
   # Code from module havelib:
@@ -170,6 +173,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module listen:
   # Code from module listen-tests:
   # Code from module localcharset:
+  # Code from module localcharset-tests:
   # Code from module locale:
   # Code from module locale-tests:
   # Code from module localeconv:
@@ -228,6 +232,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module recvfrom-tests:
   # Code from module same-inode:
   # Code from module scratch_buffer:
+  # Code from module scratch_buffer-tests:
   # Code from module select:
   # Code from module select-tests:
   # Code from module servent:
@@ -374,7 +379,6 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([closedir])
   fi
   gl_DIRENT_MODULE_INDICATOR([closedir])
-  gl_CONFIGMAKE_PREP
   gl_CHECK_TYPE_STRUCT_DIRENT_D_TYPE
   gl_DIRENT_H
   gl_FUNC_DIRFD
@@ -395,10 +399,12 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([itold])
   fi
   gl_FUNC_FNMATCH_POSIX
-  if test -n "$FNMATCH_H"; then
+  if test $HAVE_FNMATCH = 0 || test $REPLACE_FNMATCH = 1; then
     AC_LIBOBJ([fnmatch])
     gl_PREREQ_FNMATCH
   fi
+  gl_FNMATCH_MODULE_INDICATOR([fnmatch])
+  gl_FNMATCH_H
   gl_FUNC_FSEEK
   if test $REPLACE_FSEEK = 1; then
     AC_LIBOBJ([fseek])
@@ -455,13 +461,16 @@ AC_SUBST([LTALLOCA])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
   gl_GLOB
-  if test -n "$GLOB_H"; then
+  if test $HAVE_GLOB = 0 || test $REPLACE_GLOB = 1; then
     AC_LIBOBJ([glob])
-    AC_LIBOBJ([glob_pattern_p])
     AC_LIBOBJ([globfree])
     gl_PREREQ_GLOB
   fi
-  gl_HARD_LOCALE
+  if test $HAVE_GLOB_PATTERN_P = 0 || test $REPLACE_GLOB_PATTERN_P = 1; then
+    AC_LIBOBJ([glob_pattern_p])
+  fi
+  gl_GLOB_MODULE_INDICATOR([glob])
+  gl_GLOB_H
   AC_REQUIRE([gl_HOST_CPU_C_ABI])
   gl_HOSTENT
   AM_ICONV
@@ -490,7 +499,8 @@ AC_SUBST([LTALLOCA])
   gl___INLINE
   gl_LIMITS_H
   gl_LOCALCHARSET
-  LOCALCHARSET_TESTS_ENVIRONMENT="CHARSETALIASDIR=\"\$(abs_top_builddir)/$gl_source_base\""
+  dnl For backward compatibility. Some packages still use this.
+  LOCALCHARSET_TESTS_ENVIRONMENT=
   AC_SUBST([LOCALCHARSET_TESTS_ENVIRONMENT])
   gl_LOCALE_H
   gl_FUNC_LOCALECONV
@@ -504,6 +514,12 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([lseek])
   fi
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  gl_FUNC_LSTAT
+  if test $REPLACE_LSTAT = 1; then
+    AC_LIBOBJ([lstat])
+    gl_PREREQ_LSTAT
+  fi
+  gl_SYS_STAT_MODULE_INDICATOR([lstat])
   gl_FUNC_MALLOC_POSIX
   if test $REPLACE_MALLOC = 1; then
     AC_LIBOBJ([malloc])
@@ -633,6 +649,17 @@ AC_SUBST([LTALLOCA])
   AC_REQUIRE([gl_SOCKETS])
   gl_TYPE_SOCKLEN_T
   gt_TYPE_SSIZE_T
+  gl_FUNC_STAT
+  if test $REPLACE_STAT = 1; then
+    AC_LIBOBJ([stat])
+    case "$host_os" in
+      mingw*)
+        AC_LIBOBJ([stat-w32])
+        ;;
+    esac
+    gl_PREREQ_STAT
+  fi
+  gl_SYS_STAT_MODULE_INDICATOR([stat])
   gl_STAT_TIME
   gl_STAT_BIRTHTIME
   gl_STDALIGN_H
@@ -837,12 +864,6 @@ changequote([, ])dnl
   gl_LOCK
   gl_MODULE_INDICATOR([lock])
   AC_CHECK_HEADERS_ONCE([semaphore.h])
-  gl_FUNC_LSTAT
-  if test $REPLACE_LSTAT = 1; then
-    AC_LIBOBJ([lstat])
-    gl_PREREQ_LSTAT
-  fi
-  gl_SYS_STAT_MODULE_INDICATOR([lstat])
   gt_LOCALE_FR
   gt_LOCALE_FR_UTF8
   gt_LOCALE_JA
@@ -926,17 +947,6 @@ changequote([, ])dnl
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([setsockopt])
   AC_CHECK_DECLS_ONCE([alarm])
-  gl_FUNC_STAT
-  if test $REPLACE_STAT = 1; then
-    AC_LIBOBJ([stat])
-    case "$host_os" in
-      mingw*)
-        AC_LIBOBJ([stat-w32])
-        ;;
-    esac
-    gl_PREREQ_STAT
-  fi
-  gl_SYS_STAT_MODULE_INDICATOR([stat])
   AC_REQUIRE([gt_TYPE_WCHAR_T])
   AC_REQUIRE([gt_TYPE_WINT_T])
   gl_FUNC_STRERROR
@@ -1105,10 +1115,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/cdefs.h
   lib/close.c
   lib/closedir.c
-  lib/config.charset
   lib/dirent-private.h
   lib/dirent.in.h
   lib/dirfd.c
+  lib/dosname.h
   lib/errno.in.h
   lib/fd-hook.c
   lib/fd-hook.h
@@ -1152,6 +1162,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/locale.in.h
   lib/localeconv.c
   lib/lseek.c
+  lib/lstat.c
   lib/malloc.c
   lib/malloc/scratch_buffer.h
   lib/malloc/scratch_buffer_grow.c
@@ -1186,8 +1197,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/readdir.c
   lib/realloc.c
   lib/recvfrom.c
-  lib/ref-add.sin
-  lib/ref-del.sin
   lib/scratch_buffer.h
   lib/sig-handler.c
   lib/sig-handler.h
@@ -1204,6 +1213,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stat-time.h
   lib/stat-w32.c
   lib/stat-w32.h
+  lib/stat.c
   lib/stdalign.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
@@ -1254,7 +1264,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/close.m4
   m4/closedir.m4
   m4/codeset.m4
-  m4/configmake.m4
   m4/ctype.m4
   m4/d-type.m4
   m4/dirent_h.m4
@@ -1273,6 +1282,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/flexmember.m4
   m4/float_h.m4
   m4/fnmatch.m4
+  m4/fnmatch_h.m4
   m4/fpieee.m4
   m4/fseek.m4
   m4/fseeko.m4
@@ -1287,10 +1297,9 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getlogin_r.m4
   m4/getpagesize.m4
   m4/gettimeofday.m4
-  m4/glibc21.m4
   m4/glob.m4
+  m4/glob_h.m4
   m4/gnulib-common.m4
-  m4/hard-locale.m4
   m4/host-cpu-c-abi.m4
   m4/hostent.m4
   m4/iconv.m4
@@ -1449,6 +1458,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-fdopen.c
   tests/test-fgetc.c
   tests/test-float.c
+  tests/test-fnmatch-h.c
   tests/test-fnmatch.c
   tests/test-fputc.c
   tests/test-fread.c
@@ -1483,6 +1493,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getlogin_r.c
   tests/test-getpeername.c
   tests/test-gettimeofday.c
+  tests/test-glob-h.c
   tests/test-glob.c
   tests/test-iconv.c
   tests/test-ignore-value.c
@@ -1497,6 +1508,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-langinfo.c
   tests/test-limits-h.c
   tests/test-listen.c
+  tests/test-localcharset.c
   tests/test-locale.c
   tests/test-localeconv.c
   tests/test-localename.c
@@ -1531,6 +1543,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-netinet_in.c
   tests/test-nl_langinfo.c
   tests/test-nl_langinfo.sh
+  tests/test-once.c
   tests/test-open.c
   tests/test-open.h
   tests/test-pathmax.c
@@ -1543,6 +1556,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-raise.c
   tests/test-recvfrom.c
   tests/test-rwlock1.c
+  tests/test-scratch-buffer.c
   tests/test-select-fd.c
   tests/test-select-in.sh
   tests/test-select-out.sh
@@ -1621,7 +1635,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/cloexec.h
   tests=lib/connect.c
   tests=lib/ctype.in.h
-  tests=lib/dosname.h
   tests=lib/dup2.c
   tests=lib/fcntl.c
   tests=lib/fcntl.in.h
@@ -1646,7 +1659,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/localename.h
   tests=lib/localtime-buffer.c
   tests=lib/localtime-buffer.h
-  tests=lib/lstat.c
   tests=lib/mbtowc-impl.h
   tests=lib/mbtowc.c
   tests=lib/nanosleep.c
@@ -1660,9 +1672,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/setenv.c
   tests=lib/setlocale.c
   tests=lib/setsockopt.c
-  tests=lib/stat-w32.c
-  tests=lib/stat-w32.h
-  tests=lib/stat.c
   tests=lib/strerror-override.c
   tests=lib/strerror-override.h
   tests=lib/strerror.c

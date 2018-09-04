@@ -15,6 +15,16 @@
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
+#ifndef _LIBC
+
+/* Don't use __attribute__ __nonnull__ in this compilation unit.  Otherwise gcc
+   optimizes away the pattern == NULL test below.  */
+# define _GL_ARG_NONNULL(params)
+
+# include <config.h>
+
+#endif
+
 #include <glob.h>
 
 #include <errno.h>
@@ -26,7 +36,7 @@
 #include <assert.h>
 #include <unistd.h>
 
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#if defined _WIN32 && ! defined __CYGWIN__
 # define WINDOWS32
 #endif
 
@@ -78,7 +88,9 @@
 
 static const char *next_brace_sub (const char *begin, int flags) __THROWNL;
 
-typedef uint_fast8_t dirent_type;
+/* The type of ((struct dirent *) 0)->d_type is 'unsigned char' on most
+   platforms, but 'unsigned int' in the mingw from mingw.org.  */
+typedef uint_fast32_t dirent_type;
 
 #if !defined _LIBC && !defined HAVE_STRUCT_DIRENT_D_TYPE
 /* Any distinct values will do here.
