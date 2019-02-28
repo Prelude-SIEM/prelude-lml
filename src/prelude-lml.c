@@ -262,7 +262,7 @@ static int logparse_pri(syslog_header_t *hdr, const char **src, size_t *len)
                 hdr->pri = hdr->pri * 10 + (ptr[i++] - '0');
         }
 
-        if ( ptr[i] == '>' && i >= 3 && i <= 4 ) {
+        if ( ptr[i] == '>' && i >= 2 && i <= 4 ) {
                 *len -= i + 1;
                 *src += i + 1;
                 return 0;
