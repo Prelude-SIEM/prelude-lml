@@ -1,3 +1,11 @@
+* 2019-03-15, prelude-lml-5.1.0alpha1:
+
+Author: Antoine Luong
+
+- Correctly handle one-digit syslog priorities
+
+
+
 * 2018-09-07, prelude-lml-5.0.0:
 
 Author: Antoine Luong
