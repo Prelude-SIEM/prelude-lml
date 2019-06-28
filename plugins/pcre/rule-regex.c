@@ -424,6 +424,50 @@ static void destroy_context_if_needed(pcre_plugin_t *plugin, pcre_rule_t *rule,
 }
 
 
+/*
+ * FIXME: this remove any partial additional data field, which happen when a rule set
+ * the meaning but the matched value was empty.
+ */
+static void fix_additional_data(idmef_message_t *idmef)
+{
+        idmef_alert_t *alert;
+        idmef_additional_data_t *ad = NULL, *prev = NULL;
+
+        alert = idmef_message_get_alert(idmef);
+        if ( ! alert )
+                return;
+
+        while ( (ad = idmef_alert_get_next_additional_data(alert, ad)) ) {
+                if ( idmef_additional_data_get_meaning(ad) && idmef_additional_data_get_data(ad) && idmef_data_get_data(idmef_additional_data_get_data(ad)) )
+                        prev = ad;
+                else {
+                        idmef_additional_data_destroy(ad);
+                        ad = prev;
+                }
+        }
+}
+
+
+
+static void pcre_alert(pcre_rule_t *rule, pcre_state_t *state, lml_log_entry_t *log_entry)
+{
+        prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n", rule->id, rule->flags & PCRE_RULE_FLAGS_LAST, lml_log_entry_get_message(log_entry));
+
+        /*
+         * Move additionalData part, to IDMEF message
+         */
+        pcre_state_push_idmef(state, state->idmef);
+
+        /*
+         * Set various information, detect_time/analyzer.
+         */
+        lml_alert_set_infos(state->idmef, log_entry);
+
+        fix_additional_data(state->idmef);
+        lml_alert_emit(NULL, NULL, state->idmef);
+}
+
+
 
 static int match_rule_list(pcre_plugin_t *plugin,
                            pcre_rule_container_t *rc, pcre_state_t *state,
@@ -469,21 +513,7 @@ static int match_rule_list(pcre_plugin_t *plugin,
                 *match_flags |= PCRE_MATCH_FLAGS_ALERT;
 
                 if ( ! (rule->flags & PCRE_RULE_FLAGS_SILENT) ) {
-                        prelude_log_debug(4, "lml alert emit id=%d (last=%d) %s\n",
-                                          rule->id, rule->flags & PCRE_RULE_FLAGS_LAST,
-                                          lml_log_entry_get_message(log_entry));
-
-                        /*
-                         * Move additionalData part, to IDMEF message
-                         */
-                        pcre_state_push_idmef(state, state->idmef);
-
-                        /*
-                         * Set various information, detect_time/analyzer.
-                         */
-                        lml_alert_set_infos(state->idmef, log_entry);
-
-                        lml_alert_emit(NULL, NULL, state->idmef);
+                        pcre_alert(rule, state, log_entry);
                         pcre_state_destroy_internal(state);
                 }
 
