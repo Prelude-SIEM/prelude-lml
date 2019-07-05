@@ -1,3 +1,11 @@
+* 2019-07-05, prelude-lml-5.0.2:
+
+Author: Yoann Vandoorselaere
+
+- Prevent partial AdditionalData in case of empty match
+
+
+
 * 2019-03-11, prelude-lml-5.0.1:
 
 Author: Antoine Luong
