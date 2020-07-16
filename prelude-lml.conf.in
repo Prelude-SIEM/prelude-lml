@@ -167,6 +167,14 @@ file = /var/log/apache2/error_log
 
 
 #
+# Specifies the maximum length of logs, in bytes.
+# If the log exceeds this size, it will be split into several parts,
+# each one processed successively et independently of each other.
+#
+# log-max-length = 8192
+
+
+#
 # Specifies the maximum difference, in seconds and/or size, between
 # the interval of two logfile rotations. If this difference is reached,
 # a high severity alert will be emitted. The K (kbytes) or M (mbytes)
