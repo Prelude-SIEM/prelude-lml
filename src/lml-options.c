@@ -252,7 +252,7 @@ static int set_rotation_size_offset(prelude_option_t *opt, const char *arg, prel
         else if ( *eptr == 'G' || *eptr == 'g' )
                 value = value * 1024 * 1024 * 1024;
 
-        else if ( eptr != arg ) {
+        else if ( *eptr != '\0' ) {
                 prelude_string_sprintf(err, "Invalid max rotation size offset specified: %s.", arg);
                 return -1;
         }
