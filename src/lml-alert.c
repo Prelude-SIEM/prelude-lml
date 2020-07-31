@@ -1,6 +1,6 @@
 /*****
 *
-* Copyright (C) 2002-2020 CS-SI. All Rights Reserved.
+* Copyright (C) 2002-2020 CS GROUP - France. All Rights Reserved.
 * Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 *
 * This file is part of the Prelude-LML program.
@@ -59,7 +59,7 @@ static idmef_analyzer_t *idmef_analyzer;
 
 #define ANALYZER_CLASS "Log Analyzer"
 #define ANALYZER_MODEL "Prelude LML"
-#define ANALYZER_MANUFACTURER "http://www.prelude-siem.com"
+#define ANALYZER_MANUFACTURER "https://www.prelude-siem.com"
 
 
 
